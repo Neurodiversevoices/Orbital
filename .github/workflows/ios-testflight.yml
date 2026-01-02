@@ -1,0 +1,51 @@
+name: iOS TestFlight (EAS)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["master"]
+
+jobs:
+  ios-testflight:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Debug workspace (prove paths)
+        run: |
+          pwd
+          ls -la
+          find . -maxdepth 2 -name app.json -o -name eas.json -o -name package.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install EAS CLI
+        run: npm i -g eas-cli
+
+      - name: Verify Expo auth
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas whoami
+
+      - name: Write App Store Connect API key (.p8)
+        run: |
+          mkdir -p .asc
+          printf "%s" "${{ secrets.ASC_KEY_P8 }}" > .asc/AuthKey.p8
+          ls -la .asc
+
+      - name: Build and auto-submit to TestFlight
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          eas build -p ios --profile production --non-interactive --auto-submit \
+            --asc-api-key-path .asc/AuthKey.p8 \
+            --asc-api-key-id "$ASC_KEY_ID" \
+            --asc-api-issuer-id "$ASC_ISSUER_ID"
