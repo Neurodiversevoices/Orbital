@@ -34,5 +34,6 @@ jobs:
       - name: Build iOS (production)
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build -p ios --profile production --non-interactive
+        run: eas build -p ios --profile production
+
 
