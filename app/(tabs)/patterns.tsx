@@ -1,0 +1,877 @@
+import React, { useCallback, useState, useMemo, useEffect } from 'react';
+import { View, StyleSheet, FlatList, RefreshControl, useWindowDimensions, Text, Platform, Pressable } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Circle, Eye, ListTodo, Users, TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Calendar, Clock, Lock, Bug, RefreshCw } from 'lucide-react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { HistoryItem, EnergyGraph, TimeRangeTabs, TimeRange, getTimeRangeMs } from '../../components';
+import { colors, commonStyles, spacing } from '../../theme';
+import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
+import { useLocale, interpolate } from '../../lib/hooks/useLocale';
+import { useDemoMode } from '../../lib/hooks/useDemoMode';
+import { STORAGE_KEYS } from '../../lib/storage';
+import { CapacityLog, CapacityState, Category, getUnlockTier, getNextUnlockTier } from '../../types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const categoryIcons: Record<Category, React.ComponentType<any>> = {
+  sensory: Eye,
+  demand: ListTodo,
+  social: Users,
+};
+
+const stateToPercent = (state: CapacityState): number => {
+  switch (state) {
+    case 'resourced': return 100;
+    case 'stretched': return 50;
+    case 'depleted': return 0;
+  }
+};
+
+// Debug overlay component
+function DebugOverlay({ logs, storageInfo, onReseed, onClose }: {
+  logs: CapacityLog[];
+  storageInfo: { key: string; rawLength: number; parseError: string | null };
+  onReseed: () => void;
+  onClose: () => void;
+}) {
+  const firstLog = logs.length > 0 ? logs[logs.length - 1] : null;
+  const lastLog = logs.length > 0 ? logs[0] : null;
+
+  return (
+    <View style={debugStyles.overlay}>
+      <View style={debugStyles.header}>
+        <Bug size={16} color="#FF0000" />
+        <Text style={debugStyles.title}>Storage Debug</Text>
+        <Pressable onPress={onClose} style={debugStyles.closeBtn}>
+          <Text style={debugStyles.closeBtnText}>X</Text>
+        </Pressable>
+      </View>
+      <View style={debugStyles.row}>
+        <Text style={debugStyles.label}>Storage Key:</Text>
+        <Text style={debugStyles.value}>{storageInfo.key}</Text>
+      </View>
+      <View style={debugStyles.row}>
+        <Text style={debugStyles.label}>Signals Found:</Text>
+        <Text style={debugStyles.value}>{logs.length}</Text>
+      </View>
+      <View style={debugStyles.row}>
+        <Text style={debugStyles.label}>Raw JSON Length:</Text>
+        <Text style={debugStyles.value}>{storageInfo.rawLength} chars</Text>
+      </View>
+      {firstLog && (
+        <View style={debugStyles.row}>
+          <Text style={debugStyles.label}>First Signal:</Text>
+          <Text style={debugStyles.value}>{new Date(firstLog.timestamp).toLocaleDateString()}</Text>
+        </View>
+      )}
+      {lastLog && (
+        <View style={debugStyles.row}>
+          <Text style={debugStyles.label}>Last Signal:</Text>
+          <Text style={debugStyles.value}>{new Date(lastLog.timestamp).toLocaleDateString()}</Text>
+        </View>
+      )}
+      {storageInfo.parseError && (
+        <View style={debugStyles.row}>
+          <Text style={[debugStyles.label, { color: '#FF0000' }]}>Parse Error:</Text>
+          <Text style={[debugStyles.value, { color: '#FF0000' }]}>{storageInfo.parseError}</Text>
+        </View>
+      )}
+      <View style={debugStyles.row}>
+        <Text style={debugStyles.label}>Platform:</Text>
+        <Text style={debugStyles.value}>{Platform.OS}</Text>
+      </View>
+      <Pressable onPress={onReseed} style={debugStyles.reseedBtn}>
+        <RefreshCw size={14} color="#00E5FF" />
+        <Text style={debugStyles.reseedText}>Reseed Demo Data (90 signals)</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+export default function PatternsScreen() {
+  const params = useLocalSearchParams();
+  const showDebug = params.debug === '1';
+  const forceDemo = params.demo === '1';
+
+  const { logs, isLoading, removeLog, refresh } = useEnergyLogs();
+  const { width } = useWindowDimensions();
+  const { t } = useLocale();
+  const { isDemoMode, enableDemoMode, reseedDemoData } = useDemoMode();
+  const graphWidth = width - spacing.md * 2;
+  const [timeRange, setTimeRange] = useState<TimeRange>('7d');
+  const [debugVisible, setDebugVisible] = useState(showDebug);
+  const [storageInfo, setStorageInfo] = useState<{ key: string; rawLength: number; parseError: string | null }>({
+    key: STORAGE_KEYS.LOGS,
+    rawLength: 0,
+    parseError: null,
+  });
+
+  // Load storage debug info
+  useEffect(() => {
+    const loadStorageInfo = async () => {
+      try {
+        const raw = await AsyncStorage.getItem(STORAGE_KEYS.LOGS);
+        setStorageInfo({
+          key: STORAGE_KEYS.LOGS,
+          rawLength: raw?.length || 0,
+          parseError: null,
+        });
+      } catch (error: any) {
+        setStorageInfo({
+          key: STORAGE_KEYS.LOGS,
+          rawLength: 0,
+          parseError: error.message || 'Unknown error',
+        });
+      }
+    };
+    if (debugVisible) {
+      loadStorageInfo();
+    }
+  }, [debugVisible, logs]);
+
+  // Handle ?demo=1 param to force reseed demo data
+  useEffect(() => {
+    if (forceDemo) {
+      const seedDemo = async () => {
+        if (!isDemoMode) {
+          await enableDemoMode('90d');
+        } else {
+          await reseedDemoData('90d');
+        }
+        await refresh();
+      };
+      seedDemo();
+    }
+  }, [forceDemo]);
+
+  const handleReseed = useCallback(async () => {
+    if (!isDemoMode) {
+      await enableDemoMode('90d');
+    } else {
+      await reseedDemoData('90d');
+    }
+    await refresh();
+  }, [isDemoMode, enableDemoMode, reseedDemoData, refresh]);
+
+  const logCount = logs.length;
+  const currentTier = getUnlockTier(logCount);
+  const nextTier = getNextUnlockTier(logCount);
+  const isLocked = currentTier.tier === 'locked';
+
+  // Translated day names for insights
+  const dayNames = [
+    t.patterns.days.sunday,
+    t.patterns.days.monday,
+    t.patterns.days.tuesday,
+    t.patterns.days.wednesday,
+    t.patterns.days.thursday,
+    t.patterns.days.friday,
+    t.patterns.days.saturday,
+  ];
+
+  const stats = useMemo(() => {
+    const now = Date.now();
+    const rangeMs = getTimeRangeMs(timeRange);
+    const startTime = now - rangeMs;
+    const prevStartTime = startTime - rangeMs;
+
+    // Current period logs
+    const currentLogs = logs.filter((log) => log.timestamp >= startTime);
+    // Previous period logs (for trend comparison)
+    const prevLogs = logs.filter((log) => log.timestamp >= prevStartTime && log.timestamp < startTime);
+
+    if (currentLogs.length === 0) {
+      return { avg: null, trend: null, timeInDepleted: null };
+    }
+
+    // Average energy
+    const percentages = currentLogs.map((log) => stateToPercent(log.state));
+    const avg = Math.round(percentages.reduce((a, b) => a + b, 0) / percentages.length);
+
+    // Trend (compare to previous period)
+    let trend: number | null = null;
+    if (prevLogs.length > 0) {
+      const prevPercentages = prevLogs.map((log) => stateToPercent(log.state));
+      const prevAvg = prevPercentages.reduce((a, b) => a + b, 0) / prevPercentages.length;
+      trend = Math.round(avg - prevAvg);
+    }
+
+    // Time in Depleted (percentage of entries that were "depleted")
+    const depletedCount = currentLogs.filter((log) => log.state === 'depleted').length;
+    const timeInDepleted = Math.round((depletedCount / currentLogs.length) * 100);
+
+    // Category breakdown - what % of each category results in depleted/stretched
+    const categoryBreakdown: Record<Category, { count: number; strainRate: number }> = {
+      sensory: { count: 0, strainRate: 0 },
+      demand: { count: 0, strainRate: 0 },
+      social: { count: 0, strainRate: 0 },
+    };
+
+    const categories: Category[] = ['sensory', 'demand', 'social'];
+    categories.forEach((cat) => {
+      const catLogs = currentLogs.filter((log) => log.tags.includes(cat));
+      if (catLogs.length > 0) {
+        const catStrainCount = catLogs.filter((log) => log.state === 'depleted' || log.state === 'stretched').length;
+        categoryBreakdown[cat] = {
+          count: catLogs.length,
+          strainRate: Math.round((catStrainCount / catLogs.length) * 100),
+        };
+      }
+    });
+
+    return { avg, trend, timeInDepleted, categoryBreakdown };
+  }, [logs, timeRange]);
+
+  // Intelligence insights - predictive analytics
+  const insights = useMemo(() => {
+    if (logs.length < 10) return null;
+
+    const now = Date.now();
+    const dayMs = 24 * 60 * 60 * 1000;
+    const weekLogs = logs.filter((log) => log.timestamp >= now - 7 * dayMs);
+    const monthLogs = logs.filter((log) => log.timestamp >= now - 30 * dayMs);
+
+    // Day of week patterns
+    const dayPatterns: Record<number, { total: number; depleted: number }> = {};
+    for (let i = 0; i < 7; i++) {
+      dayPatterns[i] = { total: 0, depleted: 0 };
+    }
+    monthLogs.forEach((log) => {
+      const day = new Date(log.timestamp).getDay();
+      dayPatterns[day].total++;
+      if (log.state === 'depleted' || log.state === 'stretched') {
+        dayPatterns[day].depleted++;
+      }
+    });
+
+    // Find most challenging day
+    let worstDay = 0;
+    let worstRate = 0;
+    Object.entries(dayPatterns).forEach(([day, data]) => {
+      if (data.total >= 3) {
+        const rate = data.depleted / data.total;
+        if (rate > worstRate) {
+          worstRate = rate;
+          worstDay = parseInt(day);
+        }
+      }
+    });
+
+    // Time of day patterns
+    const hourPatterns: Record<string, { total: number; depleted: number }> = {
+      morning: { total: 0, depleted: 0 },
+      afternoon: { total: 0, depleted: 0 },
+      evening: { total: 0, depleted: 0 },
+    };
+    monthLogs.forEach((log) => {
+      const hour = new Date(log.timestamp).getHours();
+      let period = 'morning';
+      if (hour >= 12 && hour < 17) period = 'afternoon';
+      else if (hour >= 17) period = 'evening';
+      hourPatterns[period].total++;
+      if (log.state === 'depleted' || log.state === 'stretched') {
+        hourPatterns[period].depleted++;
+      }
+    });
+
+    // Find most challenging time
+    let challengingTime = '';
+    let timeRate = 0;
+    Object.entries(hourPatterns).forEach(([period, data]) => {
+      if (data.total >= 5) {
+        const rate = data.depleted / data.total;
+        if (rate > timeRate) {
+          timeRate = rate;
+          challengingTime = period;
+        }
+      }
+    });
+
+    // Recent trajectory (improving or declining)
+    const recentAvg = weekLogs.length > 0
+      ? weekLogs.reduce((sum, log) => sum + stateToPercent(log.state), 0) / weekLogs.length
+      : null;
+    const prevWeekLogs = logs.filter(
+      (log) => log.timestamp >= now - 14 * dayMs && log.timestamp < now - 7 * dayMs
+    );
+    const prevAvg = prevWeekLogs.length > 0
+      ? prevWeekLogs.reduce((sum, log) => sum + stateToPercent(log.state), 0) / prevWeekLogs.length
+      : null;
+
+    let trajectory: 'improving' | 'declining' | 'stable' | null = null;
+    if (recentAvg !== null && prevAvg !== null) {
+      const diff = recentAvg - prevAvg;
+      if (diff > 10) trajectory = 'improving';
+      else if (diff < -10) trajectory = 'declining';
+      else trajectory = 'stable';
+    }
+
+    // Category with highest impact
+    let highImpactCategory: Category | null = null;
+    let highImpactRate = 0;
+    (['sensory', 'demand', 'social'] as Category[]).forEach((cat) => {
+      const catLogs = monthLogs.filter((log) => log.tags.includes(cat));
+      if (catLogs.length >= 5) {
+        const strainCount = catLogs.filter((log) => log.state === 'depleted').length;
+        const rate = strainCount / catLogs.length;
+        if (rate > highImpactRate) {
+          highImpactRate = rate;
+          highImpactCategory = cat;
+        }
+      }
+    });
+
+    return {
+      worstDay: worstRate > 0.4 ? dayNames[worstDay] : null,
+      worstDayRate: Math.round(worstRate * 100),
+      challengingTime: timeRate > 0.4 ? challengingTime : null,
+      challengingTimeRate: Math.round(timeRate * 100),
+      trajectory,
+      highImpactCategory,
+      highImpactRate: Math.round(highImpactRate * 100),
+    };
+  }, [logs]);
+
+  const handleDelete = useCallback(
+    async (id: string) => {
+      await removeLog(id);
+    },
+    [removeLog]
+  );
+
+  const renderItem = useCallback(
+    ({ item, index }: { item: CapacityLog; index: number }) => (
+      <Animated.View entering={FadeIn.delay(index * 50).duration(300)}>
+        <HistoryItem log={item} onDelete={handleDelete} />
+      </Animated.View>
+    ),
+    [handleDelete]
+  );
+
+  const renderEmpty = () => (
+    <View style={styles.emptyContainer}>
+      <View style={styles.emptyOrb}>
+        <Circle size={48} color="rgba(255,255,255,0.15)" strokeWidth={1} />
+      </View>
+      <View style={styles.emptyDots}>
+        <View style={[styles.dot, { backgroundColor: '#00E5FF' }]} />
+        <View style={[styles.dot, { backgroundColor: '#E8A830' }]} />
+        <View style={[styles.dot, { backgroundColor: '#F44336' }]} />
+      </View>
+    </View>
+  );
+
+  return (
+    <SafeAreaView style={commonStyles.screen}>
+      {/* Debug Overlay */}
+      {debugVisible && (
+        <DebugOverlay
+          logs={logs}
+          storageInfo={storageInfo}
+          onReseed={handleReseed}
+          onClose={() => setDebugVisible(false)}
+        />
+      )}
+      <View style={styles.content}>
+        <FlatList
+          data={logs}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={
+            isLocked ? (
+              <View style={styles.lockedContainer}>
+                <View style={styles.lockedIconContainer}>
+                  <Lock size={32} color="rgba(255,255,255,0.3)" />
+                </View>
+                <Text style={styles.lockedTitle}>{t.patterns.lockedTitle}</Text>
+                <Text style={styles.lockedBody}>{t.patterns.lockedBody}</Text>
+                <View style={styles.lockedProgress}>
+                  <View style={styles.lockedProgressBar}>
+                    <View style={[styles.lockedProgressFill, { width: `${(logCount / 7) * 100}%` }]} />
+                  </View>
+                  <Text style={styles.lockedProgressText}>
+                    {interpolate(t.patterns.lockedProgress, { count: logCount })}
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <View>
+                <TimeRangeTabs
+                  selected={timeRange}
+                  onSelect={setTimeRange}
+                  logCount={logCount}
+                />
+                <Text style={styles.chartContext}>{t.patterns.chartContext}</Text>
+              <EnergyGraph logs={logs} width={graphWidth} timeRange={timeRange} />
+              {stats.avg !== null && (
+                <View style={styles.statsContainer}>
+                  <View style={styles.statItem}>
+                    <Text style={styles.statValue}>{stats.avg}%</Text>
+                    <Text style={styles.statLabel}>{t.patterns.statsBaseline}</Text>
+                  </View>
+                  <View style={styles.statDivider} />
+                  <View style={styles.statItem}>
+                    <Text style={[
+                      styles.statValue,
+                      stats.trend !== null && {
+                        color: stats.trend > 0 ? '#00E5FF' : stats.trend < 0 ? '#F44336' : 'rgba(255,255,255,0.9)'
+                      }
+                    ]}>
+                      {stats.trend !== null
+                        ? `${stats.trend > 0 ? '+' : ''}${stats.trend}%`
+                        : '—'}
+                    </Text>
+                    <Text style={styles.statLabel}>{t.patterns.statsTrend}</Text>
+                  </View>
+                  <View style={styles.statDivider} />
+                  <View style={styles.statItem}>
+                    <Text style={[
+                      styles.statValue,
+                      { color: stats.timeInDepleted > 30 ? '#F44336' : stats.timeInDepleted > 15 ? '#E8A830' : '#00E5FF' }
+                    ]}>
+                      {stats.timeInDepleted}%
+                    </Text>
+                    <Text style={styles.statLabel}>{t.patterns.statsDepleted}</Text>
+                  </View>
+                </View>
+              )}
+
+              {/* Category Breakdown */}
+              {stats.avg !== null && (
+                <View style={styles.categoryContainer}>
+                  <Text style={styles.categoryTitle}>{t.patterns.categoryTitle}</Text>
+                  <View style={styles.categoryRow}>
+                    {(['sensory', 'demand', 'social'] as Category[]).map((cat) => {
+                      const Icon = categoryIcons[cat];
+                      const label = t.categories[cat];
+                      const { count, strainRate } = stats.categoryBreakdown[cat];
+                      const hasData = count > 0;
+                      return (
+                        <View key={cat} style={styles.categoryItem}>
+                          <View style={styles.categoryIconRow}>
+                            <Icon size={16} color={hasData ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)'} />
+                            <Text style={[styles.categoryLabel, !hasData && { opacity: 0.4 }]}>{label}</Text>
+                          </View>
+                          <Text style={[
+                            styles.categoryRate,
+                            hasData && { color: strainRate > 60 ? '#F44336' : strainRate > 40 ? '#E8A830' : '#00E5FF' }
+                          ]}>
+                            {hasData ? `${strainRate}%` : '—'}
+                          </Text>
+                          <Text style={styles.categorySubtext}>
+                            {hasData ? t.patterns.correlation : t.patterns.noData}
+                          </Text>
+                        </View>
+                      );
+                    })}
+                  </View>
+                </View>
+              )}
+
+              {/* Intelligence Insights - Show single most relevant insight */}
+              {insights && (() => {
+                // Priority: declining > high impact category > challenging day > challenging time > improving/stable
+                let insightIcon: React.ReactNode = null;
+                let insightText: React.ReactNode = null;
+                let insightSubtext = '';
+                let tipText = t.patterns.continueTracking;
+
+                // Get translated time period if applicable
+                const getTimePeriodLabel = (period: string) => {
+                  const periods: Record<string, string> = {
+                    morning: t.patterns.timePeriods.morning,
+                    afternoon: t.patterns.timePeriods.afternoon,
+                    evening: t.patterns.timePeriods.evening,
+                  };
+                  return periods[period] || period;
+                };
+
+                if (insights.trajectory === 'declining') {
+                  insightIcon = <TrendingDown size={18} color="#F44336" />;
+                  insightText = <Text style={[styles.insightText, { color: '#F44336' }]}>{t.patterns.trajectoryDeclining}</Text>;
+                  insightSubtext = t.patterns.comparedToPrevious;
+                } else if (insights.highImpactCategory && insights.highImpactRate > 40) {
+                  insightIcon = <AlertTriangle size={18} color="#E8A830" />;
+                  const catLabel = t.categories[insights.highImpactCategory];
+                  insightText = (
+                    <Text style={styles.insightText}>
+                      <Text style={{ color: '#E8A830' }}>{catLabel}</Text> {t.patterns.showsPattern}
+                    </Text>
+                  );
+                  insightSubtext = `${insights.highImpactRate}% ${t.patterns.correlationWith}`;
+                  tipText = interpolate(t.patterns.focusOn, { category: catLabel.toLowerCase() });
+                } else if (insights.worstDay) {
+                  insightIcon = <Calendar size={18} color="#E8A830" />;
+                  insightText = (
+                    <Text style={styles.insightText}>
+                      <Text style={{ color: '#E8A830' }}>{insights.worstDay}</Text> {t.patterns.showsPattern}
+                    </Text>
+                  );
+                  insightSubtext = `${insights.worstDayRate}% ${t.patterns.correlationWith}`;
+                } else if (insights.challengingTime) {
+                  insightIcon = <Clock size={18} color="#E8A830" />;
+                  const timeLabel = getTimePeriodLabel(insights.challengingTime);
+                  insightText = (
+                    <Text style={styles.insightText}>
+                      <Text style={{ color: '#E8A830' }}>{timeLabel}</Text> {t.patterns.showsPattern}
+                    </Text>
+                  );
+                  insightSubtext = `${insights.challengingTimeRate}% ${t.patterns.correlationWith}`;
+                } else if (insights.trajectory === 'improving') {
+                  insightIcon = <TrendingUp size={18} color="#00E5FF" />;
+                  insightText = <Text style={[styles.insightText, { color: '#00E5FF' }]}>{t.patterns.trajectoryImproving}</Text>;
+                  insightSubtext = t.patterns.comparedToPrevious;
+                } else if (insights.trajectory === 'stable') {
+                  insightIcon = <TrendingUp size={18} color="#E8A830" style={{ transform: [{ rotate: '90deg' }] }} />;
+                  insightText = <Text style={[styles.insightText, { color: '#E8A830' }]}>{t.patterns.trajectoryStable}</Text>;
+                  insightSubtext = t.patterns.comparedToPrevious;
+                }
+
+                if (!insightIcon) return null;
+
+                return (
+                  <View style={styles.insightsContainer}>
+                    <Text style={styles.insightsTitle}>{t.patterns.intelligenceTitle}</Text>
+                    <View style={styles.insightRow}>
+                      {insightIcon}
+                      <View style={styles.insightContent}>
+                        {insightText}
+                        <Text style={styles.insightSubtext}>{insightSubtext}</Text>
+                      </View>
+                    </View>
+                    <View style={[styles.insightRow, styles.insightTip]}>
+                      <Lightbulb size={16} color="rgba(255,255,255,0.4)" />
+                      <Text style={styles.tipText}>{tipText}</Text>
+                    </View>
+                  </View>
+                );
+              })()}
+
+              {/* Longitudinal value message */}
+              <Text style={styles.longitudinalNote}>
+                {t.patterns.longitudinalNote}
+              </Text>
+              </View>
+            )
+          }
+          ListEmptyComponent={renderEmpty}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={refresh}
+              tintColor="rgba(255,255,255,0.5)"
+            />
+          }
+        />
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  content: {
+    flex: 1,
+    paddingHorizontal: spacing.md,
+  },
+  listContent: {
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xl,
+    flexGrow: 1,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 100,
+  },
+  emptyOrb: {
+    marginBottom: spacing.lg,
+    opacity: 0.5,
+  },
+  emptyDots: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    opacity: 0.4,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    paddingVertical: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: '300',
+    color: 'rgba(255,255,255,0.9)',
+    letterSpacing: 1,
+  },
+  statLabel: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.4)',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginTop: 4,
+  },
+  statDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  categoryContainer: {
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  categoryTitle: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.4)',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: spacing.md,
+    textAlign: 'center',
+  },
+  categoryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  categoryItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  categoryIconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  categoryLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.7)',
+  },
+  categoryRate: {
+    fontSize: 18,
+    fontWeight: '300',
+    color: 'rgba(255,255,255,0.5)',
+    letterSpacing: 1,
+  },
+  categorySubtext: {
+    fontSize: 9,
+    color: 'rgba(255,255,255,0.35)',
+    marginTop: 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  insightsContainer: {
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  insightsTitle: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.4)',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: spacing.md,
+    textAlign: 'center',
+  },
+  insightRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+  },
+  insightContent: {
+    flex: 1,
+  },
+  insightText: {
+    fontSize: 13,
+    fontWeight: '400',
+    color: 'rgba(255,255,255,0.85)',
+    lineHeight: 18,
+  },
+  insightSubtext: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.4)',
+    marginTop: 2,
+  },
+  insightTip: {
+    borderBottomWidth: 0,
+    marginTop: spacing.xs,
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.08)',
+  },
+  tipText: {
+    fontSize: 11,
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.4)',
+    flex: 1,
+  },
+  chartContext: {
+    fontSize: 9,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.35)',
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  longitudinalNote: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.25)',
+    textAlign: 'center',
+    marginTop: spacing.sm,
+    marginBottom: spacing.md,
+    letterSpacing: 0.3,
+    fontStyle: 'italic',
+  },
+  lockedContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.xl * 2,
+    paddingHorizontal: spacing.lg,
+  },
+  lockedIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  lockedTitle: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.9)',
+    marginBottom: spacing.sm,
+    textAlign: 'center',
+  },
+  lockedBody: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.5)',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: spacing.lg,
+  },
+  lockedProgress: {
+    width: '100%',
+    maxWidth: 200,
+    alignItems: 'center',
+  },
+  lockedProgressBar: {
+    width: '100%',
+    height: 4,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 2,
+    overflow: 'hidden',
+    marginBottom: spacing.sm,
+  },
+  lockedProgressFill: {
+    height: '100%',
+    backgroundColor: '#00E5FF',
+    borderRadius: 2,
+  },
+  lockedProgressText: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.4)',
+  },
+});
+
+// Debug overlay styles
+const debugStyles = StyleSheet.create({
+  overlay: {
+    position: 'absolute',
+    top: 60,
+    left: 10,
+    right: 10,
+    zIndex: 1000,
+    backgroundColor: 'rgba(0, 0, 0, 0.95)',
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 0, 0, 0.5)',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 8,
+  },
+  title: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FF0000',
+  },
+  closeBtn: {
+    padding: 4,
+  },
+  closeBtnText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.5)',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  label: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.5)',
+    fontFamily: Platform.OS === 'web' ? 'monospace' : undefined,
+  },
+  value: {
+    fontSize: 11,
+    color: '#00E5FF',
+    fontFamily: Platform.OS === 'web' ? 'monospace' : undefined,
+  },
+  reseedBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 12,
+    paddingVertical: 10,
+    backgroundColor: 'rgba(0, 229, 255, 0.1)',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 229, 255, 0.3)',
+  },
+  reseedText: {
+    fontSize: 12,
+    color: '#00E5FF',
+    fontWeight: '500',
+  },
+});
