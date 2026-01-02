@@ -16,6 +16,9 @@
     },
     "production": {
       "distribution": "store",
+      "env": {
+        "SENTRY_ALLOW_FAILURE": "true"
+      },
       "ios": {
         "credentialsSource": "remote",
         "autoIncrement": "buildNumber"
@@ -24,7 +27,10 @@
   },
   "submit": {
     "production": {
-      "ios": {}
+      "ios": {
+        "ascAppId": "6757295146"
+      }
     }
   }
 }
+
