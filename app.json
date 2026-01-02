@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "2",
+      "buildNumber": "9",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -26,7 +26,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#05060A"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.erparris.orbital"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -36,7 +37,15 @@
       }
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "react-native",
+          "organization": "orbital-health"
+        }
+      ]
     ],
     "extra": {
       "router": {},
