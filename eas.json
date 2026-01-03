@@ -17,11 +17,13 @@
     "production": {
       "distribution": "store",
       "env": {
-        "SENTRY_ALLOW_FAILURE": "true"
+        "SENTRY_ALLOW_FAILURE": "true",
+        "NODE_ENV": "production"
       },
       "ios": {
         "credentialsSource": "remote",
-        "autoIncrement": "buildNumber"
+        "autoIncrement": "buildNumber",
+        "resourceClass": "m-medium"
       }
     }
   },
