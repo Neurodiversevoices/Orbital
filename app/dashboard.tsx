@@ -23,7 +23,7 @@ import {
   PieChart,
   Activity,
 } from 'lucide-react-native';
-import { colors, commonStyles, spacing } from '../theme';
+import { colors, commonStyles, spacing, DASHBOARD_STATE_COLORS } from '../theme';
 import { generateExecutiveReport, ExecutiveReportData } from '../lib/reports/executiveReportGenerator';
 import { useLocale } from '../lib/hooks/useLocale';
 
@@ -67,9 +67,9 @@ export default function DashboardScreen() {
   const getTrendColor = () => {
     if (!reportData) return 'rgba(255,255,255,0.5)';
     switch (reportData.trajectory.trend) {
-      case 'improving': return '#4CAF50';
-      case 'declining': return '#F44336';
-      default: return '#E8A830';
+      case 'improving': return DASHBOARD_STATE_COLORS.high;
+      case 'declining': return DASHBOARD_STATE_COLORS.low;
+      default: return DASHBOARD_STATE_COLORS.stable;
     }
   };
 
@@ -80,7 +80,7 @@ export default function DashboardScreen() {
     <SafeAreaView style={commonStyles.screen}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Building2 color="#00E5FF" size={24} />
+          <Building2 color={DASHBOARD_STATE_COLORS.high} size={24} />
           <Text style={styles.headerTitle}>Institutional Dashboard</Text>
         </View>
         <Pressable onPress={() => router.back()} style={styles.closeButton}>
@@ -90,7 +90,7 @@ export default function DashboardScreen() {
 
       {/* Aggregate-Only Warning */}
       <View style={styles.warningBanner}>
-        <AlertTriangle color="#E8A830" size={16} />
+        <AlertTriangle color={DASHBOARD_STATE_COLORS.stable} size={16} />
         <Text style={styles.warningText}>
           Aggregate data only. No individual identification.
         </Text>
@@ -122,7 +122,7 @@ export default function DashboardScreen() {
             <View style={styles.metricsGrid}>
               <View style={styles.metricCard}>
                 <View style={styles.metricHeader}>
-                  <BarChart3 color="#00E5FF" size={18} />
+                  <BarChart3 color={DASHBOARD_STATE_COLORS.high} size={18} />
                   <Text style={styles.metricLabel}>Avg Capacity</Text>
                 </View>
                 <Text style={styles.metricValue}>{reportData.summary.averageCapacity}%</Text>
@@ -154,10 +154,10 @@ export default function DashboardScreen() {
 
               <View style={styles.metricCard}>
                 <View style={styles.metricHeader}>
-                  <AlertTriangle color="#F44336" size={18} />
+                  <AlertTriangle color={DASHBOARD_STATE_COLORS.low} size={18} />
                   <Text style={styles.metricLabel}>At Risk</Text>
                 </View>
-                <Text style={[styles.metricValue, { color: '#F44336' }]}>
+                <Text style={[styles.metricValue, { color: DASHBOARD_STATE_COLORS.low }]}>
                   {reportData.summary.depletedPercentage}%
                 </Text>
                 <Text style={styles.metricSubtext}>depleted signals</Text>
@@ -167,36 +167,39 @@ export default function DashboardScreen() {
             {/* State Distribution */}
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <PieChart color="#00E5FF" size={18} />
+                <PieChart color={DASHBOARD_STATE_COLORS.high} size={18} />
                 <Text style={styles.sectionTitle}>State Distribution</Text>
               </View>
               <View style={styles.distributionBar}>
+                {/* HIGH / Resourced - Cyan */}
                 <View
                   style={[
                     styles.distributionSegment,
                     {
                       flex: reportData.summary.resourcedPercentage || 1,
-                      backgroundColor: '#00E5FF',
+                      backgroundColor: DASHBOARD_STATE_COLORS.high,
                       borderTopLeftRadius: 6,
                       borderBottomLeftRadius: 6,
                     },
                   ]}
                 />
+                {/* STABLE / Stretched - Amber */}
                 <View
                   style={[
                     styles.distributionSegment,
                     {
                       flex: reportData.summary.stretchedPercentage || 1,
-                      backgroundColor: '#E8A830',
+                      backgroundColor: DASHBOARD_STATE_COLORS.stable,
                     },
                   ]}
                 />
+                {/* LOW / Depleted - Red */}
                 <View
                   style={[
                     styles.distributionSegment,
                     {
                       flex: reportData.summary.depletedPercentage || 1,
-                      backgroundColor: '#F44336',
+                      backgroundColor: DASHBOARD_STATE_COLORS.low,
                       borderTopRightRadius: 6,
                       borderBottomRightRadius: 6,
                     },
@@ -205,15 +208,15 @@ export default function DashboardScreen() {
               </View>
               <View style={styles.distributionLegend}>
                 <View style={styles.legendItem}>
-                  <View style={[styles.legendDot, { backgroundColor: '#00E5FF' }]} />
+                  <View style={[styles.legendDot, { backgroundColor: DASHBOARD_STATE_COLORS.high }]} />
                   <Text style={styles.legendText}>High ({reportData.summary.resourcedPercentage}%)</Text>
                 </View>
                 <View style={styles.legendItem}>
-                  <View style={[styles.legendDot, { backgroundColor: '#E8A830' }]} />
+                  <View style={[styles.legendDot, { backgroundColor: DASHBOARD_STATE_COLORS.stable }]} />
                   <Text style={styles.legendText}>Stable ({reportData.summary.stretchedPercentage}%)</Text>
                 </View>
                 <View style={styles.legendItem}>
-                  <View style={[styles.legendDot, { backgroundColor: '#F44336' }]} />
+                  <View style={[styles.legendDot, { backgroundColor: DASHBOARD_STATE_COLORS.low }]} />
                   <Text style={styles.legendText}>Low ({reportData.summary.depletedPercentage}%)</Text>
                 </View>
               </View>
@@ -223,7 +226,7 @@ export default function DashboardScreen() {
             {reportData.driverInsights.length > 0 && (
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                  <Users color="#00E5FF" size={18} />
+                  <Users color={DASHBOARD_STATE_COLORS.high} size={18} />
                   <Text style={styles.sectionTitle}>Strain Drivers</Text>
                 </View>
                 {reportData.driverInsights.map((insight) => (
@@ -251,7 +254,7 @@ export default function DashboardScreen() {
             {reportData.notablePatterns.length > 0 && (
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                  <Activity color="#00E5FF" size={18} />
+                  <Activity color={DASHBOARD_STATE_COLORS.high} size={18} />
                   <Text style={styles.sectionTitle}>Notable Patterns</Text>
                 </View>
                 {reportData.notablePatterns.map((pattern, index) => (
@@ -327,7 +330,7 @@ const styles = StyleSheet.create({
   },
   warningText: {
     fontSize: 12,
-    color: '#E8A830',
+    color: DASHBOARD_STATE_COLORS.stable,
     fontWeight: '500',
   },
   periodSelector: {
@@ -353,7 +356,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   periodButtonTextActive: {
-    color: '#00E5FF',
+    color: DASHBOARD_STATE_COLORS.high,
   },
   content: {
     flex: 1,
@@ -469,7 +472,7 @@ const styles = StyleSheet.create({
   },
   driverBarFill: {
     height: '100%',
-    backgroundColor: '#F44336',
+    backgroundColor: DASHBOARD_STATE_COLORS.low,
     borderRadius: 4,
   },
   driverPercent: {
@@ -488,7 +491,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#00E5FF',
+    backgroundColor: DASHBOARD_STATE_COLORS.high,
     marginTop: 6,
   },
   patternText: {

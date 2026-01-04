@@ -16,6 +16,57 @@ export interface CapacityLog {
   tags: Tag[];
   category?: Category;
   note?: string;
+  /** ISO date string YYYY-MM-DD for the local date when entry was created */
+  localDate?: string;
+  /** Detailed notes text (multiline) */
+  detailsText?: string;
+  /** Team ID if user has opted into Team Mode */
+  teamId?: string;
+  /** School Zone ID if user is in School Zone context */
+  schoolZoneId?: string;
+}
+
+// ============================================
+// BASELINE & STREAK TRACKING
+// ============================================
+
+export type ConfidenceTier = 'building' | 'baseline' | 'growing' | 'high';
+
+export interface BaselineStats {
+  /** Count of unique localDate values with at least one entry */
+  baselineDays: number;
+  /** Whether patterns are unlocked (baselineDays >= 7) */
+  patternsUnlocked: boolean;
+  /** Current consecutive day streak */
+  currentStreak: number;
+  /** Longest consecutive day streak ever */
+  longestStreak: number;
+  /** Whether user has achieved a 7-day consecutive streak */
+  hasHighConfidenceWeek: boolean;
+  /** Confidence tier based on total days logged */
+  confidenceTier: ConfidenceTier;
+  /** Progress toward baseline unlock (0-7) */
+  baselineProgress: number;
+}
+
+export interface WeeklySummary {
+  /** Start date of the 7-day streak window (YYYY-MM-DD) */
+  startDate: string;
+  /** End date of the 7-day streak window (YYYY-MM-DD) */
+  endDate: string;
+  /** Capacity distribution in the window */
+  capacitySummary: {
+    resourced: number;
+    stretched: number;
+    depleted: number;
+    averagePercent: number;
+  };
+  /** Top tags/drivers with counts */
+  topDrivers: { tag: Tag; count: number }[];
+  /** Total number of entries with notes/details */
+  notesCount: number;
+  /** Total entries in the window */
+  totalEntries: number;
 }
 
 // Legacy alias
@@ -1971,3 +2022,372 @@ export function deidentifyPatternRecord(
     ],
   };
 }
+
+// ============================================
+// TEAM MODE (EMPLOYER / ERG CAPACITY PULSE)
+// ============================================
+
+/** Privacy-first aggregate labels - no medical language */
+export type TeamCapacityLevel = 'plenty' | 'elevated' | 'near_limit';
+
+export interface TeamConfig {
+  id: string;
+  name: string;
+  teamCode: string;
+  createdAt: number;
+  /** Minimum participants required to display aggregates (privacy threshold) */
+  minParticipants: number;
+  /** Whether user has opted into this team */
+  isActive: boolean;
+}
+
+export interface TeamMembership {
+  teamId: string;
+  joinedAt: number;
+  isActive: boolean;
+}
+
+/** Aggregate-only team view - no individual data */
+export interface TeamAggregate {
+  teamId: string;
+  periodStart: number;
+  periodEnd: number;
+  /** Total unique participants in period */
+  participantCount: number;
+  /** Whether privacy threshold is met */
+  hasEnoughParticipants: boolean;
+  /** Capacity distribution (only shown if hasEnoughParticipants) */
+  capacityDistribution: {
+    plenty: number;
+    elevated: number;
+    nearLimit: number;
+  };
+  /** Top drivers by count */
+  topDrivers: {
+    driver: Category;
+    count: number;
+    percentage: number;
+  }[];
+  /** Weekly trend direction only (not magnitude) */
+  weeklyTrend: 'improving' | 'stable' | 'declining' | null;
+  /** Participation confidence based on response rate */
+  participationConfidence: 'high' | 'medium' | 'low';
+  /** Total signals in period (for confidence calculation) */
+  totalSignals: number;
+}
+
+/** Plain-language suggestions for team leads */
+export interface TeamActionSuggestion {
+  id: string;
+  priority: 1 | 2 | 3;
+  title: string;
+  description: string;
+  category: 'meeting_load' | 'quiet_time' | 'priority_reset' | 'environment' | 'support';
+}
+
+/** Team Mode settings stored per-user */
+export interface TeamModeSettings {
+  enabled: boolean;
+  currentTeamId: string | null;
+  teams: TeamMembership[];
+  lastSyncAt: number | null;
+}
+
+// ============================================
+// SCHOOL ZONE MODE (STUDENT / IEP / SUPPORT)
+// ============================================
+
+export type SchoolRole = 'student' | 'caregiver' | 'educator';
+
+export interface SchoolZoneConfig {
+  id: string;
+  name: string;
+  schoolCode: string;
+  createdAt: number;
+  /** Minimum students required for aggregate display */
+  minStudents: number;
+}
+
+export interface SchoolZoneMembership {
+  schoolZoneId: string;
+  role: SchoolRole;
+  joinedAt: number;
+  isActive: boolean;
+  /** For caregivers: linked student IDs */
+  linkedStudentIds?: string[];
+}
+
+/** Aggregate-only educator view - no individual student data */
+export interface SchoolZoneAggregate {
+  schoolZoneId: string;
+  periodStart: number;
+  periodEnd: number;
+  /** Total unique students in period */
+  studentCount: number;
+  /** Whether privacy threshold is met */
+  hasEnoughStudents: boolean;
+  /** Capacity distribution (only shown if hasEnoughStudents) */
+  capacityDistribution: {
+    plenty: number;
+    elevated: number;
+    nearLimit: number;
+  };
+  /** Top drivers by count */
+  topDrivers: {
+    driver: Category;
+    count: number;
+    percentage: number;
+  }[];
+  /** Participation confidence */
+  participationConfidence: 'high' | 'medium' | 'low';
+  /** Total signals in period */
+  totalSignals: number;
+}
+
+/** School Summary Card for caregiver export */
+export interface SchoolSummaryCard {
+  studentId: string;
+  generatedAt: number;
+  /** Date range covered */
+  dateRange: {
+    start: string;
+    end: string;
+  };
+  /** Capacity trend over the period */
+  capacityTrend: 'improving' | 'stable' | 'declining';
+  /** Average capacity percentage */
+  averageCapacity: number;
+  /** Common drivers identified */
+  commonDrivers: {
+    driver: Category;
+    frequency: 'frequent' | 'occasional' | 'rare';
+  }[];
+  /** What helps / what drains checkboxes */
+  environmentFactors: {
+    helps: EnvironmentFactor[];
+    drains: EnvironmentFactor[];
+  };
+  /** Entry count */
+  totalEntries: number;
+  /** Notes are excluded by default */
+  includesNotes: false;
+}
+
+/** Environment factors for School Summary Card */
+export type EnvironmentFactor =
+  | 'quiet_space'
+  | 'movement_breaks'
+  | 'visual_schedule'
+  | 'reduced_transitions'
+  | 'sensory_tools'
+  | 'small_groups'
+  | 'extra_time'
+  | 'check_ins'
+  | 'loud_environment'
+  | 'crowded_spaces'
+  | 'unexpected_changes'
+  | 'long_seated_periods'
+  | 'bright_lights'
+  | 'multiple_instructions'
+  | 'time_pressure'
+  | 'social_demands';
+
+/** School Zone Mode settings stored per-user */
+export interface SchoolZoneModeSettings {
+  enabled: boolean;
+  role: SchoolRole | null;
+  currentSchoolZoneId: string | null;
+  memberships: SchoolZoneMembership[];
+  /** For caregivers: last generated summary */
+  lastSummaryGeneratedAt: number | null;
+}
+
+// ============================================
+// APP MODE SYSTEM (User-Facing Modes Dropdown)
+// ============================================
+
+/**
+ * AppMode represents the user-visible mode selector.
+ * These are the 7 modes users can switch between in the dropdown.
+ */
+export type AppMode =
+  | 'personal'           // Individual self-tracking
+  | 'caregiver'          // Family/Caregiver view
+  | 'employer'           // Employer/ERG Pilot
+  | 'school_district'    // K-12 Staff
+  | 'university'         // Higher Ed Students/Staff
+  | 'healthcare'         // Healthcare Workforce
+  | 'demo';              // Demo/Sandbox mode
+
+export interface AppModeConfig {
+  id: AppMode;
+  label: string;
+  description: string;
+  icon: string;
+  isInstitutional: boolean;
+  requiresOrgCode: boolean;
+  insightsPanelType: InsightsPanelType;
+  accentColor: string;
+}
+
+export type InsightsPanelType =
+  | 'personal'           // Personal patterns & trends
+  | 'family'             // Household load distribution
+  | 'team'               // Team/ERG capacity pulse
+  | 'staff'              // Staff load trend
+  | 'student'            // Student load trend
+  | 'workforce'          // Healthcare workforce load
+  | 'demo';              // Demo showcase
+
+export const APP_MODE_CONFIGS: Record<AppMode, AppModeConfig> = {
+  personal: {
+    id: 'personal',
+    label: 'Personal',
+    description: 'Individual self-tracking. Your data stays yours.',
+    icon: 'user',
+    isInstitutional: false,
+    requiresOrgCode: false,
+    insightsPanelType: 'personal',
+    accentColor: '#00E5FF',
+  },
+  caregiver: {
+    id: 'caregiver',
+    label: 'Caregiver / Family',
+    description: 'Shared household view for caregivers and partners.',
+    icon: 'users',
+    isInstitutional: false,
+    requiresOrgCode: false,
+    insightsPanelType: 'family',
+    accentColor: '#9C27B0',
+  },
+  employer: {
+    id: 'employer',
+    label: 'Employer / ERG Pilot',
+    description: 'Aggregated team insights for workplace wellness.',
+    icon: 'briefcase',
+    isInstitutional: true,
+    requiresOrgCode: true,
+    insightsPanelType: 'team',
+    accentColor: '#FF9800',
+  },
+  school_district: {
+    id: 'school_district',
+    label: 'School District (Staff)',
+    description: 'K-12 educator and staff capacity tracking.',
+    icon: 'school',
+    isInstitutional: true,
+    requiresOrgCode: true,
+    insightsPanelType: 'staff',
+    accentColor: '#4CAF50',
+  },
+  university: {
+    id: 'university',
+    label: 'University',
+    description: 'Higher education students and staff wellness.',
+    icon: 'graduation-cap',
+    isInstitutional: true,
+    requiresOrgCode: true,
+    insightsPanelType: 'student',
+    accentColor: '#3F51B5',
+  },
+  healthcare: {
+    id: 'healthcare',
+    label: 'Healthcare Workforce',
+    description: 'Clinical and support staff capacity management.',
+    icon: 'heart-pulse',
+    isInstitutional: true,
+    requiresOrgCode: true,
+    insightsPanelType: 'workforce',
+    accentColor: '#E91E63',
+  },
+  demo: {
+    id: 'demo',
+    label: 'Demo / Sandbox',
+    description: 'Explore all features with sample data.',
+    icon: 'play-circle',
+    isInstitutional: false,
+    requiresOrgCode: false,
+    insightsPanelType: 'demo',
+    accentColor: '#00BCD4',
+  },
+};
+
+export const APP_MODES: AppMode[] = [
+  'personal',
+  'caregiver',
+  'employer',
+  'school_district',
+  'university',
+  'healthcare',
+  'demo',
+];
+
+export interface AppModeSettings {
+  currentMode: AppMode;
+  orgCode: string | null;
+  orgName: string | null;
+  joinedAt: number | null;
+  previousMode: AppMode | null;
+}
+
+export const DEFAULT_APP_MODE_SETTINGS: AppModeSettings = {
+  currentMode: 'personal',
+  orgCode: null,
+  orgName: null,
+  joinedAt: null,
+  previousMode: null,
+};
+
+// ============================================
+// AGGREGATE PRIVACY CONSTANTS
+// ============================================
+
+/** Minimum group size for displaying aggregate data (privacy protection) */
+export const TEAM_MIN_PARTICIPANTS = 10;
+export const SCHOOL_MIN_STUDENTS = 10;
+
+/** Capacity state to team label mapping */
+export const CAPACITY_TO_TEAM_LABEL: Record<CapacityState, TeamCapacityLevel> = {
+  resourced: 'plenty',
+  stretched: 'elevated',
+  depleted: 'near_limit',
+};
+
+/** Team action suggestion templates */
+export const TEAM_ACTION_TEMPLATES: TeamActionSuggestion[] = [
+  {
+    id: 'reduce_meetings',
+    priority: 1,
+    title: 'Consider meeting load reduction',
+    description: 'High demand signals suggest the team may benefit from fewer or shorter meetings this week.',
+    category: 'meeting_load',
+  },
+  {
+    id: 'quiet_hours',
+    priority: 2,
+    title: 'Introduce quiet focus hours',
+    description: 'Sensory load is elevated. Designating focus time blocks may help the team recharge.',
+    category: 'quiet_time',
+  },
+  {
+    id: 'priority_reset',
+    priority: 1,
+    title: 'Review current priorities',
+    description: 'Team capacity is near limit. Consider pausing non-essential initiatives temporarily.',
+    category: 'priority_reset',
+  },
+  {
+    id: 'environment_check',
+    priority: 3,
+    title: 'Check environment factors',
+    description: 'Sensory signals are trending up. Review workspace conditions and noise levels.',
+    category: 'environment',
+  },
+  {
+    id: 'support_resources',
+    priority: 2,
+    title: 'Highlight available support',
+    description: 'Remind the team about available resources and support channels.',
+    category: 'support',
+  },
+];

@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CapacityLog, CapacityState, Category } from '../types';
+import { getLocalDate } from './baselineUtils';
 
 const LOGS_KEY = '@orbital:logs';
 
@@ -385,6 +386,8 @@ export async function generateFakeData(years: number = 1): Promise<number> {
         timestamp,
         tags: selectedCategories,
         note,
+        localDate: getLocalDate(timestamp),
+        detailsText: note,
       });
     }
   }

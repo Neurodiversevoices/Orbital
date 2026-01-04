@@ -4,35 +4,27 @@
     "appVersionSource": "local"
   },
   "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "ios": {
-        "simulator": false
-      }
-    },
-    "preview": {
-      "distribution": "internal"
-    },
     "production": {
       "distribution": "store",
+      "ios": {
+        "credentialsSource": "remote",
+        "autoIncrement": "buildNumber"
+      },
       "env": {
         "SENTRY_ALLOW_FAILURE": "true",
         "NODE_ENV": "production"
-      },
-      "ios": {
-        "credentialsSource": "remote",
-        "autoIncrement": "buildNumber",
-        "resourceClass": "m-medium"
       }
     }
   },
   "submit": {
     "production": {
       "ios": {
-        "ascAppId": "6757295146"
+        "ascAppId": "6757295146",
+        "ascApiKeyId": "X6A8MMACDZ",
+        "ascApiKeyIssuerId": "a6c8bd6a-8f60-4aed-a0a6-d129cb2aaf7a",
+        "ascApiKeyPath": "./keys/AuthKey_X6A8MMACDZ.p8",
+        "appleTeamId": "2KM3QL4UMV"
       }
     }
   }
 }
-

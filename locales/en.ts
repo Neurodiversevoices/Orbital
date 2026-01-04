@@ -513,6 +513,127 @@ export const en = {
     demoBanner: 'DEMO',
     processing: 'Processing...',
   },
+
+  // ============================================
+  // TEAM MODE (Enterprise Capacity Pulse)
+  // ============================================
+  teamMode: {
+    title: 'Team Mode',
+    subtitle: 'Opt-in workplace capacity pulse',
+    joinTeam: 'Join Team',
+    leaveTeam: 'Leave Team',
+    teamCode: 'Team Code',
+    teamCodePlaceholder: 'Enter team code',
+    teamCodeInvalid: 'Invalid team code',
+    noTeam: 'Not part of a team',
+    noTeamDesc: 'Enter a team code to join your workplace pulse',
+    joinSuccess: 'Joined team successfully',
+    leaveSuccess: 'Left team successfully',
+    leaveConfirmTitle: 'Leave Team',
+    leaveConfirmMessage: 'You can rejoin anytime with the team code.',
+
+    // Privacy banner
+    privacyBanner: 'Your individual data is never shared. Only aggregate team data is visible.',
+
+    // Threshold warning
+    thresholdWarning: 'Team needs at least {min} participants to show aggregate data',
+    participantCount: '{count} participants',
+
+    // Aggregate display
+    aggregateTitle: 'Team Capacity Pulse',
+    capacityDistribution: 'Capacity Distribution',
+    plenty: 'Plenty',
+    elevated: 'Elevated',
+    nearLimit: 'Near Limit',
+    topDrivers: 'Top Drivers',
+    weeklyTrend: 'Weekly Trend',
+    trendImproving: 'Improving',
+    trendStable: 'Stable',
+    trendDeclining: 'Declining',
+    participationConfidence: 'Data Confidence',
+    confidenceHigh: 'High',
+    confidenceMedium: 'Medium',
+    confidenceLow: 'Low',
+    totalSignals: '{count} signals this period',
+
+    // Action panel
+    actionPanelTitle: 'Suggested Actions',
+    noSuggestions: 'No suggestions at this time',
+  },
+
+  // ============================================
+  // SCHOOL ZONE (Student/Caregiver/Educator)
+  // ============================================
+  schoolZone: {
+    title: 'School Zone',
+    subtitle: 'Capacity support for education settings',
+    joinSchool: 'Join School',
+    leaveSchool: 'Leave School',
+    schoolCode: 'School Code',
+    schoolCodePlaceholder: 'Enter school code',
+    schoolCodeInvalid: 'Invalid school code',
+    noSchool: 'Not enrolled in a school zone',
+    noSchoolDesc: 'Enter a school code to access school features',
+    joinSuccess: 'Joined school zone successfully',
+    leaveSuccess: 'Left school zone successfully',
+    leaveConfirmTitle: 'Leave School Zone',
+    leaveConfirmMessage: 'You can rejoin anytime with the school code.',
+
+    // Role selection
+    roleLabel: 'I am a',
+    roleStudent: 'Student',
+    roleCaregiver: 'Caregiver',
+    roleEducator: 'Educator',
+
+    // Privacy banner
+    privacyBanner: 'Individual student data is never shared with educators. Only aggregate class data is visible.',
+
+    // Threshold warning
+    thresholdWarning: 'Class needs at least {min} students to show aggregate data',
+    studentCount: '{count} students',
+
+    // Student view
+    studentViewTitle: 'Your Capacity',
+    studentViewDesc: 'Log your capacity to help yourself and get support',
+    goToLog: 'Log Now',
+
+    // Caregiver view
+    caregiverViewTitle: 'School Summary Card',
+    caregiverViewDesc: 'Generate a summary to share with educators',
+    generateCard: 'Generate Summary Card',
+    shareCard: 'Share Card',
+    cardDateRange: 'Period: {start} to {end}',
+    cardCapacityTrend: 'Capacity Trend',
+    cardAverageCapacity: 'Average Capacity',
+    cardCommonDrivers: 'Common Drivers',
+    cardWhatHelps: 'What Helps',
+    cardWhatDrains: 'What Drains',
+    cardEntriesCount: '{count} entries in period',
+    notesExcluded: 'Personal notes excluded for privacy',
+
+    // Educator view
+    educatorViewTitle: 'Class Capacity Overview',
+    educatorViewDesc: 'Aggregate view of class capacity patterns',
+    classCapacity: 'Class Capacity Distribution',
+    classDrivers: 'Class Drivers',
+    classConfidence: 'Data Confidence',
+
+    // Environment factors (School Summary Card)
+    envFactors: {
+      quiet_space: 'Quiet space',
+      sensory_tools: 'Sensory tools',
+      movement_breaks: 'Movement breaks',
+      extra_time: 'Extra time',
+      small_groups: 'Small groups',
+      check_ins: 'Check-ins',
+      loud_environment: 'Loud environment',
+      bright_lights: 'Bright lights',
+      time_pressure: 'Time pressure',
+      multiple_instructions: 'Multiple instructions',
+      crowded_spaces: 'Crowded spaces',
+      social_demands: 'Social demands',
+    },
+  },
 } as const;
 
 export type TranslationKeys = typeof en;

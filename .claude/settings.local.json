@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(eas build:view:*)",
+      "Bash(eas submit:*)",
+      "Bash(npm run doctor:*)",
+      "Bash(npm run build:ios:*)",
+      "Bash(npm run submit:*)",
+      "Bash(npx eas secret:create:*)",
+      "Bash(npx eas env:create:*)",
+      "Bash(npx eas build:*)",
+      "Bash(npx eas:*)"
+    ]
+  }
+}

@@ -22,22 +22,33 @@ import {
   Info,
   Building2,
   LogOut,
+  RotateCcw,
+  Users,
+  GraduationCap,
+  Database,
+  Heart,
 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, commonStyles, spacing } from '../theme';
+import { colors, commonStyles, spacing, borderRadius } from '../theme';
 import { useEnergyLogs } from '../lib/hooks/useEnergyLogs';
 import { useLocale, interpolate } from '../lib/hooks/useLocale';
 import { generateFakeData, clearFakeData } from '../lib/generateFakeData';
 import { localeNames, Locale } from '../locales';
 import { useDemoMode } from '../lib/hooks/useDemoMode';
+import { useAppMode } from '../lib/hooks/useAppMode';
+import { useTutorial } from '../lib/hooks/useTutorial';
+import { useSubscription, shouldBypassSubscription, FREE_TIER_LIMITS } from '../lib/subscription';
 import { DELETION_DISCLOSURE } from '../lib/storage';
 import { ProprietaryFooter } from '../components/legal';
+import { APP_MODE_CONFIGS } from '../types';
+import { ModeSelector } from '../components';
+import { Crown } from 'lucide-react-native';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { logs, clearAll, refresh } = useEnergyLogs();
+  const { logs, clearAll, refresh, currentMonthSignalCount } = useEnergyLogs();
   const { t, locale, setLocale } = useLocale();
   const {
     isDemoMode,
@@ -47,6 +58,10 @@ export default function SettingsScreen() {
     reseedDemoData,
     clearDemoData,
   } = useDemoMode();
+  const { resetTutorial } = useTutorial();
+  const { currentMode, modeConfig, orgName, orgCode, leaveOrg } = useAppMode();
+  const { isPro, isLoading: subscriptionLoading } = useSubscription();
+  const bypassesSubscription = shouldBypassSubscription(currentMode);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
   const [showDemoPicker, setShowDemoPicker] = useState(false);
@@ -110,6 +125,11 @@ export default function SettingsScreen() {
     );
   }, [logs.length, clearAll, t]);
 
+  const handleReplayTutorial = useCallback(async () => {
+    await resetTutorial();
+    router.replace('/tutorial');
+  }, [resetTutorial, router]);
+
   const demoT = (t as any).demo || {};
   const demoStatusLabel = isDemoMode ? (demoT.demoModeActive || 'Demo Active') : (demoT.demoMode || 'Demo Mode');
   const demoStatusSublabel = isDemoMode
@@ -138,6 +158,85 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Mode Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>MODE</Text>
+          <View style={[styles.modeCard, { borderColor: `${modeConfig.accentColor}40` }]}>
+            <View style={styles.modeCardHeader}>
+              <Text style={[styles.modeCardLabel, { color: modeConfig.accentColor }]}>
+                {modeConfig.label}
+              </Text>
+              {orgCode && (
+                <View style={[styles.orgCodeBadge, { backgroundColor: `${modeConfig.accentColor}20` }]}>
+                  <Text style={[styles.orgCodeText, { color: modeConfig.accentColor }]}>{orgCode}</Text>
+                </View>
+              )}
+            </View>
+            <Text style={styles.modeCardDescription}>{modeConfig.description}</Text>
+            {orgName && (
+              <Text style={styles.orgNameText}>Organization: {orgName}</Text>
+            )}
+            <View style={styles.modeCardActions}>
+              <ModeSelector />
+              {modeConfig.requiresOrgCode && orgCode && (
+                <Pressable
+                  style={styles.leaveOrgButton}
+                  onPress={() => {
+                    Alert.alert(
+                      'Leave Organization',
+                      `Are you sure you want to leave ${orgName || orgCode}?`,
+                      [
+                        { text: 'Cancel', style: 'cancel' },
+                        { text: 'Leave', style: 'destructive', onPress: leaveOrg },
+                      ]
+                    );
+                  }}
+                >
+                  <Text style={styles.leaveOrgText}>Leave Org</Text>
+                </Pressable>
+              )}
+            </View>
+          </View>
+        </View>
+
+        {/* Subscription Section - only show for personal/caregiver modes */}
+        {!bypassesSubscription && currentMode !== 'demo' && (
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>SUBSCRIPTION</Text>
+            {isPro ? (
+              <SettingsRow
+                icon={Crown}
+                label="Orbital Pro"
+                sublabel="Unlimited signals & full history"
+                onPress={() => router.push('/upgrade')}
+                disabled={isProcessing}
+                highlight
+              />
+            ) : (
+              <View style={styles.subscriptionCard}>
+                <View style={styles.subscriptionHeader}>
+                  <View style={styles.freeBadge}>
+                    <Text style={styles.freeBadgeText}>FREE</Text>
+                  </View>
+                  <Text style={styles.signalCount}>
+                    {logs.length > 0 ? `${Math.min(currentMonthSignalCount, FREE_TIER_LIMITS.maxSignalsPerMonth)}/${FREE_TIER_LIMITS.maxSignalsPerMonth}` : '—'} signals this month
+                  </Text>
+                </View>
+                <Text style={styles.subscriptionDescription}>
+                  Upgrade to Pro for unlimited signals and full pattern history
+                </Text>
+                <Pressable
+                  style={styles.upgradeButton}
+                  onPress={() => router.push('/upgrade')}
+                >
+                  <Crown size={16} color="#000" />
+                  <Text style={styles.upgradeButtonText}>Upgrade · $9/mo</Text>
+                </Pressable>
+              </View>
+            )}
+          </View>
+        )}
+
         {/* Preferences Section */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{t.settings.preferencesSection}</Text>
@@ -153,6 +252,13 @@ export default function SettingsScreen() {
             label={t.accessibility?.title || 'Accessibility'}
             sublabel={t.accessibility?.subtitle || 'Customize your experience'}
             onPress={() => router.push('/accessibility')}
+            disabled={isProcessing}
+          />
+          <SettingsRow
+            icon={RotateCcw}
+            label="Replay Tutorial"
+            sublabel="Review the onboarding guide"
+            onPress={handleReplayTutorial}
             disabled={isProcessing}
           />
         </View>
@@ -199,6 +305,18 @@ export default function SettingsScreen() {
           />
         </View>
 
+        {/* Privacy Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>PRIVACY</Text>
+          <SettingsRow
+            icon={Database}
+            label="What Happens to My Data"
+            sublabel="Plain-language data handling"
+            onPress={() => router.push('/your-data')}
+            disabled={isProcessing}
+          />
+        </View>
+
         {/* Compliance Section */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>COMPLIANCE</Text>
@@ -225,6 +343,25 @@ export default function SettingsScreen() {
           />
         </View>
 
+        {/* Enterprise Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>ENTERPRISE</Text>
+          <SettingsRow
+            icon={Users}
+            label="Team Mode"
+            sublabel="Opt-in workplace capacity pulse"
+            onPress={() => router.push('/team-mode')}
+            disabled={isProcessing}
+          />
+          <SettingsRow
+            icon={GraduationCap}
+            label="School Zone"
+            sublabel="Student/caregiver/educator view"
+            onPress={() => router.push('/school-zone')}
+            disabled={isProcessing}
+          />
+        </View>
+
         {/* Account Section */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>ACCOUNT</Text>
@@ -241,6 +378,13 @@ export default function SettingsScreen() {
         {/* About Section */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{t.settings.aboutSection}</Text>
+          <SettingsRow
+            icon={Heart}
+            label="Why Orbital Exists"
+            sublabel="Our philosophy and principles"
+            onPress={() => router.push('/why-orbital')}
+            disabled={isProcessing}
+          />
           <SettingsRow
             icon={Info}
             label="About Orbital"
@@ -663,5 +807,111 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: 'rgba(255,255,255,0.35)',
     marginTop: 2,
+  },
+  // Mode Card Styles
+  modeCard: {
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: spacing.md,
+    borderWidth: 1,
+  },
+  modeCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.xs,
+  },
+  modeCardLabel: {
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  orgCodeBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
+  },
+  orgCodeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  modeCardDescription: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.5)',
+    marginBottom: spacing.sm,
+  },
+  orgNameText: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.4)',
+    marginBottom: spacing.sm,
+  },
+  modeCardActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  leaveOrgButton: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    backgroundColor: 'rgba(244,67,54,0.1)',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(244,67,54,0.3)',
+  },
+  leaveOrgText: {
+    fontSize: 12,
+    color: '#F44336',
+    fontWeight: '500',
+  },
+  // Subscription Card Styles
+  subscriptionCard: {
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  subscriptionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.sm,
+  },
+  freeBadge: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
+  },
+  freeBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.6)',
+    letterSpacing: 0.5,
+  },
+  signalCount: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+  },
+  subscriptionDescription: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.5)',
+    marginBottom: spacing.md,
+  },
+  upgradeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    backgroundColor: '#00E5FF',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.md,
+  },
+  upgradeButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#000',
   },
 });

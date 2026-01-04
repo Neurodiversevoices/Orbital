@@ -4,12 +4,19 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "doctor": "node scripts/doctor.js",
+    "prebuild": "npm run doctor",
+    "build:ios": "npm run doctor && eas build --platform ios --profile production --non-interactive",
+    "build:android": "npm run doctor && eas build --platform android --profile production --non-interactive",
+    "submit:ios": "eas submit --platform ios --profile production --latest --non-interactive",
+    "submit:android": "eas submit --platform android --profile production --latest --non-interactive"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@sentry/react-native": "^7.8.0",
     "expo": "~54.0.30",
     "expo-constants": "~18.0.12",
     "expo-dev-client": "~6.0.20",
@@ -22,6 +29,7 @@
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
     "react-native-gesture-handler": "~2.28.0",
+    "react-native-purchases": "^8.12.0",
     "react-native-reanimated": "~4.1.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",

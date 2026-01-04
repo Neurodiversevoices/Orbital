@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useCallback, useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -43,6 +43,20 @@ export function GlassOrb({ state, onStateChange, onSave }: GlassOrbProps) {
   const dragX = useSharedValue(0);
   const isDragging = useSharedValue(false);
 
+  // Use refs to hold stable references to callbacks for worklets
+  // This prevents stale closure issues in production builds
+  const onStateChangeRef = useRef(onStateChange);
+  const onSaveRef = useRef(onSave);
+
+  // Keep refs updated when props change
+  useEffect(() => {
+    onStateChangeRef.current = onStateChange;
+  }, [onStateChange]);
+
+  useEffect(() => {
+    onSaveRef.current = onSave;
+  }, [onSave]);
+
   // Subtle breathing animation
   useEffect(() => {
     breathe.value = withRepeat(
@@ -64,15 +78,37 @@ export function GlassOrb({ state, onStateChange, onSave }: GlassOrbProps) {
   }, [state]);
 
   const getStateFromPosition = (pos: number): CapacityState => {
+    'worklet';
     if (pos < 0.33) return 'resourced';
     if (pos > 0.66) return 'depleted';
     return 'stretched';
   };
 
-  const updateState = (s: CapacityState) => onStateChange?.(s);
-  const triggerSave = () => onSave?.();
+  // Stable callbacks that safely access refs - prevents worklet crashes
+  const updateState = useCallback((s: CapacityState) => {
+    try {
+      if (onStateChangeRef.current) {
+        onStateChangeRef.current(s);
+      }
+    } catch (e) {
+      // Silent catch - prevents crash in production
+      console.warn('[GlassOrb] updateState error:', e);
+    }
+  }, []);
 
-  const panGesture = Gesture.Pan()
+  const triggerSave = useCallback(() => {
+    try {
+      if (onSaveRef.current) {
+        onSaveRef.current();
+      }
+    } catch (e) {
+      // Silent catch - prevents crash in production
+      console.warn('[GlassOrb] triggerSave error:', e);
+    }
+  }, []);
+
+  // Memoize gestures to prevent recreation on every render
+  const panGesture = useMemo(() => Gesture.Pan()
     .minDistance(5)
     .onBegin(() => {
       isDragging.value = true;
@@ -93,16 +129,16 @@ export function GlassOrb({ state, onStateChange, onSave }: GlassOrbProps) {
       dragX.value = withSpring(0, { damping: 15, stiffness: 100 });
       dragY.value = withSpring(0, { damping: 15, stiffness: 100 });
       runOnJS(updateState)(getStateFromPosition(colorPosition.value));
-    });
+    }), [updateState]);
 
-  const tapGesture = Gesture.Tap()
+  const tapGesture = useMemo(() => Gesture.Tap()
     .onBegin(() => { pressScale.value = withTiming(0.97, { duration: 100 }); })
     .onFinalize(() => {
       pressScale.value = withSpring(1, { damping: 12, stiffness: 200 });
       runOnJS(triggerSave)();
-    });
+    }), [triggerSave]);
 
-  const gesture = Gesture.Race(panGesture, tapGesture);
+  const gesture = useMemo(() => Gesture.Race(panGesture, tapGesture), [panGesture, tapGesture]);
 
   // Color interpolation
   const getColor = (pos: number) => {

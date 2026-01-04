@@ -53,6 +53,14 @@ export const STORAGE_KEYS = {
   REAL_DATA_BACKUP: '@orbital:real_backup',
   // Terms of Service
   TERMS_ACCEPTANCE: '@orbital:terms_acceptance',
+  // Team Mode
+  TEAM_MODE_SETTINGS: '@orbital:team_mode',
+  TEAM_CONFIGS: '@orbital:team_configs',
+  // School Zone Mode
+  SCHOOL_ZONE_SETTINGS: '@orbital:school_zone',
+  SCHOOL_ZONE_CONFIGS: '@orbital:school_configs',
+  // App Mode (user-facing modes dropdown)
+  APP_MODE_SETTINGS: '@orbital:app_mode',
 } as const;
 
 const LOGS_KEY = STORAGE_KEYS.LOGS;
@@ -511,4 +519,223 @@ export async function updateTermsPromptedAt(): Promise<void> {
     lastPromptedAt: Date.now(),
   };
   await AsyncStorage.setItem(STORAGE_KEYS.TERMS_ACCEPTANCE, JSON.stringify(record));
+}
+
+// ============================================
+// TEAM MODE STORAGE
+// ============================================
+
+import type {
+  TeamModeSettings,
+  TeamConfig,
+  SchoolZoneModeSettings,
+  SchoolZoneConfig,
+} from '../types';
+
+const DEFAULT_TEAM_MODE_SETTINGS: TeamModeSettings = {
+  enabled: false,
+  currentTeamId: null,
+  teams: [],
+  lastSyncAt: null,
+};
+
+export async function getTeamModeSettings(): Promise<TeamModeSettings> {
+  const data = await AsyncStorage.getItem(STORAGE_KEYS.TEAM_MODE_SETTINGS);
+  if (!data) return DEFAULT_TEAM_MODE_SETTINGS;
+  return { ...DEFAULT_TEAM_MODE_SETTINGS, ...JSON.parse(data) };
+}
+
+export async function saveTeamModeSettings(settings: Partial<TeamModeSettings>): Promise<void> {
+  const current = await getTeamModeSettings();
+  const updated = { ...current, ...settings };
+  await AsyncStorage.setItem(STORAGE_KEYS.TEAM_MODE_SETTINGS, JSON.stringify(updated));
+}
+
+export async function getTeamConfigs(): Promise<TeamConfig[]> {
+  const data = await AsyncStorage.getItem(STORAGE_KEYS.TEAM_CONFIGS);
+  if (!data) return [];
+  return JSON.parse(data);
+}
+
+export async function saveTeamConfig(config: TeamConfig): Promise<void> {
+  const configs = await getTeamConfigs();
+  const existingIndex = configs.findIndex(c => c.id === config.id);
+  if (existingIndex >= 0) {
+    configs[existingIndex] = config;
+  } else {
+    configs.push(config);
+  }
+  await AsyncStorage.setItem(STORAGE_KEYS.TEAM_CONFIGS, JSON.stringify(configs));
+}
+
+export async function joinTeamByCode(teamCode: string, teamName: string): Promise<TeamConfig> {
+  const teamId = `team_${teamCode.toLowerCase().replace(/\s/g, '_')}_${Date.now()}`;
+  const config: TeamConfig = {
+    id: teamId,
+    name: teamName || `Team ${teamCode}`,
+    teamCode: teamCode.toUpperCase(),
+    createdAt: Date.now(),
+    minParticipants: 10,
+    isActive: true,
+  };
+  await saveTeamConfig(config);
+
+  // Update settings
+  const settings = await getTeamModeSettings();
+  settings.enabled = true;
+  settings.currentTeamId = teamId;
+  settings.teams.push({
+    teamId,
+    joinedAt: Date.now(),
+    isActive: true,
+  });
+  await saveTeamModeSettings(settings);
+
+  return config;
+}
+
+export async function leaveTeam(teamId: string): Promise<void> {
+  const settings = await getTeamModeSettings();
+  settings.teams = settings.teams.map(t =>
+    t.teamId === teamId ? { ...t, isActive: false } : t
+  );
+  if (settings.currentTeamId === teamId) {
+    settings.currentTeamId = null;
+    settings.enabled = settings.teams.some(t => t.isActive);
+  }
+  await saveTeamModeSettings(settings);
+}
+
+// ============================================
+// SCHOOL ZONE MODE STORAGE
+// ============================================
+
+const DEFAULT_SCHOOL_ZONE_SETTINGS: SchoolZoneModeSettings = {
+  enabled: false,
+  role: null,
+  currentSchoolZoneId: null,
+  memberships: [],
+  lastSummaryGeneratedAt: null,
+};
+
+export async function getSchoolZoneModeSettings(): Promise<SchoolZoneModeSettings> {
+  const data = await AsyncStorage.getItem(STORAGE_KEYS.SCHOOL_ZONE_SETTINGS);
+  if (!data) return DEFAULT_SCHOOL_ZONE_SETTINGS;
+  return { ...DEFAULT_SCHOOL_ZONE_SETTINGS, ...JSON.parse(data) };
+}
+
+export async function saveSchoolZoneModeSettings(settings: Partial<SchoolZoneModeSettings>): Promise<void> {
+  const current = await getSchoolZoneModeSettings();
+  const updated = { ...current, ...settings };
+  await AsyncStorage.setItem(STORAGE_KEYS.SCHOOL_ZONE_SETTINGS, JSON.stringify(updated));
+}
+
+export async function getSchoolZoneConfigs(): Promise<SchoolZoneConfig[]> {
+  const data = await AsyncStorage.getItem(STORAGE_KEYS.SCHOOL_ZONE_CONFIGS);
+  if (!data) return [];
+  return JSON.parse(data);
+}
+
+export async function saveSchoolZoneConfig(config: SchoolZoneConfig): Promise<void> {
+  const configs = await getSchoolZoneConfigs();
+  const existingIndex = configs.findIndex(c => c.id === config.id);
+  if (existingIndex >= 0) {
+    configs[existingIndex] = config;
+  } else {
+    configs.push(config);
+  }
+  await AsyncStorage.setItem(STORAGE_KEYS.SCHOOL_ZONE_CONFIGS, JSON.stringify(configs));
+}
+
+export async function joinSchoolZone(
+  schoolCode: string,
+  schoolName: string,
+  role: 'student' | 'caregiver' | 'educator'
+): Promise<SchoolZoneConfig> {
+  const schoolZoneId = `school_${schoolCode.toLowerCase().replace(/\s/g, '_')}_${Date.now()}`;
+  const config: SchoolZoneConfig = {
+    id: schoolZoneId,
+    name: schoolName || `School ${schoolCode}`,
+    schoolCode: schoolCode.toUpperCase(),
+    createdAt: Date.now(),
+    minStudents: 10,
+  };
+  await saveSchoolZoneConfig(config);
+
+  // Update settings
+  const settings = await getSchoolZoneModeSettings();
+  settings.enabled = true;
+  settings.role = role;
+  settings.currentSchoolZoneId = schoolZoneId;
+  settings.memberships.push({
+    schoolZoneId,
+    role,
+    joinedAt: Date.now(),
+    isActive: true,
+  });
+  await saveSchoolZoneModeSettings(settings);
+
+  return config;
+}
+
+export async function leaveSchoolZone(schoolZoneId: string): Promise<void> {
+  const settings = await getSchoolZoneModeSettings();
+  settings.memberships = settings.memberships.map(m =>
+    m.schoolZoneId === schoolZoneId ? { ...m, isActive: false } : m
+  );
+  if (settings.currentSchoolZoneId === schoolZoneId) {
+    settings.currentSchoolZoneId = null;
+    settings.enabled = settings.memberships.some(m => m.isActive);
+  }
+  await saveSchoolZoneModeSettings(settings);
+}
+
+// ============================================
+// APP MODE STORAGE
+// ============================================
+
+// AppMode type defined inline to avoid circular dependency with types/index.ts
+type AppModeLocal = 'personal' | 'caregiver' | 'employer' | 'school_district' | 'university' | 'healthcare' | 'demo';
+
+interface AppModeSettingsLocal {
+  currentMode: AppModeLocal;
+  orgCode: string | null;
+  orgName: string | null;
+  joinedAt: number | null;
+  previousMode: AppModeLocal | null;
+}
+
+export async function getAppModeSettings(): Promise<AppModeSettingsLocal> {
+  const defaultSettings: AppModeSettingsLocal = {
+    currentMode: 'personal',
+    orgCode: null,
+    orgName: null,
+    joinedAt: null,
+    previousMode: null,
+  };
+  const data = await AsyncStorage.getItem(STORAGE_KEYS.APP_MODE_SETTINGS);
+  if (!data) return defaultSettings;
+  return { ...defaultSettings, ...JSON.parse(data) };
+}
+
+export async function saveAppModeSettings(settings: Partial<AppModeSettingsLocal>): Promise<void> {
+  const current = await getAppModeSettings();
+  const updated = { ...current, ...settings };
+  await AsyncStorage.setItem(STORAGE_KEYS.APP_MODE_SETTINGS, JSON.stringify(updated));
+}
+
+export async function switchAppMode(
+  newMode: AppModeLocal,
+  orgDetails?: { orgCode: string; orgName: string }
+): Promise<AppModeSettingsLocal> {
+  const current = await getAppModeSettings();
+  const settings: AppModeSettingsLocal = {
+    currentMode: newMode,
+    orgCode: orgDetails?.orgCode || null,
+    orgName: orgDetails?.orgName || null,
+    joinedAt: orgDetails ? Date.now() : null,
+    previousMode: current.currentMode,
+  };
+  await saveAppModeSettings(settings);
+  return settings;
 }

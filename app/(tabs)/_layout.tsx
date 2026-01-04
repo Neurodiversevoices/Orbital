@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, BarChart2 } from 'lucide-react-native';
+import { Home, BarChart2, FileText } from 'lucide-react-native';
 import { colors } from '../../theme';
 
 export default function TabLayout() {
@@ -33,6 +33,14 @@ export default function TabLayout() {
         options={{
           tabBarIcon: ({ color, size }) => (
             <BarChart2 color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="brief"
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <FileText color={color} size={size} />
           ),
         }}
       />

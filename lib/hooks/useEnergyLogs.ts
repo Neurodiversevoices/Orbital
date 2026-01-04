@@ -1,6 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { CapacityLog, CapacityState, Tag } from '../../types';
 import { savelog, getLogs, deleteLog, clearAllLogs, generateId } from '../storage';
+import { getLocalDate } from '../baselineUtils';
+import { FREE_TIER_LIMITS } from '../subscription/types';
 
 interface UseCapacityLogsReturn {
   logs: CapacityLog[];
@@ -9,6 +11,12 @@ interface UseCapacityLogsReturn {
   removeLog: (id: string) => Promise<void>;
   clearAll: () => Promise<void>;
   refresh: () => Promise<void>;
+  /** Number of signals logged this month */
+  currentMonthSignalCount: number;
+  /** Whether user has hit the free tier signal limit */
+  hasHitSignalLimit: boolean;
+  /** Signals remaining in free tier */
+  signalsRemaining: number;
 }
 
 // Keep export name for backwards compatibility but update types
@@ -33,13 +41,16 @@ export function useEnergyLogs(): UseCapacityLogsReturn {
   }, [loadLogs]);
 
   const saveEntry = useCallback(
-    async (state: CapacityState, tags: Tag[] = [], note?: string) => {
+    async (state: CapacityState, tags: Tag[] = [], note?: string, detailsText?: string) => {
+      const timestamp = Date.now();
       const newLog: CapacityLog = {
         id: generateId(),
         state,
-        timestamp: Date.now(),
+        timestamp,
         tags,
         note,
+        localDate: getLocalDate(timestamp),
+        detailsText: detailsText || note, // Use detailsText if provided, otherwise use note
       };
 
       await savelog(newLog);
@@ -62,6 +73,16 @@ export function useEnergyLogs(): UseCapacityLogsReturn {
     await loadLogs();
   }, [loadLogs]);
 
+  // Calculate current month's signal count for free tier gating
+  const currentMonthSignalCount = useMemo(() => {
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    return logs.filter(log => log.timestamp >= monthStart).length;
+  }, [logs]);
+
+  const hasHitSignalLimit = currentMonthSignalCount >= FREE_TIER_LIMITS.maxSignalsPerMonth;
+  const signalsRemaining = Math.max(0, FREE_TIER_LIMITS.maxSignalsPerMonth - currentMonthSignalCount);
+
   return {
     logs,
     isLoading,
@@ -69,5 +90,8 @@ export function useEnergyLogs(): UseCapacityLogsReturn {
     removeLog,
     clearAll,
     refresh,
+    currentMonthSignalCount,
+    hasHitSignalLimit,
+    signalsRemaining,
   };
 }

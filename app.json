@@ -7,6 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "jsEngine": "hermes",
     "scheme": "orbital",
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -16,18 +17,17 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "13",
+      "buildNumber": "22",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
+      "package": "com.erparris.orbital",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#05060A"
-      },
-      "edgeToEdgeEnabled": true,
-      "package": "com.erparris.orbital"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -42,17 +42,17 @@
         "@sentry/react-native/expo",
         {
           "url": "https://sentry.io/",
-          "project": "react-native",
-          "organization": "orbital-health"
+          "organization": "orbital-health",
+          "project": "react-native"
         }
       ]
     ],
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "e5ccc5de-2f35-4101-b7a9-d68e5d5a7cbb"
+        "projectId": "60d17137-74cc-4a95-a1d5-bd0692cf1e2a"
       }
     },
-    "owner": "erparris"
+    "owner": "orbital-health"
   }
 }

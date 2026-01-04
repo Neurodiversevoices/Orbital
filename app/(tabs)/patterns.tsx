@@ -2,15 +2,23 @@ import React, { useCallback, useState, useMemo, useEffect } from 'react';
 import { View, StyleSheet, FlatList, RefreshControl, useWindowDimensions, Text, Platform, Pressable } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Circle, Eye, ListTodo, Users, TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Calendar, Clock, Lock, Bug, RefreshCw } from 'lucide-react-native';
+import { Circle, Eye, ListTodo, Users, TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Calendar, Clock, Lock, Bug, RefreshCw, Award, Flame, FileText } from 'lucide-react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { HistoryItem, EnergyGraph, TimeRangeTabs, TimeRange, getTimeRangeMs } from '../../components';
+import { HistoryItem, EnergyGraph, TimeRangeTabs, TimeRange, getTimeRangeMs, MilestonesPanel, PatternLanguagePanel, OrgRoleBanner } from '../../components';
 import { colors, commonStyles, spacing } from '../../theme';
 import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
 import { useLocale, interpolate } from '../../lib/hooks/useLocale';
 import { useDemoMode } from '../../lib/hooks/useDemoMode';
+import { useAppMode } from '../../lib/hooks/useAppMode';
 import { STORAGE_KEYS } from '../../lib/storage';
-import { CapacityLog, CapacityState, Category, getUnlockTier, getNextUnlockTier } from '../../types';
+import { CapacityLog, CapacityState, Category, getUnlockTier, getNextUnlockTier, BaselineStats, WeeklySummary } from '../../types';
+import {
+  calculateBaselineStats,
+  findMostRecent7DayStreakWindow,
+  calculateWeeklySummary,
+  formatDateRange,
+  getConfidenceTierLabel,
+} from '../../lib/baselineUtils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const categoryIcons: Record<Category, React.ComponentType<any>> = {
@@ -26,6 +34,146 @@ const stateToPercent = (state: CapacityState): number => {
     case 'depleted': return 0;
   }
 };
+
+// Confidence Badge Component
+function ConfidenceBadge({ stats }: { stats: BaselineStats }) {
+  const tierLabel = getConfidenceTierLabel(stats.confidenceTier);
+  const tierColor = stats.confidenceTier === 'high' ? '#00E5FF'
+    : stats.confidenceTier === 'growing' ? '#4CAF50'
+    : stats.confidenceTier === 'baseline' ? '#E8A830'
+    : 'rgba(255,255,255,0.4)';
+
+  return (
+    <View style={confidenceStyles.badge}>
+      <Award size={12} color={tierColor} />
+      <Text style={[confidenceStyles.badgeText, { color: tierColor }]}>
+        {tierLabel}
+      </Text>
+      {stats.hasHighConfidenceWeek && (
+        <View style={confidenceStyles.weekBadge}>
+          <Flame size={10} color="#FF9800" />
+          <Text style={confidenceStyles.weekBadgeText}>7-Day Streak</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+// Weekly Summary Card Component
+function WeeklySummaryCard({ summary }: { summary: WeeklySummary }) {
+  const dateRange = formatDateRange(summary.startDate, summary.endDate);
+  const { capacitySummary, topDrivers, notesCount, totalEntries } = summary;
+
+  const avgColor = capacitySummary.averagePercent >= 70 ? '#00E5FF'
+    : capacitySummary.averagePercent >= 40 ? '#E8A830'
+    : '#F44336';
+
+  return (
+    <View style={summaryStyles.card}>
+      <View style={summaryStyles.header}>
+        <View style={summaryStyles.headerLeft}>
+          <Flame size={16} color="#FF9800" />
+          <Text style={summaryStyles.title}>High-Confidence Week</Text>
+        </View>
+        <Text style={summaryStyles.dateRange}>{dateRange}</Text>
+      </View>
+
+      <View style={summaryStyles.statsRow}>
+        <View style={summaryStyles.statItem}>
+          <Text style={[summaryStyles.statValue, { color: avgColor }]}>
+            {capacitySummary.averagePercent}%
+          </Text>
+          <Text style={summaryStyles.statLabel}>Avg Capacity</Text>
+        </View>
+        <View style={summaryStyles.statDivider} />
+        <View style={summaryStyles.statItem}>
+          <Text style={summaryStyles.statValue}>{totalEntries}</Text>
+          <Text style={summaryStyles.statLabel}>Entries</Text>
+        </View>
+        <View style={summaryStyles.statDivider} />
+        <View style={summaryStyles.statItem}>
+          <View style={summaryStyles.notesRow}>
+            <FileText size={14} color="rgba(255,255,255,0.6)" />
+            <Text style={summaryStyles.statValue}>{notesCount}</Text>
+          </View>
+          <Text style={summaryStyles.statLabel}>With Notes</Text>
+        </View>
+      </View>
+
+      {/* Capacity Distribution Bar */}
+      <View style={summaryStyles.distributionContainer}>
+        <Text style={summaryStyles.distributionLabel}>Capacity Distribution</Text>
+        <View style={summaryStyles.distributionBar}>
+          {capacitySummary.resourced > 0 && (
+            <View
+              style={[
+                summaryStyles.distributionSegment,
+                {
+                  flex: capacitySummary.resourced,
+                  backgroundColor: '#00E5FF',
+                  borderTopLeftRadius: 4,
+                  borderBottomLeftRadius: 4,
+                },
+              ]}
+            />
+          )}
+          {capacitySummary.stretched > 0 && (
+            <View
+              style={[
+                summaryStyles.distributionSegment,
+                { flex: capacitySummary.stretched, backgroundColor: '#E8A830' },
+              ]}
+            />
+          )}
+          {capacitySummary.depleted > 0 && (
+            <View
+              style={[
+                summaryStyles.distributionSegment,
+                {
+                  flex: capacitySummary.depleted,
+                  backgroundColor: '#F44336',
+                  borderTopRightRadius: 4,
+                  borderBottomRightRadius: 4,
+                },
+              ]}
+            />
+          )}
+        </View>
+        <View style={summaryStyles.distributionLegend}>
+          <Text style={[summaryStyles.legendItem, { color: '#00E5FF' }]}>
+            {capacitySummary.resourced} resourced
+          </Text>
+          <Text style={[summaryStyles.legendItem, { color: '#E8A830' }]}>
+            {capacitySummary.stretched} stretched
+          </Text>
+          <Text style={[summaryStyles.legendItem, { color: '#F44336' }]}>
+            {capacitySummary.depleted} depleted
+          </Text>
+        </View>
+      </View>
+
+      {/* Top Drivers */}
+      {topDrivers.length > 0 && (
+        <View style={summaryStyles.driversContainer}>
+          <Text style={summaryStyles.driversLabel}>Top Drivers</Text>
+          <View style={summaryStyles.driversRow}>
+            {topDrivers.map((driver, index) => {
+              const Icon = categoryIcons[driver.tag as Category] || Circle;
+              return (
+                <View key={driver.tag} style={summaryStyles.driverChip}>
+                  <Icon size={12} color="rgba(255,255,255,0.7)" />
+                  <Text style={summaryStyles.driverText}>
+                    {driver.tag} ({driver.count})
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      )}
+    </View>
+  );
+}
 
 // Debug overlay component
 function DebugOverlay({ logs, storageInfo, onReseed, onClose }: {
@@ -97,6 +245,7 @@ export default function PatternsScreen() {
   const { width } = useWindowDimensions();
   const { t } = useLocale();
   const { isDemoMode, enableDemoMode, reseedDemoData } = useDemoMode();
+  const { currentMode } = useAppMode();
   const graphWidth = width - spacing.md * 2;
   const [timeRange, setTimeRange] = useState<TimeRange>('7d');
   const [debugVisible, setDebugVisible] = useState(showDebug);
@@ -156,7 +305,20 @@ export default function PatternsScreen() {
   const logCount = logs.length;
   const currentTier = getUnlockTier(logCount);
   const nextTier = getNextUnlockTier(logCount);
-  const isLocked = currentTier.tier === 'locked';
+
+  // Calculate baseline stats using unique local dates
+  const baselineStats = useMemo(() => calculateBaselineStats(logs), [logs]);
+
+  // Patterns are now gated by 7 unique dates, not log count
+  const isLocked = !baselineStats.patternsUnlocked;
+
+  // Weekly Summary for 7-day streak
+  const weeklySummary = useMemo(() => {
+    if (!baselineStats.hasHighConfidenceWeek) return null;
+    const window = findMostRecent7DayStreakWindow(logs);
+    if (!window) return null;
+    return calculateWeeklySummary(logs, window);
+  }, [logs, baselineStats.hasHighConfidenceWeek]);
 
   // Translated day names for insights
   const dayNames = [
@@ -385,19 +547,44 @@ export default function PatternsScreen() {
                 <View style={styles.lockedIconContainer}>
                   <Lock size={32} color="rgba(255,255,255,0.3)" />
                 </View>
-                <Text style={styles.lockedTitle}>{t.patterns.lockedTitle}</Text>
-                <Text style={styles.lockedBody}>{t.patterns.lockedBody}</Text>
+                <Text style={styles.lockedTitle}>Building Your Baseline</Text>
+                <Text style={styles.lockedBody}>
+                  Log on 7 different days to unlock pattern insights. You can log multiple times per day.
+                </Text>
                 <View style={styles.lockedProgress}>
                   <View style={styles.lockedProgressBar}>
-                    <View style={[styles.lockedProgressFill, { width: `${(logCount / 7) * 100}%` }]} />
+                    <View style={[styles.lockedProgressFill, { width: `${(baselineStats.baselineProgress / 7) * 100}%` }]} />
                   </View>
                   <Text style={styles.lockedProgressText}>
-                    {interpolate(t.patterns.lockedProgress, { count: logCount })}
+                    {baselineStats.baselineProgress} of 7 days logged
                   </Text>
                 </View>
+                {baselineStats.currentStreak > 1 && (
+                  <View style={styles.streakIndicator}>
+                    <Flame size={14} color="#FF9800" />
+                    <Text style={styles.streakText}>
+                      {baselineStats.currentStreak}-day streak
+                    </Text>
+                  </View>
+                )}
               </View>
             ) : (
               <View>
+                {/* Org Role Banner - shows participant status for org modes */}
+                <OrgRoleBanner mode={currentMode} />
+
+                {/* Longitudinal Milestones */}
+                <MilestonesPanel logs={logs} />
+
+                {/* Pattern Language - Stability, Volatility, Recovery Lag */}
+                <PatternLanguagePanel logs={logs} />
+
+                {/* Confidence Badge */}
+                <ConfidenceBadge stats={baselineStats} />
+
+                {/* Weekly Summary Card - shown when 7-day streak achieved */}
+                {weeklySummary && <WeeklySummaryCard summary={weeklySummary} />}
+
                 <TimeRangeTabs
                   selected={timeRange}
                   onSelect={setTimeRange}
@@ -805,6 +992,183 @@ const styles = StyleSheet.create({
   lockedProgressText: {
     fontSize: 12,
     color: 'rgba(255,255,255,0.4)',
+  },
+  streakIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 152, 0, 0.3)',
+  },
+  streakText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#FF9800',
+  },
+});
+
+// Confidence Badge Styles
+const confidenceStyles = StyleSheet.create({
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginBottom: spacing.md,
+    paddingVertical: spacing.xs,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  weekBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginLeft: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    backgroundColor: 'rgba(255, 152, 0, 0.15)',
+    borderRadius: 12,
+  },
+  weekBadgeText: {
+    fontSize: 9,
+    fontWeight: '600',
+    color: '#FF9800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+});
+
+// Weekly Summary Card Styles
+const summaryStyles = StyleSheet.create({
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 152, 0, 0.3)',
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FF9800',
+  },
+  dateRange: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.5)',
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 18,
+    fontWeight: '300',
+    color: 'rgba(255,255,255,0.9)',
+  },
+  statLabel: {
+    fontSize: 9,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.4)',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginTop: 2,
+  },
+  statDivider: {
+    width: 1,
+    height: 28,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  notesRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  distributionContainer: {
+    marginBottom: spacing.md,
+  },
+  distributionLabel: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.4)',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: spacing.xs,
+  },
+  distributionBar: {
+    flexDirection: 'row',
+    height: 8,
+    borderRadius: 4,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  distributionSegment: {
+    height: '100%',
+  },
+  distributionLegend: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: spacing.xs,
+  },
+  legendItem: {
+    fontSize: 9,
+    fontWeight: '500',
+  },
+  driversContainer: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.08)',
+    paddingTop: spacing.sm,
+  },
+  driversLabel: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.4)',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: spacing.xs,
+  },
+  driversRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+  },
+  driverChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 12,
+  },
+  driverText: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.7)',
+    textTransform: 'capitalize',
   },
 });
 
