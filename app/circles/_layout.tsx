@@ -1,0 +1,19 @@
+/**
+ * CIRCLES LAYOUT
+ *
+ * Stack navigator for all Circles screens.
+ */
+
+import { Stack } from 'expo-router';
+
+export default function CirclesLayout() {
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: '#0B1220' },
+        animation: 'slide_from_right',
+      }}
+    />
+  );
+}

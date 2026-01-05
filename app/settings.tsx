@@ -19,6 +19,7 @@ import {
   Accessibility,
   FlaskConical,
   Shield,
+  ShieldCheck,
   Info,
   Building2,
   LogOut,
@@ -27,6 +28,7 @@ import {
   GraduationCap,
   Database,
   Heart,
+  FileText,
 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, commonStyles, spacing, borderRadius } from '../theme';
@@ -43,6 +45,7 @@ import { ProprietaryFooter } from '../components/legal';
 import { APP_MODE_CONFIGS } from '../types';
 import { ModeSelector } from '../components';
 import { Crown } from 'lucide-react-native';
+import { generateClinicalBrief } from '../lib/pdf';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -129,6 +132,23 @@ export default function SettingsScreen() {
     await resetTutorial();
     router.replace('/tutorial');
   }, [resetTutorial, router]);
+
+  const handleGenerateClinicalBrief = useCallback(async () => {
+    if (logs.length === 0) {
+      Alert.alert('No Data', 'Log some capacity signals first to generate a clinical brief.');
+      return;
+    }
+    setIsProcessing(true);
+    try {
+      const { share } = await generateClinicalBrief({ days: 30 });
+      await share();
+    } catch (error) {
+      console.error('[ClinicalBrief] Generation failed:', error);
+      Alert.alert('Error', 'Failed to generate clinical brief. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [logs.length]);
 
   const demoT = (t as any).demo || {};
   const demoStatusLabel = isDemoMode ? (demoT.demoModeActive || 'Demo Active') : (demoT.demoMode || 'Demo Mode');
@@ -274,6 +294,13 @@ export default function SettingsScreen() {
             disabled={isProcessing}
           />
           <SettingsRow
+            icon={FileText}
+            label="Generate Clinical Brief"
+            sublabel="Professional PDF for healthcare providers"
+            onPress={handleGenerateClinicalBrief}
+            disabled={isProcessing}
+          />
+          <SettingsRow
             icon={Share2}
             label={t.sharing.title}
             sublabel={t.sharing.subtitle}
@@ -305,14 +332,28 @@ export default function SettingsScreen() {
           />
         </View>
 
-        {/* Privacy Section */}
+        {/* Security & Privacy Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>PRIVACY</Text>
+          <Text style={styles.sectionLabel}>SECURITY & PRIVACY</Text>
           <SettingsRow
             icon={Database}
             label="What Happens to My Data"
             sublabel="Plain-language data handling"
             onPress={() => router.push('/your-data')}
+            disabled={isProcessing}
+          />
+          <SettingsRow
+            icon={ShieldCheck}
+            label="Security Controls"
+            sublabel="Circles security architecture"
+            onPress={() => router.push('/security-controls')}
+            disabled={isProcessing}
+          />
+          <SettingsRow
+            icon={Users}
+            label="Circles"
+            sublabel="Peer-to-peer capacity signaling"
+            onPress={() => router.push('/circles')}
             disabled={isProcessing}
           />
         </View>
