@@ -25,6 +25,7 @@ import {
   onCapacityLogDeleted,
   onAllLogsCleared,
 } from './patternHistory';
+import { syncWidgetOnLog } from './hooks/useWidgetSync';
 
 // Centralized storage keys
 export const STORAGE_KEYS = {
@@ -82,6 +83,9 @@ export async function savelog(log: CapacityLog): Promise<void> {
 
   // Write to pattern history for permanent retention
   await onCapacityLogSaved(log);
+
+  // Sync widget with latest capacity state
+  syncWidgetOnLog(log.state);
 }
 
 export async function getLogs(): Promise<CapacityLog[]> {

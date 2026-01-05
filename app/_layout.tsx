@@ -1,10 +1,11 @@
 import 'react-native-gesture-handler';
 
 import { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Sentry from '@sentry/react-native';
+import * as Linking from 'expo-linking';
 
 import { colors } from '../theme';
 import { LocaleProvider } from '../lib/hooks/useLocale';
@@ -23,9 +24,32 @@ Sentry.init({
 
 
 function RootLayout() {
+  const router = useRouter();
+
   useEffect(() => {
     Sentry.addBreadcrumb({ message: 'App mounted', category: 'lifecycle' });
   }, []);
+
+  useEffect(() => {
+    const handleDeepLink = (event: { url: string }) => {
+      const { url } = event;
+      if (url === 'orbital://log' || url.startsWith('orbital://log')) {
+        router.replace('/');
+      }
+    };
+
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+
+    Linking.getInitialURL().then((url) => {
+      if (url && (url === 'orbital://log' || url.startsWith('orbital://log'))) {
+        router.replace('/');
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [router]);
 
   return (
     <ErrorBoundary name="RootLayout">

@@ -1,62 +1,85 @@
 /**
  * Tutorial state management hook
- * Tracks whether user has completed the onboarding tutorial
+ *
+ * SILENT ONBOARDING: This hook now always returns hasSeenTutorial: true.
+ *
+ * Per SILENT_ONBOARDING.md doctrine:
+ * - "If a user is confused, that is acceptable."
+ * - "If a user is instructed, the system has failed."
+ *
+ * The Orb is self-evident or it is nothing. No tutorial flow exists.
+ *
+ * The hook interface is preserved for backwards compatibility,
+ * but the tutorial screen will never be shown.
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const TUTORIAL_KEY = 'orbital:tutorialSeen:v1';
+// Storage key for tracking first capacity signal (for irreversibility)
+const FIRST_SIGNAL_KEY = 'orbital:firstSignalLogged:v1';
 
 export interface TutorialState {
-  hasSeenTutorial: boolean | null; // null = loading
+  /** Always true - silent onboarding means no tutorial */
+  hasSeenTutorial: boolean | null;
   isLoading: boolean;
+  /** No-op for backwards compatibility */
   markTutorialSeen: () => Promise<void>;
+  /** No-op for backwards compatibility */
   resetTutorial: () => Promise<void>;
+  /** Track first signal for irreversibility trigger */
+  hasLoggedFirstSignal: boolean;
+  /** Mark that user has logged their first signal */
+  markFirstSignalLogged: () => Promise<void>;
 }
 
 export function useTutorial(): TutorialState {
-  const [hasSeenTutorial, setHasSeenTutorial] = useState<boolean | null>(null);
+  // SILENT ONBOARDING: Always bypass tutorial
+  const [hasSeenTutorial] = useState<boolean | null>(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasLoggedFirstSignal, setHasLoggedFirstSignal] = useState(false);
 
   useEffect(() => {
-    loadTutorialState();
+    loadState();
   }, []);
 
-  const loadTutorialState = async () => {
+  const loadState = async () => {
     try {
-      const value = await AsyncStorage.getItem(TUTORIAL_KEY);
-      setHasSeenTutorial(value === 'true');
+      const firstSignal = await AsyncStorage.getItem(FIRST_SIGNAL_KEY);
+      setHasLoggedFirstSignal(firstSignal === 'true');
     } catch (error) {
       console.warn('[Tutorial] Failed to load state:', error);
-      setHasSeenTutorial(true); // Default to seen if error
     } finally {
       setIsLoading(false);
     }
   };
 
+  // No-op: Tutorial is bypassed
   const markTutorialSeen = useCallback(async () => {
-    try {
-      await AsyncStorage.setItem(TUTORIAL_KEY, 'true');
-      setHasSeenTutorial(true);
-    } catch (error) {
-      console.warn('[Tutorial] Failed to mark seen:', error);
-    }
+    // Intentionally empty - silent onboarding
   }, []);
 
+  // No-op: Tutorial cannot be reset
   const resetTutorial = useCallback(async () => {
+    // Intentionally empty - silent onboarding
+  }, []);
+
+  // Track first signal for irreversibility trigger
+  const markFirstSignalLogged = useCallback(async () => {
     try {
-      await AsyncStorage.removeItem(TUTORIAL_KEY);
-      setHasSeenTutorial(false);
+      await AsyncStorage.setItem(FIRST_SIGNAL_KEY, 'true');
+      setHasLoggedFirstSignal(true);
     } catch (error) {
-      console.warn('[Tutorial] Failed to reset:', error);
+      console.warn('[Tutorial] Failed to mark first signal:', error);
     }
   }, []);
 
   return {
-    hasSeenTutorial,
+    hasSeenTutorial, // Always true
     isLoading,
     markTutorialSeen,
     resetTutorial,
+    hasLoggedFirstSignal,
+    markFirstSignalLogged,
   };
 }

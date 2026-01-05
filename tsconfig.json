@@ -1,6 +1,15 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
-  }
+    "strict": true,
+    "paths": {
+      "orbital-widget": ["./modules/orbital-widget"],
+      "orbital-widget/*": ["./modules/orbital-widget/*"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "modules/**/*.ts"
+  ]
 }

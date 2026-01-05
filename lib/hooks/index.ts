@@ -24,3 +24,6 @@ export type { PatternConcept, PatternStrength, PatternLanguageData } from './use
 
 // First-use experience hooks
 export { useWhyOrbital } from './useWhyOrbital';
+
+// Widget sync hooks
+export { useWidgetSync, syncWidgetOnLog } from './useWidgetSync';
