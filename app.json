@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "29",
+      "buildNumber": "30",
       "appleTeamId": "2KM3QL4UMV",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -39,6 +39,14 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "14.0"
+          }
+        }
+      ],
       [
         "@sentry/react-native/expo",
         {
