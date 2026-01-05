@@ -9,7 +9,7 @@
       "ios": {
         "credentialsSource": "remote",
         "autoIncrement": "buildNumber",
-        "image": "macos-monterey-12.4-xcode-13.4"
+        "resourceClass": "m-medium"
       },
       "env": {
         "SENTRY_ALLOW_FAILURE": "true"
