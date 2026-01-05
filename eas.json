@@ -9,11 +9,10 @@
       "ios": {
         "credentialsSource": "remote",
         "autoIncrement": "buildNumber",
-        "image": "macos-ventura-13.6-xcode-15.2"
+        "image": "default"
       },
       "env": {
-        "SENTRY_ALLOW_FAILURE": "true",
-        "NODE_ENV": "production"
+        "SENTRY_ALLOW_FAILURE": "true"
       }
     }
   },
