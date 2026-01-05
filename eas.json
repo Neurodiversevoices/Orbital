@@ -8,8 +8,7 @@
       "distribution": "store",
       "ios": {
         "credentialsSource": "remote",
-        "autoIncrement": "buildNumber",
-        "image": "default"
+        "autoIncrement": "buildNumber"
       },
       "env": {
         "SENTRY_ALLOW_FAILURE": "true"
