@@ -115,7 +115,8 @@ function withWidgetExtension(config) {
         SWIFT_EMIT_LOC_STRINGS: 'YES',
         SWIFT_VERSION: '5.0',
         TARGETED_DEVICE_FAMILY: '"1,2"',
-        IPHONEOS_DEPLOYMENT_TARGET: '14.0',
+        IPHONEOS_DEPLOYMENT_TARGET: '15.1',
+        CODE_SIGN_ENTITLEMENTS: `${targetName}/${targetName}.entitlements`,
       };
 
       xcodeProject.addTarget(targetName, 'app_extension', targetName, WIDGET_BUNDLE_ID, {

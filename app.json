@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "36",
+      "buildNumber": "37",
       "appleTeamId": "2KM3QL4UMV",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -54,7 +54,8 @@
           "organization": "orbital-health",
           "project": "react-native"
         }
-      ]
+      ],
+      "./plugins/withOrbitalWidget.js"
     ],
     "extra": {
       "router": {},
