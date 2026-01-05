@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "30",
+      "buildNumber": "31",
       "appleTeamId": "2KM3QL4UMV",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -55,6 +55,7 @@
           "project": "react-native"
         }
       ],
+      "./plugins/withDisableResourceBundleSigning.js",
       "./plugins/withOrbitalWidget.js"
     ],
     "extra": {
