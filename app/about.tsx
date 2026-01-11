@@ -20,6 +20,7 @@ import {
   Scale,
 } from 'lucide-react-native';
 import { colors, commonStyles, spacing } from '../theme';
+import { ProprietaryFooter } from '../components/legal';
 
 export default function AboutScreen() {
   const router = useRouter();
@@ -203,6 +204,8 @@ export default function AboutScreen() {
             <View style={[styles.dot, { backgroundColor: '#F44336' }]} />
           </View>
         </View>
+
+        <ProprietaryFooter compact />
       </ScrollView>
     </SafeAreaView>
   );

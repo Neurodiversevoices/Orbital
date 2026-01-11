@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { X } from 'lucide-react-native';
 import { colors, commonStyles, spacing } from '../theme';
+import { ProprietaryFooter } from '../components/legal';
 
 // Use app version for "Last updated" footer
 const APP_VERSION = '1.0.0';
@@ -134,6 +135,8 @@ export default function SecurityControlsScreen() {
           <Text style={styles.footerText}>Version: v{APP_VERSION}</Text>
           <Text style={styles.footerText}>Last updated: {LAST_UPDATED}</Text>
         </View>
+
+        <ProprietaryFooter compact />
       </ScrollView>
     </SafeAreaView>
   );

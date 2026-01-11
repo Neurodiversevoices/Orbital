@@ -180,7 +180,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000000',
     ...(Platform.OS === 'web' ? {
-      minHeight: '100vh' as any,
       minHeight: '100dvh' as any, // Dynamic viewport height for mobile
     } : {}),
     padding: 8,
