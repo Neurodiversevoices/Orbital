@@ -8,6 +8,7 @@ import {
   exportFullCsv,
   getLogsForRange,
 } from '../export';
+import { getProfileForExport, getProfileForSharedExport } from '../profile';
 
 interface UseExportReturn {
   isExporting: boolean;
@@ -20,10 +21,15 @@ interface UseExportReturn {
   ) => Promise<boolean>;
   exportSummary90d: (locale: 'en' | 'es') => Promise<boolean>;
   exportSummaryAnnual: (locale: 'en' | 'es') => Promise<boolean>;
+  /** Personal export - includes demographics (user owns their data) */
   exportJson: () => Promise<boolean>;
   exportCsv: (includeNotes?: boolean) => Promise<boolean>;
   getLogCount: (range: ExportRange) => Promise<number>;
   clearError: () => void;
+  /** Get profile for personal export (includes all demographics) */
+  getProfileForPersonalExport: () => Promise<Record<string, unknown>>;
+  /** Get profile for shared export (excludes demographics by default) */
+  getProfileForSharing: (includeDemographics?: boolean) => Promise<Record<string, unknown>>;
 }
 
 export function useExport(): UseExportReturn {
@@ -141,6 +147,17 @@ export function useExport(): UseExportReturn {
     setError(null);
   }, []);
 
+  // Profile export helpers for demographics
+  const getProfileForPersonalExport = useCallback(async (): Promise<Record<string, unknown>> => {
+    const profile = await getProfileForExport();
+    return profile as unknown as Record<string, unknown>;
+  }, []);
+
+  const getProfileForSharing = useCallback(async (includeDemographics = false): Promise<Record<string, unknown>> => {
+    const profile = await getProfileForSharedExport(includeDemographics);
+    return profile as unknown as Record<string, unknown>;
+  }, []);
+
   return {
     isExporting,
     error,
@@ -151,5 +168,7 @@ export function useExport(): UseExportReturn {
     exportCsv,
     getLogCount,
     clearError,
+    getProfileForPersonalExport,
+    getProfileForSharing,
   };
 }

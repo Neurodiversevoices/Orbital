@@ -33,7 +33,7 @@ export function TermsAcceptanceProvider({ children }: TermsAcceptanceProviderPro
         setShowModal(true);
       }
     } catch (error) {
-      console.error('[Terms] Error checking acceptance:', error);
+      if (__DEV__) console.error('[Terms] Error checking acceptance:', error);
       // On error, assume accepted to not block the user
       setHasAccepted(true);
     } finally {
@@ -47,7 +47,7 @@ export function TermsAcceptanceProvider({ children }: TermsAcceptanceProviderPro
       setHasAccepted(true);
       setShowModal(false);
     } catch (error) {
-      console.error('[Terms] Error recording acceptance:', error);
+      if (__DEV__) console.error('[Terms] Error recording acceptance:', error);
       // Still close modal to not block user
       setHasAccepted(true);
       setShowModal(false);

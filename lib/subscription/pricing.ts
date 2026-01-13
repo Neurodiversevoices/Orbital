@@ -1,23 +1,37 @@
 /**
  * Orbital Pricing Configuration — FINAL LOCK (January 2026)
  *
- * Single source of truth for all subscription tiers and QCR artifacts.
+ * Single source of truth for all B2C subscription tiers and artifacts.
  *
- * CLASS A SUBSCRIPTION PLANS:
- * - Individual: $29/mo | $290/yr (private use, no shared visibility)
- * - Circle: $79/mo | $790/yr (5 seats, mesh visibility, +$10/mo per expansion)
- * - 10-Seat Bundle: $399/mo | $3,990/yr (includes Admin Dashboard)
- * - 25-Seat Bundle: $899/mo | $8,990/yr (includes Admin Dashboard)
+ * TIER LADDER (B2C): Free → Pro → Family → Circles → CCI-Q4
  *
- * QCR (PDF ARTIFACTS):
- * - Individual QCR: $149 one-time
- * - Circle QCR: $299 one-time
- * - Bundle QCR: $499 one-time
+ * PRO (INDIVIDUAL):
+ * - Pro: $29/mo | $290/yr (required for Circles/Bundles participation)
+ *
+ * FAMILY ADD-ON (requires Pro):
+ * - Family Base (5 seats): $79/mo | $790/yr
+ * - Additional members: +$9/mo | +$90/yr per member
+ *
+ * CIRCLES (container, requires Pro for all members):
+ * - Circle: $79/mo | $790/yr (5 buddies max)
+ *
+ * BUNDLES (Annual-only, B2C groups):
+ * - 10-Seat: $1,990/yr
+ * - 15-Seat: $2,790/yr
+ * - 20-Seat: $3,490/yr
+ *
+ * ADMIN ADD-ON (optional for Circle/Bundle):
+ * - Admin: $29/mo | $290/yr (read-only history access, consent-gated)
+ *
+ * CCI-Q4 (one-time issuance):
+ * - Free users: $199
+ * - Pro users: $149
  *
  * CHECKOUT RULES:
  * - Annual plans are DEFAULT-SELECTED
  * - Monthly is secondary option
  * - Upgrades allowed, silent downgrades BLOCKED
+ * - Bundles are ANNUAL-ONLY
  */
 
 // =============================================================================
@@ -25,25 +39,41 @@
 // =============================================================================
 
 export const PRODUCT_IDS = {
-  // Individual (Solo / Lone Wolf)
-  INDIVIDUAL_MONTHLY: 'orbital_individual_monthly',
-  INDIVIDUAL_ANNUAL: 'orbital_individual_annual',
+  // Pro (Individual) - Required for Circles/Bundles
+  PRO_MONTHLY: 'orbital_pro_monthly',
+  PRO_ANNUAL: 'orbital_pro_annual',
 
-  // Circle (5 seats included)
+  // Family Add-on (requires Pro, base 5 seats)
+  FAMILY_MONTHLY: 'orbital_family_monthly',
+  FAMILY_ANNUAL: 'orbital_family_annual',
+
+  // Family Extra Seat (beyond base 5)
+  FAMILY_EXTRA_SEAT_MONTHLY: 'orbital_family_extra_seat_monthly',
+  FAMILY_EXTRA_SEAT_ANNUAL: 'orbital_family_extra_seat_annual',
+
+  // Circle (5 buddies max, all must be Pro)
   CIRCLE_MONTHLY: 'orbital_circle_monthly',
   CIRCLE_ANNUAL: 'orbital_circle_annual',
 
-  // Circle Expansion Seats
-  CIRCLE_EXPANSION_MONTHLY: 'orbital_circle_expansion_monthly',
-  CIRCLE_EXPANSION_ANNUAL: 'orbital_circle_expansion_annual',
-
-  // Bundles (Class A, Consented, Named)
-  BUNDLE_10_MONTHLY: 'orbital_bundle_10_monthly',
+  // Bundles (Annual-only, B2C groups)
   BUNDLE_10_ANNUAL: 'orbital_bundle_10_annual',
-  BUNDLE_25_MONTHLY: 'orbital_bundle_25_monthly',
-  BUNDLE_25_ANNUAL: 'orbital_bundle_25_annual',
+  BUNDLE_15_ANNUAL: 'orbital_bundle_15_annual',
+  BUNDLE_20_ANNUAL: 'orbital_bundle_20_annual',
 
-  // QCR (PDF Artifacts — One-Time Purchase)
+  // Admin Add-on (for Circle/Bundle, consent-gated)
+  ADMIN_ADDON_MONTHLY: 'orbital_admin_addon_monthly',
+  ADMIN_ADDON_ANNUAL: 'orbital_admin_addon_annual',
+
+  // CCI-Q4 Issuance (one-time, tiered pricing)
+  CCI_FREE: 'orbital_cci_free',    // $199 for Free users
+  CCI_PRO: 'orbital_cci_pro',      // $149 for Pro users
+
+  // Legacy IDs (keep for migration / PRICING_TIERS compatibility)
+  INDIVIDUAL_MONTHLY: 'orbital_individual_monthly',
+  INDIVIDUAL_ANNUAL: 'orbital_individual_annual',
+  BUNDLE_10_MONTHLY: 'orbital_bundle_10_monthly',  // Legacy (bundles now annual-only)
+  BUNDLE_25_MONTHLY: 'orbital_bundle_25_monthly',  // Legacy
+  BUNDLE_25_ANNUAL: 'orbital_bundle_25_annual',    // Legacy (replaced by 15/20)
   QCR_INDIVIDUAL: 'orbital_qcr_individual',
   QCR_CIRCLE: 'orbital_qcr_circle',
   QCR_BUNDLE: 'orbital_qcr_bundle',
@@ -69,17 +99,27 @@ export const STARTER_TIER = {
 // =============================================================================
 
 export const ENTITLEMENTS = {
-  // Plan entitlements
-  INDIVIDUAL: 'individual_access',
-  CIRCLE: 'circle_access',
-  BUNDLE_10: 'bundle_10_access',
-  BUNDLE_25: 'bundle_25_access',
+  // B2C Tier Entitlements
+  FREE: 'free_access',
+  PRO: 'pro_access',              // $29/mo | $290/yr - Required for Circles/Bundles
+  FAMILY: 'family_access',        // Base 5 seats, requires Pro
+  FAMILY_EXTRA_SEAT: 'family_extra_seat',  // Per-seat expansion beyond base 5
+  CIRCLE: 'circle_access',        // 5 buddies max, all must be Pro
+  BUNDLE_10: 'bundle_10_access',  // Annual-only
+  BUNDLE_15: 'bundle_15_access',  // Annual-only
+  BUNDLE_20: 'bundle_20_access',  // Annual-only
 
-  // Feature entitlements
+  // Add-on Entitlements
+  ADMIN_ADDON: 'admin_addon',     // READ-ONLY history access, consent-gated
+
+  // CCI Entitlements
+  CCI_PURCHASED: 'cci_purchased', // User has purchased CCI issuance
+
+  // Legacy entitlements (keep for migration / PRICING_TIERS compatibility)
+  INDIVIDUAL: 'individual_access',
+  BUNDLE_25: 'bundle_25_access',       // Legacy (replaced by 15/20)
   ADMIN_DASHBOARD: 'admin_dashboard',
   SHARED_VISIBILITY: 'shared_visibility',
-
-  // QCR entitlements
   QCR: 'qcr_access',
   QCR_INDIVIDUAL: 'qcr_individual',
   QCR_CIRCLE: 'qcr_circle',
@@ -188,7 +228,7 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
   },
 
   // ===========================================================================
-  // 10-SEAT BUNDLE (Class A, Consented, Named)
+  // 10-SEAT BUNDLE (ANNUAL-ONLY, B2C groups)
   // ===========================================================================
   bundle_10: {
     id: 'bundle_10',
@@ -196,9 +236,9 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
     shortName: 'Bundle 10',
     description: 'Program-level capacity tracking with Admin Dashboard',
     pricing: {
-      monthly: 399,
-      annual: 3990,
-      annualSavingsPercent: 17,
+      monthly: 0, // ANNUAL-ONLY
+      annual: 1990,
+      annualSavingsPercent: 0,
     },
     seats: 10,
     features: [
@@ -207,7 +247,7 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
       'Named individuals with consent',
       'Program-level insights',
       'Aggregate reporting',
-      'Still Class A (NOT Institutional)',
+      'Annual billing only',
     ],
     entitlements: [
       ENTITLEMENTS.BUNDLE_10,
@@ -218,36 +258,35 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
     hasAdminDashboard: true,
     isBundle: true,
     productIds: {
-      monthly: PRODUCT_IDS.BUNDLE_10_MONTHLY,
+      monthly: PRODUCT_IDS.BUNDLE_10_ANNUAL, // No monthly - use annual
       annual: PRODUCT_IDS.BUNDLE_10_ANNUAL,
     },
   },
 
   // ===========================================================================
-  // 25-SEAT BUNDLE (Class A, Consented, Named)
+  // 15-SEAT BUNDLE (ANNUAL-ONLY, B2C groups)
   // ===========================================================================
-  bundle_25: {
-    id: 'bundle_25',
-    name: '25-Seat Bundle',
-    shortName: 'Bundle 25',
-    description: 'Extended program capacity with full admin capabilities',
+  bundle_15: {
+    id: 'bundle_15',
+    name: '15-Seat Bundle',
+    shortName: 'Bundle 15',
+    description: 'Extended program capacity with Admin Dashboard',
     pricing: {
-      monthly: 899,
-      annual: 8990,
-      annualSavingsPercent: 17,
+      monthly: 0, // ANNUAL-ONLY
+      annual: 2790,
+      annualSavingsPercent: 0,
     },
-    seats: 25,
+    seats: 15,
     features: [
-      '25 seats included',
+      '15 seats included',
       'Admin Dashboard (hub visibility)',
       'Named individuals with consent',
       'Program-level insights',
       'Aggregate reporting',
-      'Priority support',
-      'Still Class A (NOT Institutional)',
+      'Annual billing only',
     ],
     entitlements: [
-      ENTITLEMENTS.BUNDLE_25,
+      ENTITLEMENTS.BUNDLE_15,
       ENTITLEMENTS.SHARED_VISIBILITY,
       ENTITLEMENTS.ADMIN_DASHBOARD,
     ],
@@ -255,8 +294,45 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
     hasAdminDashboard: true,
     isBundle: true,
     productIds: {
-      monthly: PRODUCT_IDS.BUNDLE_25_MONTHLY,
-      annual: PRODUCT_IDS.BUNDLE_25_ANNUAL,
+      monthly: PRODUCT_IDS.BUNDLE_15_ANNUAL, // No monthly - use annual
+      annual: PRODUCT_IDS.BUNDLE_15_ANNUAL,
+    },
+  },
+
+  // ===========================================================================
+  // 20-SEAT BUNDLE (ANNUAL-ONLY, B2C groups)
+  // ===========================================================================
+  bundle_20: {
+    id: 'bundle_20',
+    name: '20-Seat Bundle',
+    shortName: 'Bundle 20',
+    description: 'Full program capacity with Admin Dashboard',
+    pricing: {
+      monthly: 0, // ANNUAL-ONLY
+      annual: 3490,
+      annualSavingsPercent: 0,
+    },
+    seats: 20,
+    features: [
+      '20 seats included',
+      'Admin Dashboard (hub visibility)',
+      'Named individuals with consent',
+      'Program-level insights',
+      'Aggregate reporting',
+      'Priority support',
+      'Annual billing only',
+    ],
+    entitlements: [
+      ENTITLEMENTS.BUNDLE_20,
+      ENTITLEMENTS.SHARED_VISIBILITY,
+      ENTITLEMENTS.ADMIN_DASHBOARD,
+    ],
+    hasSharedVisibility: true,
+    hasAdminDashboard: true,
+    isBundle: true,
+    productIds: {
+      monthly: PRODUCT_IDS.BUNDLE_20_ANNUAL, // No monthly - use annual
+      annual: PRODUCT_IDS.BUNDLE_20_ANNUAL,
     },
   },
 };
@@ -361,6 +437,90 @@ export const CHECKOUT_CONFIG = {
 };
 
 // =============================================================================
+// B2C ADD-ON PRICING — CANONICAL SOURCE
+// =============================================================================
+
+/**
+ * Pro subscription pricing (required for Circles/Bundles participation)
+ */
+export const PRO_PRICING = {
+  monthly: 29,
+  annual: 290,
+  annualSavingsPercent: 17,
+} as const;
+
+/**
+ * Family add-on pricing (requires Pro)
+ * Base Family includes up to 5 family members
+ */
+export const FAMILY_ADDON_PRICING = {
+  monthly: 79,
+  annual: 790,
+  annualSavingsPercent: 17,
+  baseSeats: 5,
+} as const;
+
+/**
+ * Family extra seat pricing (beyond base 5 members)
+ * $9/month or $90/year per additional member
+ */
+export const FAMILY_EXTRA_SEAT_PRICING = {
+  monthly: 9,
+  annual: 90,
+  annualSavingsPercent: 17, // ~$18 savings vs monthly ($108/yr)
+} as const;
+
+/**
+ * Circle pricing (5 buddies max, all must be Pro)
+ */
+export const CIRCLE_PRICING = {
+  monthly: 79,
+  annual: 790,
+  annualSavingsPercent: 17,
+  maxBuddies: 5,
+} as const;
+
+/**
+ * Bundle pricing (ANNUAL-ONLY, B2C groups)
+ */
+export const BUNDLE_PRICING = {
+  bundle_10: { annual: 1990, seats: 10 },
+  bundle_15: { annual: 2790, seats: 15 },
+  bundle_20: { annual: 3490, seats: 20 },
+} as const;
+
+/**
+ * Admin add-on pricing (READ-ONLY history access, consent-gated)
+ */
+export const ADMIN_ADDON_PRICING = {
+  monthly: 29,
+  annual: 290,
+  annualSavingsPercent: 17,
+} as const;
+
+/**
+ * CCI-Q4 issuance pricing (tiered by user status)
+ */
+export const CCI_PRICING = {
+  freeUser: 199,   // Free users pay $199
+  proUser: 149,    // Pro users pay $149
+} as const;
+
+/**
+ * Get CCI price based on user's Pro status
+ */
+export function getCCIPrice(isPro: boolean): number {
+  return isPro ? CCI_PRICING.proUser : CCI_PRICING.freeUser;
+}
+
+/**
+ * Get CCI product ID based on user's Pro status
+ */
+export function getCCIProductId(isPro: boolean): ProductId {
+  return isPro ? PRODUCT_IDS.CCI_PRO : PRODUCT_IDS.CCI_FREE;
+}
+
+// =============================================================================
 // HELPER FUNCTIONS
 // =============================================================================
 
@@ -419,6 +579,29 @@ export function calculateCircleExpansionCost(
   return billingCycle === 'monthly'
     ? expansion.monthly * additionalSeats
     : expansion.annual * additionalSeats;
+}
+
+/**
+ * Calculate Family expansion cost (additional members beyond base 5)
+ */
+export function calculateFamilyExpansionCost(
+  additionalMembers: number,
+  billingCycle: 'monthly' | 'annual'
+): number {
+  if (additionalMembers <= 0) return 0;
+
+  return billingCycle === 'monthly'
+    ? FAMILY_EXTRA_SEAT_PRICING.monthly * additionalMembers
+    : FAMILY_EXTRA_SEAT_PRICING.annual * additionalMembers;
+}
+
+/**
+ * Get Family extra seat price for display
+ */
+export function getFamilyExtraSeatPrice(billingCycle: 'monthly' | 'annual'): number {
+  return billingCycle === 'monthly'
+    ? FAMILY_EXTRA_SEAT_PRICING.monthly
+    : FAMILY_EXTRA_SEAT_PRICING.annual;
 }
 
 /**

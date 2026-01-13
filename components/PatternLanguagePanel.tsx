@@ -15,6 +15,15 @@ import { colors, spacing, borderRadius } from '../theme';
 import { usePatternLanguage, PatternConcept, PatternStrength } from '../lib/hooks/usePatternLanguage';
 import { CapacityLog } from '../types';
 
+/**
+ * Format percentage to 1 decimal place for display
+ * e.g., 73.421 → "73.4%"
+ */
+function formatPercent(value: number): string {
+  const rounded = Math.round(value * 10) / 10;
+  return `${rounded}%`;
+}
+
 interface PatternLanguagePanelProps {
   logs: CapacityLog[];
 }
@@ -124,7 +133,7 @@ function PatternDetailModal({
                   ]}
                 />
               </View>
-              <Text style={styles.scoreValue}>{pattern.score}%</Text>
+              <Text style={styles.scoreValue}>{formatPercent(pattern.score)}</Text>
             </View>
           </View>
 
@@ -145,7 +154,7 @@ export function PatternLanguagePanel({ logs }: PatternLanguagePanelProps) {
   if (!hasEnoughData) {
     return (
       <Animated.View entering={FadeInDown.duration(300)} style={styles.emptyContainer}>
-        <Text style={styles.emptyTitle}>Pattern Insights</Text>
+        <Text style={styles.emptyTitle}>Pattern Observations</Text>
         <Text style={styles.emptyMessage}>{dataMessage}</Text>
         <View style={styles.emptyProgress}>
           <View style={styles.emptyProgressTrack}>
@@ -156,7 +165,7 @@ export function PatternLanguagePanel({ logs }: PatternLanguagePanelProps) {
               ]}
             />
           </View>
-          <Text style={styles.emptyProgressText}>{logs.length} / 7 signals</Text>
+          <Text style={styles.emptyProgressText}>{logs.length} of 7 observations required</Text>
         </View>
       </Animated.View>
     );
@@ -165,10 +174,10 @@ export function PatternLanguagePanel({ logs }: PatternLanguagePanelProps) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Your Patterns</Text>
+        <Text style={styles.headerTitle}>Longitudinal Patterns</Text>
         {dominantPattern && (
           <Text style={styles.headerSubtitle}>
-            Strongest: {dominantPattern.label}
+            Dominant: {dominantPattern.label}
           </Text>
         )}
       </View>

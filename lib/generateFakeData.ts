@@ -284,12 +284,12 @@ function pickDetailedNote(
 const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 0));
 
 export async function generateFakeData(years: number = 1): Promise<number> {
-  console.log('[Orbital] Starting data generation for', years, 'years');
+  if (__DEV__) console.log('[Orbital] Starting data generation for', years, 'years');
   const logs: CapacityLog[] = [];
   const now = Date.now();
   const msPerDay = 24 * 60 * 60 * 1000;
   const totalDays = Math.floor(years * 365);
-  console.log('[Orbital] Will generate', totalDays, 'days of data');
+  if (__DEV__) console.log('[Orbital] Will generate', totalDays, 'days of data');
 
   // Base capacity level that drifts over time (simulates life phases)
   let baseCapacity = 0.6;
@@ -395,14 +395,14 @@ export async function generateFakeData(years: number = 1): Promise<number> {
   // Sort by timestamp descending (newest first)
   logs.sort((a, b) => b.timestamp - a.timestamp);
 
-  console.log('[Orbital] Generated', logs.length, 'entries, saving...');
+  if (__DEV__) console.log('[Orbital] Generated', logs.length, 'entries, saving...');
 
   // Save to storage
   try {
     await AsyncStorage.setItem(LOGS_KEY, JSON.stringify(logs));
-    console.log('[Orbital] Saved successfully!');
+    if (__DEV__) console.log('[Orbital] Saved successfully!');
   } catch (error) {
-    console.error('[Orbital] Failed to save:', error);
+    if (__DEV__) console.error('[Orbital] Failed to save:', error);
     throw error;
   }
 

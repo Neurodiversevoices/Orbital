@@ -1,9 +1,13 @@
 /**
- * Institutional Dashboard
+ * Institutional Dashboard — DEMO ONLY
+ *
+ * GOVERNANCE: This is a DEMONSTRATION surface only.
+ * - Shows sample/simulated data
+ * - Non-configurable, non-exportable
+ * - For real institutional access, contact Orbital sales
  *
  * Aggregate-only capacity monitoring for institutions.
  * NO individual surveillance. NO personally identifiable data.
- * Suitable for employers, schools, clinics, research institutions.
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -86,6 +90,14 @@ export default function DashboardScreen() {
         <Pressable onPress={() => router.back()} style={styles.closeButton}>
           <X color={colors.textPrimary} size={24} />
         </Pressable>
+      </View>
+
+      {/* DEMO MODE BANNER — GOVERNANCE REQUIRED */}
+      <View style={styles.demoBanner}>
+        <Text style={styles.demoBannerText}>DEMO / SAMPLE DATA</Text>
+        <Text style={styles.demoBannerSubtext}>
+          For institutional access, contact Orbital sales
+        </Text>
       </View>
 
       {/* Aggregate-Only Warning */}
@@ -316,6 +328,26 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: spacing.sm,
+  },
+  demoBanner: {
+    backgroundColor: '#7A9AAA',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    marginHorizontal: spacing.md,
+    borderRadius: 8,
+    marginBottom: spacing.sm,
+    alignItems: 'center',
+  },
+  demoBannerText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#000',
+    letterSpacing: 1,
+  },
+  demoBannerSubtext: {
+    fontSize: 11,
+    color: 'rgba(0,0,0,0.7)',
+    marginTop: 2,
   },
   warningBanner: {
     flexDirection: 'row',

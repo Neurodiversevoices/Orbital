@@ -48,7 +48,7 @@ export function useTutorial(): TutorialState {
       const firstSignal = await AsyncStorage.getItem(FIRST_SIGNAL_KEY);
       setHasLoggedFirstSignal(firstSignal === 'true');
     } catch (error) {
-      console.warn('[Tutorial] Failed to load state:', error);
+      if (__DEV__) console.warn('[Tutorial] Failed to load state:', error);
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +70,7 @@ export function useTutorial(): TutorialState {
       await AsyncStorage.setItem(FIRST_SIGNAL_KEY, 'true');
       setHasLoggedFirstSignal(true);
     } catch (error) {
-      console.warn('[Tutorial] Failed to mark first signal:', error);
+      if (__DEV__) console.warn('[Tutorial] Failed to mark first signal:', error);
     }
   }, []);
 

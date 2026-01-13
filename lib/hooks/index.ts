@@ -27,3 +27,7 @@ export { useWhyOrbital } from './useWhyOrbital';
 
 // Widget sync hooks
 export { useWidgetSync, syncWidgetOnLog } from './useWidgetSync';
+
+// Capacity Intelligence hooks
+export { useCapacityIntelligence } from './useCapacityIntelligence';
+export type { ProFeature } from './useCapacityIntelligence';

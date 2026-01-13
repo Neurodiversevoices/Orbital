@@ -29,18 +29,26 @@ import {
   shouldBypassSubscription,
 } from './types';
 import { useAppMode } from '../hooks/useAppMode';
+import {
+  setPaymentScope,
+  updatePaymentStage,
+  clearPaymentScope,
+  capturePaymentError,
+  isUserCancellation,
+} from '../observability';
 
 // Dynamic import for RevenueCat to handle web gracefully
 let Purchases: typeof import('react-native-purchases').default | null = null;
 let PurchasesPackage: typeof import('react-native-purchases').PurchasesPackage | null = null;
 
-// RevenueCat API keys - replace with actual keys
-const REVENUECAT_API_KEY_IOS = 'appl_REPLACE_WITH_REVENUECAT_IOS_KEY';
-const REVENUECAT_API_KEY_ANDROID = 'goog_REPLACE_WITH_REVENUECAT_ANDROID_KEY';
+// RevenueCat API keys from environment variables
+// Falls back gracefully to free mode if not configured
+const REVENUECAT_API_KEY_IOS = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY || '';
+const REVENUECAT_API_KEY_ANDROID = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY || '';
 
 interface SubscriptionContextType extends SubscriptionState {
   /** Purchase the Pro subscription */
-  purchase: () => Promise<boolean>;
+  purchase: (productId?: string) => Promise<boolean>;
   /** Restore previous purchases */
   restore: () => Promise<boolean>;
   /** Refresh subscription status */
@@ -90,9 +98,9 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         ? REVENUECAT_API_KEY_IOS
         : REVENUECAT_API_KEY_ANDROID;
 
-      // Skip if API key not configured
-      if (apiKey.includes('REPLACE_WITH')) {
-        console.log('[Subscription] RevenueCat API key not configured, running in free mode');
+      // Skip if API key not configured (empty or placeholder)
+      if (!apiKey || apiKey.includes('REPLACE_WITH')) {
+        if (__DEV__) console.log('[Subscription] RevenueCat API key not configured, running in free mode');
         setState({
           ...DEFAULT_SUBSCRIPTION_STATE,
           isLoading: false,
@@ -113,7 +121,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         isLoading: false,
       }));
     } catch (error) {
-      console.error('[Subscription] Failed to initialize RevenueCat:', error);
+      if (__DEV__) console.error('[Subscription] Failed to initialize RevenueCat:', error);
       // Fallback to free mode - app continues working
       setState({
         ...DEFAULT_SUBSCRIPTION_STATE,
@@ -154,7 +162,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         }));
       }
     } catch (error) {
-      console.error('[Subscription] Failed to check status:', error);
+      if (__DEV__) console.error('[Subscription] Failed to check status:', error);
       // Don't crash, just assume free
       setState(prev => ({
         ...prev,
@@ -165,78 +173,133 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     }
   };
 
-  const purchase = useCallback(async (): Promise<boolean> => {
+  const purchase = useCallback(async (productId?: string): Promise<boolean> => {
     if (!Purchases || !state.isAvailable) {
-      console.log('[Subscription] Purchase not available');
+      if (__DEV__) console.log('[Subscription] Purchase not available');
       return false;
     }
 
+    const targetProductId = productId || PRODUCT_ID_MONTHLY;
+
+    // Set payment scope for Sentry zero-tolerance alerting
+    setPaymentScope({
+      provider: 'revenuecat',
+      flow: 'purchase',
+      productId: targetProductId,
+      stage: 'start',
+    });
+
     try {
       // Get available packages
+      updatePaymentStage('offerings_fetch');
       const offerings = await Purchases.getOfferings();
       const currentOffering = offerings.current;
 
       if (!currentOffering) {
-        console.error('[Subscription] No offerings available');
+        if (__DEV__) console.error('[Subscription] No offerings available');
+        clearPaymentScope();
         return false;
       }
 
-      // Find the monthly package
-      const monthlyPackage = currentOffering.availablePackages.find(
-        pkg => pkg.identifier === '$rc_monthly' || pkg.product.identifier === PRODUCT_ID_MONTHLY
+      // Find the requested package or default to monthly
+      updatePaymentStage('package_select');
+      const targetPackage = currentOffering.availablePackages.find(
+        pkg => pkg.product.identifier === targetProductId ||
+               pkg.identifier === '$rc_monthly' && !productId
       );
 
-      if (!monthlyPackage) {
-        console.error('[Subscription] Monthly package not found');
+      if (!targetPackage) {
+        if (__DEV__) console.error('[Subscription] Package not found:', targetProductId);
+        clearPaymentScope();
         return false;
       }
 
       // Make purchase
-      const { customerInfo } = await Purchases.purchasePackage(monthlyPackage);
+      updatePaymentStage('confirm');
+      const { customerInfo } = await Purchases.purchasePackage(targetPackage);
       const isPro = !!customerInfo.entitlements.active[ENTITLEMENT_ID];
 
       if (isPro) {
+        updatePaymentStage('complete');
+        clearPaymentScope();
         await checkSubscriptionStatus();
         return true;
       }
 
+      clearPaymentScope();
       return false;
     } catch (error: any) {
-      // User cancelled is not an error
-      if (error.userCancelled) {
+      // User cancelled is NOT an error - do not report to Sentry
+      if (isUserCancellation(error)) {
+        clearPaymentScope();
         return false;
       }
-      console.error('[Subscription] Purchase failed:', error);
+
+      // Payment failure - capture for zero-tolerance alerting
+      capturePaymentError(error, {
+        stage: 'failed',
+        productId: targetProductId,
+        errorCode: error.code,
+        additionalContext: {
+          userMessage: error.message,
+          underlyingError: error.underlyingErrorMessage,
+        },
+      });
+
+      if (__DEV__) console.error('[Subscription] Purchase failed:', error);
       setState(prev => ({
         ...prev,
         error: error.message || 'Purchase failed',
       }));
+      clearPaymentScope();
       return false;
     }
   }, [state.isAvailable]);
 
   const restore = useCallback(async (): Promise<boolean> => {
     if (!Purchases || !state.isAvailable) {
-      console.log('[Subscription] Restore not available');
+      if (__DEV__) console.log('[Subscription] Restore not available');
       return false;
     }
 
+    // Set payment scope for Sentry zero-tolerance alerting
+    setPaymentScope({
+      provider: 'revenuecat',
+      flow: 'restore',
+      stage: 'start',
+    });
+
     try {
+      updatePaymentStage('restore');
       const customerInfo = await Purchases.restorePurchases();
       const isPro = !!customerInfo.entitlements.active[ENTITLEMENT_ID];
 
       if (isPro) {
+        updatePaymentStage('complete');
+        clearPaymentScope();
         await checkSubscriptionStatus();
         return true;
       }
 
+      clearPaymentScope();
       return false;
     } catch (error: any) {
-      console.error('[Subscription] Restore failed:', error);
+      // Restore failure - capture for alerting
+      capturePaymentError(error, {
+        stage: 'failed',
+        errorCode: error.code,
+        additionalContext: {
+          userMessage: error.message,
+          flow: 'restore',
+        },
+      });
+
+      if (__DEV__) console.error('[Subscription] Restore failed:', error);
       setState(prev => ({
         ...prev,
         error: error.message || 'Restore failed',
       }));
+      clearPaymentScope();
       return false;
     }
   }, [state.isAvailable]);
@@ -295,7 +358,7 @@ export function useSubscription(): SubscriptionContextType {
     return {
       ...DEFAULT_SUBSCRIPTION_STATE,
       isLoading: false,
-      purchase: async () => false,
+      purchase: async (_productId?: string) => false,
       restore: async () => false,
       refresh: async () => {},
       hasAccess: () => true, // Default to allowing access

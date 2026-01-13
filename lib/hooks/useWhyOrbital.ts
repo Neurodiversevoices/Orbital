@@ -27,7 +27,7 @@ export function useWhyOrbital(): UseWhyOrbitalReturn {
         const value = await AsyncStorage.getItem(STORAGE_KEY);
         setHasSeenWhyOrbital(value === 'true');
       } catch (error) {
-        console.error('Failed to load Why Orbital status:', error);
+        if (__DEV__) console.error('Failed to load Why Orbital status:', error);
         setHasSeenWhyOrbital(false);
       } finally {
         setIsLoading(false);
@@ -42,7 +42,7 @@ export function useWhyOrbital(): UseWhyOrbitalReturn {
       await AsyncStorage.setItem(STORAGE_KEY, 'true');
       setHasSeenWhyOrbital(true);
     } catch (error) {
-      console.error('Failed to mark Why Orbital as seen:', error);
+      if (__DEV__) console.error('Failed to mark Why Orbital as seen:', error);
     }
   }, []);
 
@@ -51,7 +51,7 @@ export function useWhyOrbital(): UseWhyOrbitalReturn {
       await AsyncStorage.removeItem(STORAGE_KEY);
       setHasSeenWhyOrbital(false);
     } catch (error) {
-      console.error('Failed to reset Why Orbital status:', error);
+      if (__DEV__) console.error('Failed to reset Why Orbital status:', error);
     }
   }, []);
 

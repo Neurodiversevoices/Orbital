@@ -4,9 +4,8 @@
  * Provides isolated demo data mode for screenshots, demos, and testing.
  * Never touches real user data. Works completely offline.
  *
- * Activation:
- * - Settings → Advanced → Demo Mode toggle
- * - Long-press Orbital logo 5 times
+ * FOUNDER-ONLY: Demo mode is gated behind EXPO_PUBLIC_FOUNDER_DEMO=1
+ * Normal users cannot see, enable, or trigger demo data generation.
  *
  * Usage:
  *   const { isDemoMode, enableDemoMode, disableDemoMode, reseedDemoData } = useDemoMode();
@@ -24,11 +23,42 @@ import {
   AuditEntry,
 } from '../../types';
 
-type DemoDuration = '30d' | '90d' | '180d' | '365d';
+// =============================================================================
+// FOUNDER-ONLY GATE
+// Demo mode is ONLY available when EXPO_PUBLIC_FOUNDER_DEMO=1
+// In production builds, this is unset → demo entry points do not render
+// =============================================================================
+export const FOUNDER_DEMO_ENABLED = process.env.EXPO_PUBLIC_FOUNDER_DEMO === '1';
+
+/**
+ * HARD EXECUTION GUARD — Engine-level protection
+ * Call at top of every demo function to prevent execution in production.
+ * Throws if demo functions are called without FOUNDER_DEMO_ENABLED=true.
+ */
+function assertFounderDemo(operation: string): void {
+  if (!FOUNDER_DEMO_ENABLED) {
+    const error = new Error(`[DemoMode] BLOCKED: ${operation} called without FOUNDER_DEMO_ENABLED`);
+    if (__DEV__) {
+      console.error(error.message);
+    }
+    throw error;
+  }
+}
+
+export type DemoDuration = '30d' | '90d' | '180d' | '365d' | '3y' | '5y' | '10y';
+
+/**
+ * Check if a log ID is demo data (starts with 'demo-')
+ * Used by cloud sync to block demo data from entering outbox.
+ */
+export function isDemoLogId(logId: string): boolean {
+  return logId.startsWith('demo-');
+}
 
 interface DemoModeContextType {
   isDemoMode: boolean;
   isLoading: boolean;
+  isFounderDemo: boolean; // True only when EXPO_PUBLIC_FOUNDER_DEMO=1
   enableDemoMode: (duration?: DemoDuration) => Promise<void>;
   disableDemoMode: () => Promise<void>;
   reseedDemoData: (duration?: DemoDuration) => Promise<void>;
@@ -63,31 +93,97 @@ class SeededRandom {
 
 const rng = new SeededRandom();
 
-// Premium demo data patterns
+// Multi-year longitudinal demo patterns
+// Designed for institutional credibility: medical record / therapist notes feel
 const DEMO_PATTERNS = {
-  // Baseline hovers around 50-55%, creating a realistic "average person" feel
-  baselineTarget: 0.52,
+  // Starting baseline (year 0) - slightly below center
+  baselineStart: 0.48,
 
-  // Crisis period: days 25-32 (a visible dip)
-  crisisStart: 25,
-  crisisEnd: 32,
-  crisisSeverity: -0.25,
+  // Structural drift: gradual improvement over years (1.5% per year)
+  yearlyImprovement: 0.015,
 
-  // Recovery trend: days 33-45 (gradual improvement)
-  recoveryStart: 33,
-  recoveryEnd: 45,
+  // Seasonal modulation amplitude (capacity lower Nov-Feb, higher May-Aug)
+  seasonalAmplitude: 0.08,
 
-  // Good streak: days 60-70 (stable high period)
-  goodStreakStart: 60,
-  goodStreakEnd: 70,
+  // Day-of-week effects (consistent signature across all years)
+  dayOfWeekEffects: {
+    0: 0.06,   // Sunday: slightly higher
+    1: -0.10,  // Monday: notably harder
+    2: -0.03,  // Tuesday: slightly harder
+    3: 0.0,    // Wednesday: neutral
+    4: 0.02,   // Thursday: slightly better
+    5: 0.05,   // Friday: better
+    6: 0.07,   // Saturday: higher
+  } as Record<number, number>,
+
+  // Time-of-day effects
+  timeOfDayEffects: {
+    earlyMorning: -0.08,  // before 7am
+    morning: 0.06,        // 7-10am
+    midday: 0.0,          // 10am-1pm
+    afternoon: -0.10,     // 1-5pm (post-lunch dip)
+    evening: -0.05,       // 5-9pm
+    night: -0.08,         // after 9pm
+  },
 
   // Category correlations (which drivers appear with depleted states)
   categoryCorrelations: {
-    sensory: 0.35,  // 35% of depleted logs have sensory
-    demand: 0.45,   // 45% have demand
-    social: 0.20,   // 20% have social
+    sensory: 0.35,
+    demand: 0.45,
+    social: 0.20,
   },
 };
+
+// Generate major crisis events for multi-year records
+// Returns array of { startDay, duration, severity } for crisis periods
+function generateCrisisEvents(totalDays: number): Array<{ startDay: number; duration: number; severity: number }> {
+  const events: Array<{ startDay: number; duration: number; severity: number }> = [];
+
+  // Major crisis every 400-550 days (roughly 12-18 months)
+  // Plus smaller quarterly dips
+  let lastMajorCrisis = 0;
+
+  for (let day = 30; day < totalDays; day++) {
+    const daysSinceLastMajor = day - lastMajorCrisis;
+
+    // Major crisis check (every 400-550 days)
+    if (daysSinceLastMajor > 400 && daysSinceLastMajor < 550) {
+      // 30% chance per day in this window to start a major crisis
+      const hash = (day * 31337) % 100;
+      if (hash < 30 && events.filter(e => e.startDay > day - 100).length === 0) {
+        events.push({
+          startDay: day,
+          duration: 12 + (hash % 10), // 12-21 days
+          severity: 0.25 + (hash % 15) / 100, // 0.25-0.40 severity
+        });
+        lastMajorCrisis = day;
+        day += 60; // Skip ahead to avoid clustering
+        continue;
+      }
+    }
+
+    // Smaller quarterly dips (every 80-100 days, less severe)
+    if (day % 90 > 85 && day % 90 < 95) {
+      const hash = (day * 7919) % 100;
+      if (hash < 40 && events.filter(e => Math.abs(e.startDay - day) < 30).length === 0) {
+        events.push({
+          startDay: day,
+          duration: 5 + (hash % 5), // 5-9 days
+          severity: 0.12 + (hash % 10) / 100, // 0.12-0.22 severity
+        });
+      }
+    }
+  }
+
+  return events;
+}
+
+// Generate stability plateaus (periods of reduced volatility)
+function isInPlateau(dayOffset: number, totalDays: number): boolean {
+  // Create plateaus roughly every 200-300 days, lasting 60-120 days
+  const cyclePosition = dayOffset % 250;
+  return cyclePosition > 80 && cyclePosition < 180;
+}
 
 // Premium note templates (polished for screenshots)
 const premiumNotes = {
@@ -127,47 +223,73 @@ function generateId(): string {
   return `demo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
-function getCapacityForDay(dayOffset: number, hourOfDay: number): { state: CapacityState; value: number } {
-  let capacity = DEMO_PATTERNS.baselineTarget;
+// Multi-year capacity calculation with longitudinal patterns
+function getCapacityForDayMultiYear(
+  dayOffset: number,
+  hourOfDay: number,
+  totalDays: number,
+  crisisEvents: Array<{ startDay: number; duration: number; severity: number }>
+): { state: CapacityState; value: number } {
+  const entryDate = new Date(Date.now() - dayOffset * 86400000);
+  const dayOfWeek = entryDate.getDay();
+  const month = entryDate.getMonth(); // 0-11
+  const yearsAgo = dayOffset / 365;
 
-  // Time of day effects
-  if (hourOfDay < 7) capacity -= 0.1;
-  else if (hourOfDay >= 7 && hourOfDay < 10) capacity += 0.08;
-  else if (hourOfDay >= 13 && hourOfDay < 15) capacity -= 0.12;
-  else if (hourOfDay >= 21) capacity -= 0.08;
+  // 1. Start with baseline + structural improvement over years
+  let capacity = DEMO_PATTERNS.baselineStart + (yearsAgo * DEMO_PATTERNS.yearlyImprovement);
 
-  // Day of week (Monday harder)
-  const dayOfWeek = new Date(Date.now() - dayOffset * 86400000).getDay();
-  if (dayOfWeek === 1) capacity -= 0.1;
-  if (dayOfWeek === 5) capacity += 0.05;
-  if (dayOfWeek === 0 || dayOfWeek === 6) capacity += 0.08;
+  // 2. Seasonal modulation (Nov-Feb lower, May-Aug higher)
+  // Using cosine wave centered on February (month 1) as the low point
+  const seasonalPhase = ((month + 1) / 12) * 2 * Math.PI; // Offset so Feb is trough
+  const seasonalEffect = Math.cos(seasonalPhase) * DEMO_PATTERNS.seasonalAmplitude;
+  capacity += seasonalEffect;
 
-  // Crisis period
-  if (dayOffset >= DEMO_PATTERNS.crisisStart && dayOffset <= DEMO_PATTERNS.crisisEnd) {
-    const crisisProgress = (dayOffset - DEMO_PATTERNS.crisisStart) / (DEMO_PATTERNS.crisisEnd - DEMO_PATTERNS.crisisStart);
-    const crisisDepth = Math.sin(crisisProgress * Math.PI) * DEMO_PATTERNS.crisisSeverity;
-    capacity += crisisDepth;
+  // 3. Day-of-week effects (consistent signature across years)
+  capacity += DEMO_PATTERNS.dayOfWeekEffects[dayOfWeek] || 0;
+
+  // 4. Time-of-day effects
+  if (hourOfDay < 7) {
+    capacity += DEMO_PATTERNS.timeOfDayEffects.earlyMorning;
+  } else if (hourOfDay < 10) {
+    capacity += DEMO_PATTERNS.timeOfDayEffects.morning;
+  } else if (hourOfDay < 13) {
+    capacity += DEMO_PATTERNS.timeOfDayEffects.midday;
+  } else if (hourOfDay < 17) {
+    capacity += DEMO_PATTERNS.timeOfDayEffects.afternoon;
+  } else if (hourOfDay < 21) {
+    capacity += DEMO_PATTERNS.timeOfDayEffects.evening;
+  } else {
+    capacity += DEMO_PATTERNS.timeOfDayEffects.night;
   }
 
-  // Recovery trend
-  if (dayOffset >= DEMO_PATTERNS.recoveryStart && dayOffset <= DEMO_PATTERNS.recoveryEnd) {
-    const recoveryProgress = (dayOffset - DEMO_PATTERNS.recoveryStart) / (DEMO_PATTERNS.recoveryEnd - DEMO_PATTERNS.recoveryStart);
-    capacity += recoveryProgress * 0.15;
+  // 5. Crisis events (major and minor)
+  for (const crisis of crisisEvents) {
+    if (dayOffset >= crisis.startDay && dayOffset < crisis.startDay + crisis.duration) {
+      // Within crisis: sine wave for natural rise/fall
+      const crisisProgress = (dayOffset - crisis.startDay) / crisis.duration;
+      const crisisDepth = Math.sin(crisisProgress * Math.PI) * crisis.severity;
+      capacity -= crisisDepth;
+    } else if (dayOffset >= crisis.startDay + crisis.duration && dayOffset < crisis.startDay + crisis.duration + 14) {
+      // Recovery period: gradual return (14 days post-crisis)
+      const recoveryProgress = (dayOffset - crisis.startDay - crisis.duration) / 14;
+      capacity -= crisis.severity * 0.3 * (1 - recoveryProgress); // Lingering 30% effect
+    }
   }
 
-  // Good streak
-  if (dayOffset >= DEMO_PATTERNS.goodStreakStart && dayOffset <= DEMO_PATTERNS.goodStreakEnd) {
-    capacity += 0.12;
-  }
+  // 6. Plateau effect: reduced volatility during stable periods
+  const inPlateau = isInPlateau(dayOffset, totalDays);
 
-  // Add controlled randomness
-  capacity += (rng.next() - 0.5) * 0.15;
-  capacity = Math.max(0.1, Math.min(0.95, capacity));
+  // 7. Controlled randomness (less during plateaus)
+  const volatility = inPlateau ? 0.06 : 0.12;
+  capacity += (rng.next() - 0.5) * volatility;
+
+  // Clamp to valid range
+  capacity = Math.max(0.08, Math.min(0.92, capacity));
 
   // Determine state
   let state: CapacityState;
-  if (capacity > 0.6) state = 'resourced';
-  else if (capacity > 0.35) state = 'stretched';
+  if (capacity > 0.58) state = 'resourced';
+  else if (capacity > 0.32) state = 'stretched';
   else state = 'depleted';
 
   return { state, value: capacity };
@@ -202,69 +324,79 @@ function pickNote(state: CapacityState): string {
   return notes[Math.floor(rng.next() * notes.length)];
 }
 
-async function generatePremiumDemoData(duration: DemoDuration = '90d'): Promise<{
+async function generatePremiumDemoData(duration: DemoDuration = '10y'): Promise<{
   logs: CapacityLog[];
   recipients: ShareRecipient[];
   shares: ShareConfig[];
   audit: AuditEntry[];
 }> {
+  // HARD GUARD: Block demo data generation in production
+  assertFounderDemo('generatePremiumDemoData');
+
   rng.reset(42); // Consistent seed for reproducible data
 
   const logs: CapacityLog[] = [];
   const now = Date.now();
 
-  // Map duration to days
+  // Map duration to days (expanded for multi-year support)
   const durationDays: Record<DemoDuration, number> = {
     '30d': 30,
     '90d': 90,
     '180d': 180,
     '365d': 365,
+    '3y': 1095,   // 3 years
+    '5y': 1825,   // 5 years
+    '10y': 3650,  // 10 years
   };
   const totalDays = durationDays[duration];
 
-  // Realistic signal generation: 1 signal per day, with ~85% coverage (natural gaps)
-  // This ensures SIGNALS count = approximately the number of days with some realistic gaps
-  const COVERAGE_RATE = 0.85; // 85% of days have a signal
+  // Generate crisis events for the entire duration
+  const crisisEvents = generateCrisisEvents(totalDays);
+
+  // Coverage rate varies slightly by era (more consistent in recent years)
+  // This creates a natural "record matured over time" feel
+  const getBaseCoverage = (dayOffset: number): number => {
+    const yearsAgo = dayOffset / 365;
+    if (yearsAgo > 7) return 0.75; // Older records: 75% coverage
+    if (yearsAgo > 4) return 0.80; // Mid-era: 80% coverage
+    if (yearsAgo > 2) return 0.85; // Recent years: 85% coverage
+    return 0.88; // Most recent: 88% coverage
+  };
 
   for (let day = 0; day < totalDays; day++) {
-    // Skip some days randomly to simulate natural gaps (15% chance of no signal)
-    if (rng.next() > COVERAGE_RATE) {
+    const coverage = getBaseCoverage(day);
+
+    // Skip some days randomly to simulate natural gaps
+    if (rng.next() > coverage) {
       continue;
     }
 
-    // Generate exactly ONE signal per day (consistent with Orbital's mental model)
-    // Varied time of day for realism
+    // Generate exactly ONE signal per day
     const currentHour = new Date(now).getHours();
     const timeSlot = rng.next();
     let hour: number;
 
     if (day === 0) {
-      // For today, only use hours that have already passed
-      // Use morning hours if it's still early, or spread across elapsed hours
       hour = Math.max(1, Math.floor(rng.next() * Math.min(currentHour, 22)));
     } else if (timeSlot < 0.3) {
-      // Morning (8-11am) - 30% chance
       hour = 8 + Math.floor(rng.next() * 4);
     } else if (timeSlot < 0.7) {
-      // Afternoon (12-5pm) - 40% chance
       hour = 12 + Math.floor(rng.next() * 6);
     } else {
-      // Evening (6-9pm) - 30% chance
       hour = 18 + Math.floor(rng.next() * 4);
     }
 
     const minute = Math.floor(rng.next() * 60);
 
-    // Calculate timestamp: X days ago at specified hour:minute
     const entryDate = new Date(now);
     entryDate.setDate(entryDate.getDate() - day);
     entryDate.setHours(hour, minute, 0, 0);
     const timestamp = entryDate.getTime();
 
-    // Skip entries that would be in the future (safety check)
     if (timestamp > now) continue;
 
-    const { state } = getCapacityForDay(day, hour);
+    // Use multi-year pattern generator
+    const { state } = getCapacityForDayMultiYear(day, hour, totalDays, crisisEvents);
     const categories = pickCategory(state);
     const note = pickNote(state);
 
@@ -356,7 +488,7 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
         const unlocked = await AsyncStorage.getItem('@orbital:advanced_unlocked');
         setAdvancedUnlocked(unlocked === 'true');
       } catch (error) {
-        console.error('[DemoMode] Failed to load state:', error);
+        if (__DEV__) console.error('[DemoMode] Failed to load state:', error);
       }
       setIsLoading(false);
     };
@@ -380,7 +512,7 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
 
       await AsyncStorage.setItem(STORAGE_KEYS.REAL_DATA_BACKUP, backup);
     } catch (error) {
-      console.error('[DemoMode] Failed to backup real data:', error);
+      if (__DEV__) console.error('[DemoMode] Failed to backup real data:', error);
     }
   }, []);
 
@@ -396,12 +528,15 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
         await AsyncStorage.setItem(STORAGE_KEYS.AUDIT_LOG, audit);
       }
     } catch (error) {
-      console.error('[DemoMode] Failed to restore real data:', error);
+      if (__DEV__) console.error('[DemoMode] Failed to restore real data:', error);
     }
   }, []);
 
-  // Enable demo mode
-  const enableDemoMode = useCallback(async (duration: DemoDuration = '90d') => {
+  // Enable demo mode (default: 10y to unlock all time range tabs)
+  const enableDemoMode = useCallback(async (duration: DemoDuration = '10y') => {
+    // HARD GUARD: Block in production
+    assertFounderDemo('enableDemoMode');
+
     setIsLoading(true);
     try {
       // Backup real data first
@@ -420,9 +555,9 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
       await AsyncStorage.setItem(STORAGE_KEYS.DEMO_MODE_ENABLED, 'true');
       setIsDemoMode(true);
 
-      console.log('[DemoMode] Enabled with', logs.length, 'demo entries');
+      if (__DEV__) console.log('[DemoMode] Enabled with', logs.length, 'demo entries');
     } catch (error) {
-      console.error('[DemoMode] Failed to enable:', error);
+      if (__DEV__) console.error('[DemoMode] Failed to enable:', error);
     }
     setIsLoading(false);
   }, [backupRealData]);
@@ -438,15 +573,18 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
       await AsyncStorage.setItem(STORAGE_KEYS.DEMO_MODE_ENABLED, 'false');
       setIsDemoMode(false);
 
-      console.log('[DemoMode] Disabled, real data restored');
+      if (__DEV__) console.log('[DemoMode] Disabled, real data restored');
     } catch (error) {
-      console.error('[DemoMode] Failed to disable:', error);
+      if (__DEV__) console.error('[DemoMode] Failed to disable:', error);
     }
     setIsLoading(false);
   }, [restoreRealData]);
 
   // Reseed demo data (regenerate with same style)
-  const reseedDemoData = useCallback(async (duration: DemoDuration = '90d') => {
+  const reseedDemoData = useCallback(async (duration: DemoDuration = '10y') => {
+    // HARD GUARD: Block in production
+    assertFounderDemo('reseedDemoData');
+
     if (!isDemoMode) return;
 
     setIsLoading(true);
@@ -460,15 +598,18 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
       await AsyncStorage.setItem(STORAGE_KEYS.SHARES, JSON.stringify(shares));
       await AsyncStorage.setItem(STORAGE_KEYS.AUDIT_LOG, JSON.stringify(audit));
 
-      console.log('[DemoMode] Reseeded with', logs.length, 'entries');
+      if (__DEV__) console.log('[DemoMode] Reseeded with', logs.length, 'entries');
     } catch (error) {
-      console.error('[DemoMode] Failed to reseed:', error);
+      if (__DEV__) console.error('[DemoMode] Failed to reseed:', error);
     }
     setIsLoading(false);
   }, [isDemoMode]);
 
   // Clear demo data (return to empty/new user state)
   const clearDemoData = useCallback(async () => {
+    // HARD GUARD: Block in production
+    assertFounderDemo('clearDemoData');
+
     if (!isDemoMode) return;
 
     setIsLoading(true);
@@ -478,9 +619,9 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
       await AsyncStorage.setItem(STORAGE_KEYS.SHARES, '[]');
       await AsyncStorage.setItem(STORAGE_KEYS.AUDIT_LOG, '[]');
 
-      console.log('[DemoMode] Cleared to empty state');
+      if (__DEV__) console.log('[DemoMode] Cleared to empty state');
     } catch (error) {
-      console.error('[DemoMode] Failed to clear:', error);
+      if (__DEV__) console.error('[DemoMode] Failed to clear:', error);
     }
     setIsLoading(false);
   }, [isDemoMode]);
@@ -520,6 +661,7 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
       value={{
         isDemoMode,
         isLoading,
+        isFounderDemo: FOUNDER_DEMO_ENABLED,
         enableDemoMode,
         disableDemoMode,
         reseedDemoData,

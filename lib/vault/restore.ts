@@ -28,7 +28,7 @@ export const RestoreService = {
 
       return logs as EnergyLog[];
     } catch (error) {
-      console.error('Restore failed:', error);
+      if (__DEV__) console.error('Restore failed:', error);
       throw new Error('Invalid mnemonic or corrupted backup file');
     }
   }

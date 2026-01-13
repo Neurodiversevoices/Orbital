@@ -40,12 +40,12 @@ export async function startSensoryMonitoring(): Promise<boolean> {
   const config = await getSensoryConfig();
 
   if (!config.enabled) {
-    console.log('[Orbital Sensory] Monitoring disabled in config');
+    if (__DEV__) console.log('[Orbital Sensory] Monitoring disabled in config');
     return false;
   }
 
   if (serviceState.isMonitoring) {
-    console.log('[Orbital Sensory] Already monitoring');
+    if (__DEV__) console.log('[Orbital Sensory] Already monitoring');
     return true;
   }
 
@@ -56,7 +56,7 @@ export async function startSensoryMonitoring(): Promise<boolean> {
     await checkAmbientNoise(config);
   }, 5000); // Check every 5 seconds
 
-  console.log('[Orbital Sensory] Monitoring started');
+  if (__DEV__) console.log('[Orbital Sensory] Monitoring started');
   return true;
 }
 
@@ -73,7 +73,7 @@ export async function stopSensoryMonitoring(): Promise<void> {
     lastAlertTime: 0,
   };
 
-  console.log('[Orbital Sensory] Monitoring stopped');
+  if (__DEV__) console.log('[Orbital Sensory] Monitoring stopped');
 }
 
 export function isMonitoring(): boolean {
@@ -126,7 +126,7 @@ async function checkAmbientNoise(config: SensoryAlertConfig): Promise<void> {
       serviceState.sustainedHighStart = null;
     }
   } catch (error) {
-    console.error('[Orbital Sensory] Error checking ambient noise:', error);
+    if (__DEV__) console.error('[Orbital Sensory] Error checking ambient noise:', error);
   }
 }
 
@@ -177,7 +177,7 @@ async function triggerSensoryAlert(params: {
     acknowledged: false,
   });
 
-  console.log(`[Orbital Sensory] Alert triggered: ${params.severity} (${params.peakValue}dB)`);
+  if (__DEV__) console.log(`[Orbital Sensory] Alert triggered: ${params.severity} (${params.peakValue}dB)`);
 
   // In a real implementation, this would trigger:
   // - Local notification

@@ -1,16 +1,18 @@
 /**
  * Milestones Panel Component
  *
- * Displays longitudinal milestone progress:
+ * Displays longitudinal record depth indicators:
  * - 7-day: Patterns forming
  * - 30-day: Baseline established
  * - 90-day: High-confidence patterns
+ *
+ * Institutional/clinical framing — no gamification
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { Sparkles, Target, ShieldCheck, ChevronRight, Flame } from 'lucide-react-native';
+import { Sparkles, Target, ShieldCheck, Database } from 'lucide-react-native';
 import { spacing, borderRadius } from '../theme';
 import { useMilestones, Milestone } from '../lib/hooks/useMilestones';
 import { CapacityLog } from '../types';
@@ -43,7 +45,7 @@ function MilestoneItem({
       style={[
         styles.milestoneItem,
         compact && styles.milestoneItemCompact,
-        milestone.isAchieved && styles.milestoneItemAchieved,
+        milestone.isAchieved && styles.milestoneItemActive,
         { borderColor: milestone.isAchieved ? `${milestone.color}40` : 'rgba(255,255,255,0.06)' },
       ]}
     >
@@ -73,9 +75,7 @@ function MilestoneItem({
             {milestone.title}
           </Text>
           {milestone.isAchieved && (
-            <View style={[styles.achievedBadge, { backgroundColor: `${milestone.color}20` }]}>
-              <Text style={[styles.achievedBadgeText, { color: milestone.color }]}>Achieved</Text>
-            </View>
+            <Text style={[styles.activeIndicator, { color: milestone.color }]}>●</Text>
           )}
         </View>
 
@@ -94,7 +94,7 @@ function MilestoneItem({
               />
             </View>
             <Text style={styles.progressText}>
-              {milestone.progress}% · {milestone.requiredDays - Math.round(milestone.progress * milestone.requiredDays / 100)} days to go
+              {Math.round(milestone.progress * milestone.requiredDays / 100)} of {milestone.requiredDays} days
             </Text>
           </View>
         )}
@@ -104,20 +104,29 @@ function MilestoneItem({
 }
 
 export function MilestonesPanel({ logs, compact = false }: MilestonesPanelProps) {
-  const { milestones, currentStreak, totalUniqueDays, nextMilestone } = useMilestones(logs);
+  const { milestones, totalUniqueDays, nextMilestone } = useMilestones(logs);
+
+  // Calculate data coverage percentage (rough estimate based on total possible days)
+  const oldestLog = logs.length > 0 ? logs[logs.length - 1] : null;
+  const newestLog = logs.length > 0 ? logs[0] : null;
+  const daySpan = oldestLog && newestLog
+    ? Math.max(1, Math.ceil((newestLog.timestamp - oldestLog.timestamp) / (1000 * 60 * 60 * 24)))
+    : 0;
+  const coveragePercent = daySpan > 0 ? Math.min(100, Math.round((totalUniqueDays / daySpan) * 100)) : 0;
 
   if (compact) {
-    // Show only next milestone or most recent achievement
     const displayMilestone = nextMilestone || milestones[milestones.length - 1];
 
     return (
       <View style={styles.compactContainer}>
         <View style={styles.compactHeader}>
-          <View style={styles.streakContainer}>
-            <Flame size={14} color="#FF9800" />
-            <Text style={styles.streakText}>{currentStreak} day streak</Text>
+          <View style={styles.depthContainer}>
+            <Database size={12} color="rgba(255,255,255,0.5)" />
+            <Text style={styles.depthText}>Record depth: {totalUniqueDays} days</Text>
           </View>
-          <Text style={styles.daysText}>{totalUniqueDays} unique days</Text>
+          {coveragePercent > 0 && (
+            <Text style={styles.coverageText}>{coveragePercent}% coverage</Text>
+          )}
         </View>
 
         {displayMilestone && (
@@ -130,15 +139,15 @@ export function MilestonesPanel({ logs, compact = false }: MilestonesPanelProps)
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Your Journey</Text>
-        <View style={styles.streakContainer}>
-          <Flame size={14} color="#FF9800" />
-          <Text style={styles.streakText}>{currentStreak} day streak</Text>
+        <Text style={styles.headerTitle}>Capacity Record</Text>
+        <View style={styles.depthContainer}>
+          <Database size={12} color="rgba(255,255,255,0.5)" />
+          <Text style={styles.depthText}>{totalUniqueDays} days</Text>
         </View>
       </View>
 
       <Text style={styles.headerSubtitle}>
-        {totalUniqueDays} unique days logged · Pattern history is retained forever
+        {totalUniqueDays} unique observation days · Longitudinal record retained
       </Text>
 
       <View style={styles.milestonesContainer}>
@@ -188,21 +197,21 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.4)',
     marginBottom: spacing.md,
   },
-  streakContainer: {
+  depthContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(255,152,0,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: 8,
   },
-  streakText: {
+  depthText: {
     fontSize: 11,
-    fontWeight: '600',
-    color: '#FF9800',
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.6)',
   },
-  daysText: {
+  coverageText: {
     fontSize: 11,
     color: 'rgba(255,255,255,0.4)',
   },
@@ -220,7 +229,7 @@ const styles = StyleSheet.create({
     padding: spacing.sm,
     marginTop: spacing.xs,
   },
-  milestoneItemAchieved: {
+  milestoneItemActive: {
     backgroundColor: 'rgba(255,255,255,0.04)',
   },
   milestoneIcon: {
@@ -253,14 +262,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
     lineHeight: 16,
   },
-  achievedBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-  },
-  achievedBadgeText: {
-    fontSize: 10,
-    fontWeight: '600',
+  activeIndicator: {
+    fontSize: 8,
   },
   progressContainer: {
     marginTop: spacing.sm,

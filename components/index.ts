@@ -14,3 +14,12 @@ export { ModeInsightsPanel } from './ModeInsightsPanel';
 export { MilestonesPanel } from './MilestonesPanel';
 export { PatternLanguagePanel } from './PatternLanguagePanel';
 export { OrgRoleBanner } from './OrgRoleBanner';
+export { EmptyState } from './EmptyState';
+
+// Legal components
+export {
+  PoisonPillConsentGate,
+  hasPoisonPillConsent,
+  getPoisonPillConsents,
+} from './legal/PoisonPillConsentGate';
+export type { PoisonPillConsentResult } from './legal/PoisonPillConsentGate';

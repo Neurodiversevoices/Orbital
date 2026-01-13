@@ -52,7 +52,7 @@ export default function RecoveryElasticityScreen() {
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <ChevronLeft color="rgba(255,255,255,0.7)" size={24} />
         </Pressable>
-        <Text style={styles.headerTitle}>Recovery Elasticity</Text>
+        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>Recovery Elasticity</Text>
         <View style={styles.headerRight}>
           <ScopeSelectorCompact scope={scope} onScopeChange={setScope} />
         </View>
@@ -233,6 +233,7 @@ const styles = StyleSheet.create({
     padding: spacing.sm,
   },
   headerTitle: {
+    flexShrink: 0,
     flex: 1,
     fontSize: 17,
     fontWeight: '600',

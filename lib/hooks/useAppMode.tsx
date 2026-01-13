@@ -74,7 +74,7 @@ export function AppModeProvider({ children }: AppModeProviderProps) {
       const loaded = await getAppModeSettings();
       setSettings(castSettings(loaded));
     } catch (error) {
-      console.error('[AppMode] Failed to load settings:', error);
+      if (__DEV__) console.error('[AppMode] Failed to load settings:', error);
     }
     setIsLoading(false);
   };
@@ -87,7 +87,7 @@ export function AppModeProvider({ children }: AppModeProviderProps) {
       const newSettings = await switchAppMode(mode as any, orgDetails);
       setSettings(castSettings(newSettings));
     } catch (error) {
-      console.error('[AppMode] Failed to switch mode:', error);
+      if (__DEV__) console.error('[AppMode] Failed to switch mode:', error);
     }
   }, []);
 
@@ -104,7 +104,7 @@ export function AppModeProvider({ children }: AppModeProviderProps) {
       await saveAppModeSettings(newSettings as any);
       setSettings(newSettings);
     } catch (error) {
-      console.error('[AppMode] Failed to leave org:', error);
+      if (__DEV__) console.error('[AppMode] Failed to leave org:', error);
     }
   }, [settings]);
 

@@ -29,6 +29,7 @@ import {
 } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { colors, spacing, borderRadius } from '../theme';
+import { ProprietaryFooter } from '../components/legal';
 
 interface DataPointProps {
   icon: React.ComponentType<{ color: string; size: number }>;
@@ -146,7 +147,7 @@ export default function YourDataScreen() {
         <DataPoint
           icon={EyeOff}
           title="Personal Identifiers"
-          description="We don't collect your name, email, location, or any personally identifiable information. Orbital works without accounts for a reason."
+          description="We don't collect your name, email, location, or any personally identifiable information. Orbital works without requiring an account for a reason."
           type="never"
           delay={450}
         />
@@ -200,6 +201,8 @@ export default function YourDataScreen() {
             Orbital exists to help you understand your capacity patterns over time. We designed every feature with your privacy as the foundation—not an afterthought.
           </Text>
         </Animated.View>
+
+        <ProprietaryFooter compact />
 
         <View style={{ height: spacing.xl }} />
       </ScrollView>

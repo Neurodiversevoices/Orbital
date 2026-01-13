@@ -102,7 +102,7 @@ export async function initSafeModeAsync(): Promise<SafeModeState> {
     return safeModeState;
   } catch (e) {
     // If storage fails, continue without safe mode
-    console.warn('[SafeMode] Failed to initialize:', e);
+    if (__DEV__) console.warn('[SafeMode] Failed to initialize:', e);
     return safeModeState;
   }
 }
@@ -128,7 +128,7 @@ export async function markStartupComplete(): Promise<void> {
       await AsyncStorage.setItem(CRASH_COUNT_KEY, '0');
     }
   } catch (e) {
-    console.warn('[SafeMode] Failed to mark startup complete:', e);
+    if (__DEV__) console.warn('[SafeMode] Failed to mark startup complete:', e);
   }
 }
 

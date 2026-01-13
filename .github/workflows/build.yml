@@ -1,38 +1,13 @@
-name: Build & Deploy
+name: Web Build & Validate
+
+# WEB ONLY — NO MOBILE BUILDS
+# EAS, iOS, Android, TestFlight builds are DISABLED
 
 on:
   push:
     branches: [master, main]
   pull_request:
     branches: [master, main]
-  workflow_dispatch:
-    inputs:
-      platform:
-        description: 'Platform to build'
-        required: true
-        default: 'ios'
-        type: choice
-        options:
-          - ios
-          - android
-          - all
-      profile:
-        description: 'Build profile'
-        required: true
-        default: 'production'
-        type: choice
-        options:
-          - development
-          - preview
-          - production
-      submit:
-        description: 'Submit to store after build'
-        required: false
-        default: false
-        type: boolean
-
-env:
-  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
 jobs:
   doctor:
@@ -65,91 +40,10 @@ jobs:
             config-snapshot.json
           retention-days: 30
 
-      - name: Comment on PR
-        if: failure() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const report = fs.readFileSync('health-report.md', 'utf8');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## Doctor Failed\n\n${report}`
-            });
-
-  build-ios:
-    name: Build iOS
+  validate:
+    name: Validate & Build Web
     needs: doctor
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'workflow_dispatch' &&
-      (github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'all')
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build iOS
-        run: eas build --platform ios --profile ${{ github.event.inputs.profile }} --non-interactive
-
-      - name: Submit to TestFlight
-        if: github.event.inputs.submit == 'true' && github.event.inputs.profile == 'production'
-        run: eas submit --platform ios --profile production --latest --non-interactive
-
-  build-android:
-    name: Build Android
-    needs: doctor
-    runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'workflow_dispatch' &&
-      (github.event.inputs.platform == 'android' || github.event.inputs.platform == 'all')
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Android
-        run: eas build --platform android --profile ${{ github.event.inputs.profile }} --non-interactive
-
-      - name: Submit to Play Store
-        if: github.event.inputs.submit == 'true' && github.event.inputs.profile == 'production'
-        run: eas submit --platform android --profile production --latest --non-interactive
-
-  pr-check:
-    name: PR Validation
-    needs: doctor
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -166,5 +60,5 @@ jobs:
       - name: TypeScript Check
         run: npx tsc --noEmit
 
-      - name: Validate Config
-        run: npm run doctor
+      - name: Build Web
+        run: npm run build:web

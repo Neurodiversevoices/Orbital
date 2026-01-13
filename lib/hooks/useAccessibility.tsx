@@ -88,7 +88,7 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
           setUndoStack(stack.filter(a => a.expiresAt > now));
         }
       } catch (error) {
-        console.error('[Accessibility] Failed to load settings:', error);
+        if (__DEV__) console.error('[Accessibility] Failed to load settings:', error);
       }
       setIsLoaded(true);
     };
@@ -100,7 +100,7 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.ACCESSIBILITY, JSON.stringify(newSettings));
     } catch (error) {
-      console.error('[Accessibility] Failed to save settings:', error);
+      if (__DEV__) console.error('[Accessibility] Failed to save settings:', error);
     }
   }, []);
 
@@ -189,7 +189,7 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.UNDO_STACK, JSON.stringify(stack));
     } catch (error) {
-      console.error('[Accessibility] Failed to save undo stack:', error);
+      if (__DEV__) console.error('[Accessibility] Failed to save undo stack:', error);
     }
   }, []);
 
@@ -247,7 +247,7 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
       queue.push({ action, timestamp: Date.now() });
       await AsyncStorage.setItem(STORAGE_KEYS.OFFLINE_QUEUE, JSON.stringify(queue));
     } catch (error) {
-      console.error('[Accessibility] Failed to queue offline action:', error);
+      if (__DEV__) console.error('[Accessibility] Failed to queue offline action:', error);
     }
   }, [settings.offlineMode]);
 
@@ -261,7 +261,7 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
       // For now, just clear the queue
       await AsyncStorage.removeItem(STORAGE_KEYS.OFFLINE_QUEUE);
     } catch (error) {
-      console.error('[Accessibility] Failed to process offline queue:', error);
+      if (__DEV__) console.error('[Accessibility] Failed to process offline queue:', error);
     }
   }, []);
 

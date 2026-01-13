@@ -248,7 +248,7 @@ export function GlassOrb({ state, onStateChange, onSave }: GlassOrbProps) {
 
   return (
     <GestureDetector gesture={gesture}>
-      <Animated.View style={[styles.container, containerStyle]}>
+      <Animated.View style={[styles.container, containerStyle]} testID="glass-orb" data-testid="glass-orb">
         {/* Outer glow */}
         <Animated.View style={[styles.glow, glowStyle]} />
 

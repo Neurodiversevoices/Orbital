@@ -48,7 +48,7 @@ export function useSharing(): UseSharingReturn {
       setAuditLog(auditData);
     } catch (e) {
       setError('Failed to load sharing data');
-      console.error('[Orbital Sharing] Load failed:', e);
+      if (__DEV__) console.error('[Orbital Sharing] Load failed:', e);
     } finally {
       setIsLoading(false);
     }

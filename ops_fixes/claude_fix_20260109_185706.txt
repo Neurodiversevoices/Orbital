@@ -1,0 +1,46 @@
+﻿I don't have write permissions. Here is the complete surgical fix:
+
+---
+
+## ROOT CAUSE (2-4 sentences)
+
+**These are TEST alerts, not production payment failures.** All log entries are prefixed with `TEST:` or `[TEST]`, indicating they were manually written to verify the alerting/watcher pipeline. The `__DEV_testSentryAlerts()` function in `lib/observability/sentryTags.ts` is correctly guarded with `if (!__DEV__)`, but it's exported from the public barrel (`lib/observability/index.ts`), which risks accidental import in production paths.
+
+---
+
+## EXACT PATCH PLAN
+
+### 1. `lib/observability/index.ts` ΓÇö Remove dev-test function from public exports
+
+```diff
+ export {
+   setPaymentScope,
+   updatePaymentStage,
+   clearPaymentScope,
+   capturePaymentError,
+   isUserCancellation,
+   withPaymentTracking,
+-  __DEV_testSentryAlerts,
++  // __DEV_testSentryAlerts intentionally NOT exported from barrel
++  // Import directly from './sentryTags' in dev screens if needed
+ } from './sentryTags';
+```
+
+### 2. `ORBITAL_ALERTS.log` ΓÇö Clear test entries
+
+```bash
+# Clear the log to stop re-triggering the watcher
+echo -n "" > ORBITAL_ALERTS.log
+```
+
+---
+
+## VERIFICATION STEPS
+
+1. **Confirm no production imports**: `grep -r "__DEV_testSentryAlerts" --include="*.ts" --include="*.tsx" | grep -v sentryTags.ts | grep -v index.ts` ΓÇö should return empty
+2. **Build passes**: `npm run build` or `npx expo export` completes without errors (no missing export references)
+3. **Watcher silent**: After clearing `ORBITAL_ALERTS.log`, confirm no new alerts trigger within 5 minutes
+
+---
+
+**Status: NO REAL PAYMENT FAILURE** ΓÇö This was test traffic verifying the observability pipeline. The fix hardens the export surface to prevent accidental use of the dev-only test function.

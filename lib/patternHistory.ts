@@ -96,7 +96,7 @@ export async function writePatternHistory(
   existing.push(record);
   await savePatternHistory(existing);
 
-  console.log('[PatternHistory] Record created:', record.id);
+  if (__DEV__) console.log('[PatternHistory] Record created:', record.id);
   return record;
 }
 
@@ -174,7 +174,7 @@ export async function softDeletePatternRecord(
   const index = all.findIndex(r => r.id === recordId);
 
   if (index === -1) {
-    console.warn('[PatternHistory] Record not found for soft-delete:', recordId);
+    if (__DEV__) console.warn('[PatternHistory] Record not found for soft-delete:', recordId);
     return false;
   }
 
@@ -182,7 +182,7 @@ export async function softDeletePatternRecord(
   all[index] = deidentifyPatternRecord(all[index], reason);
   await savePatternHistory(all);
 
-  console.log('[PatternHistory] Record soft-deleted:', recordId, 'reason:', reason);
+  if (__DEV__) console.log('[PatternHistory] Record soft-deleted:', recordId, 'reason:', reason);
   return true;
 }
 
@@ -219,7 +219,7 @@ export async function softDeleteUserPatternHistory(
   await savePatternHistory(updated);
   result.completedAt = Date.now();
 
-  console.log('[PatternHistory] User history soft-deleted:', userId, result);
+  if (__DEV__) console.log('[PatternHistory] User history soft-deleted:', userId, result);
   return result;
 }
 
@@ -313,7 +313,7 @@ export async function onCapacityLogSaved(
     await writePatternHistory(log, mode);
   } catch (error) {
     // Log but don't fail the main save operation
-    console.error('[PatternHistory] Failed to write pattern history:', error);
+    if (__DEV__) console.error('[PatternHistory] Failed to write pattern history:', error);
   }
 }
 
@@ -326,7 +326,7 @@ export async function onCapacityLogDeleted(logId: string): Promise<void> {
     const patternHistoryId = `ph_${logId}`;
     await softDeletePatternRecord(patternHistoryId, 'user_deleted');
   } catch (error) {
-    console.error('[PatternHistory] Failed to soft-delete pattern history:', error);
+    if (__DEV__) console.error('[PatternHistory] Failed to soft-delete pattern history:', error);
   }
 }
 
@@ -338,7 +338,7 @@ export async function onAllLogsCleared(userId: string = DEFAULT_USER_ID): Promis
   try {
     await softDeleteUserPatternHistory(userId, 'user_deleted');
   } catch (error) {
-    console.error('[PatternHistory] Failed to soft-delete all pattern history:', error);
+    if (__DEV__) console.error('[PatternHistory] Failed to soft-delete all pattern history:', error);
   }
 }
 

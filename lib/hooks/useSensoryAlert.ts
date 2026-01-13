@@ -48,7 +48,7 @@ export function useSensoryAlert(): UseSensoryAlertReturn {
       setEvents(evts);
       setIsMonitoring(checkIsMonitoring());
     } catch (error) {
-      console.error('[Orbital Sensory] Failed to load data:', error);
+      if (__DEV__) console.error('[Orbital Sensory] Failed to load data:', error);
     } finally {
       setIsLoading(false);
     }

@@ -1,15 +1,17 @@
 import React, { useCallback, useState, useMemo, useEffect } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl, useWindowDimensions, Text, Platform, Pressable } from 'react-native';
+import { View, StyleSheet, FlatList, RefreshControl, useWindowDimensions, Text, Platform, Pressable, Modal } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Circle, Eye, ListTodo, Users, TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Calendar, Clock, Lock, Bug, RefreshCw, Award, Flame, FileText } from 'lucide-react-native';
+import { Circle, Eye, ListTodo, Users, TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Calendar, Clock, Lock, Bug, RefreshCw, Award, FileText, Database } from 'lucide-react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { HistoryItem, EnergyGraph, TimeRangeTabs, TimeRange, getTimeRangeMs, MilestonesPanel, PatternLanguagePanel, OrgRoleBanner } from '../../components';
+import { QCRButton, QCRScreen, QCRPaywall } from '../../components/qcr';
 import { colors, commonStyles, spacing } from '../../theme';
 import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
 import { useLocale, interpolate } from '../../lib/hooks/useLocale';
-import { useDemoMode } from '../../lib/hooks/useDemoMode';
+import { useDemoMode, FOUNDER_DEMO_ENABLED } from '../../lib/hooks/useDemoMode';
 import { useAppMode } from '../../lib/hooks/useAppMode';
+import { useQCR } from '../../lib/qcr';
 import { STORAGE_KEYS } from '../../lib/storage';
 import { CapacityLog, CapacityState, Category, getUnlockTier, getNextUnlockTier, BaselineStats, WeeklySummary } from '../../types';
 import {
@@ -45,14 +47,13 @@ function ConfidenceBadge({ stats }: { stats: BaselineStats }) {
 
   return (
     <View style={confidenceStyles.badge}>
-      <Award size={12} color={tierColor} />
+      <Database size={12} color={tierColor} />
       <Text style={[confidenceStyles.badgeText, { color: tierColor }]}>
         {tierLabel}
       </Text>
       {stats.hasHighConfidenceWeek && (
         <View style={confidenceStyles.weekBadge}>
-          <Flame size={10} color="#FF9800" />
-          <Text style={confidenceStyles.weekBadgeText}>7-Day Streak</Text>
+          <Text style={confidenceStyles.weekBadgeText}>7-day observation period</Text>
         </View>
       )}
     </View>
@@ -72,8 +73,8 @@ function WeeklySummaryCard({ summary }: { summary: WeeklySummary }) {
     <View style={summaryStyles.card}>
       <View style={summaryStyles.header}>
         <View style={summaryStyles.headerLeft}>
-          <Flame size={16} color="#FF9800" />
-          <Text style={summaryStyles.title}>High-Confidence Week</Text>
+          <Database size={16} color="rgba(255,255,255,0.6)" />
+          <Text style={summaryStyles.title}>Weekly Summary</Text>
         </View>
         <Text style={summaryStyles.dateRange}>{dateRange}</Text>
       </View>
@@ -238,8 +239,9 @@ function DebugOverlay({ logs, storageInfo, onReseed, onClose }: {
 
 export default function PatternsScreen() {
   const params = useLocalSearchParams();
-  const showDebug = params.debug === '1';
-  const forceDemo = params.demo === '1';
+  // FOUNDER-ONLY: Debug and demo params only work when EXPO_PUBLIC_FOUNDER_DEMO=1
+  const showDebug = FOUNDER_DEMO_ENABLED && params.debug === '1';
+  const forceDemo = FOUNDER_DEMO_ENABLED && params.demo === '1';
 
   const { logs, isLoading, removeLog, refresh } = useEnergyLogs();
   const { width } = useWindowDimensions();
@@ -254,6 +256,20 @@ export default function PatternsScreen() {
     rawLength: 0,
     parseError: null,
   });
+
+  // QCR State
+  const [showQCRScreen, setShowQCRScreen] = useState(false);
+  const [showQCRPaywall, setShowQCRPaywall] = useState(false);
+  const {
+    hasQCRAccess,
+    report: qcrReport,
+    isGenerating: isQCRGenerating,
+    error: qcrError,
+    generateReport: generateQCR,
+    purchaseQCR,
+    restoreQCR,
+    isDemoReport,
+  } = useQCR({ logs });
 
   // Load storage debug info
   useEffect(() => {
@@ -301,6 +317,34 @@ export default function PatternsScreen() {
     }
     await refresh();
   }, [isDemoMode, enableDemoMode, reseedDemoData, refresh]);
+
+  // QCR button handler - show paywall if no access, otherwise generate and show report
+  const handleQCRPress = useCallback(async () => {
+    if (hasQCRAccess) {
+      await generateQCR();
+      setShowQCRScreen(true);
+    } else {
+      setShowQCRPaywall(true);
+    }
+  }, [hasQCRAccess, generateQCR]);
+
+  const handleQCRPurchase = useCallback(async (productId: 'quarterly' | 'monthly') => {
+    const success = await purchaseQCR(productId);
+    if (success) {
+      await generateQCR();
+      setShowQCRScreen(true);
+    }
+    return success;
+  }, [purchaseQCR, generateQCR]);
+
+  const handleQCRRestore = useCallback(async () => {
+    const success = await restoreQCR();
+    if (success) {
+      await generateQCR();
+      setShowQCRScreen(true);
+    }
+    return success;
+  }, [restoreQCR, generateQCR]);
 
   const logCount = logs.length;
   const currentTier = getUnlockTier(logCount);
@@ -525,8 +569,8 @@ export default function PatternsScreen() {
 
   return (
     <SafeAreaView style={commonStyles.screen}>
-      {/* Debug Overlay */}
-      {debugVisible && (
+      {/* Debug Overlay - FOUNDER-ONLY */}
+      {FOUNDER_DEMO_ENABLED && debugVisible && (
         <DebugOverlay
           logs={logs}
           storageInfo={storageInfo}
@@ -561,9 +605,9 @@ export default function PatternsScreen() {
                 </View>
                 {baselineStats.currentStreak > 1 && (
                   <View style={styles.streakIndicator}>
-                    <Flame size={14} color="#FF9800" />
+                    <Database size={14} color="rgba(255,255,255,0.5)" />
                     <Text style={styles.streakText}>
-                      {baselineStats.currentStreak}-day streak
+                      {baselineStats.currentStreak} consecutive days
                     </Text>
                   </View>
                 )}
@@ -579,10 +623,18 @@ export default function PatternsScreen() {
                 {/* Pattern Language - Stability, Volatility, Recovery Lag */}
                 <PatternLanguagePanel logs={logs} />
 
+                {/* QCR Entry Point */}
+                <QCRButton
+                  hasAccess={hasQCRAccess}
+                  isDemoMode={isDemoMode}
+                  onPress={handleQCRPress}
+                  delay={200}
+                />
+
                 {/* Confidence Badge */}
                 <ConfidenceBadge stats={baselineStats} />
 
-                {/* Weekly Summary Card - shown when 7-day streak achieved */}
+                {/* Weekly Summary Card - shown when 7-day observation period complete */}
                 {weeklySummary && <WeeklySummaryCard summary={weeklySummary} />}
 
                 <TimeRangeTabs
@@ -753,6 +805,30 @@ export default function PatternsScreen() {
           }
         />
       </View>
+
+      {/* QCR Screen Modal */}
+      <Modal
+        visible={showQCRScreen && !!qcrReport}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => setShowQCRScreen(false)}
+      >
+        {qcrReport && (
+          <QCRScreen
+            report={qcrReport}
+            onClose={() => setShowQCRScreen(false)}
+          />
+        )}
+      </Modal>
+
+      {/* QCR Paywall Modal */}
+      <QCRPaywall
+        visible={showQCRPaywall}
+        onClose={() => setShowQCRPaywall(false)}
+        onPurchase={handleQCRPurchase}
+        onRestore={handleQCRRestore}
+        error={qcrError}
+      />
     </SafeAreaView>
   );
 }
@@ -1000,15 +1076,15 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 152, 0, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   streakText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#FF9800',
+    color: 'rgba(255, 255, 255, 0.6)',
   },
 });
 

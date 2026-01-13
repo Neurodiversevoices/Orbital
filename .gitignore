@@ -53,3 +53,4 @@ config-snapshot.json
 
 keys/*.p8
 
+.vercel

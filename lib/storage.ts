@@ -289,10 +289,31 @@ export async function saveInstitutionalConfig(config: Partial<InstitutionalConfi
   await AsyncStorage.setItem(STORAGE_KEYS.INSTITUTIONAL_CONFIG, JSON.stringify(updated));
 }
 
+/**
+ * GOVERNANCE: Institutional tier activation is BLOCKED in-app.
+ *
+ * - 'personal' and 'family' tiers: Can be activated through normal flows
+ * - 'pilot' and 'enterprise' tiers: BLOCKED - Requires sales engagement
+ *
+ * For institutional access, users must contact Orbital sales.
+ * This function will return the current config unchanged for blocked tiers.
+ */
 export async function activateInstitutionalTier(
   tier: InstitutionalTier,
   orgDetails?: { orgId: string; orgName: string; licenseExpiresAt?: number }
 ): Promise<InstitutionalConfig> {
+  // GOVERNANCE BLOCK: Institutional tiers cannot be self-activated
+  const BLOCKED_TIERS: InstitutionalTier[] = ['pilot', 'enterprise'];
+  if (BLOCKED_TIERS.includes(tier)) {
+    if (__DEV__) {
+      console.warn(
+        `[GOVERNANCE] Institutional tier "${tier}" cannot be activated in-app. Contact Orbital sales.`
+      );
+    }
+    // Return current config unchanged - do not activate
+    return getInstitutionalConfig();
+  }
+
   const features = INSTITUTIONAL_FEATURE_SETS[tier];
   const config: InstitutionalConfig = {
     tier,
@@ -306,7 +327,7 @@ export async function activateInstitutionalTier(
   };
   await saveInstitutionalConfig(config);
   await logAuditEntry('export_generated', {
-    details: `Institutional tier activated: ${tier}`,
+    details: `Tier activated: ${tier}`,
   });
   return config;
 }

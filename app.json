@@ -39,6 +39,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-apple-authentication",
       [
         "expo-build-properties",
         {
@@ -57,11 +58,7 @@
       ]
     ],
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "60d17137-74cc-4a95-a1d5-bd0692cf1e2a"
-      }
-    },
-    "owner": "orbital-health"
+      "router": {}
+    }
   }
 }

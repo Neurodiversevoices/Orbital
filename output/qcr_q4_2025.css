@@ -1,0 +1,320 @@
+/**
+ * Clinical Capacity Instrument (CCI) Stylesheet
+ *
+ * Matches EnergyGraph.tsx colors exactly:
+ * - Resourced/High:  #00E5FF (Cyan)
+ * - Stretched/Mod:   #E8A830 (Amber)
+ * - Depleted/Low:    #F44336 (Red)
+ *
+ * Typography: System UI stack for clinical documents
+ */
+
+@page {
+  size: Letter;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1.5;
+  color: #1a1a1a;
+  background: #fff;
+}
+
+.page {
+  width: 8.5in;
+  min-height: 11in;
+  padding: 0.6in 0.7in;
+  background: #fff;
+  border: 1px solid #ccc;
+}
+
+/* ============================================
+   ARTIFACT TITLE
+   ============================================ */
+
+.artifact-title {
+  font-size: 18pt;
+  font-weight: 700;
+  color: #1e3a5f;
+  text-align: center;
+  margin-bottom: 6px;
+  padding-bottom: 8px;
+  border-bottom: 3px solid #1e3a5f;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================
+   CHAIN OF CUSTODY
+   ============================================ */
+
+.chain-of-custody {
+  padding: 16px 0;
+}
+
+.coc-line {
+  margin-bottom: 6px;
+  font-size: 11pt;
+}
+
+.coc-label {
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.coc-value {
+  color: #1a1a1a;
+}
+
+.coc-value em {
+  font-style: italic;
+  color: #1a1a1a;
+}
+
+.coc-note {
+  color: #666;
+}
+
+.coc-status {
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* ============================================
+   SEPARATOR
+   ============================================ */
+
+.separator {
+  height: 3px;
+  background: #d4a84b;
+  margin: 8px 0 20px 0;
+}
+
+/* ============================================
+   SECTION TITLE
+   ============================================ */
+
+.section-title {
+  font-size: 14pt;
+  font-weight: 700;
+  color: #1e3a5f;
+  margin-bottom: 16px;
+  letter-spacing: 0.3px;
+}
+
+/* ============================================
+   PATIENT INFO
+   ============================================ */
+
+.patient-info {
+  margin-bottom: 24px;
+}
+
+.info-line {
+  margin-bottom: 4px;
+  font-size: 11pt;
+}
+
+.info-label {
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.info-value {
+  color: #1a1a1a;
+}
+
+/* ============================================
+   MAIN CONTENT - TWO COLUMN
+   ============================================ */
+
+.main-content {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+/* ============================================
+   AUDIT PANEL (LEFT)
+   ============================================ */
+
+.audit-panel {
+  width: 240px;
+  flex-shrink: 0;
+  border-left: 4px solid #1e3a5f;
+  padding-left: 16px;
+  padding-top: 8px;
+}
+
+.audit-title {
+  font-size: 11pt;
+  font-weight: 700;
+  color: #1e3a5f;
+  margin-bottom: 16px;
+  letter-spacing: 0.3px;
+}
+
+.audit-row {
+  margin-bottom: 12px;
+}
+
+.audit-label {
+  font-weight: 700;
+  color: #1a1a1a;
+  font-size: 10pt;
+}
+
+.audit-value {
+  color: #1a1a1a;
+  font-size: 10pt;
+}
+
+.audit-note {
+  display: block;
+  font-size: 9pt;
+  font-style: italic;
+  color: #666;
+  margin-top: 2px;
+  padding-left: 2px;
+}
+
+.verdict-row {
+  margin-top: 16px;
+}
+
+.audit-verdict {
+  font-weight: 700;
+  color: #1a1a1a;
+  font-size: 10pt;
+}
+
+/* ============================================
+   CHARTS PANEL (RIGHT)
+   ============================================ */
+
+.charts-panel {
+  flex: 1;
+}
+
+.chart-block {
+  margin-bottom: 20px;
+}
+
+.chart-title {
+  font-size: 11pt;
+  font-weight: 700;
+  color: #1e3a5f;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.chart-subtitle {
+  font-weight: 400;
+  color: #666;
+}
+
+.capacity-chart {
+  width: 100%;
+  height: 180px;
+}
+
+.bar-chart {
+  width: 100%;
+  height: 170px;
+}
+
+/* ============================================
+   CHART COLORS - Match EnergyGraph.tsx
+   ============================================ */
+
+/* Zone background fills (subtle) */
+.zone-high { fill: #00E5FF; fill-opacity: 0.04; }
+.zone-moderate { fill: #E8A830; fill-opacity: 0.03; }
+.zone-low { fill: #F44336; fill-opacity: 0.04; }
+
+/* Capacity state colors */
+.color-resourced { fill: #00E5FF; }
+.color-stretched { fill: #E8A830; }
+.color-depleted { fill: #F44336; }
+
+/* Axis styling */
+.axis-label {
+  font-size: 10pt;
+  fill: #666;
+  text-anchor: middle;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.axis-label-y {
+  font-size: 9pt;
+  fill: #666;
+  text-anchor: end;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.axis-line {
+  stroke: #999;
+  stroke-width: 1;
+}
+
+.grid-line {
+  stroke: #e0e0e0;
+  stroke-width: 1;
+}
+
+/* ============================================
+   PROVIDER STATEMENT (FOOTER)
+   ============================================ */
+
+.provider-statement {
+  border-top: 1px solid #ccc;
+  padding-top: 20px;
+  margin-top: 16px;
+}
+
+.provider-statement p {
+  font-size: 10pt;
+  line-height: 1.6;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.provider-statement p:last-child {
+  margin-bottom: 0;
+}
+
+.provider-label {
+  font-weight: 700;
+  color: #1e3a5f;
+}
+
+.provider-statement em {
+  font-style: italic;
+}
+
+/* ============================================
+   PRINT
+   ============================================ */
+
+@media print {
+  .page {
+    border: none;
+  }
+
+  /* Force color printing for charts */
+  .capacity-chart,
+  .bar-chart,
+  svg rect,
+  svg circle,
+  svg path {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

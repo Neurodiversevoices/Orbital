@@ -1,8 +1,11 @@
 /**
- * Mode Selector Dropdown Component
+ * Explore Orbital Modes — Mode Selector with Governance
  *
- * A dropdown that allows users to switch between the 7 Orbital modes.
- * Shows current mode with icon, expands to show all options.
+ * GOVERNANCE:
+ * - B2C users can SEE all modes and click around in DEMO
+ * - Only Personal/Family/Circle are live
+ * - All institutional modes are DEMO-ONLY with no export/config/pricing/activation
+ * - Institutional mode CTAs route to "Contact Orbital"
  */
 
 import React, { useState, useCallback } from 'react';
@@ -14,6 +17,7 @@ import {
   Modal,
   ScrollView,
   TextInput,
+  Linking,
 } from 'react-native';
 import Animated, {
   FadeIn,
@@ -32,10 +36,45 @@ import {
   Building2,
   Check,
   X,
+  ExternalLink,
+  Mail,
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../theme';
 import { AppMode, APP_MODE_CONFIGS, APP_MODES } from '../types';
 import { useAppMode } from '../lib/hooks/useAppMode';
+
+// =============================================================================
+// GOVERNANCE: MODE ENTITLEMENTS
+// =============================================================================
+
+/**
+ * Modes that are LIVE for B2C users
+ */
+const LIVE_MODES: AppMode[] = ['personal', 'caregiver'];
+
+/**
+ * Modes that are DEMO-ONLY (institutional)
+ */
+const DEMO_ONLY_MODES: AppMode[] = ['employer', 'school_district', 'university', 'healthcare', 'demo'];
+
+/**
+ * Check if a mode is live for B2C
+ */
+function isModeAvailable(mode: AppMode): boolean {
+  return LIVE_MODES.includes(mode);
+}
+
+/**
+ * Check if a mode is institutional (DEMO-ONLY)
+ */
+function isInstitutionalMode(mode: AppMode): boolean {
+  return DEMO_ONLY_MODES.includes(mode);
+}
+
+/**
+ * Contact URL for institutional access
+ */
+const INSTITUTIONAL_CONTACT_URL = 'mailto:contact@orbital.health?subject=Orbital%20Institutional%20Access%20Request';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -139,10 +178,17 @@ export function ModeSelector({ compact = false }: ModeSelectorProps) {
           >
             <Pressable onPress={() => {}} style={styles.modalInner}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Select Mode</Text>
+                <Text style={styles.modalTitle}>Explore Orbital Modes</Text>
                 <Pressable onPress={() => setIsOpen(false)} style={styles.closeButton}>
                   <X size={20} color="rgba(255,255,255,0.6)" />
                 </Pressable>
+              </View>
+
+              {/* Governance Notice */}
+              <View style={styles.governanceNotice}>
+                <Text style={styles.governanceText}>
+                  Personal and Family modes are live. Institutional modes are demo-only previews.
+                </Text>
               </View>
 
               <ScrollView style={styles.modeList} showsVerticalScrollIndicator={false}>
@@ -150,6 +196,8 @@ export function ModeSelector({ compact = false }: ModeSelectorProps) {
                   const config = APP_MODE_CONFIGS[mode];
                   const ModeIcon = MODE_ICONS[config.icon] || User;
                   const isSelected = mode === currentMode;
+                  const isDemo = isInstitutionalMode(mode);
+                  const isLive = isModeAvailable(mode);
 
                   return (
                     <Pressable
@@ -164,25 +212,45 @@ export function ModeSelector({ compact = false }: ModeSelectorProps) {
                         <ModeIcon size={20} color={config.accentColor} />
                       </View>
                       <View style={styles.modeInfo}>
-                        <Text style={[styles.modeLabel, isSelected && { color: config.accentColor }]}>
-                          {config.label}
-                        </Text>
+                        <View style={styles.modeLabelRow}>
+                          <Text style={[styles.modeLabel, isSelected && { color: config.accentColor }]}>
+                            {config.label}
+                          </Text>
+                          {isDemo && (
+                            <View style={styles.demoBadge}>
+                              <Text style={styles.demoBadgeText}>DEMO</Text>
+                            </View>
+                          )}
+                          {isLive && !isSelected && (
+                            <View style={styles.liveBadge}>
+                              <Text style={styles.liveBadgeText}>LIVE</Text>
+                            </View>
+                          )}
+                        </View>
                         <Text style={styles.modeDescription} numberOfLines={1}>
-                          {config.description}
+                          {isDemo ? 'Preview only — Contact Orbital for access' : config.description}
                         </Text>
                       </View>
                       {isSelected && (
                         <Check size={18} color={config.accentColor} />
                       )}
-                      {config.requiresOrgCode && !isSelected && (
-                        <View style={styles.orgRequiredBadge}>
-                          <Text style={styles.orgRequiredText}>ORG</Text>
-                        </View>
-                      )}
                     </Pressable>
                   );
                 })}
               </ScrollView>
+
+              {/* Institutional Contact CTA */}
+              <Pressable
+                style={styles.institutionalCta}
+                onPress={() => {
+                  Linking.openURL(INSTITUTIONAL_CONTACT_URL);
+                  setIsOpen(false);
+                }}
+              >
+                <Mail color="#000" size={16} />
+                <Text style={styles.institutionalCtaText}>Request Institutional Access</Text>
+                <ExternalLink color="#000" size={14} />
+              </Pressable>
             </Pressable>
           </Animated.View>
         </Pressable>
@@ -428,6 +496,62 @@ const styles = StyleSheet.create({
   },
   orgSubmitText: {
     fontSize: 14,
+    fontWeight: '600',
+    color: '#000',
+  },
+  // Governance styles
+  governanceNotice: {
+    backgroundColor: 'rgba(232,168,48,0.1)',
+    borderRadius: borderRadius.sm,
+    padding: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  governanceText: {
+    fontSize: 11,
+    color: '#E8A830',
+    textAlign: 'center',
+  },
+  modeLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  demoBadge: {
+    backgroundColor: 'rgba(232,168,48,0.2)',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  demoBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#E8A830',
+    letterSpacing: 0.5,
+  },
+  liveBadge: {
+    backgroundColor: 'rgba(76,175,80,0.2)',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  liveBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#4CAF50',
+    letterSpacing: 0.5,
+  },
+  institutionalCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    backgroundColor: '#00D7FF',
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  institutionalCtaText: {
+    fontSize: 13,
     fontWeight: '600',
     color: '#000',
   },

@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Sentry from '@sentry/react-native';
 import * as Linking from 'expo-linking';
+import Constants from 'expo-constants';
 
 import { colors } from '../theme';
 import { LocaleProvider } from '../lib/hooks/useLocale';
@@ -15,11 +16,100 @@ import { AppModeProvider } from '../lib/hooks/useAppMode';
 import { SubscriptionProvider } from '../lib/subscription';
 import { TermsAcceptanceProvider } from '../lib/hooks/useTermsAcceptance';
 import { ErrorBoundary } from '../components';
+import { AgeGate } from '../components/legal/AgeGate';
 
-// Initialize Sentry - minimal config, no experimental features
+// =============================================================================
+// SENTRY CONFIGURATION - 24/7 Watchdog (Only Bark on Critical Failures)
+// =============================================================================
+// Noise Filtering: Drop warning/info/debug BEFORE sending to Sentry
+// Spike Alert: Configure in Sentry UI for crash-free sessions < 99%
+// Zero Tolerance: Payment failures tagged for instant alerting
+// =============================================================================
+
 Sentry.init({
   dsn: 'https://bbb78729aee9b642c8d677a48da6379d@o4510642690457600.ingest.us.sentry.io/4510642826772480',
+
+  // Only enabled in production builds (TestFlight + App Store)
   enabled: !__DEV__,
+
+  // Environment tagging for alert filtering (production-only alerts)
+  // CRITICAL: Alerts filter on environment=production
+  // - Local dev (__DEV__=true): 'development' (alerts disabled anyway)
+  // - TestFlight (__DEV__=false): 'production' (alerts WILL fire)
+  // - App Store (__DEV__=false): 'production' (alerts WILL fire)
+  environment: __DEV__ ? 'development' : 'production',
+
+  // Release tracking for regression detection
+  release: Constants.expoConfig?.version
+    ? `orbital@${Constants.expoConfig.version}`
+    : undefined,
+
+  // Performance monitoring - modest sample rate (5%)
+  // Does NOT affect error capture (errors always captured)
+  tracesSampleRate: 0.05,
+
+  // Enable session tracking for crash-free rate alerts
+  enableAutoSessionTracking: true,
+  sessionTrackingIntervalMillis: 30000, // 30 seconds
+
+  // ==========================================================================
+  // beforeSend: Filter noise BEFORE it reaches Sentry
+  // ==========================================================================
+  beforeSend(event, hint) {
+    // DROP: warning, info, debug levels (noise)
+    // KEEP: error, fatal (critical failures only)
+    const level = event.level;
+    if (level === 'warning' || level === 'info' || level === 'debug' || level === 'log') {
+      return null; // Discard - do not send to Sentry
+    }
+
+    // Attach additional context for payment-related errors
+    if (event.tags?.feature === 'payment') {
+      event.fingerprint = [
+        'payment',
+        String(event.tags['payment.provider'] || 'unknown'),
+        String(event.tags['payment.flow'] || 'unknown'),
+        String(event.tags['payment.stage'] || 'unknown'),
+      ];
+    }
+
+    return event;
+  },
+
+  // ==========================================================================
+  // beforeBreadcrumb: Keep breadcrumbs clean
+  // ==========================================================================
+  beforeBreadcrumb(breadcrumb) {
+    // Drop noisy console breadcrumbs in production
+    if (breadcrumb.category === 'console' && breadcrumb.level !== 'error') {
+      return null;
+    }
+    return breadcrumb;
+  },
+
+  // ==========================================================================
+  // ignoreErrors: Conservative list - do NOT hide unknown real bugs
+  // ==========================================================================
+  ignoreErrors: [
+    // Network transient errors (user connectivity issues)
+    'Network request failed',
+    'Failed to fetch',
+    'Load failed',
+    'TypeError: cancelled',
+    // User-initiated cancellations (not errors)
+    'User cancelled',
+    'user cancelled',
+    // React Native specific noise
+    'Non-Error promise rejection captured',
+  ],
+
+  // Integrations configuration
+  integrations: (integrations) => {
+    return integrations.filter((integration) => {
+      // Keep default integrations, filter if needed
+      return true;
+    });
+  },
 });
 
 
@@ -60,6 +150,8 @@ function RootLayout() {
             <AppModeProvider>
             <SubscriptionProvider>
               <TermsAcceptanceProvider>
+                {/* AGE GATE — LEGAL REQUIRED: Blocks ALL access until 13+ verified */}
+                <AgeGate>
                 <StatusBar style="light" />
                 <Stack
                   screenOptions={{
@@ -181,7 +273,15 @@ function RootLayout() {
                       animation: 'slide_from_right',
                     }}
                   />
+                  <Stack.Screen
+                    name="enterprise-dashboard"
+                    options={{
+                      presentation: 'modal',
+                      animation: 'slide_from_bottom',
+                    }}
+                  />
                 </Stack>
+                </AgeGate>
               </TermsAcceptanceProvider>
             </SubscriptionProvider>
             </AppModeProvider>

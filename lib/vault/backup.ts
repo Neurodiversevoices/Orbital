@@ -24,7 +24,7 @@ export const BackupService = {
 
       return file.uri;
     } catch (error) {
-      console.error('Backup failed:', error);
+      if (__DEV__) console.error('Backup failed:', error);
       throw new Error('Failed to create secure backup');
     }
   }

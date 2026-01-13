@@ -24,6 +24,7 @@ import { X, Clock, Shield, Heart } from 'lucide-react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { colors, spacing, borderRadius } from '../theme';
 import { useWhyOrbital } from '../lib/hooks/useWhyOrbital';
+import { ProprietaryFooter } from '../components/legal';
 
 interface PrincipleProps {
   icon: React.ComponentType<{ color: string; size: number }>;
@@ -162,7 +163,7 @@ export default function WhyOrbitalScreen() {
           <Principle
             icon={Shield}
             title="Privacy-First"
-            description="Your capacity signals belong to you. No accounts, no cloud sync, no selling data. Ever."
+            description="Your capacity signals belong to you. Optional sync, you control it. We never sell your data. Ever."
             delay={500}
           />
 
@@ -197,6 +198,8 @@ export default function WhyOrbitalScreen() {
 
         {/* Tap anywhere hint */}
         <Text style={styles.fallbackHintText}>tap anywhere to continue</Text>
+
+        <ProprietaryFooter compact />
       </View>
     </SafeAreaView>
   );

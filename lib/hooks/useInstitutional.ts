@@ -43,7 +43,7 @@ export function useInstitutional(): UseInstitutionalReturn {
       const cfg = await getInstitutionalConfig();
       setConfig(cfg);
     } catch (error) {
-      console.error('[Orbital] Failed to load institutional config:', error);
+      if (__DEV__) console.error('[Orbital] Failed to load institutional config:', error);
     } finally {
       setIsLoading(false);
     }

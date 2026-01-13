@@ -8,7 +8,7 @@ if (Platform.OS === 'ios') {
   try {
     widgetModule = require('../../modules/orbital-widget');
   } catch (e) {
-    console.log('[WidgetSync] Widget module not available');
+    if (__DEV__) console.log('[WidgetSync] Widget module not available');
   }
 }
 
@@ -28,7 +28,7 @@ export function useWidgetSync(currentState: CapacityState | null) {
       widgetModule.updateWidgetFromCapacityState(state);
       lastSyncedState.current = state;
     } catch (e) {
-      console.error('[WidgetSync] Failed to update widget:', e);
+      if (__DEV__) console.error('[WidgetSync] Failed to update widget:', e);
     }
   }, []);
 
@@ -56,6 +56,6 @@ export function syncWidgetOnLog(state: CapacityState): void {
   try {
     widgetModule.updateWidgetFromCapacityState(state);
   } catch (e) {
-    console.error('[WidgetSync] Failed to sync widget on log:', e);
+    if (__DEV__) console.error('[WidgetSync] Failed to sync widget on log:', e);
   }
 }

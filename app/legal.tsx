@@ -102,12 +102,19 @@ export default function LegalScreen() {
           );
         })}
 
+        {/* PATCH 2: Enhanced Not Medical Advice Disclaimer */}
         <View style={styles.disclaimerSection}>
           <AlertTriangle color="rgba(255,255,255,0.3)" size={20} />
-          <Text style={styles.disclaimerText}>
-            Orbital is a non-diagnostic capacity tracking tool. It does not provide
-            medical advice, diagnosis, or treatment recommendations.
-          </Text>
+          <View style={styles.disclaimerContent}>
+            <Text style={styles.disclaimerText}>
+              Orbital does not provide medical advice, diagnosis, or treatment.
+            </Text>
+            <Text style={styles.disclaimerTextSecondary}>
+              The Clinical Capacity Instrument (CCI-Q4) is informational and designed to
+              support documentation and record review; it does not guarantee reimbursement
+              or clinical outcomes.
+            </Text>
+          </View>
         </View>
 
         <View style={styles.footer}>
@@ -253,11 +260,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(232,168,48,0.2)',
   },
-  disclaimerText: {
+  disclaimerContent: {
     flex: 1,
+  },
+  disclaimerText: {
     fontSize: 12,
-    color: 'rgba(232,168,48,0.8)',
+    color: 'rgba(232,168,48,0.9)',
     lineHeight: 18,
+    fontWeight: '500',
+  },
+  disclaimerTextSecondary: {
+    fontSize: 11,
+    color: 'rgba(232,168,48,0.7)',
+    lineHeight: 16,
+    marginTop: spacing.xs,
   },
   footer: {
     alignItems: 'center',

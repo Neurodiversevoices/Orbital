@@ -22,23 +22,25 @@ function generateId(prefix: string): string {
 // PRICING BANDS
 // ============================================
 
+/**
+ * GOVERNANCE: B2C tiers only.
+ *
+ * INSTITUTIONAL PRICING IS NOT EXPOSED IN-APP.
+ * Pilot and Enterprise pricing is scope-defined through sales engagement.
+ *
+ * For institutional inquiries: Contact Orbital sales.
+ */
 export const DEFAULT_PRICING_BANDS: PricingBand[] = [
-  // Personal tier
+  // Personal tier (B2C - Free)
   { tier: 'personal', minSeats: 1, maxSeats: 1, pricePerSeat: 0, currency: 'USD', billingCycle: 'monthly' },
 
-  // Family tier
-  { tier: 'family', minSeats: 2, maxSeats: 6, pricePerSeat: 4.99, currency: 'USD', billingCycle: 'monthly' },
-  { tier: 'family', minSeats: 2, maxSeats: 6, pricePerSeat: 49.99, currency: 'USD', billingCycle: 'annual' },
+  // Family tier (B2C - see lib/subscription/pricing.ts for canonical prices)
+  { tier: 'family', minSeats: 2, maxSeats: 6, pricePerSeat: 0, currency: 'USD', billingCycle: 'monthly' }, // Placeholder - real pricing in pricing.ts
 
-  // Pilot tier
-  { tier: 'pilot', minSeats: 10, maxSeats: 50, pricePerSeat: 8.00, currency: 'USD', billingCycle: 'monthly' },
-  { tier: 'pilot', minSeats: 10, maxSeats: 50, pricePerSeat: 80.00, currency: 'USD', billingCycle: 'annual' },
-
-  // Enterprise tier (volume discounts)
-  { tier: 'enterprise', minSeats: 51, maxSeats: 100, pricePerSeat: 7.00, currency: 'USD', billingCycle: 'annual' },
-  { tier: 'enterprise', minSeats: 101, maxSeats: 500, pricePerSeat: 6.00, currency: 'USD', billingCycle: 'annual' },
-  { tier: 'enterprise', minSeats: 501, maxSeats: 1000, pricePerSeat: 5.00, currency: 'USD', billingCycle: 'annual' },
-  { tier: 'enterprise', minSeats: 1001, maxSeats: 999999, pricePerSeat: 4.00, currency: 'USD', billingCycle: 'annual' },
+  // INSTITUTIONAL TIERS: Pricing not exposed in-app
+  // Pilot: "Contact Orbital" - scope-defined engagement
+  // Enterprise: "Contact Orbital" - scope-defined engagement
+  // Custom: "Contact Orbital" - scope-defined engagement
 ];
 
 export async function getPricingBands(): Promise<PricingBand[]> {

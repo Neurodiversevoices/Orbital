@@ -64,7 +64,7 @@ export const en = {
   patterns: {
     // Locked state
     lockedTitle: 'Patterns unlock at 7 signals',
-    lockedBody: "Log when it matters—no streaks, no pressure.",
+    lockedBody: "Log when it matters. No requirements, no pressure.",
     lockedProgress: '{count} of 7 logged',
 
     // Chart context
@@ -80,16 +80,16 @@ export const en = {
     correlation: 'correlation',
     noData: 'no data',
 
-    // Intelligence section
-    intelligenceTitle: 'Capacity Intelligence',
-    trajectoryDeclining: 'Capacity declining this week',
-    trajectoryImproving: 'Capacity improving this week',
-    trajectoryStable: 'Capacity stable this week',
-    comparedToPrevious: 'Compared to previous week',
+    // Observations section
+    intelligenceTitle: 'Observations',
+    trajectoryDeclining: 'Capacity declining this period',
+    trajectoryImproving: 'Capacity improving this period',
+    trajectoryStable: 'Capacity stable this period',
+    comparedToPrevious: 'Compared to prior period',
     showsPattern: 'shows consistent pattern',
     correlationWith: 'correlation with reduced capacity',
-    focusOn: 'Focus on managing {category} load',
-    continueTracking: 'Continue tracking to build personalized insights',
+    focusOn: 'Consider monitoring {category} load',
+    continueTracking: 'Record depth strengthens over time',
 
     // Days
     days: {
@@ -496,10 +496,13 @@ export const en = {
     clearDemoData: 'Clear Demo Data',
     clearDemoDataDesc: 'Reset to empty state',
     duration: {
-      '30d': '30 Signals',
-      '90d': '90 Signals',
-      '180d': '180 Signals',
-      '365d': '365 Signals',
+      '30d': '1 Month',
+      '90d': '3 Months',
+      '180d': '6 Months',
+      '365d': '1 Year',
+      '3y': '3 Years',
+      '5y': '5 Years',
+      '10y': '10 Years',
     },
     durationLabel: 'Data Range',
     unlockHint: 'Tap logo 5x to unlock advanced settings',

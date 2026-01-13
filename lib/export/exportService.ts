@@ -63,7 +63,7 @@ export async function exportData(
 
     return { success: true };
   } catch (error) {
-    console.error('[Orbital Export] Failed:', error);
+    if (__DEV__) console.error('[Orbital Export] Failed:', error);
     return { success: false, error: 'export_failed' };
   }
 }

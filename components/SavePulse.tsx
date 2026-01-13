@@ -63,6 +63,8 @@ export function SavePulse({ trigger, state }: SavePulseProps) {
         },
       ]}
       pointerEvents="none"
+      testID="save-pulse"
+      data-testid="save-pulse"
     />
   );
 }

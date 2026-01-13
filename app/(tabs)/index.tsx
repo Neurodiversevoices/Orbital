@@ -29,7 +29,7 @@ import { colors, commonStyles, spacing } from '../../theme';
 import { CapacityState, Category } from '../../types';
 import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
 import { useLocale } from '../../lib/hooks/useLocale';
-import { useDemoMode } from '../../lib/hooks/useDemoMode';
+import { useDemoMode, FOUNDER_DEMO_ENABLED } from '../../lib/hooks/useDemoMode';
 import { useAppMode } from '../../lib/hooks/useAppMode';
 import { useTutorial } from '../../lib/hooks/useTutorial';
 import { useSubscription, shouldBypassSubscription, FREE_TIER_LIMITS } from '../../lib/subscription';
@@ -52,7 +52,8 @@ const stateColors: Record<CapacityState, string> = {
 export default function HomeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const forceDemo = params.demo === '1';
+  // FOUNDER-ONLY: Demo param only works when EXPO_PUBLIC_FOUNDER_DEMO=1
+  const forceDemo = FOUNDER_DEMO_ENABLED && params.demo === '1';
   const insets = useSafeAreaInsets();
   const scrollViewRef = useRef<ScrollView>(null);
 

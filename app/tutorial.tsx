@@ -22,6 +22,7 @@ import {
 import { colors, spacing } from '../theme';
 import { useTutorial } from '../lib/hooks/useTutorial';
 import { useWhyOrbital } from '../lib/hooks/useWhyOrbital';
+import { ProprietaryFooter } from '../components/legal';
 
 // NOTE: Why Orbital screen marks itself as seen when dismissed.
 // We only check hasSeenWhyOrbital here, we don't pre-mark it.
@@ -200,6 +201,8 @@ export default function TutorialScreen() {
       <Text style={styles.stepCounter}>
         {currentStep + 1} of {TUTORIAL_STEPS.length}
       </Text>
+
+      <ProprietaryFooter compact />
     </SafeAreaView>
   );
 }

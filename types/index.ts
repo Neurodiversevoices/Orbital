@@ -85,7 +85,7 @@ export type OrbitalMode = 'personal' | 'family' | 'clinician-share' | 'org-pilot
 export const ORBITAL_MODES: Record<OrbitalMode, { label: string; description: string }> = {
   personal: {
     label: 'Personal',
-    description: 'Individual self-tracking. Your data stays yours.',
+    description: 'Individual capacity tracking. Personal data is protected. Orbital maintains the longitudinal capacity record.',
   },
   family: {
     label: 'Family',
@@ -503,7 +503,17 @@ export type AuditEventType =
   | 'auth_event'
   | 'retention_applied'
   | 'offboarding_initiated'
-  | 'offboarding_completed';
+  | 'offboarding_completed'
+  // Poison Pill Consent Gate events
+  | 'poison_pill_consent_granted'
+  | 'poison_pill_consent_rejected'
+  | 'coercion_report_initiated'
+  // Circle security events
+  | 'circle_invite_created'
+  | 'circle_invite_accepted'
+  | 'circle_invite_rejected'
+  | 'circle_member_removed'
+  | 'circle_consent_logged';
 
 export interface ImmutableAuditEntry {
   id: string;
@@ -2243,7 +2253,7 @@ export const APP_MODE_CONFIGS: Record<AppMode, AppModeConfig> = {
   personal: {
     id: 'personal',
     label: 'Personal',
-    description: 'Individual self-tracking. Your data stays yours.',
+    description: 'Individual capacity tracking. Personal data is protected. Orbital maintains the longitudinal capacity record.',
     icon: 'user',
     isInstitutional: false,
     requiresOrgCode: false,

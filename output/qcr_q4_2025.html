@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinical Capacity Instrument</title>
+  <link rel="stylesheet" href="qcr_q4_2025.css">
+</head>
+<body>
+
+<div class="page">
+  <!-- HEADER -->
+  <h1 class="artifact-title">CLINICAL ARTIFACT RECORD [LOCKED]</h1>
+
+  <!-- CHAIN OF CUSTODY -->
+  <div class="chain-of-custody">
+    <div class="coc-line">
+      <span class="coc-label">Generated:</span>
+      <span class="coc-value">2026-01-10 14:02:41 UTC</span>
+    </div>
+    <div class="coc-line">
+      <span class="coc-label">Observation Window:</span>
+      <span class="coc-value">2025-10-01 to 2025-12-31 <em>(Closed)</em></span>
+    </div>
+    <div class="coc-line">
+      <span class="coc-label">Protocol:</span>
+      <span class="coc-value">Structured Ecological Momentary Assessment (EMA) v4.2</span>
+    </div>
+    <div class="coc-line">
+      <span class="coc-label">Integrity Hash:</span>
+      <span class="coc-value">sha256: 8f43c9d11e...a72b5f1d2 <span class="coc-note">(Digital Signature)</span></span>
+    </div>
+    <div class="coc-line">
+      <span class="coc-label">Status:</span>
+      <span class="coc-value coc-status">IMMUTABLE SNAPSHOT</span>
+    </div>
+  </div>
+
+  <div class="separator"></div>
+
+  <!-- CAPACITY SUMMARY REPORT -->
+  <h2 class="section-title">CAPACITY SUMMARY REPORT</h2>
+
+  <div class="patient-info">
+    <div class="info-line">
+      <span class="info-label">Patient ID:</span>
+      <span class="info-value">34827-AFJ</span>
+    </div>
+    <div class="info-line">
+      <span class="info-label">Observation Period:</span>
+      <span class="info-value">Oct 1, 2025 – Dec 31, 2025</span>
+    </div>
+  </div>
+
+  <!-- TWO COLUMN LAYOUT -->
+  <div class="main-content">
+    <!-- LEFT: DATA INTEGRITY AUDIT -->
+    <div class="audit-panel">
+      <h3 class="audit-title">DATA INTEGRITY AUDIT</h3>
+      <div class="audit-row">
+        <span class="audit-label">Compliance Rate:</span>
+        <span class="audit-value">85% (High Reliability)</span>
+      </div>
+      <div class="audit-row">
+        <span class="audit-label">Input Latency:</span>
+        <span class="audit-value">Mean 4.2s</span>
+        <span class="audit-note">(Consistent thoughtful reporting)</span>
+      </div>
+      <div class="audit-row">
+        <span class="audit-label">Pattern Consistency:</span>
+        <span class="audit-value">92%</span>
+        <span class="audit-note">(Signals internal consistency)</span>
+      </div>
+      <div class="audit-row verdict-row">
+        <span class="audit-label">Verdict:</span>
+        <span class="audit-verdict">CLINICALLY RELIABLE SIGNAL</span>
+      </div>
+    </div>
+
+    <!-- RIGHT: CHARTS -->
+    <div class="charts-panel">
+      <!-- CAPACITY LEVELS CHART - MATCHES APP EXACTLY -->
+      <div class="chart-block">
+        <div class="chart-title">CAPACITY LEVELS <span class="chart-subtitle">(Last 3 Months)</span></div>
+        <svg class="capacity-chart" viewBox="0 0 400 180">
+          <!-- Defs: Gradients matching EnergyGraph.tsx -->
+          <defs>
+            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#00E5FF"/>
+              <stop offset="50%" stop-color="#E8A830"/>
+              <stop offset="100%" stop-color="#F44336"/>
+            </linearGradient>
+            <linearGradient id="areaFill" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#00E5FF" stop-opacity="0.15"/>
+              <stop offset="50%" stop-color="#E8A830" stop-opacity="0.08"/>
+              <stop offset="100%" stop-color="#F44336" stop-opacity="0.15"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Zone backgrounds (subtle fills matching app) -->
+          <rect x="40" y="32" width="344" height="38.67" fill="#00E5FF" fill-opacity="0.04"/>
+          <rect x="40" y="70.67" width="344" height="38.67" fill="#E8A830" fill-opacity="0.03"/>
+          <rect x="40" y="109.33" width="344" height="38.67" fill="#F44336" fill-opacity="0.04"/>
+
+          <!-- Zone divider lines (dashed) -->
+          <line x1="40" y1="70.67" x2="384" y2="70.67" stroke="rgba(100,100,100,0.3)" stroke-width="1" stroke-dasharray="4 4"/>
+          <line x1="40" y1="109.33" x2="384" y2="109.33" stroke="rgba(100,100,100,0.3)" stroke-width="1" stroke-dasharray="4 4"/>
+
+          <!-- Top/bottom borders -->
+          <line x1="40" y1="32" x2="384" y2="32" stroke="rgba(100,100,100,0.2)" stroke-width="1"/>
+          <line x1="40" y1="148" x2="384" y2="148" stroke="rgba(100,100,100,0.2)" stroke-width="1"/>
+
+          <!-- Left axis line -->
+          <line x1="40" y1="32" x2="40" y2="148" stroke="rgba(100,100,100,0.3)" stroke-width="1"/>
+
+          <!-- Zone indicator circles (left side) -->
+          <circle cx="20" cy="51.33" r="4" fill="#00E5FF" fill-opacity="0.8"/>
+          <circle cx="20" cy="90" r="4" fill="#E8A830" fill-opacity="0.8"/>
+          <circle cx="20" cy="128.67" r="4" fill="#F44336" fill-opacity="0.8"/>
+
+          <!-- Zone labels -->
+          <text x="8" y="54" font-size="8" fill="#00E5FF" font-family="system-ui, sans-serif" font-weight="600">H</text>
+          <text x="8" y="93" font-size="8" fill="#E8A830" font-family="system-ui, sans-serif" font-weight="600">M</text>
+          <text x="8" y="131" font-size="8" fill="#F44336" font-family="system-ui, sans-serif" font-weight="600">L</text>
+
+          <!-- Area fill under curve -->
+          <path d="M 50,125 C 70,118 90,110 110,95 C 130,85 150,78 170,88 C 190,105 210,115 230,108 C 250,95 270,82 290,75 C 310,80 330,88 350,82 L 350,148 L 50,148 Z" fill="url(#areaFill)"/>
+
+          <!-- Main capacity trace line (bezier, gradient stroke) -->
+          <path d="M 50,125 C 62,120 78,112 90,100 C 102,88 118,80 130,82 C 145,84 160,95 175,105 C 190,110 205,108 220,98 C 235,88 250,78 265,75 C 285,73 305,78 325,82 C 340,85 355,82 365,80"
+                stroke="url(#lineGradient)"
+                stroke-width="2.5"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+
+          <!-- Data points with white centers (matching app) -->
+          <g class="data-points">
+            <circle cx="50" cy="125" r="4" fill="#F44336"/><circle cx="50" cy="125" r="2" fill="white" fill-opacity="0.9"/>
+            <circle cx="90" cy="100" r="4" fill="#E8A830"/><circle cx="90" cy="100" r="2" fill="white" fill-opacity="0.9"/>
+            <circle cx="130" cy="82" r="4" fill="#E8A830"/><circle cx="130" cy="82" r="2" fill="white" fill-opacity="0.9"/>
+            <circle cx="175" cy="105" r="4" fill="#E8A830"/><circle cx="175" cy="105" r="2" fill="white" fill-opacity="0.9"/>
+            <circle cx="220" cy="98" r="4" fill="#E8A830"/><circle cx="220" cy="98" r="2" fill="white" fill-opacity="0.9"/>
+            <circle cx="265" cy="75" r="4" fill="#E8A830"/><circle cx="265" cy="75" r="2" fill="white" fill-opacity="0.9"/>
+            <circle cx="325" cy="82" r="4" fill="#E8A830"/><circle cx="325" cy="82" r="2" fill="white" fill-opacity="0.9"/>
+            <circle cx="365" cy="80" r="4" fill="#E8A830"/><circle cx="365" cy="80" r="2" fill="white" fill-opacity="0.9"/>
+          </g>
+
+          <!-- X-axis date labels -->
+          <text x="100" y="165" class="axis-label">Oct</text>
+          <text x="217" y="165" class="axis-label">Nov</text>
+          <text x="334" y="165" class="axis-label">Dec</text>
+        </svg>
+      </div>
+
+      <!-- STABILITY & VOLATILITY CHART -->
+      <div class="chart-block">
+        <div class="chart-title">STABILITY & VOLATILITY</div>
+        <svg class="bar-chart" viewBox="0 0 380 160">
+          <!-- Y-axis -->
+          <line x1="50" y1="20" x2="50" y2="130" class="axis-line"/>
+          <line x1="50" y1="130" x2="350" y2="130" class="axis-line"/>
+
+          <!-- Y-axis labels -->
+          <text x="40" y="25" class="axis-label-y">80</text>
+          <text x="40" y="45" class="axis-label-y">70</text>
+          <text x="40" y="75" class="axis-label-y">40</text>
+          <text x="40" y="105" class="axis-label-y">20</text>
+          <text x="40" y="133" class="axis-label-y">0</text>
+
+          <!-- Grid lines -->
+          <line x1="50" y1="20" x2="350" y2="20" class="grid-line"/>
+          <line x1="50" y1="40" x2="350" y2="40" class="grid-line"/>
+          <line x1="50" y1="70" x2="350" y2="70" class="grid-line"/>
+          <line x1="50" y1="100" x2="350" y2="100" class="grid-line"/>
+
+          <!-- October bars - Using app colors -->
+          <rect x="70" y="42" width="28" height="88" fill="#00E5FF"/>
+          <rect x="102" y="95" width="28" height="35" fill="#E8A830"/>
+
+          <!-- November bars -->
+          <rect x="170" y="48" width="28" height="82" fill="#00E5FF"/>
+          <rect x="202" y="88" width="28" height="42" fill="#E8A830"/>
+
+          <!-- December bars -->
+          <rect x="270" y="45" width="28" height="85" fill="#00E5FF"/>
+          <rect x="302" y="90" width="28" height="40" fill="#E8A830"/>
+
+          <!-- X-axis labels -->
+          <text x="100" y="148" class="axis-label">Oct</text>
+          <text x="200" y="148" class="axis-label">Nov</text>
+          <text x="300" y="148" class="axis-label">Dec</text>
+
+          <!-- Legend -->
+          <rect x="80" y="155" width="10" height="10" fill="#00E5FF"/>
+          <text x="95" y="163" font-size="8" fill="#666" font-family="system-ui, sans-serif">Stability</text>
+          <rect x="150" y="155" width="10" height="10" fill="#E8A830"/>
+          <text x="165" y="163" font-size="8" fill="#666" font-family="system-ui, sans-serif">Volatility</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROVIDER UTILITY STATEMENT -->
+  <div class="provider-statement">
+    <p><span class="provider-label">PROVIDER UTILITY STATEMENT:</span> This artifact is an objective summary of patient-generated capacity signals.</p>
+    <p><em>It is provided to assist clinical documentation of functional status. It does NOT constitute a diagnosis.</em></p>
+    <p><em>Inclusion of this record in a medical file serves as evidence of data review, not endorsement of subjective claims.</em></p>
+  </div>
+</div>
+
+</body>
+</html>
