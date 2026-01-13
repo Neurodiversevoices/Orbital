@@ -280,10 +280,24 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Subscription Section - only show for personal/caregiver modes */}
+        {/* Plans & Pricing - Primary entry point for B2C */}
         {!bypassesSubscription && currentMode !== 'demo' && (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>SUBSCRIPTION</Text>
+            <Text style={styles.sectionLabel}>PLANS & PRICING</Text>
+            <SettingsRow
+              icon={Sparkles}
+              label="View All Plans"
+              sublabel="Free · Pro · Family · Circles · Bundles"
+              onPress={() => router.push('/upgrade')}
+              disabled={isProcessing}
+            />
+          </View>
+        )}
+
+        {/* Subscription Status */}
+        {!bypassesSubscription && currentMode !== 'demo' && (
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>YOUR STATUS</Text>
             {isPro ? (
               <SettingsRow
                 icon={Crown}
