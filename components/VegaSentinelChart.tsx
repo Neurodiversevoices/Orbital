@@ -1,7 +1,12 @@
 /**
  * Vega-Lite Sentinel Chart Component
  *
- * STATE FIRST. DATA SECOND.
+ * STATE FIRST. RENDER MODE CONTRACT.
+ *
+ * EXECUTIVE SAFETY-CRITICAL:
+ * 1. Derive SentinelState BEFORE render
+ * 2. Get RenderMode from state
+ * 3. Apply render contract to all visual elements
  *
  * MANDATORY SCREEN ORDER:
  * 1. SYSTEM STATE BANNER (top 20%, full width, non-interactive)
@@ -16,7 +21,14 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { generateSentinelSpec, convertToVegaData, COLORS } from '../lib/vega/sentinelSpec';
 import type { SentinelChartData } from '../lib/vega/sentinelSpec';
-import { VolatilityDataPoint, SystemState } from '../lib/sentinel/types';
+import {
+  VolatilityDataPoint,
+  SystemState,
+  SentinelState,
+  SentinelRenderMode,
+  RENDER_MODES,
+  deriveSentinelState,
+} from '../lib/sentinel/types';
 import { spacing, borderRadius } from '../theme';
 
 // =============================================================================
@@ -33,29 +45,18 @@ interface VegaSentinelChartProps {
 }
 
 // =============================================================================
-// SYSTEM STATE MAPPING (NO BANNED WORDS)
+// THRESHOLD CONDITION TEXT (NO BANNED WORDS)
 // =============================================================================
 
-function getSystemStateText(state: SystemState): string {
-  switch (state) {
-    case 'critical':
-      return 'BASELINE BREACH CONFIRMED';
-    case 'sustained_volatility':
-      return 'SUSTAINED VOLATILITY';
-    case 'elevated':
-      return 'SENTINEL ACTIVE';
-    default:
-      return 'MONITORING';
-  }
-}
-
-function getThresholdCondition(state: SystemState): string {
-  switch (state) {
-    case 'critical':
-    case 'sustained_volatility':
+function getThresholdCondition(sentinelState: SentinelState): string {
+  switch (sentinelState) {
+    case 'BREACH_CONFIRMED':
       return 'Active';
-    case 'elevated':
+    case 'DEGRADED':
       return 'Elevated';
+    case 'RECOVERING':
+      return 'Recovering';
+    case 'CALM':
     default:
       return 'Normal';
   }
@@ -74,6 +75,18 @@ export function VegaSentinelChart({
   sampleSize,
 }: VegaSentinelChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // =========================================================================
+  // STEP 1: DERIVE SENTINEL STATE (BEFORE RENDER)
+  // =========================================================================
+  const sentinelState: SentinelState = useMemo(() => {
+    return deriveSentinelState(systemState, consecutiveDays);
+  }, [systemState, consecutiveDays]);
+
+  // =========================================================================
+  // STEP 2: GET RENDER MODE FROM STATE
+  // =========================================================================
+  const renderMode: SentinelRenderMode = RENDER_MODES[sentinelState];
 
   // Convert points to Vega format
   const vegaData = useMemo(() => convertToVegaData(points), [points]);
@@ -96,7 +109,7 @@ export function VegaSentinelChart({
 
   const triggerAnnotation = triggerDay !== null ? `Sentinel Triggered — Day ${Math.abs(triggerDay)}` : null;
 
-  // Generate spec
+  // Generate spec with renderMode
   const spec = useMemo(() => {
     const chartData: SentinelChartData = {
       points: vegaData,
@@ -105,9 +118,10 @@ export function VegaSentinelChart({
       baseline,
       cohortLabel,
       sampleSize,
+      renderMode,
     };
     return generateSentinelSpec(chartData);
-  }, [vegaData, triggerDay, triggerAnnotation, baseline, cohortLabel, sampleSize]);
+  }, [vegaData, triggerDay, triggerAnnotation, baseline, cohortLabel, sampleSize, renderMode]);
 
   // Render Vega chart (web only) — SVG, actions off, tooltips off
   useEffect(() => {
@@ -122,22 +136,27 @@ export function VegaSentinelChart({
     });
   }, [spec]);
 
-  const stateText = getSystemStateText(systemState);
-  const conditionText = getThresholdCondition(systemState);
+  const conditionText = getThresholdCondition(sentinelState);
 
+  // =========================================================================
+  // STEP 3: RENDER WITH STATE-DRIVEN STYLING
+  // =========================================================================
   return (
     <View style={styles.container}>
       {/* ============================================================= */}
       {/* 1. SYSTEM STATE BANNER — TOP 20%, FULL WIDTH, NON-INTERACTIVE */}
+      {/* Format: "SYSTEM STATE: <renderMode.bannerLabel>"              */}
       {/* ============================================================= */}
-      <View style={styles.systemStateBanner}>
+      <View style={[styles.systemStateBanner, { backgroundColor: renderMode.bannerBg }]}>
         <Text style={styles.systemStateLabel}>SYSTEM STATE</Text>
-        <Text style={styles.systemStateValue}>{stateText}</Text>
+        <Text style={[styles.systemStateValue, { color: renderMode.bannerText }]}>
+          {renderMode.bannerLabel}
+        </Text>
         <Text style={styles.systemStateMeta}>DEMO / SIMULATED / AGGREGATE</Text>
       </View>
 
       {/* ============================================================= */}
-      {/* 2. THRESHOLD STATUS PANEL — TEXTUAL CERTAINTY */}
+      {/* 2. THRESHOLD STATUS PANEL — TEXTUAL CERTAINTY (2-3 lines max) */}
       {/* ============================================================= */}
       <View style={styles.thresholdPanel}>
         <Text style={styles.thresholdTitle}>THRESHOLD STATUS</Text>
@@ -153,7 +172,7 @@ export function VegaSentinelChart({
       </View>
 
       {/* ============================================================= */}
-      {/* 3. VOLATILITY CONDITION GRAPH — SUPPORTING EVIDENCE */}
+      {/* 3. VOLATILITY CONDITION GRAPH — SUPPORTING EVIDENCE           */}
       {/* ============================================================= */}
       <View style={styles.chartSection}>
         <Text style={styles.cohortLabel}>{cohortLabel} · n={sampleSize.toLocaleString()}</Text>
@@ -169,7 +188,7 @@ export function VegaSentinelChart({
       </View>
 
       {/* ============================================================= */}
-      {/* 4. SIGNAL INTEGRITY FOOTNOTE — BOTTOM */}
+      {/* 4. SIGNAL INTEGRITY FOOTNOTE — BOTTOM (3 short lines)         */}
       {/* ============================================================= */}
       <View style={styles.signalIntegrityPanel}>
         <Text style={styles.signalIntegrityTitle}>SIGNAL INTEGRITY</Text>
