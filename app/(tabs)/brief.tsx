@@ -69,6 +69,7 @@ import {
   getCohortSampleSize,
 } from '../../lib/sentinel';
 import { SentinelChart } from '../../components/SentinelChart';
+import { VegaSentinelChart } from '../../components/VegaSentinelChart';
 import { useAccess } from '../../lib/access';
 
 // =============================================================================
@@ -364,36 +365,49 @@ function K12SentinelBrief() {
         </Text>
       </View>
 
-      {/* Sentinel Chart — Truthful Demo Engine */}
-      <View style={styles.sentinelContainer}>
-        <SentinelChart
+      {/* Sentinel Chart — Vega-Lite K-12 Demo (Web) / Legacy (Native) */}
+      {Platform.OS === 'web' ? (
+        <VegaSentinelChart
           points={sentinelData.volatilityTrend}
           baseline={sentinelData.baselineValue}
-          upperBand={70}
           systemState={sentinelData.systemState}
           consecutiveDays={sentinelData.consecutiveDaysAboveBaseline}
-          title={sentinelData.cohortLabel}
-          height={220}
-          accentColor="#00D7FF"
+          cohortLabel={`K-12 Education · ${AGE_COHORT_LABELS[selectedCohort]}`}
+          sampleSize={cohortSampleSize}
         />
-      </View>
+      ) : (
+        <>
+          <View style={styles.sentinelContainer}>
+            <SentinelChart
+              points={sentinelData.volatilityTrend}
+              baseline={sentinelData.baselineValue}
+              upperBand={70}
+              systemState={sentinelData.systemState}
+              consecutiveDays={sentinelData.consecutiveDaysAboveBaseline}
+              title={sentinelData.cohortLabel}
+              height={220}
+              accentColor="#00D7FF"
+            />
+          </View>
 
-      {/* Cohort-specific status */}
-      <View style={styles.statusCard}>
-        <Text style={styles.statusLabel}>SYSTEM STATE</Text>
-        <Text style={styles.statusValue}>
-          {sentinelData.systemState === 'sustained_volatility'
-            ? 'Sentinel Triggered'
-            : sentinelData.systemState === 'critical'
-            ? 'Critical Volatility'
-            : sentinelData.systemState === 'elevated'
-            ? 'Elevated volatility'
-            : 'Within baseline'}
-        </Text>
-        <Text style={styles.statusDetail}>
-          {sentinelData.consecutiveDaysAboveBaseline} consecutive days above baseline
-        </Text>
-      </View>
+          {/* Cohort-specific status */}
+          <View style={styles.statusCard}>
+            <Text style={styles.statusLabel}>SYSTEM STATE</Text>
+            <Text style={styles.statusValue}>
+              {sentinelData.systemState === 'sustained_volatility'
+                ? 'Sentinel Triggered'
+                : sentinelData.systemState === 'critical'
+                ? 'Critical Volatility'
+                : sentinelData.systemState === 'elevated'
+                ? 'Elevated volatility'
+                : 'Within baseline'}
+            </Text>
+            <Text style={styles.statusDetail}>
+              {sentinelData.consecutiveDaysAboveBaseline} consecutive days above baseline
+            </Text>
+          </View>
+        </>
+      )}
 
       {/* Governance Notice */}
       <View style={styles.governanceNotice}>
@@ -681,19 +695,30 @@ function GlobalBrief() {
         </Text>
       </View>
 
-      {/* Sentinel Chart — Truthful Demo Engine */}
-      <View style={styles.sentinelContainer}>
-        <SentinelChart
+      {/* Sentinel Chart — Vega-Lite Global Demo (Web) / Legacy (Native) */}
+      {Platform.OS === 'web' ? (
+        <VegaSentinelChart
           points={sentinelData.volatilityTrend}
           baseline={sentinelData.baselineValue}
-          upperBand={70}
           systemState={sentinelData.systemState}
           consecutiveDays={sentinelData.consecutiveDaysAboveBaseline}
-          title={sentinelData.cohortLabel}
-          height={220}
-          accentColor="#9C27B0"
+          cohortLabel={`Global Population · ${AGE_COHORT_LABELS[selectedCohort]}`}
+          sampleSize={3000}
         />
-      </View>
+      ) : (
+        <View style={styles.sentinelContainer}>
+          <SentinelChart
+            points={sentinelData.volatilityTrend}
+            baseline={sentinelData.baselineValue}
+            upperBand={70}
+            systemState={sentinelData.systemState}
+            consecutiveDays={sentinelData.consecutiveDaysAboveBaseline}
+            title={sentinelData.cohortLabel}
+            height={220}
+            accentColor="#9C27B0"
+          />
+        </View>
+      )}
 
       {/* Governance Notice */}
       <View style={styles.governanceNotice}>
