@@ -47,6 +47,7 @@ import {
   getFreeUserViewBanner,
   FREE_ROLE_RESTRICTIONS,
 } from './forcedRoleView';
+import { FOUNDER_DEMO_ENABLED } from '../hooks/useDemoMode';
 
 // =============================================================================
 // CONSTANTS
@@ -518,10 +519,13 @@ export function useAccess(): AccessContext {
     return true;
   }, [freeUserViewActive]);
 
+  // B2C Briefings: ONLY show Personal scope
+  // Organization/Global scopes are for B2B/Institutional modes only
   const showBriefingsOrgGlobalFlag = useMemo(() => {
     if (freeUserViewActive) return false;
-    return true;
-  }, [freeUserViewActive]);
+    // Only show Org/Global for institutional modes OR founder demo
+    return orgBypass || FOUNDER_DEMO_ENABLED;
+  }, [freeUserViewActive, orgBypass]);
 
   const showSentinelDemoFlag = useMemo(() => {
     if (freeUserViewActive) return false;
