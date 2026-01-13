@@ -1,10 +1,15 @@
 /**
  * Vega-Lite Sentinel Chart Component
  *
- * Renders Sentinel volatility charts using Vega-Lite.
- * Designed for executive briefing visual language.
+ * STATE FIRST. DATA SECOND.
  *
- * WEB ONLY: This component uses vega-embed which is web-specific.
+ * MANDATORY SCREEN ORDER:
+ * 1. SYSTEM STATE BANNER (top 20%, full width, non-interactive)
+ * 2. THRESHOLD STATUS PANEL (textual certainty)
+ * 3. VOLATILITY CONDITION GRAPH (supporting evidence)
+ * 4. SIGNAL INTEGRITY FOOTNOTE (bottom)
+ *
+ * WEB ONLY.
  */
 
 import React, { useEffect, useRef, useMemo } from 'react';
@@ -19,97 +24,41 @@ import { spacing, borderRadius } from '../theme';
 // =============================================================================
 
 interface VegaSentinelChartProps {
-  /** Volatility data points */
   points: VolatilityDataPoint[];
-  /** Baseline threshold value */
   baseline: number;
-  /** Current system state */
   systemState: SystemState;
-  /** Consecutive days above baseline */
   consecutiveDays: number;
-  /** Cohort label for display */
   cohortLabel: string;
-  /** Sample size N */
   sampleSize: number;
-  /** Optional title override */
-  title?: string;
 }
 
 // =============================================================================
-// SYSTEM STATE PANEL
+// SYSTEM STATE MAPPING (NO BANNED WORDS)
 // =============================================================================
 
-function SystemStatePanel({
-  systemState,
-  consecutiveDays,
-  sampleSize,
-}: {
-  systemState: SystemState;
-  consecutiveDays: number;
-  sampleSize: number;
-}) {
-  const stateText = useMemo(() => {
-    switch (systemState) {
-      case 'critical':
-        return 'Critical threshold exceeded';
-      case 'sustained_volatility':
-        return 'Sustained volatility detected';
-      case 'elevated':
-        return 'Elevated activity observed';
-      default:
-        return 'Within normal parameters';
-    }
-  }, [systemState]);
-
-  return (
-    <View style={styles.panel}>
-      <Text style={styles.panelTitle}>System State</Text>
-      <Text style={styles.panelSubtext}>{stateText}</Text>
-      <Text style={styles.panelSubtext}>{consecutiveDays} days above baseline</Text>
-      <Text style={styles.panelSubtext}>n={sampleSize.toLocaleString()}</Text>
-    </View>
-  );
+function getSystemStateText(state: SystemState): string {
+  switch (state) {
+    case 'critical':
+      return 'BASELINE BREACH CONFIRMED';
+    case 'sustained_volatility':
+      return 'SUSTAINED VOLATILITY';
+    case 'elevated':
+      return 'SENTINEL ACTIVE';
+    default:
+      return 'MONITORING';
+  }
 }
 
-// =============================================================================
-// ASSESSMENT PANEL
-// =============================================================================
-
-function AssessmentPanel({ systemState }: { systemState: SystemState }) {
-  const bullets = useMemo(() => {
-    switch (systemState) {
-      case 'critical':
-      case 'sustained_volatility':
-        return [
-          'Sustained deviation from historical baseline',
-          'Increased probability of downstream disruption',
-          'Signal is aggregate and non-identifying',
-        ];
-      case 'elevated':
-        return [
-          'Activity above typical range',
-          'Monitoring for sustained patterns',
-          'Signal is aggregate and non-identifying',
-        ];
-      default:
-        return [
-          'Activity within expected range',
-          'No action required at this time',
-          'Signal is aggregate and non-identifying',
-        ];
-    }
-  }, [systemState]);
-
-  return (
-    <View style={styles.panel}>
-      <Text style={styles.panelTitle}>ASSESSMENT</Text>
-      {bullets.map((bullet, idx) => (
-        <Text key={idx} style={styles.bulletText}>
-          • {bullet}
-        </Text>
-      ))}
-    </View>
-  );
+function getThresholdCondition(state: SystemState): string {
+  switch (state) {
+    case 'critical':
+    case 'sustained_volatility':
+      return 'Active';
+    case 'elevated':
+      return 'Elevated';
+    default:
+      return 'Normal';
+  }
 }
 
 // =============================================================================
@@ -123,7 +72,6 @@ export function VegaSentinelChart({
   consecutiveDays,
   cohortLabel,
   sampleSize,
-  title,
 }: VegaSentinelChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -161,54 +109,74 @@ export function VegaSentinelChart({
     return generateSentinelSpec(chartData);
   }, [vegaData, triggerDay, triggerAnnotation, baseline, cohortLabel, sampleSize]);
 
-  // Render Vega chart (web only)
+  // Render Vega chart (web only) — SVG, actions off, tooltips off
   useEffect(() => {
     if (Platform.OS !== 'web' || !containerRef.current) return;
 
-    // Dynamic import vega-embed for web only
     import('vega-embed').then(({ default: vegaEmbed }) => {
       vegaEmbed(containerRef.current!, spec as any, {
         actions: false,
         renderer: 'svg',
-        theme: 'dark',
+        tooltip: false,
       }).catch(console.error);
     });
   }, [spec]);
 
+  const stateText = getSystemStateText(systemState);
+  const conditionText = getThresholdCondition(systemState);
+
   return (
     <View style={styles.container}>
-      {/* Header — quiet, institutional */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Orbital Sentinel</Text>
-        <Text style={styles.headerSubtitle}>Capacity Volatility Early Warning</Text>
+      {/* ============================================================= */}
+      {/* 1. SYSTEM STATE BANNER — TOP 20%, FULL WIDTH, NON-INTERACTIVE */}
+      {/* ============================================================= */}
+      <View style={styles.systemStateBanner}>
+        <Text style={styles.systemStateLabel}>SYSTEM STATE</Text>
+        <Text style={styles.systemStateValue}>{stateText}</Text>
+        <Text style={styles.systemStateMeta}>DEMO / SIMULATED / AGGREGATE</Text>
       </View>
 
-      {/* Cohort selector info */}
-      <View style={styles.cohortRow}>
-        <Text style={styles.cohortLabel}>{cohortLabel}</Text>
-      </View>
-
-      {/* Chart container */}
-      <View style={styles.chartContainer}>
-        {Platform.OS === 'web' ? (
-          <div ref={containerRef} style={{ width: '100%', minHeight: 260 }} />
-        ) : (
-          <View style={styles.fallback}>
-            <Text style={styles.fallbackText}>Chart available on web only</Text>
-          </View>
+      {/* ============================================================= */}
+      {/* 2. THRESHOLD STATUS PANEL — TEXTUAL CERTAINTY */}
+      {/* ============================================================= */}
+      <View style={styles.thresholdPanel}>
+        <Text style={styles.thresholdTitle}>THRESHOLD STATUS</Text>
+        <Text style={styles.thresholdLine}>
+          Baseline exceeded for {consecutiveDays} consecutive days
+        </Text>
+        {triggerDay !== null && (
+          <Text style={styles.thresholdLine}>
+            Trigger condition met on Day {Math.abs(triggerDay)}
+          </Text>
         )}
+        <Text style={styles.thresholdLine}>Condition: {conditionText}</Text>
       </View>
 
-      {/* Bottom panels */}
-      <View style={styles.panelsRow}>
-        <SystemStatePanel systemState={systemState} consecutiveDays={consecutiveDays} sampleSize={sampleSize} />
-        <AssessmentPanel systemState={systemState} />
+      {/* ============================================================= */}
+      {/* 3. VOLATILITY CONDITION GRAPH — SUPPORTING EVIDENCE */}
+      {/* ============================================================= */}
+      <View style={styles.chartSection}>
+        <Text style={styles.cohortLabel}>{cohortLabel} · n={sampleSize.toLocaleString()}</Text>
+        <View style={styles.chartContainer}>
+          {Platform.OS === 'web' ? (
+            <div ref={containerRef} style={{ width: '100%', minHeight: 180 }} />
+          ) : (
+            <View style={styles.fallback}>
+              <Text style={styles.fallbackText}>Chart available on web only</Text>
+            </View>
+          )}
+        </View>
       </View>
 
-      {/* Footer disclaimer */}
-      <Text style={styles.footerDisclaimer}>
-        Illustrative aggregate-level capacity intelligence view. No personal data is tracked or collected.
-      </Text>
+      {/* ============================================================= */}
+      {/* 4. SIGNAL INTEGRITY FOOTNOTE — BOTTOM */}
+      {/* ============================================================= */}
+      <View style={styles.signalIntegrityPanel}>
+        <Text style={styles.signalIntegrityTitle}>SIGNAL INTEGRITY</Text>
+        <Text style={styles.signalIntegrityLine}>Aggregate signal (cohort-level)</Text>
+        <Text style={styles.signalIntegrityLine}>Non-identifying</Text>
+        <Text style={styles.signalIntegrityLine}>Monitoring-only (non-operational demo)</Text>
+      </View>
     </View>
   );
 }
@@ -221,95 +189,121 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     backgroundColor: COLORS.bgDark,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
+    borderRadius: borderRadius.md,
   },
-  header: {
-    marginBottom: spacing.md,
-  },
-  headerTitle: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: COLORS.textSecondary,
-    letterSpacing: 0.3,
-  },
-  headerSubtitle: {
-    fontSize: 9,
-    color: COLORS.textMuted,
-    letterSpacing: 0.3,
-    marginTop: 2,
-    opacity: 0.7,
-  },
-  cohortRow: {
-    flexDirection: 'row',
+
+  // =========================================================================
+  // 1. SYSTEM STATE BANNER — dominates top ~20%
+  // =========================================================================
+  systemStateBanner: {
+    width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.md,
     alignItems: 'center',
-    marginBottom: spacing.sm,
+  },
+  systemStateLabel: {
+    fontSize: 9,
+    fontWeight: '500',
+    color: COLORS.textMuted,
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  systemStateValue: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+    letterSpacing: 0.5,
+    textAlign: 'center',
+  },
+  systemStateMeta: {
+    fontSize: 8,
+    fontWeight: '400',
+    color: COLORS.textMuted,
+    letterSpacing: 0.5,
+    marginTop: 8,
+    opacity: 0.6,
+  },
+
+  // =========================================================================
+  // 2. THRESHOLD STATUS PANEL
+  // =========================================================================
+  thresholdPanel: {
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.04)',
+  },
+  thresholdTitle: {
+    fontSize: 9,
+    fontWeight: '500',
+    color: COLORS.textMuted,
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  thresholdLine: {
+    fontSize: 10,
+    color: COLORS.textSecondary,
+    lineHeight: 16,
+  },
+
+  // =========================================================================
+  // 3. VOLATILITY CONDITION GRAPH
+  // =========================================================================
+  chartSection: {
+    paddingHorizontal: spacing.sm,
+    paddingTop: spacing.sm,
   },
   cohortLabel: {
-    fontSize: 10,
+    fontSize: 9,
     color: COLORS.textMuted,
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 3,
+    marginBottom: spacing.xs,
+    paddingHorizontal: spacing.xs,
   },
   chartContainer: {
     backgroundColor: COLORS.bgMid,
-    borderRadius: borderRadius.md,
+    borderRadius: borderRadius.sm,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.04)',
     overflow: 'hidden',
-    minHeight: 260,
+    minHeight: 180,
   },
   fallback: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: 260,
+    minHeight: 180,
   },
   fallbackText: {
     color: COLORS.textMuted,
-    fontSize: 14,
+    fontSize: 12,
   },
-  panelsRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginTop: spacing.md,
+
+  // =========================================================================
+  // 4. SIGNAL INTEGRITY FOOTNOTE
+  // =========================================================================
+  signalIntegrityPanel: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.04)',
+    marginTop: spacing.sm,
   },
-  panel: {
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
-    borderRadius: borderRadius.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.04)',
-    padding: spacing.sm,
-  },
-  panelTitle: {
-    fontSize: 9,
+  signalIntegrityTitle: {
+    fontSize: 8,
     fontWeight: '500',
     color: COLORS.textMuted,
-    marginBottom: 3,
-    letterSpacing: 0.3,
-  },
-  panelSubtext: {
-    fontSize: 9,
-    color: COLORS.textMuted,
-    marginTop: 1,
+    letterSpacing: 0.5,
+    marginBottom: 4,
     opacity: 0.7,
   },
-  bulletText: {
-    fontSize: 9,
-    color: COLORS.textMuted,
-    marginTop: 1,
-    lineHeight: 13,
-    opacity: 0.8,
-  },
-  footerDisclaimer: {
+  signalIntegrityLine: {
     fontSize: 8,
     color: COLORS.textMuted,
-    textAlign: 'center',
-    marginTop: spacing.sm,
-    opacity: 0.5,
+    lineHeight: 12,
+    opacity: 0.6,
   },
 });
 
