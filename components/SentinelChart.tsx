@@ -53,20 +53,32 @@ interface SentinelChartProps {
 // CONSTANTS
 // =============================================================================
 
-const CHART_PADDING = { top: 20, right: 20, bottom: 40, left: 45 };
-const DEFAULT_HEIGHT = 200;
+const CHART_PADDING = { top: 20, right: 65, bottom: 40, left: 45 };
+const DEFAULT_HEIGHT = 220;
 
-// Colors matching reference design
+// Colors matching reference design (assets/sentinel-demo.png)
 const COLORS = {
-  line: '#00E5FF',
-  lineAbove: '#FF9800',
-  baseline: 'rgba(255,255,255,0.3)',
-  upperBand: 'rgba(255,152,0,0.15)',
-  grid: 'rgba(255,255,255,0.08)',
-  text: 'rgba(255,255,255,0.6)',
-  textMuted: 'rgba(255,255,255,0.4)',
-  trigger: '#FF9800',
-  critical: '#F44336',
+  // Background
+  bgDark: '#0a1628',
+  bgMid: '#0f1e32',
+  bgPanel: 'rgba(10, 22, 40, 0.85)',
+  bgPanelBorder: 'rgba(255, 255, 255, 0.08)',
+  // Gradient colors (green → amber → red)
+  green: '#22c55e',
+  amber: '#f59e0b',
+  red: '#ef4444',
+  // Text
+  white: '#ffffff',
+  textPrimary: 'rgba(255, 255, 255, 0.95)',
+  textSecondary: 'rgba(255, 255, 255, 0.7)',
+  textMuted: 'rgba(255, 255, 255, 0.5)',
+  textDim: 'rgba(255, 255, 255, 0.35)',
+  // Chart elements
+  baseline: 'rgba(255, 255, 255, 0.3)',
+  grid: 'rgba(255, 255, 255, 0.06)',
+  trigger: '#f59e0b',
+  critical: '#ef4444',
+  cyanAccent: 'rgba(34, 211, 238, 0.7)',
 };
 
 // =============================================================================
@@ -122,6 +134,49 @@ function formatDayLabel(dayOffset: number): string {
   return `${dayOffset}d`;
 }
 
+/**
+ * Get system state description for bottom panel
+ */
+function getStateDescription(state: SystemState, consecutiveDays: number): string {
+  switch (state) {
+    case 'critical':
+      return 'Critical volatility threshold exceeded';
+    case 'sustained_volatility':
+      return 'Sustained volatility detected';
+    case 'elevated':
+      return 'Elevated activity observed';
+    default:
+      return 'Within normal parameters';
+  }
+}
+
+/**
+ * Get assessment bullet points based on state
+ */
+function getAssessmentBullets(state: SystemState): string[] {
+  switch (state) {
+    case 'critical':
+    case 'sustained_volatility':
+      return [
+        'Sustained deviation from historical baseline',
+        'Increased probability of downstream disruption',
+        'Signal is aggregate and non-identifying',
+      ];
+    case 'elevated':
+      return [
+        'Activity above typical range',
+        'Monitoring for sustained patterns',
+        'Signal is aggregate and non-identifying',
+      ];
+    default:
+      return [
+        'Activity within expected range',
+        'No action required at this time',
+        'Signal is aggregate and non-identifying',
+      ];
+  }
+}
+
 // =============================================================================
 // COMPONENT
 // =============================================================================
@@ -134,7 +189,7 @@ export function SentinelChart({
   consecutiveDays,
   title,
   height = DEFAULT_HEIGHT,
-  accentColor = COLORS.line,
+  accentColor = COLORS.cyanAccent,
 }: SentinelChartProps) {
   const chartWidth = 320; // Will scale with container
   const chartHeight = height - CHART_PADDING.top - CHART_PADDING.bottom;
@@ -216,6 +271,10 @@ export function SentinelChart({
     return null;
   }, [systemState, consecutiveDays]);
 
+  // Panel content
+  const stateDescription = getStateDescription(systemState, consecutiveDays);
+  const assessmentBullets = getAssessmentBullets(systemState);
+
   return (
     <View style={styles.container}>
       {/* Title */}
@@ -233,16 +292,18 @@ export function SentinelChart({
       <View style={styles.chartContainer}>
         <Svg width="100%" height={height} viewBox={`0 0 ${chartWidth} ${height}`}>
           <Defs>
-            {/* Gradient for area fill */}
-            <LinearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0%" stopColor={accentColor} stopOpacity={0.3} />
-              <Stop offset="100%" stopColor={accentColor} stopOpacity={0.02} />
+            {/* Three-color gradient for area fill (green → amber → red) */}
+            <LinearGradient id="areaGradient" x1="0" y1="1" x2="0" y2="0">
+              <Stop offset="0%" stopColor={COLORS.green} stopOpacity={0.8} />
+              <Stop offset="50%" stopColor={COLORS.amber} stopOpacity={0.7} />
+              <Stop offset="100%" stopColor={COLORS.red} stopOpacity={0.6} />
             </LinearGradient>
 
-            {/* Gradient for trigger area */}
-            <LinearGradient id="triggerGradient" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0%" stopColor={COLORS.trigger} stopOpacity={0.4} />
-              <Stop offset="100%" stopColor={COLORS.trigger} stopOpacity={0.05} />
+            {/* Line gradient (follows same color scheme) */}
+            <LinearGradient id="lineGradient" x1="0" y1="1" x2="0" y2="0">
+              <Stop offset="0%" stopColor={COLORS.green} stopOpacity={1} />
+              <Stop offset="50%" stopColor={COLORS.amber} stopOpacity={1} />
+              <Stop offset="100%" stopColor={COLORS.red} stopOpacity={1} />
             </LinearGradient>
           </Defs>
 
@@ -263,14 +324,34 @@ export function SentinelChart({
               );
             })}
 
-            {/* Upper band (warning zone) */}
-            <Rect
-              x={0}
-              y={chartHeight - (upperBand / 100) * chartHeight}
-              width={innerWidth}
-              height={(upperBand / 100) * chartHeight}
-              fill={COLORS.upperBand}
-            />
+            {/* Band labels on right side */}
+            <SvgText
+              x={innerWidth + 8}
+              y={chartHeight * 0.15}
+              fill={COLORS.textDim}
+              fontSize={9}
+              textAnchor="start"
+            >
+              HIGH
+            </SvgText>
+            <SvgText
+              x={innerWidth + 8}
+              y={chartHeight * 0.5}
+              fill={COLORS.textDim}
+              fontSize={9}
+              textAnchor="start"
+            >
+              MODERATE
+            </SvgText>
+            <SvgText
+              x={innerWidth + 8}
+              y={chartHeight * 0.85}
+              fill={COLORS.textDim}
+              fontSize={9}
+              textAnchor="start"
+            >
+              LOW
+            </SvgText>
 
             {/* Baseline */}
             <Line
@@ -359,7 +440,7 @@ export function SentinelChart({
           <SvgText
             x={12}
             y={height / 2}
-            fill={COLORS.text}
+            fill={COLORS.textSecondary}
             fontSize={10}
             textAnchor="middle"
             transform={`rotate(-90, 12, ${height / 2})`}
@@ -369,17 +450,31 @@ export function SentinelChart({
         </Svg>
       </View>
 
-      {/* Baseline legend */}
-      <View style={styles.legend}>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendDash, { backgroundColor: 'rgba(255,255,255,0.3)' }]} />
-          <Text style={styles.legendText}>Baseline ({baseline})</Text>
+      {/* Bottom panels */}
+      <View style={styles.panelsRow}>
+        {/* SYSTEM STATE panel */}
+        <View style={styles.panel}>
+          <Text style={[styles.panelTitle, { color: stateColor }]}>
+            SYSTEM STATE: {stateDescription}
+          </Text>
+          <Text style={styles.panelSubtext}>
+            {consecutiveDays} consecutive days above baseline
+          </Text>
         </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: COLORS.trigger }]} />
-          <Text style={styles.legendText}>Above Threshold ({upperBand})</Text>
+
+        {/* ASSESSMENT panel */}
+        <View style={styles.panel}>
+          <Text style={styles.panelTitle}>ASSESSMENT</Text>
+          {assessmentBullets.map((bullet, idx) => (
+            <Text key={idx} style={styles.bulletText}>• {bullet}</Text>
+          ))}
         </View>
       </View>
+
+      {/* Footer disclaimer */}
+      <Text style={styles.footerDisclaimer}>
+        Illustrative aggregate-level capacity intelligence view. No personal data is tracked or collected.
+      </Text>
     </View>
   );
 }
@@ -400,10 +495,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   chartContainer: {
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: COLORS.bgDark,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: COLORS.bgPanelBorder,
     overflow: 'hidden',
   },
   triggerCallout: {
@@ -427,30 +522,43 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-  legend: {
+  panelsRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
     gap: spacing.md,
-    marginTop: spacing.sm,
+    marginTop: spacing.md,
   },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+  panel: {
+    flex: 1,
+    backgroundColor: COLORS.bgPanel,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: COLORS.bgPanelBorder,
+    padding: spacing.md,
   },
-  legendDash: {
-    width: 16,
-    height: 2,
-    borderRadius: 1,
+  panelTitle: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  legendDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  legendText: {
+  panelSubtext: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
+    color: COLORS.textMuted,
+  },
+  bulletText: {
+    fontSize: 10,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+    lineHeight: 14,
+  },
+  footerDisclaimer: {
+    fontSize: 9,
+    color: COLORS.textDim,
+    textAlign: 'center',
+    marginTop: spacing.md,
+    fontStyle: 'italic',
   },
 });
 
