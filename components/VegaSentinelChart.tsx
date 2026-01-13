@@ -1,12 +1,7 @@
 /**
  * Vega-Lite Sentinel Chart Component
  *
- * STATE FIRST. RENDER MODE CONTRACT.
- *
- * EXECUTIVE SAFETY-CRITICAL:
- * 1. Derive SentinelState BEFORE render
- * 2. Get RenderMode from state
- * 3. Apply render contract to all visual elements
+ * CLEAN, CALM, DEFENSIBLE.
  *
  * MANDATORY SCREEN ORDER:
  * 1. SYSTEM STATE BANNER (top 20%, full width, non-interactive)
@@ -21,14 +16,7 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { generateSentinelSpec, convertToVegaData, COLORS } from '../lib/vega/sentinelSpec';
 import type { SentinelChartData } from '../lib/vega/sentinelSpec';
-import {
-  VolatilityDataPoint,
-  SystemState,
-  SentinelState,
-  SentinelRenderMode,
-  RENDER_MODES,
-  deriveSentinelState,
-} from '../lib/sentinel/types';
+import { VolatilityDataPoint, SystemState } from '../lib/sentinel/types';
 import { spacing, borderRadius } from '../theme';
 
 // =============================================================================
@@ -45,18 +33,28 @@ interface VegaSentinelChartProps {
 }
 
 // =============================================================================
-// THRESHOLD CONDITION TEXT (NO BANNED WORDS)
+// TEXT HELPERS (NO BANNED WORDS)
 // =============================================================================
 
-function getThresholdCondition(sentinelState: SentinelState): string {
-  switch (sentinelState) {
-    case 'BREACH_CONFIRMED':
+function getSystemStateText(state: SystemState): string {
+  switch (state) {
+    case 'critical':
+    case 'sustained_volatility':
+      return 'BASELINE BREACH CONFIRMED';
+    case 'elevated':
+      return 'ELEVATED';
+    default:
+      return 'MONITORING';
+  }
+}
+
+function getThresholdCondition(state: SystemState): string {
+  switch (state) {
+    case 'critical':
+    case 'sustained_volatility':
       return 'Active';
-    case 'DEGRADED':
+    case 'elevated':
       return 'Elevated';
-    case 'RECOVERING':
-      return 'Recovering';
-    case 'CALM':
     default:
       return 'Normal';
   }
@@ -75,18 +73,6 @@ export function VegaSentinelChart({
   sampleSize,
 }: VegaSentinelChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // =========================================================================
-  // STEP 1: DERIVE SENTINEL STATE (BEFORE RENDER)
-  // =========================================================================
-  const sentinelState: SentinelState = useMemo(() => {
-    return deriveSentinelState(systemState, consecutiveDays);
-  }, [systemState, consecutiveDays]);
-
-  // =========================================================================
-  // STEP 2: GET RENDER MODE FROM STATE
-  // =========================================================================
-  const renderMode: SentinelRenderMode = RENDER_MODES[sentinelState];
 
   // Convert points to Vega format
   const vegaData = useMemo(() => convertToVegaData(points), [points]);
@@ -109,7 +95,7 @@ export function VegaSentinelChart({
 
   const triggerAnnotation = triggerDay !== null ? `Sentinel Triggered — Day ${Math.abs(triggerDay)}` : null;
 
-  // Generate spec with renderMode
+  // Generate spec — line is driven directly by fake cohort data
   const spec = useMemo(() => {
     const chartData: SentinelChartData = {
       points: vegaData,
@@ -118,10 +104,9 @@ export function VegaSentinelChart({
       baseline,
       cohortLabel,
       sampleSize,
-      renderMode,
     };
     return generateSentinelSpec(chartData);
-  }, [vegaData, triggerDay, triggerAnnotation, baseline, cohortLabel, sampleSize, renderMode]);
+  }, [vegaData, triggerDay, triggerAnnotation, baseline, cohortLabel, sampleSize]);
 
   // Render Vega chart (web only) — SVG, actions off, tooltips off
   useEffect(() => {
@@ -136,22 +121,17 @@ export function VegaSentinelChart({
     });
   }, [spec]);
 
-  const conditionText = getThresholdCondition(sentinelState);
+  const stateText = getSystemStateText(systemState);
+  const conditionText = getThresholdCondition(systemState);
 
-  // =========================================================================
-  // STEP 3: RENDER WITH STATE-DRIVEN STYLING
-  // =========================================================================
   return (
     <View style={styles.container}>
       {/* ============================================================= */}
       {/* 1. SYSTEM STATE BANNER — TOP 20%, FULL WIDTH, NON-INTERACTIVE */}
-      {/* Format: "SYSTEM STATE: <renderMode.bannerLabel>"              */}
       {/* ============================================================= */}
-      <View style={[styles.systemStateBanner, { backgroundColor: renderMode.bannerBg }]}>
+      <View style={styles.systemStateBanner}>
         <Text style={styles.systemStateLabel}>SYSTEM STATE</Text>
-        <Text style={[styles.systemStateValue, { color: renderMode.bannerText }]}>
-          {renderMode.bannerLabel}
-        </Text>
+        <Text style={styles.systemStateValue}>{stateText}</Text>
         <Text style={styles.systemStateMeta}>DEMO / SIMULATED / AGGREGATE</Text>
       </View>
 

@@ -16,7 +16,7 @@
  * - SVG renderer, actions off, tooltips off
  */
 
-import { VolatilityDataPoint, SentinelRenderMode, RENDER_MODES } from '../sentinel/types';
+import { VolatilityDataPoint } from '../sentinel/types';
 
 // =============================================================================
 // TYPES
@@ -36,8 +36,6 @@ export interface SentinelChartData {
   baseline: number;
   cohortLabel: string;
   sampleSize: number;
-  /** Render mode from SentinelState — controls all visual aspects */
-  renderMode: SentinelRenderMode;
 }
 
 // =============================================================================
@@ -59,10 +57,8 @@ export const COLORS = {
   bandModerate: 'rgba(160, 150, 120, 0.04)',
   bandHigh: 'rgba(160, 130, 130, 0.04)',
 
-  // Data-driven line colors (cyan → amber → red)
-  lineCyan: 'rgba(34, 211, 238, 0.9)',    // Calm: <= lowThreshold
-  lineAmber: 'rgba(245, 180, 60, 0.9)',   // Warning: low < x <= high
-  lineRed: 'rgba(248, 113, 113, 0.9)',    // Breach: > highThreshold
+  // Line — ONE solid neutral color (no gradients, no color changes)
+  lineNeutral: 'rgba(220, 225, 235, 0.85)',
 
   // Baseline reference
   baseline: 'rgba(255, 255, 255, 0.35)',
@@ -115,17 +111,18 @@ export function convertToVegaData(points: VolatilityDataPoint[]): VegaDataPoint[
 /**
  * Generate the Vega-Lite specification for Sentinel chart
  *
- * STATE FIRST. RENDER MODE CONTRACT.
+ * CLEAN, CALM, DEFENSIBLE.
  *
  * NON-NEGOTIABLE:
- * - ZERO scatter points (no point marks)
- * - Alert window DOMINATES (controlled by renderMode)
+ * - ONE solid neutral color line (no gradients, no color changes)
+ * - ZERO scatter points / dots
+ * - ONE dashed baseline
+ * - ONE alert window (subtle, contextual)
  * - Y-axis LOCKED 0–100 forever
- * - Line color driven by renderMode (pre/post trigger)
  * - SVG renderer, actions off, tooltips off
  */
 export function generateSentinelSpec(data: SentinelChartData): object {
-  const { points, triggerDay, triggerAnnotation, baseline, renderMode } = data;
+  const { points, triggerDay, triggerAnnotation, baseline } = data;
 
   const minDay = Math.min(...points.map((p) => p.day));
   const maxDay = 0;
@@ -135,22 +132,17 @@ export function generateSentinelSpec(data: SentinelChartData): object {
   const alertStart = triggeredDays.length > 0 ? Math.min(...triggeredDays) : null;
   const alertEnd = triggeredDays.length > 0 ? Math.max(...triggeredDays) : null;
 
-  // Alert window — controlled by renderMode (CALM = no window)
-  const showAlertWindow = renderMode.alertWindowPresent && alertStart !== null && alertEnd !== null;
-  const alertWindowData = showAlertWindow
-    ? [{ x: alertStart, x2: alertEnd, y: THRESHOLDS.trigger, y2: THRESHOLDS.yMax }]
-    : [];
-
-  // Annotation — controlled by renderMode.showAnnotation
-  const annotationData =
-    renderMode.showAnnotation && triggerDay !== null && triggerAnnotation
-      ? [{ day: triggerDay, text: triggerAnnotation, value: 75 }]
+  // Alert window — ONE rectangular band, subtle fill
+  const alertWindowData =
+    alertStart !== null && alertEnd !== null
+      ? [{ x: alertStart, x2: alertEnd, y: THRESHOLDS.trigger, y2: THRESHOLDS.yMax }]
       : [];
 
-  // Build line layers — STATE-DRIVEN coloring
-  // Pre-trigger segments (before triggerDay or all if no trigger)
-  // Post-trigger segments (after triggerDay, breach only)
-  const lineLayers = buildStateLineLayers(points, minDay, maxDay, triggerDay, renderMode);
+  // Annotation — ONE only: "Sentinel Triggered — Day X"
+  const annotationData =
+    triggerDay !== null && triggerAnnotation
+      ? [{ day: triggerDay, text: triggerAnnotation, value: 75 }]
+      : [];
 
   const spec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
@@ -201,16 +193,16 @@ export function generateSentinelSpec(data: SentinelChartData): object {
           color: { field: 'color', type: 'nominal', scale: null },
         },
       },
-      // Layer 2: ALERT WINDOW — DOMINANT visual (state-controlled)
+      // Layer 2: ALERT WINDOW — ONE rectangular band, subtle fill
       ...(alertWindowData.length > 0
         ? [
             {
               data: { values: alertWindowData },
               mark: {
                 type: 'rect',
-                opacity: renderMode.alertWindowOpacity,
+                opacity: 0.12,
                 stroke: COLORS.alertBorder,
-                strokeWidth: 1.5,
+                strokeWidth: 1,
               },
               encoding: {
                 x: { field: 'x', type: 'quantitative', scale: { domain: [minDay, maxDay] } },
@@ -222,23 +214,51 @@ export function generateSentinelSpec(data: SentinelChartData): object {
             },
           ]
         : []),
-      // Layer 3: Baseline reference line (always present)
+      // Layer 3: ONE dashed baseline line
       {
         data: { values: [{ baseline }] },
         mark: {
           type: 'rule',
           strokeDash: [4, 4],
           strokeWidth: 1.5,
-          opacity: 0.6,
+          opacity: 0.5,
         },
         encoding: {
           y: { field: 'baseline', type: 'quantitative' },
           color: { value: COLORS.baseline },
         },
       },
-      // Layer 4: State-driven line segments (NO POINTS)
-      ...lineLayers,
-      // Layer 5: Annotation — exactly one, state-controlled
+      // Layer 4: ONE solid neutral color line (NO dots, NO color changes)
+      {
+        data: { values: points },
+        mark: {
+          type: 'line',
+          interpolate: 'monotone',
+          strokeWidth: 2.5,
+          strokeCap: 'round',
+        },
+        encoding: {
+          x: {
+            field: 'day',
+            type: 'quantitative',
+            scale: { domain: [minDay, maxDay] },
+            axis: {
+              title: null,
+              format: 'd',
+              tickCount: 7,
+              labelExpr: "datum.value === 0 ? 'NOW' : datum.value",
+            },
+          },
+          y: {
+            field: 'value',
+            type: 'quantitative',
+            scale: { domain: [THRESHOLDS.yMin, THRESHOLDS.yMax] },
+            axis: { title: null, tickCount: 5 },
+          },
+          color: { value: COLORS.lineNeutral },
+        },
+      },
+      // Layer 5: ONE annotation only — "Sentinel Triggered — Day X"
       ...(annotationData.length > 0
         ? [
             {
@@ -250,7 +270,7 @@ export function generateSentinelSpec(data: SentinelChartData): object {
                 dx: 4,
                 dy: -4,
                 fontSize: 9,
-                fontWeight: 500,
+                fontWeight: 400,
               },
               encoding: {
                 x: { field: 'day', type: 'quantitative' },
@@ -265,106 +285,6 @@ export function generateSentinelSpec(data: SentinelChartData): object {
   };
 
   return spec;
-}
-
-/**
- * Build state-driven line layers
- *
- * For BREACH_CONFIRMED:
- *   - Pre-trigger points: lineColorPre (amber)
- *   - Post-trigger points: lineColorPost (red)
- *
- * For other states:
- *   - All points: lineColorPre (single color)
- */
-function buildStateLineLayers(
-  points: VegaDataPoint[],
-  minDay: number,
-  maxDay: number,
-  triggerDay: number | null,
-  renderMode: SentinelRenderMode
-): object[] {
-  const baseEncoding = {
-    x: {
-      field: 'day',
-      type: 'quantitative',
-      scale: { domain: [minDay, maxDay] },
-      axis: {
-        title: null,
-        format: 'd',
-        tickCount: 7,
-        labelExpr: "datum.value === 0 ? 'NOW' : datum.value",
-      },
-    },
-    y: {
-      field: 'value',
-      type: 'quantitative',
-      scale: { domain: [THRESHOLDS.yMin, THRESHOLDS.yMax] },
-      axis: { title: null, tickCount: 5 },
-    },
-  };
-
-  const baseMark = {
-    type: 'line',
-    interpolate: 'monotone',
-    strokeWidth: 2.5,
-    strokeCap: 'round',
-  };
-
-  // If no trigger day or colors are same, render single line
-  if (triggerDay === null || renderMode.lineColorPre === renderMode.lineColorPost) {
-    return [
-      {
-        data: { values: points },
-        mark: baseMark,
-        encoding: {
-          ...baseEncoding,
-          color: { value: renderMode.lineColorPre },
-        },
-      },
-    ];
-  }
-
-  // Split into pre-trigger and post-trigger segments
-  const prePoints = points.filter((p) => p.day < triggerDay);
-  const postPoints = points.filter((p) => p.day >= triggerDay);
-
-  const layers: object[] = [];
-
-  // Pre-trigger segment (amber)
-  if (prePoints.length > 0) {
-    layers.push({
-      data: { values: prePoints },
-      mark: baseMark,
-      encoding: {
-        x: {
-          field: 'day',
-          type: 'quantitative',
-          scale: { domain: [minDay, maxDay] },
-        },
-        y: {
-          field: 'value',
-          type: 'quantitative',
-          scale: { domain: [THRESHOLDS.yMin, THRESHOLDS.yMax] },
-        },
-        color: { value: renderMode.lineColorPre },
-      },
-    });
-  }
-
-  // Post-trigger segment (red)
-  if (postPoints.length > 0) {
-    layers.push({
-      data: { values: postPoints },
-      mark: baseMark,
-      encoding: {
-        ...baseEncoding,
-        color: { value: renderMode.lineColorPost },
-      },
-    });
-  }
-
-  return layers;
 }
 
 /**
