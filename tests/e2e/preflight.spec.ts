@@ -12,8 +12,10 @@ const CANONICAL_PRICES = {
   individual: { monthly: 29, annual: 290 },
   circle: { monthly: 79, annual: 790 },
   circleExpansion: { monthly: 10, annual: 100 },
-  bundle10: { monthly: 399, annual: 3990 },
-  bundle25: { monthly: 899, annual: 8990 },
+  // Pro Bundles (Annual-only)
+  bundle10: { annual: 2700 },
+  bundle15: { annual: 4000 },
+  bundle20: { annual: 5200 },
   qcrIndividual: 149,
   qcrCircle: 299,
   qcrBundle: 499,

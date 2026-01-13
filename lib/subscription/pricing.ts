@@ -15,10 +15,10 @@
  * CIRCLES (container, requires Pro for all members):
  * - Circle: $79/mo | $790/yr (5 buddies max)
  *
- * BUNDLES (Annual-only, B2C groups):
- * - 10-Seat: $1,990/yr
- * - 15-Seat: $2,790/yr
- * - 20-Seat: $3,490/yr
+ * PRO BUNDLES (Annual-only, small groups & communities):
+ * - 10-Seat: $2,700/yr
+ * - 15-Seat: $4,000/yr
+ * - 20-Seat: $5,200/yr
  *
  * ADMIN ADD-ON (optional for Circle/Bundle):
  * - Admin: $29/mo | $290/yr (read-only history access, consent-gated)
@@ -228,25 +228,22 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
   },
 
   // ===========================================================================
-  // 10-SEAT BUNDLE (ANNUAL-ONLY, B2C groups)
+  // 10-SEAT PRO BUNDLE (ANNUAL-ONLY, small groups & communities)
   // ===========================================================================
   bundle_10: {
     id: 'bundle_10',
-    name: '10-Seat Bundle',
+    name: '10 Seats',
     shortName: 'Bundle 10',
-    description: 'Program-level capacity tracking with Admin Dashboard',
+    description: 'Full Pro access for each member',
     pricing: {
       monthly: 0, // ANNUAL-ONLY
-      annual: 1990,
+      annual: 2700,
       annualSavingsPercent: 0,
     },
     seats: 10,
     features: [
       '10 seats included',
-      'Admin Dashboard (hub visibility)',
-      'Named individuals with consent',
-      'Program-level insights',
-      'Aggregate reporting',
+      'Full Pro access per seat',
       'Annual billing only',
     ],
     entitlements: [
@@ -264,25 +261,22 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
   },
 
   // ===========================================================================
-  // 15-SEAT BUNDLE (ANNUAL-ONLY, B2C groups)
+  // 15-SEAT PRO BUNDLE (ANNUAL-ONLY, small groups & communities)
   // ===========================================================================
   bundle_15: {
     id: 'bundle_15',
-    name: '15-Seat Bundle',
+    name: '15 Seats',
     shortName: 'Bundle 15',
-    description: 'Extended program capacity with Admin Dashboard',
+    description: 'Full Pro access for each member',
     pricing: {
       monthly: 0, // ANNUAL-ONLY
-      annual: 2790,
+      annual: 4000,
       annualSavingsPercent: 0,
     },
     seats: 15,
     features: [
       '15 seats included',
-      'Admin Dashboard (hub visibility)',
-      'Named individuals with consent',
-      'Program-level insights',
-      'Aggregate reporting',
+      'Full Pro access per seat',
       'Annual billing only',
     ],
     entitlements: [
@@ -300,26 +294,22 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
   },
 
   // ===========================================================================
-  // 20-SEAT BUNDLE (ANNUAL-ONLY, B2C groups)
+  // 20-SEAT PRO BUNDLE (ANNUAL-ONLY, small groups & communities)
   // ===========================================================================
   bundle_20: {
     id: 'bundle_20',
-    name: '20-Seat Bundle',
+    name: '20 Seats',
     shortName: 'Bundle 20',
-    description: 'Full program capacity with Admin Dashboard',
+    description: 'Full Pro access for each member',
     pricing: {
       monthly: 0, // ANNUAL-ONLY
-      annual: 3490,
+      annual: 5200,
       annualSavingsPercent: 0,
     },
     seats: 20,
     features: [
       '20 seats included',
-      'Admin Dashboard (hub visibility)',
-      'Named individuals with consent',
-      'Program-level insights',
-      'Aggregate reporting',
-      'Priority support',
+      'Full Pro access per seat',
       'Annual billing only',
     ],
     entitlements: [
@@ -481,12 +471,13 @@ export const CIRCLE_PRICING = {
 } as const;
 
 /**
- * Bundle pricing (ANNUAL-ONLY, B2C groups)
+ * Pro Bundle pricing (ANNUAL-ONLY, small groups & communities)
+ * Each seat = full Pro access
  */
 export const BUNDLE_PRICING = {
-  bundle_10: { annual: 1990, seats: 10 },
-  bundle_15: { annual: 2790, seats: 15 },
-  bundle_20: { annual: 3490, seats: 20 },
+  bundle_10: { annual: 2700, seats: 10 },
+  bundle_15: { annual: 4000, seats: 15 },
+  bundle_20: { annual: 5200, seats: 20 },
 } as const;
 
 /**

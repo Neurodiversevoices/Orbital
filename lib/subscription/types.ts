@@ -6,7 +6,7 @@
  * PRO: $29/mo | $290/yr
  * FAMILY: $79/mo | $790/yr (includes 5 members) + $9/mo | $90/yr per additional
  * CIRCLES: $79/mo | $790/yr (up to 5 Pro users)
- * BUNDLES: ANNUAL-ONLY (10=$1,990, 15=$2,790, 20=$3,490)
+ * PRO BUNDLES: ANNUAL-ONLY (10=$2,700, 15=$4,000, 20=$5,200)
  * ADMIN ADD-ON: $29/mo | $290/yr
  * CCI-Q4: $199 (Free) | $149 (Pro/Family/Circle)
  *

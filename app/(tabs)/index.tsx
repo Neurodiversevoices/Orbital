@@ -24,7 +24,7 @@ import Animated, {
 import { useRouter, useLocalSearchParams, Redirect } from 'expo-router';
 import { Settings, TrendingUp, TrendingDown, Minus } from 'lucide-react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { GlassOrb, SavePulse, CategorySelector, Composer, COMPOSER_HEIGHT, ModeSelector, ModeInsightsPanel, OrgRoleBanner } from '../../components';
+import { GlassOrb, SavePulse, CategorySelector, Composer, COMPOSER_HEIGHT, ModeInsightsPanel, OrgRoleBanner } from '../../components';
 import { colors, commonStyles, spacing } from '../../theme';
 import { CapacityState, Category } from '../../types';
 import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
@@ -240,7 +240,7 @@ export default function HomeScreen() {
         keyboardVerticalOffset={0}
       >
         <Animated.View style={[styles.header, headerAnimatedStyle]}>
-          <ModeSelector compact />
+          <View style={styles.headerSpacer} />
           <Text style={[styles.title, { color: `${modeConfig.accentColor}CC` }]}>Orbital</Text>
           <Pressable onPress={() => router.push('/settings')} style={styles.settingsButton}>
             <Settings color={colors.textSecondary} size={24} />
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm,
     paddingBottom: spacing.xs,
   },
-  headerSpacer: { width: 40 }, // Legacy: kept for reference
+  headerSpacer: { width: 40 },
   title: {
     fontSize: 22,
     fontWeight: '200',

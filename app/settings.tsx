@@ -238,9 +238,9 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Mode Section */}
+        {/* Explore Demo Modes Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>MODE</Text>
+          <Text style={styles.sectionLabel}>EXPLORE DEMO MODES</Text>
           <View style={[styles.modeCard, { borderColor: `${modeConfig.accentColor}40` }]}>
             <View style={styles.modeCardHeader}>
               <Text style={[styles.modeCardLabel, { color: modeConfig.accentColor }]}>
@@ -253,6 +253,7 @@ export default function SettingsScreen() {
               )}
             </View>
             <Text style={styles.modeCardDescription}>{modeConfig.description}</Text>
+            <Text style={styles.demoNotice}>Demo modes are read-only previews. No pricing or activation.</Text>
             {orgName && (
               <Text style={styles.orgNameText}>Organization: {orgName}</Text>
             )}
@@ -310,7 +311,7 @@ export default function SettingsScreen() {
                   onPress={() => router.push('/upgrade')}
                 >
                   <Crown size={16} color="#000" />
-                  <Text style={styles.upgradeButtonText}>Upgrade · $19/mo</Text>
+                  <Text style={styles.upgradeButtonText}>Upgrade · $29/mo</Text>
                 </Pressable>
                 <Pressable
                   style={styles.redeemButton}
@@ -1119,7 +1120,7 @@ const styles = StyleSheet.create({
   modeCardDescription: {
     fontSize: 13,
     color: 'rgba(255,255,255,0.5)',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   orgNameText: {
     fontSize: 12,

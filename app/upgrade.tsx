@@ -7,14 +7,17 @@
  * FAMILY: $79/mo | $790/yr (includes 5 members)
  *   - Additional members: +$9/mo | +$90/yr per member
  * CIRCLES: $79/mo | $790/yr (up to 5 Pro users)
- * BUNDLES: ANNUAL-ONLY
- *   - 10 seats: $1,990/yr
- *   - 15 seats: $2,790/yr
- *   - 20 seats: $3,490/yr
+ * PRO BUNDLES (Annual-only):
+ *   - 10 seats: $2,700/yr
+ *   - 15 seats: $4,000/yr
+ *   - 20 seats: $5,200/yr
  * ADMIN ADD-ON: $29/mo | $290/yr
- * CCI-Q4 (Issuance Fee):
- *   - Free users: $199
- *   - Pro/Family/Circle: $149
+ *
+ * CCI OPTIONS (B2C ONLY):
+ * - Individual CCI: $199 (Free) | $149 (Pro/Family/Circle/Bundle)
+ *   - Issued per individual, one-time paid artifact
+ * - Circle Aggregate CCI: COMING SOON (staged, not purchasable)
+ *   - Aggregate capacity report for Circle, no individual attribution
  *
  * All pricing from lib/subscription/pricing.ts (canonical source)
  */
@@ -249,8 +252,8 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
       <View style={styles.cciHeader}>
         <FileText size={24} color="#7A9AAA" />
         <View style={styles.cciHeaderText}>
-          <Text style={styles.cciTitle}>CCI-Q4 Issuance</Text>
-          <Text style={styles.cciSubtitle}>Clinical Capacity Instrument</Text>
+          <Text style={styles.cciTitle}>Individual CCI</Text>
+          <Text style={styles.cciSubtitle}>Clinical Capacity Instrument · Issued per individual</Text>
         </View>
       </View>
 
@@ -279,10 +282,10 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
       {/* ISSUANCE CONFIRMATION — BLOCKING MODAL (PHASE 2-D) */}
       {!hasPurchased && (
         <View style={styles.cciConfirmationContainer}>
-          <Text style={styles.cciModalTitle}>Confirm CCI-Q4 Issuance</Text>
+          <Text style={styles.cciModalTitle}>Confirm Individual CCI Issuance</Text>
           <Text style={styles.cciModalBody}>
             This action creates a fixed clinical-grade record derived from your stored capacity history.
-            Once issued, the artifact cannot be altered.
+            Once issued, the artifact cannot be altered. Issued per individual.
           </Text>
           <Pressable
             style={styles.cciConfirmationRow}
@@ -325,7 +328,7 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
         disabled={!canPurchase}
       >
         <Text style={[styles.cciButtonText, !canPurchase && styles.cciButtonTextDisabled]}>
-          {hasPurchased ? 'Issued' : `Issue CCI-Q4 · ${formatPrice(price)}`}
+          {hasPurchased ? 'Issued' : `Issue Individual CCI · ${formatPrice(price)}`}
         </Text>
       </Pressable>
 
@@ -577,35 +580,37 @@ export default function UpgradeScreen() {
         </Animated.View>
 
         {/* =============================================================== */}
-        {/* BUNDLES (Annual-only) */}
+        {/* PRO BUNDLES (Annual-only) */}
         {/* =============================================================== */}
         <Animated.View entering={FadeInDown.delay(250).duration(400)}>
-          <Text style={styles.sectionTitle}>BUNDLES</Text>
-          <Text style={styles.sectionSubtitle}>Annual-only · B2C group packages</Text>
+          <Text style={styles.sectionTitle}>PRO BUNDLES (ANNUAL)</Text>
+          <Text style={styles.sectionSubtitle}>Designed for small groups and communities.</Text>
+          <Text style={styles.sectionSubtitle}>Includes full Pro access for each member.</Text>
 
           <View style={styles.bundleContainer}>
             <BundleCard
               seats={10}
               annualPrice={BUNDLE_PRICING.bundle_10.annual}
-              onSelect={() => handlePurchase(PRODUCT_IDS.BUNDLE_10_ANNUAL, '10-Seat Bundle')}
+              onSelect={() => handlePurchase(PRODUCT_IDS.BUNDLE_10_ANNUAL, '10-Seat Pro Bundle')}
               disabled={isPurchasing}
               isOwned={bundleSize === 10}
             />
             <BundleCard
               seats={15}
               annualPrice={BUNDLE_PRICING.bundle_15.annual}
-              onSelect={() => handlePurchase(PRODUCT_IDS.BUNDLE_15_ANNUAL, '15-Seat Bundle')}
+              onSelect={() => handlePurchase(PRODUCT_IDS.BUNDLE_15_ANNUAL, '15-Seat Pro Bundle')}
               disabled={isPurchasing}
               isOwned={bundleSize === 15}
             />
             <BundleCard
               seats={20}
               annualPrice={BUNDLE_PRICING.bundle_20.annual}
-              onSelect={() => handlePurchase(PRODUCT_IDS.BUNDLE_20_ANNUAL, '20-Seat Bundle')}
+              onSelect={() => handlePurchase(PRODUCT_IDS.BUNDLE_20_ANNUAL, '20-Seat Pro Bundle')}
               disabled={isPurchasing}
               isOwned={bundleSize === 20}
             />
           </View>
+          <Text style={styles.bundleFooter}>Purchased directly in the app. No contracts.</Text>
         </Animated.View>
 
         {/* =============================================================== */}
@@ -637,10 +642,10 @@ export default function UpgradeScreen() {
         )}
 
         {/* =============================================================== */}
-        {/* CCI-Q4 ISSUANCE */}
+        {/* INDIVIDUAL CCI */}
         {/* =============================================================== */}
         <Animated.View entering={FadeInDown.delay(350).duration(400)}>
-          <Text style={styles.sectionTitle}>CCI-Q4 ISSUANCE</Text>
+          <Text style={styles.sectionTitle}>INDIVIDUAL CCI</Text>
           <Text style={styles.sectionSubtitle}>
             {isPro ? `Pro price: ${formatPrice(CCI_PRICING.proUser)}` : `Free user: ${formatPrice(CCI_PRICING.freeUser)} · Pro: ${formatPrice(CCI_PRICING.proUser)}`}
           </Text>
@@ -651,7 +656,7 @@ export default function UpgradeScreen() {
               if (confirmed) {
                 handlePurchase(
                   isPro ? PRODUCT_IDS.CCI_PRO : PRODUCT_IDS.CCI_FREE,
-                  'CCI-Q4 Issuance'
+                  'Individual CCI Issuance'
                 );
               }
             }}
@@ -659,6 +664,31 @@ export default function UpgradeScreen() {
             hasPurchased={hasCCIPurchased}
           />
         </Animated.View>
+
+        {/* =============================================================== */}
+        {/* CIRCLE AGGREGATE CCI (COMING SOON) — Only visible for Circle members */}
+        {/* =============================================================== */}
+        {hasCircle && (
+          <Animated.View entering={FadeInDown.delay(375).duration(400)}>
+            <View style={styles.cciAggregateCard}>
+              <View style={styles.cciHeader}>
+                <Users size={24} color="#9C27B0" />
+                <View style={styles.cciHeaderText}>
+                  <View style={styles.cciAggregateTitleRow}>
+                    <Text style={[styles.cciTitle, { color: '#9C27B0' }]}>Circle Aggregate CCI</Text>
+                    <View style={styles.comingSoonBadge}>
+                      <Text style={styles.comingSoonText}>COMING SOON</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.cciSubtitle}>An aggregate capacity report for the Circle. No individual attribution.</Text>
+                </View>
+              </View>
+              <Text style={styles.cciAggregateNotice}>
+                Available on request. Contact support for early access.
+              </Text>
+            </View>
+          </Animated.View>
+        )}
 
         {/* =============================================================== */}
         {/* SPONSOR CODE */}
@@ -1045,7 +1075,15 @@ const styles = StyleSheet.create({
   // Bundle
   bundleContainer: {
     gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  bundleFooter: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+    textAlign: 'center',
+    marginTop: spacing.sm,
     marginBottom: spacing.md,
+    fontStyle: 'italic',
   },
   bundleItem: {
     flexDirection: 'row',
@@ -1253,6 +1291,41 @@ const styles = StyleSheet.create({
     color: 'rgba(122,154,170,0.7)',
     fontStyle: 'italic',
     marginTop: spacing.md,
+  },
+
+  // Circle Aggregate CCI (Coming Soon)
+  cciAggregateCard: {
+    backgroundColor: 'rgba(156,39,176,0.08)',
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(156,39,176,0.2)',
+    padding: spacing.md,
+    marginTop: spacing.md,
+  },
+  cciAggregateTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    flexWrap: 'wrap',
+  },
+  comingSoonBadge: {
+    backgroundColor: 'rgba(156,39,176,0.2)',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  comingSoonText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#9C27B0',
+    letterSpacing: 0.5,
+  },
+  cciAggregateNotice: {
+    fontSize: 12,
+    color: 'rgba(156,39,176,0.7)',
+    fontStyle: 'italic',
+    marginTop: spacing.sm,
+    textAlign: 'center',
   },
 
   // Sponsor Card
