@@ -355,12 +355,21 @@ export async function executePurchase(
 
   // Check prerequisite entitlements
   if (product.requiresEntitlement) {
-    const hasPrereq = await hasEntitlement(product.requiresEntitlement);
+    let hasPrereq = await hasEntitlement(product.requiresEntitlement);
+
+    // Special case: Admin Add-on can be purchased with Circle OR any Bundle
+    if (!hasPrereq && product.entitlementId === 'admin_addon') {
+      const hasBundle10 = await hasEntitlement('bundle_10_access');
+      const hasBundle15 = await hasEntitlement('bundle_15_access');
+      const hasBundle20 = await hasEntitlement('bundle_20_access');
+      hasPrereq = hasBundle10 || hasBundle15 || hasBundle20;
+    }
+
     if (!hasPrereq) {
       return {
         success: false,
         purchaseId: '',
-        error: `Requires ${product.requiresEntitlement} first`,
+        error: `Requires Circle or Bundle first`,
       };
     }
   }

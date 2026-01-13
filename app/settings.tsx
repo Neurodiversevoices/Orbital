@@ -330,6 +330,15 @@ export default function SettingsScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>DEVELOPER TOOLS</Text>
 
+            {/* Operator Admin View - Aggregate Signals */}
+            <SettingsRow
+              icon={TrendingUp}
+              label="Operator Admin"
+              sublabel="Aggregate signals by cohort (read-only)"
+              onPress={() => router.push('/operator-admin')}
+              disabled={isProcessing}
+            />
+
             {/* FREE USER VIEW Active Banner */}
             {freeUserViewActive && (
               <View style={styles.freeUserViewActiveBanner}>
