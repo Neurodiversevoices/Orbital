@@ -45,37 +45,26 @@ export const COLORS = {
   bgDark: '#0a1628',
   bgMid: '#0f1e32',
 
-  // Bands (subtle, not cartoon)
-  bandLow: 'rgba(34, 197, 94, 0.12)',      // Green - very subtle
-  bandModerate: 'rgba(245, 158, 11, 0.12)', // Amber - very subtle
-  bandHigh: 'rgba(239, 68, 68, 0.12)',      // Red - very subtle
+  // Bands — PASSIVE, contextual only (executive briefing style)
+  bandLow: 'rgba(120, 160, 130, 0.04)',       // Muted sage - barely visible
+  bandModerate: 'rgba(180, 160, 120, 0.04)',  // Muted tan - barely visible
+  bandHigh: 'rgba(160, 120, 120, 0.04)',      // Muted rose - barely visible
 
-  // Band borders (even more subtle)
-  bandBorderLow: 'rgba(34, 197, 94, 0.25)',
-  bandBorderMod: 'rgba(245, 158, 11, 0.25)',
-  bandBorderHigh: 'rgba(239, 68, 68, 0.25)',
+  // Line/Area gradient stops — DESATURATED for institutional feel
+  lineNormal: '#6b9080',      // Muted sage green
+  lineElevated: '#b8a078',    // Muted tan/amber
+  lineTriggered: '#a08080',   // Muted rose (NOT alarming red)
 
-  // Line/Area gradient stops
-  lineNormal: '#22c55e',      // Green
-  lineElevated: '#f59e0b',    // Amber
-  lineTriggered: '#ef4444',   // Red
+  // Text — quiet authority
+  textPrimary: 'rgba(255, 255, 255, 0.75)',
+  textSecondary: 'rgba(255, 255, 255, 0.50)',
+  textMuted: 'rgba(255, 255, 255, 0.30)',
 
-  // Area fill
-  areaGradientStart: 'rgba(34, 197, 94, 0.4)',
-  areaGradientEnd: 'rgba(239, 68, 68, 0.1)',
+  // Grid — barely perceptible
+  gridLine: 'rgba(255, 255, 255, 0.04)',
 
-  // Text
-  textPrimary: 'rgba(255, 255, 255, 0.9)',
-  textSecondary: 'rgba(255, 255, 255, 0.6)',
-  textMuted: 'rgba(255, 255, 255, 0.4)',
-
-  // Grid
-  gridLine: 'rgba(255, 255, 255, 0.06)',
-
-  // Annotation
-  annotationBg: 'rgba(245, 158, 11, 0.15)',
-  annotationBorder: '#f59e0b',
-  annotationText: '#f59e0b',
+  // Annotation — neutral, not attention-grabbing
+  annotationText: 'rgba(255, 255, 255, 0.50)',
 };
 
 // =============================================================================
@@ -144,27 +133,28 @@ export function generateSentinelSpec(data: SentinelChartData): object {
       view: { stroke: null },
       axis: {
         labelColor: COLORS.textMuted,
-        titleColor: COLORS.textSecondary,
+        titleColor: COLORS.textMuted,
         gridColor: COLORS.gridLine,
-        domainColor: COLORS.gridLine,
-        tickColor: COLORS.gridLine,
+        domainColor: 'transparent',
+        tickColor: 'transparent',
         labelFont: 'system-ui, -apple-system, sans-serif',
         titleFont: 'system-ui, -apple-system, sans-serif',
-        labelFontSize: 10,
-        titleFontSize: 11,
+        labelFontSize: 9,
+        titleFontSize: 9,
       },
       legend: { disable: true },
       title: {
-        color: COLORS.textPrimary,
+        color: COLORS.textSecondary,
         font: 'system-ui, -apple-system, sans-serif',
-        fontSize: 13,
-        fontWeight: 600,
+        fontSize: 10,
+        fontWeight: 400,
+        letterSpacing: '0.5px',
       },
     },
     title: {
-      text: 'VOLATILITY TREND VS BASELINE',
+      text: 'Volatility Trend vs Baseline',
       anchor: 'start',
-      offset: 10,
+      offset: 8,
     },
     layer: [
       // Layer 1: Background bands
@@ -177,22 +167,22 @@ export function generateSentinelSpec(data: SentinelChartData): object {
           color: { field: 'color', type: 'nominal', scale: null },
         },
       },
-      // Layer 2: Band labels on right
+      // Layer 2: Band labels on right — very subtle
       {
         data: {
           values: [
-            { label: 'HIGH', y: 83 },
-            { label: 'MODERATE', y: 50 },
-            { label: 'LOW', y: 17 },
+            { label: 'High', y: 83 },
+            { label: 'Moderate', y: 50 },
+            { label: 'Low', y: 17 },
           ],
         },
         mark: {
           type: 'text',
           align: 'left',
           dx: 5,
-          fontSize: 9,
-          fontWeight: 500,
-          opacity: 0.5,
+          fontSize: 8,
+          fontWeight: 400,
+          opacity: 0.25,
         },
         encoding: {
           x: { value: 'width' },
@@ -201,28 +191,28 @@ export function generateSentinelSpec(data: SentinelChartData): object {
           color: { value: COLORS.textMuted },
         },
       },
-      // Layer 3: Baseline reference line
+      // Layer 3: Baseline reference line — subtle
       {
         data: { values: [{ baseline }] },
         mark: {
           type: 'rule',
-          strokeDash: [4, 4],
-          strokeWidth: 1,
-          opacity: 0.4,
+          strokeDash: [3, 3],
+          strokeWidth: 0.5,
+          opacity: 0.2,
         },
         encoding: {
           y: { field: 'baseline', type: 'quantitative' },
-          color: { value: COLORS.textSecondary },
+          color: { value: COLORS.textMuted },
         },
       },
-      // Layer 4: Area fill under line
+      // Layer 4: Area fill under line — soft, secondary
       {
         data: { values: points },
         mark: {
           type: 'area',
           interpolate: 'monotone',
           line: false,
-          opacity: 0.3,
+          opacity: 0.08,
         },
         encoding: {
           x: {
@@ -252,13 +242,13 @@ export function generateSentinelSpec(data: SentinelChartData): object {
           },
         },
       },
-      // Layer 5: Main line
+      // Layer 5: Main line — primary signal, restrained
       {
         data: { values: points },
         mark: {
           type: 'line',
           interpolate: 'monotone',
-          strokeWidth: 2,
+          strokeWidth: 1.5,
           strokeCap: 'round',
         },
         encoding: {
@@ -274,28 +264,7 @@ export function generateSentinelSpec(data: SentinelChartData): object {
           },
         },
       },
-      // Layer 6: Current value point
-      {
-        data: { values: points.filter((p) => p.day === 0) },
-        mark: {
-          type: 'circle',
-          size: 50,
-          opacity: 1,
-        },
-        encoding: {
-          x: { field: 'day', type: 'quantitative' },
-          y: { field: 'value', type: 'quantitative' },
-          color: {
-            field: 'value',
-            type: 'quantitative',
-            scale: {
-              domain: [0, 33, 66, 100],
-              range: [COLORS.lineNormal, COLORS.lineNormal, COLORS.lineElevated, COLORS.lineTriggered],
-            },
-          },
-        },
-      },
-      // Layer 7: Trigger annotation (if triggered)
+      // Layer 6: Trigger annotation (if triggered) — neutral, quiet
       ...(annotationData.length > 0
         ? [
             {
@@ -304,10 +273,10 @@ export function generateSentinelSpec(data: SentinelChartData): object {
                 type: 'text',
                 align: 'left',
                 baseline: 'bottom',
-                dx: 8,
-                dy: -8,
-                fontSize: 11,
-                fontWeight: 600,
+                dx: 6,
+                dy: -6,
+                fontSize: 9,
+                fontWeight: 400,
               },
               encoding: {
                 x: { field: 'day', type: 'quantitative' },

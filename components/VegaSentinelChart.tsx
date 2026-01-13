@@ -51,7 +51,7 @@ function SystemStatePanel({
   const stateText = useMemo(() => {
     switch (systemState) {
       case 'critical':
-        return 'Critical volatility threshold exceeded';
+        return 'Critical threshold exceeded';
       case 'sustained_volatility':
         return 'Sustained volatility detected';
       case 'elevated':
@@ -61,18 +61,12 @@ function SystemStatePanel({
     }
   }, [systemState]);
 
-  const stateColor =
-    systemState === 'critical'
-      ? '#ef4444'
-      : systemState === 'sustained_volatility' || systemState === 'elevated'
-        ? '#f59e0b'
-        : '#22c55e';
-
   return (
     <View style={styles.panel}>
-      <Text style={[styles.panelTitle, { color: stateColor }]}>SYSTEM STATE: {stateText}</Text>
-      <Text style={styles.panelSubtext}>{consecutiveDays} consecutive days above baseline</Text>
-      <Text style={styles.panelSubtext}>Sample size: n={sampleSize.toLocaleString()}</Text>
+      <Text style={styles.panelTitle}>System State</Text>
+      <Text style={styles.panelSubtext}>{stateText}</Text>
+      <Text style={styles.panelSubtext}>{consecutiveDays} days above baseline</Text>
+      <Text style={styles.panelSubtext}>n={sampleSize.toLocaleString()}</Text>
     </View>
   );
 }
@@ -181,30 +175,18 @@ export function VegaSentinelChart({
     });
   }, [spec]);
 
-  // Trigger callout
-  const showTriggerCallout = systemState === 'sustained_volatility' || systemState === 'critical';
-  const triggerColor = systemState === 'critical' ? '#ef4444' : '#f59e0b';
-
   return (
     <View style={styles.container}>
-      {/* Header */}
+      {/* Header — quiet, institutional */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>ORBITAL SENTINEL™</Text>
-        <Text style={styles.headerSubtitle}>CAPACITY VOLATILITY EARLY WARNING SYSTEM</Text>
+        <Text style={styles.headerTitle}>Orbital Sentinel</Text>
+        <Text style={styles.headerSubtitle}>Capacity Volatility Early Warning</Text>
       </View>
 
       {/* Cohort selector info */}
       <View style={styles.cohortRow}>
-        <Text style={styles.cohortLabel}>Cohort: {cohortLabel}</Text>
+        <Text style={styles.cohortLabel}>{cohortLabel}</Text>
       </View>
-
-      {/* Trigger callout */}
-      {showTriggerCallout && triggerAnnotation && (
-        <View style={[styles.triggerCallout, { borderColor: triggerColor }]}>
-          <View style={[styles.triggerDot, { backgroundColor: triggerColor }]} />
-          <Text style={[styles.triggerText, { color: triggerColor }]}>{triggerAnnotation}</Text>
-        </View>
-      )}
 
       {/* Chart container */}
       <View style={styles.chartContainer}>
@@ -246,16 +228,17 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-    letterSpacing: 1,
+    fontSize: 13,
+    fontWeight: '500',
+    color: COLORS.textSecondary,
+    letterSpacing: 0.3,
   },
   headerSubtitle: {
-    fontSize: 10,
+    fontSize: 9,
     color: COLORS.textMuted,
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
     marginTop: 2,
+    opacity: 0.7,
   },
   cohortRow: {
     flexDirection: 'row',
@@ -263,33 +246,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   cohortLabel: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  triggerCallout: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-    borderWidth: 1,
-    borderRadius: borderRadius.sm,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    marginBottom: spacing.md,
-  },
-  triggerDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 8,
-  },
-  triggerText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 10,
+    color: COLORS.textMuted,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 3,
   },
   chartContainer: {
     backgroundColor: COLORS.bgMid,
@@ -311,43 +273,43 @@ const styles = StyleSheet.create({
   },
   panelsRow: {
     flexDirection: 'row',
-    gap: spacing.md,
+    gap: spacing.sm,
     marginTop: spacing.md,
   },
   panel: {
     flex: 1,
-    backgroundColor: 'rgba(10, 22, 40, 0.85)',
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    borderRadius: borderRadius.sm,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    padding: spacing.md,
+    borderColor: 'rgba(255,255,255,0.04)',
+    padding: spacing.sm,
   },
   panelTitle: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
-    marginBottom: 4,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontSize: 9,
+    fontWeight: '500',
+    color: COLORS.textMuted,
+    marginBottom: 3,
+    letterSpacing: 0.3,
   },
   panelSubtext: {
-    fontSize: 10,
-    color: COLORS.textMuted,
-    marginTop: 2,
-  },
-  bulletText: {
-    fontSize: 10,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-    lineHeight: 14,
-  },
-  footerDisclaimer: {
     fontSize: 9,
     color: COLORS.textMuted,
-    textAlign: 'center',
-    marginTop: spacing.md,
-    fontStyle: 'italic',
+    marginTop: 1,
     opacity: 0.7,
+  },
+  bulletText: {
+    fontSize: 9,
+    color: COLORS.textMuted,
+    marginTop: 1,
+    lineHeight: 13,
+    opacity: 0.8,
+  },
+  footerDisclaimer: {
+    fontSize: 8,
+    color: COLORS.textMuted,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+    opacity: 0.5,
   },
 });
 
