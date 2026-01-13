@@ -39,39 +39,46 @@ export interface SentinelChartData {
 }
 
 // =============================================================================
-// COLOR PALETTE
+// COLOR PALETTE — BOARDROOM READABLE
 // =============================================================================
 
 export const COLORS = {
   // Background
   bgDark: '#0a1628',
   bgMid: '#0f1e32',
+  bgPanel: 'rgba(20, 35, 55, 0.85)',
 
   // Alert window — DOMINANT visual element
-  alertWindow: 'rgba(180, 140, 100, 0.15)',
-  alertBorder: 'rgba(180, 140, 100, 0.4)',
+  alertWindow: 'rgba(180, 140, 100, 0.18)',
+  alertBorder: 'rgba(200, 160, 120, 0.5)',
 
   // Baseline bands — passive context only
-  bandLow: 'rgba(120, 160, 130, 0.03)',
-  bandModerate: 'rgba(160, 150, 120, 0.03)',
-  bandHigh: 'rgba(160, 130, 130, 0.03)',
+  bandLow: 'rgba(120, 160, 130, 0.04)',
+  bandModerate: 'rgba(160, 150, 120, 0.04)',
+  bandHigh: 'rgba(160, 130, 130, 0.04)',
 
-  // Line — single color, no gradient theatrics
-  line: 'rgba(180, 170, 150, 0.7)',
+  // Data-driven line colors (cyan → amber → red)
+  lineCyan: 'rgba(34, 211, 238, 0.9)',    // Calm: <= lowThreshold
+  lineAmber: 'rgba(245, 180, 60, 0.9)',   // Warning: low < x <= high
+  lineRed: 'rgba(248, 113, 113, 0.9)',    // Breach: > highThreshold
 
   // Baseline reference
-  baseline: 'rgba(255, 255, 255, 0.15)',
+  baseline: 'rgba(255, 255, 255, 0.35)',
 
-  // Text
-  textPrimary: 'rgba(255, 255, 255, 0.75)',
-  textSecondary: 'rgba(255, 255, 255, 0.45)',
-  textMuted: 'rgba(255, 255, 255, 0.25)',
+  // Text — HIGH CONTRAST for projectors
+  textHeading: 'rgba(240, 245, 255, 0.92)',
+  textPrimary: 'rgba(230, 238, 250, 0.88)',
+  textSecondary: 'rgba(210, 220, 235, 0.78)',
+  textMuted: 'rgba(180, 195, 215, 0.60)',
 
-  // Grid
-  gridLine: 'rgba(255, 255, 255, 0.03)',
+  // Grid — visible but not dominant
+  gridLine: 'rgba(255, 255, 255, 0.08)',
+
+  // Axis labels — clearly readable
+  axisLabel: 'rgba(200, 210, 230, 0.72)',
 
   // Annotation
-  annotationText: 'rgba(255, 255, 255, 0.45)',
+  annotationText: 'rgba(220, 230, 245, 0.70)',
 };
 
 // =============================================================================
@@ -143,22 +150,22 @@ export function generateSentinelSpec(data: SentinelChartData): object {
     config: {
       view: { stroke: null },
       axis: {
-        labelColor: COLORS.textMuted,
-        titleColor: COLORS.textMuted,
+        labelColor: COLORS.axisLabel,
+        titleColor: COLORS.textSecondary,
         gridColor: COLORS.gridLine,
         domainColor: 'transparent',
         tickColor: 'transparent',
         labelFont: 'system-ui, -apple-system, sans-serif',
         titleFont: 'system-ui, -apple-system, sans-serif',
-        labelFontSize: 8,
-        titleFontSize: 8,
+        labelFontSize: 10,
+        titleFontSize: 10,
       },
       legend: { disable: true },
       title: {
-        color: COLORS.textSecondary,
+        color: COLORS.textHeading,
         font: 'system-ui, -apple-system, sans-serif',
-        fontSize: 9,
-        fontWeight: 400,
+        fontSize: 11,
+        fontWeight: 500,
       },
     },
     title: {
@@ -218,7 +225,7 @@ export function generateSentinelSpec(data: SentinelChartData): object {
           color: { value: COLORS.baseline },
         },
       },
-      // Layer 4: Volatility line — ONE thick line, NO points
+      // Layer 4a: Volatility line — CYAN segment (calm: value <= low)
       {
         data: { values: points },
         mark: {
@@ -227,6 +234,7 @@ export function generateSentinelSpec(data: SentinelChartData): object {
           strokeWidth: 2.5,
           strokeCap: 'round',
         },
+        transform: [{ filter: `datum.value <= ${THRESHOLDS.low}` }],
         encoding: {
           x: {
             field: 'day',
@@ -245,7 +253,55 @@ export function generateSentinelSpec(data: SentinelChartData): object {
             scale: { domain: [THRESHOLDS.yMin, THRESHOLDS.yMax] },
             axis: { title: null, tickCount: 5 },
           },
-          color: { value: COLORS.line },
+          color: { value: COLORS.lineCyan },
+        },
+      },
+      // Layer 4b: Volatility line — AMBER segment (warning: low < value <= moderate)
+      {
+        data: { values: points },
+        mark: {
+          type: 'line',
+          interpolate: 'monotone',
+          strokeWidth: 2.5,
+          strokeCap: 'round',
+        },
+        transform: [{ filter: `datum.value > ${THRESHOLDS.low} && datum.value <= ${THRESHOLDS.moderate}` }],
+        encoding: {
+          x: {
+            field: 'day',
+            type: 'quantitative',
+            scale: { domain: [minDay, maxDay] },
+          },
+          y: {
+            field: 'value',
+            type: 'quantitative',
+            scale: { domain: [THRESHOLDS.yMin, THRESHOLDS.yMax] },
+          },
+          color: { value: COLORS.lineAmber },
+        },
+      },
+      // Layer 4c: Volatility line — RED segment (breach: value > moderate)
+      {
+        data: { values: points },
+        mark: {
+          type: 'line',
+          interpolate: 'monotone',
+          strokeWidth: 2.5,
+          strokeCap: 'round',
+        },
+        transform: [{ filter: `datum.value > ${THRESHOLDS.moderate}` }],
+        encoding: {
+          x: {
+            field: 'day',
+            type: 'quantitative',
+            scale: { domain: [minDay, maxDay] },
+          },
+          y: {
+            field: 'value',
+            type: 'quantitative',
+            scale: { domain: [THRESHOLDS.yMin, THRESHOLDS.yMax] },
+          },
+          color: { value: COLORS.lineRed },
         },
       },
       // Layer 5: Annotation — single neutral label
