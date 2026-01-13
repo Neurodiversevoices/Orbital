@@ -437,8 +437,7 @@ export default function UpgradeScreen() {
       <View style={styles.header}>
         <View style={styles.headerSpacer} />
         <View style={styles.headerTitleContainer}>
-          <Text style={styles.title}>RECORD ACCESS</Text>
-          <Text style={styles.headerSubtitle}>Access levels determine retention, eligibility, and issuance rights.</Text>
+          <Text style={styles.title}>Plans</Text>
         </View>
         <Pressable onPress={() => router.back()} style={styles.closeButton}>
           <X color={colors.textPrimary} size={24} />
@@ -446,171 +445,170 @@ export default function UpgradeScreen() {
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Current Status */}
-        <Animated.View entering={FadeInDown.delay(50).duration(400)} style={styles.statusCard}>
-          <View style={styles.statusRow}>
-            <Text style={styles.statusLabel}>Status:</Text>
-            <View style={[styles.statusBadge, isPro && styles.statusBadgePro]}>
-              <Text style={styles.statusBadgeText}>{isPro ? 'PRO' : 'FREE'}</Text>
+        {/* =============================================================== */}
+        {/* CHOOSE YOUR PLAN — All options visible and equal */}
+        {/* =============================================================== */}
+        <Text style={styles.plansHeader}>Choose Your Plan</Text>
+
+        {/* FREE */}
+        <Animated.View entering={FadeInDown.delay(50).duration(400)}>
+          <View style={[styles.planCard, !isPro && styles.planCardCurrent]}>
+            <View style={styles.planCardHeader}>
+              <View>
+                <Text style={styles.planCardName}>Free</Text>
+                <Text style={styles.planCardPrice}>$0</Text>
+              </View>
+              {!isPro && (
+                <View style={styles.currentBadge}>
+                  <Text style={styles.currentBadgeText}>CURRENT</Text>
+                </View>
+              )}
             </View>
-          </View>
-          {!isPro && (
-            <Text style={styles.statusHint}>
+            <Text style={styles.planCardDescription}>
               {FREE_TIER_LIMITS.maxSignalsPerMonth} signals/month · {FREE_TIER_LIMITS.maxPatternHistoryDays} days history
             </Text>
-          )}
+            <View style={styles.planCardCta}>
+              <Text style={styles.planCardCtaText}>{isPro ? 'Basic tier' : 'Your current plan'}</Text>
+            </View>
+          </View>
         </Animated.View>
 
-        {/* =============================================================== */}
-        {/* PRO SUBSCRIPTION */}
-        {/* =============================================================== */}
+        {/* PRO */}
         <Animated.View entering={FadeInDown.delay(100).duration(400)}>
-          <Text style={styles.sectionTitle}>PRO SUBSCRIPTION</Text>
-
-          <TierCard
-            name="Pro"
-            description="Unlimited signals & full pattern history"
-            monthlyPrice={PRO_PRICING.monthly}
-            annualPrice={PRO_PRICING.annual}
-            features={[
-              'Unlimited daily signals',
-              'Full pattern history',
-              'Required for Circles & Bundles',
-              'Priority support',
-            ]}
-            isRecommended={!isPro}
-            isCurrentTier={isPro}
-            onSelectMonthly={() => handlePurchase(PRODUCT_IDS.PRO_MONTHLY, 'Pro (Monthly)')}
-            onSelectAnnual={() => handlePurchase(PRODUCT_IDS.PRO_ANNUAL, 'Pro (Annual)')}
-            disabled={isPurchasing}
-            color="#FFD700"
-          />
-        </Animated.View>
-
-        {/* =============================================================== */}
-        {/* FAMILY ADD-ON */}
-        {/* =============================================================== */}
-        <Animated.View entering={FadeInDown.delay(150).duration(400)}>
-          <Text style={styles.sectionTitle}>FAMILY ADD-ON</Text>
-          <Text style={styles.sectionSubtitle}>
-            Base includes {FAMILY_ADDON_PRICING.baseSeats} family members
-          </Text>
-
-          <TierCard
-            name="Family"
-            description="Shared capacity tracking for your household"
-            monthlyPrice={FAMILY_ADDON_PRICING.monthly}
-            annualPrice={FAMILY_ADDON_PRICING.annual}
-            features={[
-              `Up to ${FAMILY_ADDON_PRICING.baseSeats} family members included`,
-              'Family circle visibility',
-              'Household capacity insights',
-              'Family-level trend analysis',
-            ]}
-            isCurrentTier={hasFamily}
-            onSelectMonthly={() => handlePurchase(PRODUCT_IDS.FAMILY_MONTHLY, 'Family (Monthly)')}
-            onSelectAnnual={() => handlePurchase(PRODUCT_IDS.FAMILY_ANNUAL, 'Family (Annual)')}
-            disabled={isPurchasing || !isPro}
-            requiresText={!isPro ? 'Requires Pro' : undefined}
-            color="#FF9800"
-          />
-
-          {/* Family Expansion Pricing - Additional members beyond base 5 */}
-          <View style={styles.expansionPricingCard}>
-            <View style={styles.expansionHeader}>
-              <UserPlus size={18} color="#FF9800" />
-              <Text style={styles.expansionTitle}>Additional Family Members</Text>
+          <View style={[styles.planCard, styles.planCardHighlight, isPro && !hasFamily && !hasCircle && styles.planCardCurrent]}>
+            <View style={styles.planCardHeader}>
+              <View>
+                <Text style={[styles.planCardName, { color: '#FFD700' }]}>Pro</Text>
+                <Text style={styles.planCardPrice}>{formatPrice(PRO_PRICING.annual)}/yr</Text>
+              </View>
+              {isPro && !hasFamily && !hasCircle && bundleSize === null && (
+                <View style={[styles.currentBadge, { backgroundColor: '#FFD700' }]}>
+                  <Text style={[styles.currentBadgeText, { color: '#000' }]}>CURRENT</Text>
+                </View>
+              )}
             </View>
-            <Text style={styles.expansionSubtitle}>
-              Beyond the base {FAMILY_ADDON_PRICING.baseSeats} members included
+            <Text style={styles.planCardDescription}>
+              Unlimited signals · Full pattern history · Priority support
             </Text>
-            <View style={styles.expansionPriceRow}>
-              <View style={styles.expansionPriceOption}>
-                <Text style={styles.expansionPriceAmount}>
-                  +{formatPrice(FAMILY_EXTRA_SEAT_PRICING.monthly)}
-                </Text>
-                <Text style={styles.expansionPricePeriod}>/month per member</Text>
+            <Pressable
+              style={[styles.planCardCtaButton, isPro && styles.planCardCtaButtonDisabled]}
+              onPress={() => handlePurchase(PRODUCT_IDS.PRO_ANNUAL, 'Pro (Annual)')}
+              disabled={isPurchasing || isPro}
+            >
+              <Crown size={16} color={isPro ? 'rgba(255,255,255,0.4)' : '#000'} />
+              <Text style={[styles.planCardCtaButtonText, isPro && styles.planCardCtaButtonTextDisabled]}>
+                {isPro ? 'Active' : 'Upgrade to Pro'}
+              </Text>
+            </Pressable>
+          </View>
+        </Animated.View>
+
+        {/* FAMILY */}
+        <Animated.View entering={FadeInDown.delay(150).duration(400)}>
+          <View style={[styles.planCard, hasFamily && styles.planCardCurrent]}>
+            <View style={styles.planCardHeader}>
+              <View>
+                <Text style={[styles.planCardName, { color: '#FF9800' }]}>Family</Text>
+                <Text style={styles.planCardPrice}>{formatPrice(FAMILY_ADDON_PRICING.annual)}/yr</Text>
               </View>
-              <Text style={styles.expansionPriceOr}>or</Text>
-              <View style={styles.expansionPriceOption}>
-                <Text style={styles.expansionPriceAmount}>
-                  +{formatPrice(FAMILY_EXTRA_SEAT_PRICING.annual)}
-                </Text>
-                <Text style={styles.expansionPricePeriod}>/year per member</Text>
-              </View>
+              {hasFamily && (
+                <View style={[styles.currentBadge, { backgroundColor: '#FF9800' }]}>
+                  <Text style={[styles.currentBadgeText, { color: '#000' }]}>ACTIVE</Text>
+                </View>
+              )}
             </View>
-            {hasFamily && (
-              <Pressable
-                style={styles.addMemberButton}
-                onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_EXTRA_SEAT_ANNUAL, 'Family Extra Member (Annual)')}
-                disabled={isPurchasing}
-              >
-                <UserPlus size={16} color="#000" />
-                <Text style={styles.addMemberButtonText}>Add Family Member</Text>
-              </Pressable>
-            )}
+            <Text style={styles.planCardDescription}>
+              Up to 5 family members · Household insights · Shared visibility
+            </Text>
+            {!isPro && <Text style={styles.planCardRequires}>Requires Pro</Text>}
+            <Pressable
+              style={[styles.planCardCtaButton, { backgroundColor: '#FF9800' }, (hasFamily || !isPro) && styles.planCardCtaButtonDisabled]}
+              onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_ANNUAL, 'Family (Annual)')}
+              disabled={isPurchasing || hasFamily || !isPro}
+            >
+              <Users size={16} color={(hasFamily || !isPro) ? 'rgba(255,255,255,0.4)' : '#000'} />
+              <Text style={[styles.planCardCtaButtonText, (hasFamily || !isPro) && styles.planCardCtaButtonTextDisabled]}>
+                {hasFamily ? 'Active' : 'Start a Family'}
+              </Text>
+            </Pressable>
           </View>
         </Animated.View>
 
-        {/* =============================================================== */}
         {/* CIRCLES */}
-        {/* =============================================================== */}
         <Animated.View entering={FadeInDown.delay(200).duration(400)}>
-          <Text style={styles.sectionTitle}>CIRCLES</Text>
-          <Text style={styles.sectionSubtitle}>Shared capacity awareness + optional Admin visibility</Text>
-
-          <TierCard
-            name="Circle"
-            description="Create a circle with up to 5 trusted buddies"
-            monthlyPrice={CIRCLE_PRICING.monthly}
-            annualPrice={CIRCLE_PRICING.annual}
-            features={[
-              'Up to 5 buddies (all must be Pro)',
-              'Shared capacity awareness',
-              'Circle-level insights',
-              'Admin access available after creation',
-            ]}
-            isCurrentTier={hasCircle}
-            onSelectMonthly={() => handlePurchase(PRODUCT_IDS.CIRCLE_MONTHLY, 'Circle (Monthly)')}
-            onSelectAnnual={() => handlePurchase(PRODUCT_IDS.CIRCLE_ANNUAL, 'Circle (Annual)')}
-            disabled={isPurchasing || !isPro}
-            requiresText={!isPro ? 'Requires Pro for all members' : undefined}
-            color="#00E5FF"
-          />
+          <View style={[styles.planCard, hasCircle && styles.planCardCurrent]}>
+            <View style={styles.planCardHeader}>
+              <View>
+                <Text style={[styles.planCardName, { color: '#00E5FF' }]}>Circles</Text>
+                <Text style={styles.planCardPrice}>{formatPrice(CIRCLE_PRICING.annual)}/yr</Text>
+              </View>
+              {hasCircle && (
+                <View style={[styles.currentBadge, { backgroundColor: '#00E5FF' }]}>
+                  <Text style={[styles.currentBadgeText, { color: '#000' }]}>ACTIVE</Text>
+                </View>
+              )}
+            </View>
+            <Text style={styles.planCardDescription}>
+              Up to 5 trusted buddies · Shared capacity awareness · Circle insights
+            </Text>
+            {!isPro && <Text style={styles.planCardRequires}>Requires Pro for all members</Text>}
+            <Pressable
+              style={[styles.planCardCtaButton, { backgroundColor: '#00E5FF' }, (hasCircle || !isPro) && styles.planCardCtaButtonDisabled]}
+              onPress={() => handlePurchase(PRODUCT_IDS.CIRCLE_ANNUAL, 'Circle (Annual)')}
+              disabled={isPurchasing || hasCircle || !isPro}
+            >
+              <Users size={16} color={(hasCircle || !isPro) ? 'rgba(255,255,255,0.4)' : '#000'} />
+              <Text style={[styles.planCardCtaButtonText, (hasCircle || !isPro) && styles.planCardCtaButtonTextDisabled]}>
+                {hasCircle ? 'Active' : 'Create a Circle'}
+              </Text>
+            </Pressable>
+          </View>
         </Animated.View>
 
-        {/* =============================================================== */}
-        {/* PRO BUNDLES (Annual-only) */}
-        {/* =============================================================== */}
+        {/* BUNDLES */}
         <Animated.View entering={FadeInDown.delay(250).duration(400)}>
-          <Text style={styles.sectionTitle}>PRO BUNDLES (ANNUAL)</Text>
-          <Text style={styles.sectionSubtitle}>Designed for small groups and communities.</Text>
-          <Text style={styles.sectionSubtitle}>Includes full Pro access for each member.</Text>
-
-          <View style={styles.bundleContainer}>
-            <BundleCard
-              seats={10}
-              annualPrice={BUNDLE_PRICING.bundle_10.annual}
-              onSelect={() => handlePurchase(PRODUCT_IDS.BUNDLE_10_ANNUAL, '10-Seat Pro Bundle')}
-              disabled={isPurchasing}
-              isOwned={bundleSize === 10}
-            />
-            <BundleCard
-              seats={15}
-              annualPrice={BUNDLE_PRICING.bundle_15.annual}
-              onSelect={() => handlePurchase(PRODUCT_IDS.BUNDLE_15_ANNUAL, '15-Seat Pro Bundle')}
-              disabled={isPurchasing}
-              isOwned={bundleSize === 15}
-            />
-            <BundleCard
-              seats={20}
-              annualPrice={BUNDLE_PRICING.bundle_20.annual}
-              onSelect={() => handlePurchase(PRODUCT_IDS.BUNDLE_20_ANNUAL, '20-Seat Pro Bundle')}
-              disabled={isPurchasing}
-              isOwned={bundleSize === 20}
-            />
+          <View style={[styles.planCard, bundleSize !== null && styles.planCardCurrent]}>
+            <View style={styles.planCardHeader}>
+              <View>
+                <Text style={[styles.planCardName, { color: '#9C27B0' }]}>Bundles</Text>
+                <Text style={styles.planCardPrice}>From {formatPrice(BUNDLE_PRICING.bundle_10.annual)}/yr</Text>
+              </View>
+              {bundleSize !== null && (
+                <View style={[styles.currentBadge, { backgroundColor: '#9C27B0' }]}>
+                  <Text style={styles.currentBadgeText}>{bundleSize} SEATS</Text>
+                </View>
+              )}
+            </View>
+            <Text style={styles.planCardDescription}>
+              10, 15, or 20 Pro seats · For groups & communities · Annual billing
+            </Text>
+            <View style={styles.bundleOptions}>
+              <Pressable
+                style={[styles.bundleOptionButton, bundleSize === 10 && styles.bundleOptionButtonActive]}
+                onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_10_ANNUAL, '10-Seat Pro Bundle')}
+                disabled={isPurchasing || bundleSize !== null}
+              >
+                <Text style={[styles.bundleOptionText, bundleSize === 10 && styles.bundleOptionTextActive]}>10 seats</Text>
+                <Text style={[styles.bundleOptionPrice, bundleSize === 10 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_10.annual)}</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.bundleOptionButton, bundleSize === 15 && styles.bundleOptionButtonActive]}
+                onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_15_ANNUAL, '15-Seat Pro Bundle')}
+                disabled={isPurchasing || bundleSize !== null}
+              >
+                <Text style={[styles.bundleOptionText, bundleSize === 15 && styles.bundleOptionTextActive]}>15 seats</Text>
+                <Text style={[styles.bundleOptionPrice, bundleSize === 15 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_15.annual)}</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.bundleOptionButton, bundleSize === 20 && styles.bundleOptionButtonActive]}
+                onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_20_ANNUAL, '20-Seat Pro Bundle')}
+                disabled={isPurchasing || bundleSize !== null}
+              >
+                <Text style={[styles.bundleOptionText, bundleSize === 20 && styles.bundleOptionTextActive]}>20 seats</Text>
+                <Text style={[styles.bundleOptionPrice, bundleSize === 20 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_20.annual)}</Text>
+              </Pressable>
+            </View>
           </View>
-          <Text style={styles.bundleFooter}>Purchased directly in the app. No contracts.</Text>
         </Animated.View>
 
         {/* =============================================================== */}
@@ -808,6 +806,134 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     paddingHorizontal: spacing.md,
+  },
+
+  // Plans Header
+  plansHeader: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.95)',
+    marginBottom: spacing.lg,
+    textAlign: 'center',
+  },
+
+  // Plan Card (equal for all plans)
+  planCard: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+  },
+  planCardHighlight: {
+    borderColor: 'rgba(255,215,0,0.3)',
+    backgroundColor: 'rgba(255,215,0,0.05)',
+  },
+  planCardCurrent: {
+    borderColor: 'rgba(76,175,80,0.4)',
+  },
+  planCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: spacing.sm,
+  },
+  planCardName: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.9)',
+  },
+  planCardPrice: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.6)',
+    marginTop: 2,
+  },
+  planCardDescription: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.5)',
+    lineHeight: 20,
+    marginBottom: spacing.md,
+  },
+  planCardRequires: {
+    fontSize: 12,
+    color: '#FF9800',
+    fontStyle: 'italic',
+    marginBottom: spacing.sm,
+  },
+  planCardCta: {
+    paddingVertical: spacing.sm,
+  },
+  planCardCtaText: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.4)',
+    textAlign: 'center',
+  },
+  planCardCtaButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    backgroundColor: '#FFD700',
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.md,
+  },
+  planCardCtaButtonDisabled: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  planCardCtaButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#000',
+  },
+  planCardCtaButtonTextDisabled: {
+    color: 'rgba(255,255,255,0.4)',
+  },
+  currentBadge: {
+    backgroundColor: 'rgba(76,175,80,0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
+  },
+  currentBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#4CAF50',
+    letterSpacing: 0.5,
+  },
+
+  // Bundle Options (inline in Bundles card)
+  bundleOptions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  bundleOptionButton: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    alignItems: 'center',
+  },
+  bundleOptionButtonActive: {
+    backgroundColor: 'rgba(156,39,176,0.2)',
+    borderColor: '#9C27B0',
+  },
+  bundleOptionText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.7)',
+  },
+  bundleOptionPrice: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.4)',
+    marginTop: 2,
+  },
+  bundleOptionTextActive: {
+    color: '#9C27B0',
   },
 
   // Status Card
