@@ -69,6 +69,7 @@ import {
   getCohortSampleSize,
 } from '../../lib/sentinel';
 import { SentinelChart } from '../../components/SentinelChart';
+import { useAccess } from '../../lib/access';
 
 // =============================================================================
 // TYPES
@@ -105,20 +106,46 @@ const DEMO_MODE_TABS: DemoModeTab[] = [
 
 export default function BriefingsScreen() {
   const [scope, setScope] = useState<BriefScope>('personal');
+  const { showBriefingsOrgGlobal, freeUserViewActive, freeUserViewBanner } = useAccess();
+
+  // Filter tabs based on access level
+  const visibleTabs = useMemo(() => {
+    if (!showBriefingsOrgGlobal) {
+      // Free User View: only show Personal tab
+      return SCOPE_TABS.filter((tab) => tab.id === 'personal');
+    }
+    return SCOPE_TABS;
+  }, [showBriefingsOrgGlobal]);
+
+  // If current scope is not visible, reset to personal
+  React.useEffect(() => {
+    if (!showBriefingsOrgGlobal && scope !== 'personal') {
+      setScope('personal');
+    }
+  }, [showBriefingsOrgGlobal, scope]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      {/* FREE USER VIEW Banner */}
+      {freeUserViewActive && (
+        <View style={styles.freeUserViewBanner}>
+          <Text style={styles.freeUserViewBannerText}>{freeUserViewBanner}</Text>
+        </View>
+      )}
+
       {/* Header */}
       <Animated.View entering={FadeIn.duration(400)} style={styles.header}>
         <Text style={styles.headerTitle}>Briefings</Text>
         <Text style={styles.headerSubtitle}>
-          Capacity intelligence across scopes
+          {freeUserViewActive
+            ? 'Personal capacity intelligence'
+            : 'Capacity intelligence across scopes'}
         </Text>
       </Animated.View>
 
       {/* Scope Tabs */}
       <View style={styles.tabContainer}>
-        {SCOPE_TABS.map((tab) => {
+        {visibleTabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = scope === tab.id;
           return (
@@ -146,8 +173,8 @@ export default function BriefingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {scope === 'personal' && <PersonalBrief />}
-        {scope === 'organization' && <OrganizationBrief />}
-        {scope === 'global' && <GlobalBrief />}
+        {scope === 'organization' && showBriefingsOrgGlobal && <OrganizationBrief />}
+        {scope === 'global' && showBriefingsOrgGlobal && <GlobalBrief />}
       </ScrollView>
     </SafeAreaView>
   );
@@ -708,6 +735,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  freeUserViewBanner: {
+    backgroundColor: '#F44336',
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  freeUserViewBannerText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1,
   },
   header: {
     paddingHorizontal: spacing.md,

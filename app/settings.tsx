@@ -29,6 +29,11 @@ import {
   Database,
   Heart,
   FileText,
+  Cloud,
+  UserCircle,
+  Briefcase,
+  TrendingUp,
+  Phone,
 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, commonStyles, spacing, borderRadius } from '../theme';
@@ -36,15 +41,16 @@ import { useEnergyLogs } from '../lib/hooks/useEnergyLogs';
 import { useLocale, interpolate } from '../lib/hooks/useLocale';
 import { generateFakeData, clearFakeData } from '../lib/generateFakeData';
 import { localeNames, Locale } from '../locales';
-import { useDemoMode } from '../lib/hooks/useDemoMode';
+import { useDemoMode, FOUNDER_DEMO_ENABLED, DemoDuration } from '../lib/hooks/useDemoMode';
 import { useAppMode } from '../lib/hooks/useAppMode';
 import { useTutorial } from '../lib/hooks/useTutorial';
 import { useSubscription, shouldBypassSubscription, FREE_TIER_LIMITS } from '../lib/subscription';
+import { useAccess } from '../lib/access';
 import { DELETION_DISCLOSURE } from '../lib/storage';
 import { ProprietaryFooter } from '../components/legal';
 import { APP_MODE_CONFIGS } from '../types';
 import { ModeSelector } from '../components';
-import { Crown } from 'lucide-react-native';
+import { Crown, Gift } from 'lucide-react-native';
 import { generateClinicalBrief } from '../lib/pdf';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -56,6 +62,7 @@ export default function SettingsScreen() {
   const {
     isDemoMode,
     isLoading: isDemoLoading,
+    isFounderDemo,
     enableDemoMode,
     disableDemoMode,
     reseedDemoData,
@@ -64,17 +71,64 @@ export default function SettingsScreen() {
   const { resetTutorial } = useTutorial();
   const { currentMode, modeConfig, orgName, orgCode, leaveOrg } = useAppMode();
   const { isPro, isLoading: subscriptionLoading } = useSubscription();
+  const {
+    qaFreeModeEnabled,
+    enableQAFreeMode,
+    disableQAFreeMode,
+    tierLabel,
+    limits,
+    // FREE USER VIEW — Hard override
+    freeUserViewActive,
+    freeUserViewBanner,
+    enableFreeUserView,
+    disableFreeUserView,
+  } = useAccess();
   const bypassesSubscription = shouldBypassSubscription(currentMode);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
   const [showDemoPicker, setShowDemoPicker] = useState(false);
+
+  const handleToggleQAFreeMode = useCallback(async () => {
+    setIsProcessing(true);
+    try {
+      if (qaFreeModeEnabled) {
+        await disableQAFreeMode();
+      } else {
+        await enableQAFreeMode();
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [qaFreeModeEnabled, enableQAFreeMode, disableQAFreeMode]);
+
+  // FREE USER VIEW toggle (hard override)
+  const handleToggleFreeUserView = useCallback(async () => {
+    setIsProcessing(true);
+    try {
+      if (freeUserViewActive) {
+        await disableFreeUserView();
+        // Force reload to re-evaluate all access checks
+        if (typeof window !== 'undefined') {
+          window.location.reload();
+        }
+      } else {
+        await enableFreeUserView();
+        // Force reload to re-evaluate all access checks
+        if (typeof window !== 'undefined') {
+          window.location.reload();
+        }
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [freeUserViewActive, enableFreeUserView, disableFreeUserView]);
 
   const handleLanguageSelect = useCallback(async (newLocale: Locale) => {
     await setLocale(newLocale);
     setShowLanguagePicker(false);
   }, [setLocale]);
 
-  const handleDemoSelect = useCallback(async (option: 'off' | '30d' | '90d' | '180d' | '365d') => {
+  const handleDemoSelect = useCallback(async (option: 'off' | DemoDuration) => {
     setShowDemoPicker(false);
     setIsProcessing(true);
     if (option === 'off') {
@@ -158,8 +212,14 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={commonStyles.screen}>
+      {/* FREE USER VIEW Banner — Always visible when active */}
+      {freeUserViewActive && (
+        <View style={styles.freeUserViewBanner}>
+          <Text style={styles.freeUserViewBannerText}>{freeUserViewBanner}</Text>
+        </View>
+      )}
       {/* Demo Mode Banner */}
-      {isDemoMode && (
+      {isDemoMode && !freeUserViewActive && (
         <View style={styles.demoBanner}>
           <Text style={styles.demoBannerText}>{demoT.demoBanner || 'DEMO'}</Text>
         </View>
@@ -235,8 +295,8 @@ export default function SettingsScreen() {
             ) : (
               <View style={styles.subscriptionCard}>
                 <View style={styles.subscriptionHeader}>
-                  <View style={styles.freeBadge}>
-                    <Text style={styles.freeBadgeText}>FREE</Text>
+                  <View style={styles.starterBadge}>
+                    <Text style={styles.starterBadgeText}>STARTER</Text>
                   </View>
                   <Text style={styles.signalCount}>
                     {logs.length > 0 ? `${Math.min(currentMonthSignalCount, FREE_TIER_LIMITS.maxSignalsPerMonth)}/${FREE_TIER_LIMITS.maxSignalsPerMonth}` : '—'} signals this month
@@ -250,10 +310,106 @@ export default function SettingsScreen() {
                   onPress={() => router.push('/upgrade')}
                 >
                   <Crown size={16} color="#000" />
-                  <Text style={styles.upgradeButtonText}>Upgrade · $9/mo</Text>
+                  <Text style={styles.upgradeButtonText}>Upgrade · $19/mo</Text>
+                </Pressable>
+                <Pressable
+                  style={styles.redeemButton}
+                  onPress={() => router.push('/redeem')}
+                >
+                  <Gift size={14} color="#00E5FF" />
+                  <Text style={styles.redeemButtonText}>Have a sponsor code?</Text>
                 </Pressable>
               </View>
             )}
+          </View>
+        )}
+
+        {/* DEVELOPER TOOLS — FREE USER VIEW (Hard Override) */}
+        {isFounderDemo && (
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>DEVELOPER TOOLS</Text>
+
+            {/* FREE USER VIEW Active Banner */}
+            {freeUserViewActive && (
+              <View style={styles.freeUserViewActiveBanner}>
+                <Text style={styles.freeUserViewActiveBannerText}>FREE USER VIEW ACTIVE</Text>
+                <Text style={styles.freeUserViewActiveSubtext}>
+                  All elevated access suppressed — identical to new user
+                </Text>
+              </View>
+            )}
+
+            {/* FREE USER VIEW Toggle */}
+            <SettingsRow
+              icon={FlaskConical}
+              label={freeUserViewActive ? 'Exit Free User View' : 'View App as Free User'}
+              sublabel={freeUserViewActive
+                ? 'Tap to restore normal access'
+                : 'Experience app as brand-new free user'
+              }
+              onPress={handleToggleFreeUserView}
+              disabled={isProcessing}
+              highlight={freeUserViewActive}
+              danger={freeUserViewActive}
+            />
+
+            {/* Info box explaining what Free User View does */}
+            <View style={styles.freeUserViewInfo}>
+              <Text style={styles.freeUserViewInfoTitle}>What Free User View Blocks:</Text>
+              <Text style={styles.freeUserViewInfoText}>
+                • ALL Pro access{'\n'}
+                • ALL Circles access{'\n'}
+                • ALL Family access{'\n'}
+                • ALL Institutional modes{'\n'}
+                • Organization tab (HIDDEN){'\n'}
+                • Briefings Org/Global scopes (HIDDEN){'\n'}
+                • Sentinel demo charts (BLOCKED){'\n'}
+                • CCI issuance (BLOCKED){'\n'}
+                • Upgrade discounts (NONE){'\n'}
+                • Admin privileges (NONE)
+              </Text>
+              <Text style={styles.freeUserViewInfoNote}>
+                This is NOT a cosmetic toggle. Page reloads to re-evaluate permissions.
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* Founder QA Section (Legacy) — Only visible to founder */}
+        {isFounderDemo && !freeUserViewActive && (
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>FOUNDER QA (LEGACY)</Text>
+            {qaFreeModeEnabled && (
+              <View style={styles.qaFreeModeActiveBanner}>
+                <Text style={styles.qaFreeModeActiveBannerText}>QA FREE MODE ACTIVE</Text>
+                <Text style={styles.qaFreeModeActiveSubtext}>
+                  You are experiencing Orbital as a Starter (Free) user
+                </Text>
+              </View>
+            )}
+            <SettingsRow
+              icon={FlaskConical}
+              label={qaFreeModeEnabled ? 'QA Free Mode (Active)' : 'QA Free Mode'}
+              sublabel={qaFreeModeEnabled
+                ? `Tier: ${tierLabel} · ${limits.maxSignalsPerMonth} signals/mo · ${limits.maxPatternHistoryDays}d history`
+                : 'Test as Free user (allows institutional demos)'
+              }
+              onPress={handleToggleQAFreeMode}
+              disabled={isProcessing}
+              highlight={qaFreeModeEnabled}
+            />
+            <View style={styles.qaFreeModeInfo}>
+              <Text style={styles.qaFreeModeInfoTitle}>What QA Free Mode Tests:</Text>
+              <Text style={styles.qaFreeModeInfoText}>
+                • No Pro entitlements{'\n'}
+                • No Circle/Family/Bundle access{'\n'}
+                • Limited signals ({limits.maxSignalsPerMonth}/month){'\n'}
+                • Limited history ({limits.maxPatternHistoryDays} days){'\n'}
+                • CCI at Free price ($199){'\n'}
+                • Upgrade prompts visible{'\n'}
+                • NOTE: Allows institutional demos
+              </Text>
+            </View>
           </View>
         )}
 
@@ -322,19 +478,29 @@ export default function SettingsScreen() {
             danger
             disabled={isProcessing}
           />
-          <SettingsRow
-            icon={FlaskConical}
-            label={demoStatusLabel}
-            sublabel={demoStatusSublabel}
-            onPress={() => setShowDemoPicker(true)}
-            disabled={isProcessing || isDemoLoading}
-            highlight={isDemoMode}
-          />
+          {/* Demo Mode - FOUNDER-ONLY: only visible when EXPO_PUBLIC_FOUNDER_DEMO=1 */}
+          {isFounderDemo && (
+            <SettingsRow
+              icon={FlaskConical}
+              label={demoStatusLabel}
+              sublabel={demoStatusSublabel}
+              onPress={() => setShowDemoPicker(true)}
+              disabled={isProcessing || isDemoLoading}
+              highlight={isDemoMode}
+            />
+          )}
         </View>
 
         {/* Security & Privacy Section */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>SECURITY & PRIVACY</Text>
+          <SettingsRow
+            icon={Cloud}
+            label="Cloud Sync"
+            sublabel="Account & backup settings"
+            onPress={() => router.push('/cloud-sync')}
+            disabled={isProcessing}
+          />
           <SettingsRow
             icon={Database}
             label="What Happens to My Data"
@@ -378,26 +544,45 @@ export default function SettingsScreen() {
           <SettingsRow
             icon={Building2}
             label="Institutional Dashboard"
-            sublabel="Aggregate capacity insights"
+            sublabel="Demo preview — Sample aggregate data"
             onPress={() => router.push('/dashboard')}
             disabled={isProcessing}
           />
         </View>
 
-        {/* Enterprise Section */}
+        {/* Enterprise Section — DEMO PREVIEW ONLY */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>ENTERPRISE</Text>
+          <Text style={styles.sectionLabel}>ENTERPRISE (DEMO PREVIEW)</Text>
+          <View style={styles.demoNotice}>
+            <Text style={styles.demoNoticeText}>
+              Sample institutional features. Contact Orbital for real access.
+            </Text>
+          </View>
+          <SettingsRow
+            icon={Briefcase}
+            label="B2B Add-Ons"
+            sublabel="Demo preview — Vertical signal authority licensing"
+            onPress={() => router.push('/b2b-addons')}
+            disabled={isProcessing}
+          />
+          <SettingsRow
+            icon={Phone}
+            label="Executive Engagement"
+            sublabel="Founder-led briefings — Available by request"
+            onPress={() => router.push('/executive-engagement')}
+            disabled={isProcessing}
+          />
           <SettingsRow
             icon={Users}
             label="Team Mode"
-            sublabel="Opt-in workplace capacity pulse"
+            sublabel="Demo preview — Contact Orbital for activation"
             onPress={() => router.push('/team-mode')}
             disabled={isProcessing}
           />
           <SettingsRow
             icon={GraduationCap}
             label="School Zone"
-            sublabel="Student/caregiver/educator view"
+            sublabel="Demo preview — Contact Orbital for activation"
             onPress={() => router.push('/school-zone')}
             disabled={isProcessing}
           />
@@ -406,6 +591,13 @@ export default function SettingsScreen() {
         {/* Account Section */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>ACCOUNT</Text>
+          <SettingsRow
+            icon={UserCircle}
+            label="Profile"
+            sublabel="Optional demographics for aggregate insights"
+            onPress={() => router.push('/profile')}
+            disabled={isProcessing}
+          />
           <SettingsRow
             icon={LogOut}
             label="Data Exit"
@@ -500,88 +692,124 @@ export default function SettingsScreen() {
         </Pressable>
       </Modal>
 
-      {/* Demo Mode Picker Modal */}
-      <Modal
-        visible={showDemoPicker}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowDemoPicker(false)}
-      >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setShowDemoPicker(false)}
+      {/* Demo Mode Picker Modal - FOUNDER-ONLY */}
+      {isFounderDemo && (
+        <Modal
+          visible={showDemoPicker}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowDemoPicker(false)}
         >
-          <View style={styles.languagePickerContainer}>
-            <View style={styles.languagePickerHeader}>
-              <Text style={styles.languagePickerTitle}>{demoT.demoMode || 'Demo Mode'}</Text>
-              <Pressable onPress={() => setShowDemoPicker(false)}>
-                <X color={colors.textPrimary} size={20} />
-              </Pressable>
+          <Pressable
+            style={styles.modalOverlay}
+            onPress={() => setShowDemoPicker(false)}
+          >
+            <View style={styles.languagePickerContainer}>
+              <View style={styles.languagePickerHeader}>
+                <Text style={styles.languagePickerTitle}>{demoT.demoMode || 'Demo Mode'}</Text>
+                <Pressable onPress={() => setShowDemoPicker(false)}>
+                  <X color={colors.textPrimary} size={20} />
+                </Pressable>
+              </View>
+              <ScrollView style={styles.languageList}>
+                <Pressable
+                  style={[
+                    styles.languageOption,
+                    !isDemoMode && styles.languageOptionSelected,
+                  ]}
+                  onPress={() => handleDemoSelect('off')}
+                >
+                  <View>
+                    <Text style={[styles.languageOptionText, !isDemoMode && styles.languageOptionTextSelected]}>
+                      Off
+                    </Text>
+                    <Text style={styles.demoOptionSublabel}>Use real data</Text>
+                  </View>
+                  {!isDemoMode && <Check color="#00E5FF" size={18} />}
+                </Pressable>
+                <Pressable
+                  style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
+                  onPress={() => handleDemoSelect('30d')}
+                >
+                  <View>
+                    <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
+                      {demoT.duration?.['30d'] || '30 Days'}
+                    </Text>
+                    <Text style={styles.demoOptionSublabel}>~30 days of data</Text>
+                  </View>
+                </Pressable>
+                <Pressable
+                  style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
+                  onPress={() => handleDemoSelect('90d')}
+                >
+                  <View>
+                    <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
+                      {demoT.duration?.['90d'] || '90 Days'}
+                    </Text>
+                    <Text style={styles.demoOptionSublabel}>~90 days of data</Text>
+                  </View>
+                </Pressable>
+                <Pressable
+                  style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
+                  onPress={() => handleDemoSelect('180d')}
+                >
+                  <View>
+                    <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
+                      {demoT.duration?.['180d'] || '6 Months'}
+                    </Text>
+                    <Text style={styles.demoOptionSublabel}>~6 months of data</Text>
+                  </View>
+                </Pressable>
+                <Pressable
+                  style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
+                  onPress={() => handleDemoSelect('365d')}
+                >
+                  <View>
+                    <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
+                      {demoT.duration?.['365d'] || '1 Year'}
+                    </Text>
+                    <Text style={styles.demoOptionSublabel}>~1 year of data</Text>
+                  </View>
+                </Pressable>
+                {/* Multi-year options for institutional demos */}
+                <Pressable
+                  style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
+                  onPress={() => handleDemoSelect('3y')}
+                >
+                  <View>
+                    <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
+                      {demoT.duration?.['3y'] || '3 Years'}
+                    </Text>
+                    <Text style={styles.demoOptionSublabel}>~3 years of data</Text>
+                  </View>
+                </Pressable>
+                <Pressable
+                  style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
+                  onPress={() => handleDemoSelect('5y')}
+                >
+                  <View>
+                    <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
+                      {demoT.duration?.['5y'] || '5 Years'}
+                    </Text>
+                    <Text style={styles.demoOptionSublabel}>~5 years of data</Text>
+                  </View>
+                </Pressable>
+                <Pressable
+                  style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
+                  onPress={() => handleDemoSelect('10y')}
+                >
+                  <View>
+                    <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
+                      {demoT.duration?.['10y'] || '10 Years'}
+                    </Text>
+                    <Text style={styles.demoOptionSublabel}>Full longitudinal record (recommended)</Text>
+                  </View>
+                </Pressable>
+              </ScrollView>
             </View>
-            <View style={styles.languageList}>
-              <Pressable
-                style={[
-                  styles.languageOption,
-                  !isDemoMode && styles.languageOptionSelected,
-                ]}
-                onPress={() => handleDemoSelect('off')}
-              >
-                <View>
-                  <Text style={[styles.languageOptionText, !isDemoMode && styles.languageOptionTextSelected]}>
-                    Off
-                  </Text>
-                  <Text style={styles.demoOptionSublabel}>Use real data</Text>
-                </View>
-                {!isDemoMode && <Check color="#00E5FF" size={18} />}
-              </Pressable>
-              <Pressable
-                style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
-                onPress={() => handleDemoSelect('30d')}
-              >
-                <View>
-                  <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
-                    {demoT.duration?.['30d'] || '30 Signals'}
-                  </Text>
-                  <Text style={styles.demoOptionSublabel}>~30 days of data</Text>
-                </View>
-              </Pressable>
-              <Pressable
-                style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
-                onPress={() => handleDemoSelect('90d')}
-              >
-                <View>
-                  <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
-                    {demoT.duration?.['90d'] || '90 Signals'}
-                  </Text>
-                  <Text style={styles.demoOptionSublabel}>~90 days of data</Text>
-                </View>
-              </Pressable>
-              <Pressable
-                style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
-                onPress={() => handleDemoSelect('180d')}
-              >
-                <View>
-                  <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
-                    {demoT.duration?.['180d'] || '180 Signals'}
-                  </Text>
-                  <Text style={styles.demoOptionSublabel}>~6 months of data</Text>
-                </View>
-              </Pressable>
-              <Pressable
-                style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
-                onPress={() => handleDemoSelect('365d')}
-              >
-                <View>
-                  <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
-                    {demoT.duration?.['365d'] || '365 Signals'}
-                  </Text>
-                  <Text style={styles.demoOptionSublabel}>~1 year of data</Text>
-                </View>
-              </Pressable>
-            </View>
-          </View>
-        </Pressable>
-      </Modal>
+          </Pressable>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 }
@@ -685,6 +913,18 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     color: 'rgba(255,255,255,0.35)',
+  },
+  demoNotice: {
+    backgroundColor: 'rgba(122,154,170,0.15)',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: 8,
+    marginBottom: spacing.sm,
+  },
+  demoNoticeText: {
+    fontSize: 11,
+    color: '#7A9AAA',
+    textAlign: 'center',
     letterSpacing: 1,
     marginBottom: spacing.sm,
     marginLeft: spacing.xs,
@@ -919,13 +1159,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: spacing.sm,
   },
-  freeBadge: {
+  starterBadge: {
     backgroundColor: 'rgba(255,255,255,0.1)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 4,
   },
-  freeBadgeText: {
+  starterBadgeText: {
     fontSize: 10,
     fontWeight: '600',
     color: 'rgba(255,255,255,0.6)',
@@ -954,5 +1194,115 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#000',
+  },
+  redeemButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  redeemButtonText: {
+    fontSize: 13,
+    color: '#00E5FF',
+  },
+  // QA Free Mode Styles
+  qaFreeModeActiveBanner: {
+    backgroundColor: 'rgba(156,39,176,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(156,39,176,0.4)',
+    borderRadius: 8,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    alignItems: 'center',
+  },
+  qaFreeModeActiveBannerText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#9C27B0',
+    letterSpacing: 1,
+  },
+  qaFreeModeActiveSubtext: {
+    fontSize: 11,
+    color: 'rgba(156,39,176,0.8)',
+    marginTop: 2,
+  },
+  qaFreeModeInfo: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 8,
+    padding: spacing.md,
+    marginTop: spacing.xs,
+  },
+  qaFreeModeInfoTitle: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.5)',
+    marginBottom: spacing.xs,
+  },
+  qaFreeModeInfoText: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.4)',
+    lineHeight: 18,
+  },
+  // FREE USER VIEW Styles
+  freeUserViewBanner: {
+    backgroundColor: '#F44336',
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  freeUserViewBannerText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  freeUserViewActiveBanner: {
+    backgroundColor: 'rgba(244,67,54,0.15)',
+    borderWidth: 2,
+    borderColor: 'rgba(244,67,54,0.6)',
+    borderRadius: 8,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    alignItems: 'center',
+  },
+  freeUserViewActiveBannerText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#F44336',
+    letterSpacing: 1,
+  },
+  freeUserViewActiveSubtext: {
+    fontSize: 12,
+    color: 'rgba(244,67,54,0.8)',
+    marginTop: 4,
+  },
+  freeUserViewInfo: {
+    backgroundColor: 'rgba(244,67,54,0.08)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(244,67,54,0.2)',
+    padding: spacing.md,
+    marginTop: spacing.xs,
+  },
+  freeUserViewInfoTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#F44336',
+    marginBottom: spacing.sm,
+  },
+  freeUserViewInfoText: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.6)',
+    lineHeight: 18,
+  },
+  freeUserViewInfoNote: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: 'rgba(244,67,54,0.8)',
+    marginTop: spacing.sm,
+    textAlign: 'center',
   },
 });
