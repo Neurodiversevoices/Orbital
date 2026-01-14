@@ -246,6 +246,12 @@ function validateLayoutTsx() {
 function validateEasJson() {
   console.log('\n--- Validating eas.json ---');
 
+  // EAS is optional - only needed for mobile builds
+  if (!fs.existsSync(EAS_JSON)) {
+    ok('eas.json not present (web-only mode - no EAS charges)');
+    return;
+  }
+
   const config = readJSON(EAS_JSON);
   if (!config) return;
 
@@ -359,7 +365,7 @@ function generateReports() {
   const timestamp = new Date().toISOString();
   const appConfig = readJSON(APP_JSON);
   const pkgConfig = readJSON(PACKAGE_JSON);
-  const easConfig = readJSON(EAS_JSON);
+  const easConfig = fs.existsSync(EAS_JSON) ? readJSON(EAS_JSON) : null;
 
   // Config snapshot
   const snapshot = {
