@@ -33,6 +33,7 @@ import {
   Briefcase,
   TrendingUp,
   Phone,
+  Activity,
 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, commonStyles, spacing, borderRadius } from '../theme';
@@ -497,6 +498,13 @@ export default function SettingsScreen() {
               Sample institutional features. Contact Orbital for real access.
             </Text>
           </View>
+          <SettingsRow
+            icon={Activity}
+            label="Sentinel Brief"
+            sublabel="Demo preview — Volatility condition report"
+            onPress={() => router.push('/sentinel-brief')}
+            disabled={isProcessing}
+          />
           <SettingsRow
             icon={Briefcase}
             label="B2B Add-Ons"
