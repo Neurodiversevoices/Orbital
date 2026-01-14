@@ -338,6 +338,11 @@ async function generatePremiumDemoData(duration: DemoDuration = '10y'): Promise<
   const logs: CapacityLog[] = [];
   const now = Date.now();
 
+  // Calculate midnight of today ONCE (for consistent timestamp calculation)
+  const midnightDate = new Date(now);
+  midnightDate.setHours(0, 0, 0, 0);
+  const midnightToday = midnightDate.getTime();
+
   // Map duration to days (expanded for multi-year support)
   const durationDays: Record<DemoDuration, number> = {
     '30d': 30,
@@ -366,52 +371,77 @@ async function generatePremiumDemoData(duration: DemoDuration = '10y'): Promise<
   for (let day = 0; day < totalDays; day++) {
     const coverage = getBaseCoverage(day);
 
-    // Skip some days randomly to simulate natural gaps
-    if (rng.next() > coverage) {
+    // ALWAYS include entries for first 365 days (guarantees 1-year view has data on every day)
+    // Skip some days randomly for older data to simulate natural gaps
+    if (day >= 365 && rng.next() > coverage) {
       continue;
     }
 
-    // Generate exactly ONE signal per day
+    // Generate 2-4 entries per day at different times (morning, afternoon, evening)
+    const entriesPerDay = 2 + Math.floor(rng.next() * 3); // 2, 3, or 4 entries
     const currentHour = new Date(now).getHours();
-    const timeSlot = rng.next();
-    let hour: number;
 
-    if (day === 0) {
-      hour = Math.max(1, Math.floor(rng.next() * Math.min(currentHour, 22)));
-    } else if (timeSlot < 0.3) {
-      hour = 8 + Math.floor(rng.next() * 4);
-    } else if (timeSlot < 0.7) {
-      hour = 12 + Math.floor(rng.next() * 6);
-    } else {
-      hour = 18 + Math.floor(rng.next() * 4);
+    // Time slots: morning (7-10), midday (11-14), afternoon (15-17), evening (18-21)
+    const timeSlots = [
+      { start: 7, end: 10 },   // morning
+      { start: 11, end: 14 },  // midday
+      { start: 15, end: 17 },  // afternoon
+      { start: 18, end: 21 },  // evening
+    ];
+
+    // Shuffle and pick slots for this day's entries
+    const shuffledSlots = timeSlots.sort(() => rng.next() - 0.5).slice(0, entriesPerDay);
+
+    for (let entryIndex = 0; entryIndex < entriesPerDay; entryIndex++) {
+      const slot = shuffledSlots[entryIndex] || timeSlots[entryIndex % timeSlots.length];
+      let hour: number;
+      let minute: number = Math.floor(rng.next() * 60);
+
+      if (day === 0) {
+        // For today: only create entries for times that have passed
+        const maxHour = Math.max(0, currentHour - 1);
+        if (slot.start > maxHour) continue; // Skip future time slots
+        hour = slot.start + Math.floor(rng.next() * Math.min(slot.end - slot.start, maxHour - slot.start + 1));
+        hour = Math.min(hour, maxHour);
+      } else {
+        hour = slot.start + Math.floor(rng.next() * (slot.end - slot.start));
+      }
+
+      // Calculate timestamp: midnight of (day days ago) + hour/minute offset
+      let timestamp = midnightToday - (day * 86400000) + (hour * 3600000) + (minute * 60000);
+
+      // Ensure timestamp is never in the future
+      if (timestamp > now) {
+        continue; // Skip this entry if it would be in the future
+      }
+
+      // Use multi-year pattern generator (state can vary within a day)
+      const { state } = getCapacityForDayMultiYear(day, hour, totalDays, crisisEvents);
+      const categories = pickCategory(state);
+      const note = pickNote(state);
+
+      logs.push({
+        id: generateId(),
+        state,
+        timestamp,
+        tags: categories,
+        category: categories[0],
+        note,
+      });
     }
-
-    const minute = Math.floor(rng.next() * 60);
-
-    const entryDate = new Date(now);
-    entryDate.setDate(entryDate.getDate() - day);
-    entryDate.setHours(hour, minute, 0, 0);
-    const timestamp = entryDate.getTime();
-
-    if (timestamp > now) continue;
-
-    // Use multi-year pattern generator
-    const { state } = getCapacityForDayMultiYear(day, hour, totalDays, crisisEvents);
-    const categories = pickCategory(state);
-    const note = pickNote(state);
-
-    logs.push({
-      id: generateId(),
-      state,
-      timestamp,
-      tags: categories,
-      category: categories[0],
-      note,
-    });
   }
 
   // Sort newest first
   logs.sort((a, b) => b.timestamp - a.timestamp);
+
+  // Debug: log the timestamp range
+  if (__DEV__ && logs.length > 0) {
+    const oldestLog = logs[logs.length - 1];
+    const newestLog = logs[0];
+    const oldestDaysAgo = Math.round((now - oldestLog.timestamp) / 86400000);
+    const newestDaysAgo = Math.round((now - newestLog.timestamp) / 86400000);
+    console.log(`[DemoData] Generated ${logs.length} logs spanning ${oldestDaysAgo}d to ${newestDaysAgo}d ago (totalDays=${totalDays})`);
+  }
 
   // Create one fake shared recipient (for demo purposes)
   const recipients: ShareRecipient[] = [
@@ -537,6 +567,8 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
     // HARD GUARD: Block in production
     assertFounderDemo('enableDemoMode');
 
+    console.log('[DemoMode] enableDemoMode called with duration:', duration);
+
     setIsLoading(true);
     try {
       // Backup real data first
@@ -544,6 +576,18 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
 
       // Generate demo data
       const { logs, recipients, shares, audit } = await generatePremiumDemoData(duration);
+
+      // Log the timestamp range
+      if (logs.length > 0) {
+        const now = Date.now();
+        const oldest = logs[logs.length - 1];
+        const newest = logs[0];
+        console.log('[DemoMode] enableDemoMode generated data range:', {
+          count: logs.length,
+          oldestDaysAgo: Math.round((now - oldest.timestamp) / 86400000),
+          newestDaysAgo: Math.round((now - newest.timestamp) / 86400000),
+        });
+      }
 
       // Save demo data to main storage keys (so existing hooks work)
       await AsyncStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(logs));
@@ -555,9 +599,9 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
       await AsyncStorage.setItem(STORAGE_KEYS.DEMO_MODE_ENABLED, 'true');
       setIsDemoMode(true);
 
-      if (__DEV__) console.log('[DemoMode] Enabled with', logs.length, 'demo entries');
+      console.log('[DemoMode] Enabled with', logs.length, 'demo entries - SAVED');
     } catch (error) {
-      if (__DEV__) console.error('[DemoMode] Failed to enable:', error);
+      console.error('[DemoMode] Failed to enable:', error);
     }
     setIsLoading(false);
   }, [backupRealData]);
@@ -585,22 +629,41 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
     // HARD GUARD: Block in production
     assertFounderDemo('reseedDemoData');
 
-    if (!isDemoMode) return;
+    console.log('[DemoMode] reseedDemoData called with duration:', duration, 'isDemoMode:', isDemoMode);
+
+    if (!isDemoMode) {
+      console.log('[DemoMode] Skipping reseed - not in demo mode');
+      return;
+    }
 
     setIsLoading(true);
     try {
       // Generate new demo data with different seed
-      rng.reset(Date.now() % 100000);
+      const seed = Date.now() % 100000;
+      console.log('[DemoMode] Reseeding with seed:', seed);
+      rng.reset(seed);
       const { logs, recipients, shares, audit } = await generatePremiumDemoData(duration);
+
+      // Log the timestamp range of generated data
+      if (logs.length > 0) {
+        const now = Date.now();
+        const oldest = logs[logs.length - 1];
+        const newest = logs[0];
+        console.log('[DemoMode] Generated data range:', {
+          count: logs.length,
+          oldestDaysAgo: Math.round((now - oldest.timestamp) / 86400000),
+          newestDaysAgo: Math.round((now - newest.timestamp) / 86400000),
+        });
+      }
 
       await AsyncStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(logs));
       await AsyncStorage.setItem(STORAGE_KEYS.RECIPIENTS, JSON.stringify(recipients));
       await AsyncStorage.setItem(STORAGE_KEYS.SHARES, JSON.stringify(shares));
       await AsyncStorage.setItem(STORAGE_KEYS.AUDIT_LOG, JSON.stringify(audit));
 
-      if (__DEV__) console.log('[DemoMode] Reseeded with', logs.length, 'entries');
+      console.log('[DemoMode] Reseeded with', logs.length, 'entries - SAVED TO STORAGE');
     } catch (error) {
-      if (__DEV__) console.error('[DemoMode] Failed to reseed:', error);
+      console.error('[DemoMode] Failed to reseed:', error);
     }
     setIsLoading(false);
   }, [isDemoMode]);

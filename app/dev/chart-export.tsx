@@ -29,12 +29,10 @@ import { EnergyGraph } from '../../components';
 
 const TIME_RANGE_OPTIONS: { value: TimeRange; label: string; days: number }[] = [
   { value: '7d', label: '7 Days', days: 7 },
-  { value: '14d', label: '14 Days', days: 14 },
-  { value: '1m', label: '1 Month', days: 30 },
+  { value: '30d', label: '30 Days', days: 30 },
   { value: '90d', label: '90 Days (QCR)', days: 90 },
+  { value: '6m', label: '6 Months', days: 183 },
   { value: '1y', label: '1 Year', days: 365 },
-  { value: '2y', label: '2 Years', days: 730 },
-  { value: '5y', label: '5 Years', days: 1825 },
   { value: '10y', label: '10 Years', days: 3650 },
 ];
 

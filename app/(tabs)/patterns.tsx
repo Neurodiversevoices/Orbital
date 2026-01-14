@@ -4,7 +4,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Circle, Eye, ListTodo, Users, TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Calendar, Clock, Lock, Bug, RefreshCw, Award, FileText, Database } from 'lucide-react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { HistoryItem, EnergyGraph, TimeRangeTabs, TimeRange, getTimeRangeMs, MilestonesPanel, PatternLanguagePanel, OrgRoleBanner } from '../../components';
+import { HistoryItem, EnergyGraph, TimeRangeTabs, TimeRange, getTimeRangeMs, MilestonesPanel, PatternLanguagePanel, OrgRoleBanner, WeeklyCapacityRecord } from '../../components';
 import { QCRButton, QCRScreen, QCRPaywall } from '../../components/qcr';
 import { colors, commonStyles, spacing } from '../../theme';
 import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
@@ -19,7 +19,6 @@ import {
   findMostRecent7DayStreakWindow,
   calculateWeeklySummary,
   formatDateRange,
-  getConfidenceTierLabel,
 } from '../../lib/baselineUtils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -37,9 +36,13 @@ const stateToPercent = (state: CapacityState): number => {
   }
 };
 
-// Confidence Badge Component
-function ConfidenceBadge({ stats }: { stats: BaselineStats }) {
-  const tierLabel = getConfidenceTierLabel(stats.confidenceTier);
+// Data Depth Badge Component
+function DataDepthBadge({ stats }: { stats: BaselineStats }) {
+  // Calm, non-clinical labels for data depth
+  const tierLabel = stats.confidenceTier === 'high' ? 'Strong pattern data'
+    : stats.confidenceTier === 'growing' ? 'Growing pattern data'
+    : stats.confidenceTier === 'baseline' ? 'Building pattern data'
+    : 'Starting out';
   const tierColor = stats.confidenceTier === 'high' ? '#00E5FF'
     : stats.confidenceTier === 'growing' ? '#4CAF50'
     : stats.confidenceTier === 'baseline' ? '#E8A830'
@@ -53,7 +56,7 @@ function ConfidenceBadge({ stats }: { stats: BaselineStats }) {
       </Text>
       {stats.hasHighConfidenceWeek && (
         <View style={confidenceStyles.weekBadge}>
-          <Text style={confidenceStyles.weekBadgeText}>7-day observation period</Text>
+          <Text style={confidenceStyles.weekBadgeText}>7-day view available</Text>
         </View>
       )}
     </View>
@@ -74,7 +77,7 @@ function WeeklySummaryCard({ summary }: { summary: WeeklySummary }) {
       <View style={summaryStyles.header}>
         <View style={summaryStyles.headerLeft}>
           <Database size={16} color="rgba(255,255,255,0.6)" />
-          <Text style={summaryStyles.title}>Weekly Summary</Text>
+          <Text style={summaryStyles.title}>This Week</Text>
         </View>
         <Text style={summaryStyles.dateRange}>{dateRange}</Text>
       </View>
@@ -251,6 +254,8 @@ export default function PatternsScreen() {
   const graphWidth = width - spacing.md * 2;
   const [timeRange, setTimeRange] = useState<TimeRange>('7d');
   const [debugVisible, setDebugVisible] = useState(showDebug);
+  const [calendarWeekStart, setCalendarWeekStart] = useState<Date | null>(null);
+  const [calendarWeekEnd, setCalendarWeekEnd] = useState<Date | null>(null);
   const [storageInfo, setStorageInfo] = useState<{ key: string; rawLength: number; parseError: string | null }>({
     key: STORAGE_KEYS.LOGS,
     rawLength: 0,
@@ -299,9 +304,9 @@ export default function PatternsScreen() {
     if (forceDemo) {
       const seedDemo = async () => {
         if (!isDemoMode) {
-          await enableDemoMode('90d');
+          await enableDemoMode('3y');
         } else {
-          await reseedDemoData('90d');
+          await reseedDemoData('3y');
         }
         await refresh();
       };
@@ -311,9 +316,9 @@ export default function PatternsScreen() {
 
   const handleReseed = useCallback(async () => {
     if (!isDemoMode) {
-      await enableDemoMode('90d');
+      await enableDemoMode('3y');
     } else {
-      await reseedDemoData('90d');
+      await reseedDemoData('3y');
     }
     await refresh();
   }, [isDemoMode, enableDemoMode, reseedDemoData, refresh]);
@@ -428,7 +433,7 @@ export default function PatternsScreen() {
     return { avg, trend, timeInDepleted, categoryBreakdown };
   }, [logs, timeRange]);
 
-  // Intelligence insights - predictive analytics
+  // Pattern observations - what patterns have emerged
   const insights = useMemo(() => {
     if (logs.length < 10) return null;
 
@@ -545,27 +550,22 @@ export default function PatternsScreen() {
     [removeLog]
   );
 
-  const renderItem = useCallback(
-    ({ item, index }: { item: CapacityLog; index: number }) => (
-      <Animated.View entering={FadeIn.delay(index * 50).duration(300)}>
-        <HistoryItem log={item} onDelete={handleDelete} />
-      </Animated.View>
-    ),
-    [handleDelete]
-  );
+  // Handle calendar week navigation - sync graph with calendar (7d view only)
+  const handleWeekChange = useCallback((weekStart: Date, weekEnd: Date) => {
+    setCalendarWeekStart(weekStart);
+    setCalendarWeekEnd(weekEnd);
+    setTimeRange('7d'); // Calendar sync always uses 7d view
+  }, []);
 
-  const renderEmpty = () => (
-    <View style={styles.emptyContainer}>
-      <View style={styles.emptyOrb}>
-        <Circle size={48} color="rgba(255,255,255,0.15)" strokeWidth={1} />
-      </View>
-      <View style={styles.emptyDots}>
-        <View style={[styles.dot, { backgroundColor: '#00E5FF' }]} />
-        <View style={[styles.dot, { backgroundColor: '#E8A830' }]} />
-        <View style={[styles.dot, { backgroundColor: '#F44336' }]} />
-      </View>
-    </View>
-  );
+  // Handle time range tab changes - clear calendar sync for non-7d views
+  const handleTimeRangeChange = useCallback((range: TimeRange) => {
+    setTimeRange(range);
+    if (range !== '7d') {
+      // Clear calendar sync so graph shows full range from now
+      setCalendarWeekStart(null);
+      setCalendarWeekEnd(null);
+    }
+  }, []);
 
   return (
     <SafeAreaView style={commonStyles.screen}>
@@ -580,9 +580,9 @@ export default function PatternsScreen() {
       )}
       <View style={styles.content}>
         <FlatList
-          data={logs}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          data={[]}
+          renderItem={null}
+          keyExtractor={() => 'header'}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={
@@ -591,9 +591,9 @@ export default function PatternsScreen() {
                 <View style={styles.lockedIconContainer}>
                   <Lock size={32} color="rgba(255,255,255,0.3)" />
                 </View>
-                <Text style={styles.lockedTitle}>Building Your Baseline</Text>
+                <Text style={styles.lockedTitle}>Getting to Know Your Patterns</Text>
                 <Text style={styles.lockedBody}>
-                  Log on 7 different days to unlock pattern insights. You can log multiple times per day.
+                  Log on 7 different days to see your patterns. You can log multiple times per day.
                 </Text>
                 <View style={styles.lockedProgress}>
                   <View style={styles.lockedProgressBar}>
@@ -617,6 +617,94 @@ export default function PatternsScreen() {
                 {/* Org Role Banner - shows participant status for org modes */}
                 <OrgRoleBanner mode={currentMode} />
 
+                {/* Page Header - Calm, Non-Diagnostic */}
+                <View style={styles.pageHeader}>
+                  <Text style={styles.pageTitle}>Your Capacity Patterns</Text>
+                  <Text style={styles.pageSubtitle}>
+                    How your capacity has changed over time. This is not a diagnosis.
+                  </Text>
+                </View>
+
+                {/* GRAPH - TOP OF PAGE */}
+                <TimeRangeTabs
+                  selected={timeRange}
+                  onSelect={handleTimeRangeChange}
+                  logCount={logCount}
+                />
+                <EnergyGraph
+                  logs={logs}
+                  width={graphWidth}
+                  timeRange={timeRange}
+                  startDate={calendarWeekStart || undefined}
+                  endDate={calendarWeekEnd || undefined}
+                />
+
+                {/* Stats below graph */}
+                {stats.avg !== null && (
+                  <View style={styles.statsContainer}>
+                    <View style={styles.statItem}>
+                      <Text style={styles.statValue}>{stats.avg}%</Text>
+                      <Text style={styles.statLabel}>Baseline</Text>
+                    </View>
+                    <View style={styles.statDivider} />
+                    <View style={styles.statItem}>
+                      <Text style={[
+                        styles.statValue,
+                        stats.trend !== null && {
+                          color: stats.trend > 0 ? '#00E5FF' : stats.trend < 0 ? '#F44336' : 'rgba(255,255,255,0.9)'
+                        }
+                      ]}>
+                        {stats.trend !== null
+                          ? `${stats.trend > 0 ? '+' : ''}${stats.trend}%`
+                          : '—'}
+                      </Text>
+                      <Text style={styles.statLabel}>Trend</Text>
+                    </View>
+                    <View style={styles.statDivider} />
+                    <View style={styles.statItem}>
+                      <Text style={[
+                        styles.statValue,
+                        { color: stats.timeInDepleted > 30 ? '#F44336' : stats.timeInDepleted > 15 ? '#E8A830' : '#00E5FF' }
+                      ]}>
+                        {stats.timeInDepleted}%
+                      </Text>
+                      <Text style={styles.statLabel}>Depleted</Text>
+                    </View>
+                  </View>
+                )}
+
+                {/* Capacity Drivers */}
+                {stats.avg !== null && (
+                  <View style={styles.categoryContainer}>
+                    <Text style={styles.categoryTitle}>Capacity Drivers</Text>
+                    <View style={styles.categoryRow}>
+                      {(['sensory', 'demand', 'social'] as Category[]).map((cat) => {
+                        const Icon = categoryIcons[cat];
+                        const label = t.categories[cat];
+                        const { count, strainRate } = stats.categoryBreakdown[cat];
+                        const hasData = count > 0;
+                        return (
+                          <View key={cat} style={styles.categoryItem}>
+                            <View style={styles.categoryIconRow}>
+                              <Icon size={16} color={hasData ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)'} />
+                              <Text style={[styles.categoryLabel, !hasData && { opacity: 0.4 }]}>{label}</Text>
+                            </View>
+                            <Text style={[
+                              styles.categoryRate,
+                              hasData && { color: strainRate > 60 ? '#F44336' : strainRate > 40 ? '#E8A830' : '#00E5FF' }
+                            ]}>
+                              {hasData ? `${strainRate}%` : '—'}
+                            </Text>
+                            <Text style={styles.categorySubtext}>
+                              {hasData ? 'correlation' : 'no data'}
+                            </Text>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  </View>
+                )}
+
                 {/* Longitudinal Milestones */}
                 <MilestonesPanel logs={logs} />
 
@@ -631,171 +719,30 @@ export default function PatternsScreen() {
                   delay={200}
                 />
 
-                {/* Confidence Badge */}
-                <ConfidenceBadge stats={baselineStats} />
+                {/* Data Depth Badge */}
+                <DataDepthBadge stats={baselineStats} />
 
-                {/* Weekly Summary Card - shown when 7-day observation period complete */}
+                {/* Weekly Summary Card - shown when 7-day data available */}
                 {weeklySummary && <WeeklySummaryCard summary={weeklySummary} />}
 
-                <TimeRangeTabs
-                  selected={timeRange}
-                  onSelect={setTimeRange}
-                  logCount={logCount}
-                />
-                <Text style={styles.chartContext}>{t.patterns.chartContext}</Text>
-              <EnergyGraph logs={logs} width={graphWidth} timeRange={timeRange} />
-              {stats.avg !== null && (
-                <View style={styles.statsContainer}>
-                  <View style={styles.statItem}>
-                    <Text style={styles.statValue}>{stats.avg}%</Text>
-                    <Text style={styles.statLabel}>{t.patterns.statsBaseline}</Text>
-                  </View>
-                  <View style={styles.statDivider} />
-                  <View style={styles.statItem}>
-                    <Text style={[
-                      styles.statValue,
-                      stats.trend !== null && {
-                        color: stats.trend > 0 ? '#00E5FF' : stats.trend < 0 ? '#F44336' : 'rgba(255,255,255,0.9)'
-                      }
-                    ]}>
-                      {stats.trend !== null
-                        ? `${stats.trend > 0 ? '+' : ''}${stats.trend}%`
-                        : '—'}
-                    </Text>
-                    <Text style={styles.statLabel}>{t.patterns.statsTrend}</Text>
-                  </View>
-                  <View style={styles.statDivider} />
-                  <View style={styles.statItem}>
-                    <Text style={[
-                      styles.statValue,
-                      { color: stats.timeInDepleted > 30 ? '#F44336' : stats.timeInDepleted > 15 ? '#E8A830' : '#00E5FF' }
-                    ]}>
-                      {stats.timeInDepleted}%
-                    </Text>
-                    <Text style={styles.statLabel}>{t.patterns.statsDepleted}</Text>
-                  </View>
-                </View>
-              )}
+                {/* Weekly Capacity Record - Calendar View (synced with graph) */}
+                <WeeklyCapacityRecord logs={logs} onDelete={handleDelete} onWeekChange={handleWeekChange} />
 
-              {/* Category Breakdown */}
-              {stats.avg !== null && (
-                <View style={styles.categoryContainer}>
-                  <Text style={styles.categoryTitle}>{t.patterns.categoryTitle}</Text>
-                  <View style={styles.categoryRow}>
-                    {(['sensory', 'demand', 'social'] as Category[]).map((cat) => {
-                      const Icon = categoryIcons[cat];
-                      const label = t.categories[cat];
-                      const { count, strainRate } = stats.categoryBreakdown[cat];
-                      const hasData = count > 0;
-                      return (
-                        <View key={cat} style={styles.categoryItem}>
-                          <View style={styles.categoryIconRow}>
-                            <Icon size={16} color={hasData ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)'} />
-                            <Text style={[styles.categoryLabel, !hasData && { opacity: 0.4 }]}>{label}</Text>
-                          </View>
-                          <Text style={[
-                            styles.categoryRate,
-                            hasData && { color: strainRate > 60 ? '#F44336' : strainRate > 40 ? '#E8A830' : '#00E5FF' }
-                          ]}>
-                            {hasData ? `${strainRate}%` : '—'}
-                          </Text>
-                          <Text style={styles.categorySubtext}>
-                            {hasData ? t.patterns.correlation : t.patterns.noData}
-                          </Text>
-                        </View>
-                      );
-                    })}
-                  </View>
-                </View>
-              )}
-
-              {/* Intelligence Insights - Show single most relevant insight */}
-              {insights && (() => {
-                // Priority: declining > high impact category > challenging day > challenging time > improving/stable
-                let insightIcon: React.ReactNode = null;
-                let insightText: React.ReactNode = null;
-                let insightSubtext = '';
-                let tipText = t.patterns.continueTracking;
-
-                // Get translated time period if applicable
-                const getTimePeriodLabel = (period: string) => {
-                  const periods: Record<string, string> = {
-                    morning: t.patterns.timePeriods.morning,
-                    afternoon: t.patterns.timePeriods.afternoon,
-                    evening: t.patterns.timePeriods.evening,
-                  };
-                  return periods[period] || period;
-                };
-
-                if (insights.trajectory === 'declining') {
-                  insightIcon = <TrendingDown size={18} color="#F44336" />;
-                  insightText = <Text style={[styles.insightText, { color: '#F44336' }]}>{t.patterns.trajectoryDeclining}</Text>;
-                  insightSubtext = t.patterns.comparedToPrevious;
-                } else if (insights.highImpactCategory && insights.highImpactRate > 40) {
-                  insightIcon = <AlertTriangle size={18} color="#E8A830" />;
-                  const catLabel = t.categories[insights.highImpactCategory];
-                  insightText = (
-                    <Text style={styles.insightText}>
-                      <Text style={{ color: '#E8A830' }}>{catLabel}</Text> {t.patterns.showsPattern}
-                    </Text>
-                  );
-                  insightSubtext = `${insights.highImpactRate}% ${t.patterns.correlationWith}`;
-                  tipText = interpolate(t.patterns.focusOn, { category: catLabel.toLowerCase() });
-                } else if (insights.worstDay) {
-                  insightIcon = <Calendar size={18} color="#E8A830" />;
-                  insightText = (
-                    <Text style={styles.insightText}>
-                      <Text style={{ color: '#E8A830' }}>{insights.worstDay}</Text> {t.patterns.showsPattern}
-                    </Text>
-                  );
-                  insightSubtext = `${insights.worstDayRate}% ${t.patterns.correlationWith}`;
-                } else if (insights.challengingTime) {
-                  insightIcon = <Clock size={18} color="#E8A830" />;
-                  const timeLabel = getTimePeriodLabel(insights.challengingTime);
-                  insightText = (
-                    <Text style={styles.insightText}>
-                      <Text style={{ color: '#E8A830' }}>{timeLabel}</Text> {t.patterns.showsPattern}
-                    </Text>
-                  );
-                  insightSubtext = `${insights.challengingTimeRate}% ${t.patterns.correlationWith}`;
-                } else if (insights.trajectory === 'improving') {
-                  insightIcon = <TrendingUp size={18} color="#00E5FF" />;
-                  insightText = <Text style={[styles.insightText, { color: '#00E5FF' }]}>{t.patterns.trajectoryImproving}</Text>;
-                  insightSubtext = t.patterns.comparedToPrevious;
-                } else if (insights.trajectory === 'stable') {
-                  insightIcon = <TrendingUp size={18} color="#E8A830" style={{ transform: [{ rotate: '90deg' }] }} />;
-                  insightText = <Text style={[styles.insightText, { color: '#E8A830' }]}>{t.patterns.trajectoryStable}</Text>;
-                  insightSubtext = t.patterns.comparedToPrevious;
-                }
-
-                if (!insightIcon) return null;
-
-                return (
-                  <View style={styles.insightsContainer}>
-                    <Text style={styles.insightsTitle}>{t.patterns.intelligenceTitle}</Text>
-                    <View style={styles.insightRow}>
-                      {insightIcon}
-                      <View style={styles.insightContent}>
-                        {insightText}
-                        <Text style={styles.insightSubtext}>{insightSubtext}</Text>
-                      </View>
+                {/* Footer */}
+                <View style={styles.footerSection}>
+                  {logs.length === 0 && (
+                    <View style={styles.emptyInline}>
+                      <Text style={styles.emptyInlineText}>No entries yet. Start logging on the home screen.</Text>
                     </View>
-                    <View style={[styles.insightRow, styles.insightTip]}>
-                      <Lightbulb size={16} color="rgba(255,255,255,0.4)" />
-                      <Text style={styles.tipText}>{tipText}</Text>
-                    </View>
-                  </View>
-                );
-              })()}
-
-              {/* Longitudinal value message */}
-              <Text style={styles.longitudinalNote}>
-                {t.patterns.longitudinalNote}
-              </Text>
+                  )}
+                  <Text style={styles.longitudinalNote}>
+                    {t.patterns.longitudinalNote}
+                  </Text>
+                </View>
               </View>
             )
           }
-          ListEmptyComponent={renderEmpty}
+          ListEmptyComponent={null}
           refreshControl={
             <RefreshControl
               refreshing={isLoading}
@@ -842,6 +789,65 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     paddingBottom: spacing.xl,
     flexGrow: 1,
+  },
+  pageHeader: {
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  pageTitle: {
+    fontSize: 20,
+    fontWeight: '300',
+    color: 'rgba(255,255,255,0.9)',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  pageSubtitle: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.4)',
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+  entriesLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.4)',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  footerContainer: {
+    marginTop: spacing.lg,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.08)',
+  },
+  graphSectionLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.7)',
+    textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+  graphSection: {
+    marginTop: spacing.lg,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.08)',
+  },
+  footerSection: {
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+  },
+  emptyInline: {
+    paddingVertical: spacing.xl,
+    alignItems: 'center',
+  },
+  emptyInlineText: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.4)',
+    fontStyle: 'italic',
   },
   emptyContainer: {
     flex: 1,
@@ -1088,7 +1094,7 @@ const styles = StyleSheet.create({
   },
 });
 
-// Confidence Badge Styles
+// Data Depth Badge Styles
 const confidenceStyles = StyleSheet.create({
   badge: {
     flexDirection: 'row',

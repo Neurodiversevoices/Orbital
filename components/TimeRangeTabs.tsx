@@ -12,7 +12,7 @@ import { getUnlockTier } from '../types';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-export type TimeRange = '7d' | '14d' | '1m' | '90d' | '1y' | '2y' | '5y' | '10y';
+export type TimeRange = '7d' | '30d' | '90d' | '6m' | '1y' | '10y';
 
 interface TimeRangeTabsProps {
   selected: TimeRange;
@@ -22,13 +22,11 @@ interface TimeRangeTabsProps {
 
 const ranges: { key: TimeRange; label: string; requiredLogs: number }[] = [
   { key: '7d', label: '7D', requiredLogs: 7 },
-  { key: '14d', label: '14D', requiredLogs: 14 },
-  { key: '1m', label: '1M', requiredLogs: 30 },
-  { key: '90d', label: '90D', requiredLogs: 90 },
-  { key: '1y', label: '1Y', requiredLogs: 365 },
-  { key: '2y', label: '2Y', requiredLogs: 500 },
-  { key: '5y', label: '5Y', requiredLogs: 1000 },
-  { key: '10y', label: '10Y', requiredLogs: 2000 },
+  { key: '30d', label: '30D', requiredLogs: 14 },
+  { key: '90d', label: '90D', requiredLogs: 30 },
+  { key: '6m', label: '6M', requiredLogs: 60 },
+  { key: '1y', label: '1Y', requiredLogs: 120 },
+  { key: '10y', label: '10Y', requiredLogs: 365 },
 ];
 
 function TabButton({
@@ -105,18 +103,14 @@ export function getTimeRangeMs(range: TimeRange): number {
   switch (range) {
     case '7d':
       return 7 * day;
-    case '14d':
-      return 14 * day;
-    case '1m':
+    case '30d':
       return 30 * day;
     case '90d':
       return 90 * day;
+    case '6m':
+      return 183 * day;
     case '1y':
       return 365 * day;
-    case '2y':
-      return 2 * 365 * day;
-    case '5y':
-      return 5 * 365 * day;
     case '10y':
       return 10 * 365 * day;
   }

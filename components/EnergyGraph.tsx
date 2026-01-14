@@ -40,6 +40,10 @@ interface CapacityGraphProps {
   logs: CapacityLog[];
   width: number;
   timeRange: TimeRange;
+  /** Optional: override start date for calendar sync */
+  startDate?: Date;
+  /** Optional: override end date for calendar sync */
+  endDate?: Date;
 }
 
 // Get aggregation bucket size based on time range
@@ -48,13 +52,12 @@ const getBucketSize = (range: TimeRange): number => {
   const day = 24 * hour;
   switch (range) {
     case '7d': return 6 * hour;       // 6-hour buckets
-    case '14d': return 12 * hour;     // 12-hour buckets
-    case '1m': return day;            // Daily
+    case '30d': return day;           // Daily buckets
     case '90d': return 3 * day;       // 3-day buckets
-    case '1y': return 7 * day;        // Weekly
-    case '2y': return 14 * day;       // Bi-weekly
-    case '5y': return 30 * day;       // Monthly
-    case '10y': return 60 * day;      // Bi-monthly
+    case '6m': return 7 * day;        // Weekly buckets
+    case '1y': return 14 * day;       // Bi-weekly buckets
+    case '10y': return 60 * day;      // Bi-monthly buckets
+    default: return day;              // Fallback to daily
   }
 };
 
@@ -62,11 +65,11 @@ const getBucketSize = (range: TimeRange): number => {
 const formatDateLabel = (date: Date, range: TimeRange): string => {
   if (range === '7d') {
     return date.toLocaleDateString('en-US', { weekday: 'short' });
-  } else if (range === '14d') {
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  } else if (range === '1m') {
+  } else if (range === '30d') {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   } else if (range === '90d') {
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  } else if (range === '6m') {
     return date.toLocaleDateString('en-US', { month: 'short' });
   } else {
     return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
@@ -77,28 +80,34 @@ const formatDateLabel = (date: Date, range: TimeRange): string => {
 const getDateLabelCount = (range: TimeRange): number => {
   switch (range) {
     case '7d': return 7;
-    case '14d': return 5;
-    case '1m': return 4;
-    case '90d': return 3;
-    case '1y': return 4;
-    case '2y': return 4;
-    case '5y': return 5;
+    case '30d': return 5;
+    case '90d': return 4;
+    case '6m': return 4;
+    case '1y': return 5;
     case '10y': return 5;
+    default: return 4;
   }
 };
 
-export function EnergyGraph({ logs, width, timeRange }: CapacityGraphProps) {
+export function EnergyGraph({ logs, width, timeRange, startDate, endDate }: CapacityGraphProps) {
   const graphWidth = width - GRAPH_PADDING_LEFT - GRAPH_PADDING_H;
   const graphHeight = GRAPH_HEIGHT - GRAPH_PADDING_TOP - GRAPH_PADDING_BOTTOM;
 
   const { points, pathData, dateLabels } = useMemo(() => {
+    // Use custom date range if provided (for calendar sync), otherwise use timeRange from now
     const now = Date.now();
-    const rangeMs = getTimeRangeMs(timeRange);
-    const startTime = now - rangeMs;
+    const useCustomRange = startDate && endDate;
+    const rangeMs = useCustomRange
+      ? (endDate.getTime() - startDate.getTime())
+      : getTimeRangeMs(timeRange);
+    const startTime = useCustomRange ? startDate.getTime() : (now - rangeMs);
+    const endTime = useCustomRange ? endDate.getTime() : now;
     const bucketSize = getBucketSize(timeRange);
 
     // Filter logs within time range
-    const filteredLogs = logs.filter((log) => log.timestamp >= startTime);
+    const filteredLogs = logs.filter((log) =>
+      log.timestamp >= startTime && log.timestamp < endTime
+    );
 
     // Generate date labels
     const labelCount = getDateLabelCount(timeRange);
@@ -166,7 +175,7 @@ export function EnergyGraph({ logs, width, timeRange }: CapacityGraphProps) {
     }
 
     return { points: pts, pathData: path, dateLabels: labels };
-  }, [logs, graphWidth, graphHeight, timeRange]);
+  }, [logs, graphWidth, graphHeight, timeRange, startDate, endDate]);
 
   const hasData = points.length > 0;
 
