@@ -61,6 +61,7 @@ import {
   BUNDLE_PRICING,
   ADMIN_ADDON_PRICING,
   CCI_PRICING,
+  CCI_GROUP_PRICING,
   formatPrice,
 } from '../lib/subscription/pricing';
 import {
@@ -382,20 +383,32 @@ export default function UpgradeScreen() {
   };
 
   const handlePurchase = useCallback(async (productId: string, productName: string) => {
+    console.log('[PURCHASE] Starting purchase:', productId, productName);
     setIsPurchasing(true);
 
     await handleMockPurchase(
       productId,
       () => {
-        Alert.alert(
-          'Success!',
-          `${productName} has been activated.`,
-          [{ text: 'Continue', onPress: () => { loadEntitlements(); } }]
-        );
+        console.log('[PURCHASE] Success:', productName);
+        if (Platform.OS === 'web') {
+          window.alert(`Success! ${productName} has been activated.`);
+          loadEntitlements();
+        } else {
+          Alert.alert(
+            'Success!',
+            `${productName} has been activated.`,
+            [{ text: 'Continue', onPress: () => { loadEntitlements(); } }]
+          );
+        }
         setIsPurchasing(false);
       },
       (error) => {
-        Alert.alert('Purchase Failed', error);
+        console.log('[PURCHASE] Failed:', error);
+        if (Platform.OS === 'web') {
+          window.alert(`Purchase Failed: ${error}`);
+        } else {
+          Alert.alert('Purchase Failed', error);
+        }
         setIsPurchasing(false);
       }
     );
@@ -465,7 +478,7 @@ export default function UpgradeScreen() {
               )}
             </View>
             <Text style={styles.planCardDescription}>
-              {FREE_TIER_LIMITS.maxSignalsPerMonth} signals/month · {FREE_TIER_LIMITS.maxPatternHistoryDays} days history
+              Unlimited entries · 7 days history
             </Text>
             <View style={styles.planCardCta}>
               <Text style={styles.planCardCtaText}>{isPro ? 'Basic tier' : 'Your current plan'}</Text>
@@ -479,7 +492,7 @@ export default function UpgradeScreen() {
             <View style={styles.planCardHeader}>
               <View>
                 <Text style={[styles.planCardName, { color: '#FFD700' }]}>Pro</Text>
-                <Text style={styles.planCardPrice}>{formatPrice(PRO_PRICING.annual)}/yr</Text>
+                <Text style={styles.planCardPrice}>{formatPrice(PRO_PRICING.monthly)}/mo · {formatPrice(PRO_PRICING.annual)}/yr</Text>
               </View>
               {isPro && !hasFamily && !hasCircle && bundleSize === null && (
                 <View style={[styles.currentBadge, { backgroundColor: '#FFD700' }]}>
@@ -490,16 +503,27 @@ export default function UpgradeScreen() {
             <Text style={styles.planCardDescription}>
               Unlimited signals · Full pattern history · Priority support
             </Text>
-            <Pressable
-              style={[styles.planCardCtaButton, isPro && styles.planCardCtaButtonDisabled]}
-              onPress={() => handlePurchase(PRODUCT_IDS.PRO_ANNUAL, 'Pro (Annual)')}
-              disabled={isPurchasing || isPro}
-            >
-              <Crown size={16} color={isPro ? 'rgba(255,255,255,0.4)' : '#000'} />
-              <Text style={[styles.planCardCtaButtonText, isPro && styles.planCardCtaButtonTextDisabled]}>
-                {isPro ? 'Active' : 'Upgrade to Pro'}
-              </Text>
-            </Pressable>
+            <View style={styles.planCardButtonRow}>
+              <Pressable
+                style={[styles.planCardCtaButton, isPro && styles.planCardCtaButtonDisabled]}
+                onPress={() => handlePurchase(PRODUCT_IDS.PRO_ANNUAL, 'Pro (Annual)')}
+                disabled={isPurchasing || isPro}
+              >
+                <Text style={[styles.planCardCtaButtonText, isPro && styles.planCardCtaButtonTextDisabled]}>
+                  {isPro ? 'Active' : `${formatPrice(PRO_PRICING.annual)}/yr`}
+                </Text>
+                {!isPro && <Text style={styles.savingsBadge}>Save 17%</Text>}
+              </Pressable>
+              <Pressable
+                style={[styles.planCardCtaButtonSecondary, isPro && styles.planCardCtaButtonDisabled]}
+                onPress={() => handlePurchase(PRODUCT_IDS.PRO_MONTHLY, 'Pro (Monthly)')}
+                disabled={isPurchasing || isPro}
+              >
+                <Text style={[styles.planCardCtaButtonSecondaryText, isPro && styles.planCardCtaButtonTextDisabled]}>
+                  {formatPrice(PRO_PRICING.monthly)}/mo
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </Animated.View>
 
@@ -509,7 +533,7 @@ export default function UpgradeScreen() {
             <View style={styles.planCardHeader}>
               <View>
                 <Text style={[styles.planCardName, { color: '#FF9800' }]}>Family</Text>
-                <Text style={styles.planCardPrice}>{formatPrice(FAMILY_ADDON_PRICING.annual)}/yr</Text>
+                <Text style={styles.planCardPrice}>{formatPrice(FAMILY_ADDON_PRICING.monthly)}/mo · {formatPrice(FAMILY_ADDON_PRICING.annual)}/yr</Text>
               </View>
               {hasFamily && (
                 <View style={[styles.currentBadge, { backgroundColor: '#FF9800' }]}>
@@ -521,16 +545,27 @@ export default function UpgradeScreen() {
               Up to 5 family members · Household insights · Shared visibility
             </Text>
             {!isPro && <Text style={styles.planCardRequires}>Requires Pro</Text>}
-            <Pressable
-              style={[styles.planCardCtaButton, { backgroundColor: '#FF9800' }, (hasFamily || !isPro) && styles.planCardCtaButtonDisabled]}
-              onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_ANNUAL, 'Family (Annual)')}
-              disabled={isPurchasing || hasFamily || !isPro}
-            >
-              <Users size={16} color={(hasFamily || !isPro) ? 'rgba(255,255,255,0.4)' : '#000'} />
-              <Text style={[styles.planCardCtaButtonText, (hasFamily || !isPro) && styles.planCardCtaButtonTextDisabled]}>
-                {hasFamily ? 'Active' : 'Start a Family'}
-              </Text>
-            </Pressable>
+            <View style={styles.planCardButtonRow}>
+              <Pressable
+                style={[styles.planCardCtaButton, { backgroundColor: '#FF9800' }, (hasFamily || !isPro) && styles.planCardCtaButtonDisabled]}
+                onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_ANNUAL, 'Family (Annual)')}
+                disabled={isPurchasing || hasFamily || !isPro}
+              >
+                <Text style={[styles.planCardCtaButtonText, (hasFamily || !isPro) && styles.planCardCtaButtonTextDisabled]}>
+                  {hasFamily ? 'Active' : `${formatPrice(FAMILY_ADDON_PRICING.annual)}/yr`}
+                </Text>
+                {!hasFamily && isPro && <Text style={styles.savingsBadge}>Save 17%</Text>}
+              </Pressable>
+              <Pressable
+                style={[styles.planCardCtaButtonSecondary, (hasFamily || !isPro) && styles.planCardCtaButtonDisabled]}
+                onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_MONTHLY, 'Family (Monthly)')}
+                disabled={isPurchasing || hasFamily || !isPro}
+              >
+                <Text style={[styles.planCardCtaButtonSecondaryText, (hasFamily || !isPro) && styles.planCardCtaButtonTextDisabled]}>
+                  {formatPrice(FAMILY_ADDON_PRICING.monthly)}/mo
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </Animated.View>
 
@@ -540,7 +575,7 @@ export default function UpgradeScreen() {
             <View style={styles.planCardHeader}>
               <View>
                 <Text style={[styles.planCardName, { color: '#00E5FF' }]}>Circles</Text>
-                <Text style={styles.planCardPrice}>{formatPrice(CIRCLE_PRICING.annual)}/yr</Text>
+                <Text style={styles.planCardPrice}>{formatPrice(CIRCLE_PRICING.monthly)}/mo · {formatPrice(CIRCLE_PRICING.annual)}/yr</Text>
               </View>
               {hasCircle && (
                 <View style={[styles.currentBadge, { backgroundColor: '#00E5FF' }]}>
@@ -552,16 +587,27 @@ export default function UpgradeScreen() {
               Up to 5 trusted buddies · Shared capacity awareness · Circle insights
             </Text>
             {!isPro && <Text style={styles.planCardRequires}>Requires Pro for all members</Text>}
-            <Pressable
-              style={[styles.planCardCtaButton, { backgroundColor: '#00E5FF' }, (hasCircle || !isPro) && styles.planCardCtaButtonDisabled]}
-              onPress={() => handlePurchase(PRODUCT_IDS.CIRCLE_ANNUAL, 'Circle (Annual)')}
-              disabled={isPurchasing || hasCircle || !isPro}
-            >
-              <Users size={16} color={(hasCircle || !isPro) ? 'rgba(255,255,255,0.4)' : '#000'} />
-              <Text style={[styles.planCardCtaButtonText, (hasCircle || !isPro) && styles.planCardCtaButtonTextDisabled]}>
-                {hasCircle ? 'Active' : 'Create a Circle'}
-              </Text>
-            </Pressable>
+            <View style={styles.planCardButtonRow}>
+              <Pressable
+                style={[styles.planCardCtaButton, { backgroundColor: '#00E5FF' }, (hasCircle || !isPro) && styles.planCardCtaButtonDisabled]}
+                onPress={() => handlePurchase(PRODUCT_IDS.CIRCLE_ANNUAL, 'Circle (Annual)')}
+                disabled={isPurchasing || hasCircle || !isPro}
+              >
+                <Text style={[styles.planCardCtaButtonText, (hasCircle || !isPro) && styles.planCardCtaButtonTextDisabled]}>
+                  {hasCircle ? 'Active' : `${formatPrice(CIRCLE_PRICING.annual)}/yr`}
+                </Text>
+                {!hasCircle && isPro && <Text style={styles.savingsBadge}>Save 17%</Text>}
+              </Pressable>
+              <Pressable
+                style={[styles.planCardCtaButtonSecondary, (hasCircle || !isPro) && styles.planCardCtaButtonDisabled]}
+                onPress={() => handlePurchase(PRODUCT_IDS.CIRCLE_MONTHLY, 'Circle (Monthly)')}
+                disabled={isPurchasing || hasCircle || !isPro}
+              >
+                <Text style={[styles.planCardCtaButtonSecondaryText, (hasCircle || !isPro) && styles.planCardCtaButtonTextDisabled]}>
+                  {formatPrice(CIRCLE_PRICING.monthly)}/mo
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </Animated.View>
 
@@ -664,29 +710,68 @@ export default function UpgradeScreen() {
         </Animated.View>
 
         {/* =============================================================== */}
-        {/* CIRCLE AGGREGATE CCI (COMING SOON) — Only visible for Circle members */}
+        {/* CIRCLE AGGREGATE CCI - $399 - Always visible */}
         {/* =============================================================== */}
-        {hasCircle && (
-          <Animated.View entering={FadeInDown.delay(375).duration(400)}>
-            <View style={styles.cciAggregateCard}>
-              <View style={styles.cciHeader}>
-                <Users size={24} color="#9C27B0" />
-                <View style={styles.cciHeaderText}>
-                  <View style={styles.cciAggregateTitleRow}>
-                    <Text style={[styles.cciTitle, { color: '#9C27B0' }]}>Circle Aggregate CCI</Text>
-                    <View style={styles.comingSoonBadge}>
-                      <Text style={styles.comingSoonText}>COMING SOON</Text>
-                    </View>
-                  </View>
-                  <Text style={styles.cciSubtitle}>An aggregate capacity report for the Circle. No individual attribution.</Text>
-                </View>
+        <Animated.View entering={FadeInDown.delay(375).duration(400)}>
+          <View style={styles.cciCard}>
+            <View style={styles.cciHeader}>
+              <Users size={24} color="#9C27B0" />
+              <View style={styles.cciHeaderText}>
+                <Text style={[styles.cciTitle, { color: '#9C27B0' }]}>Circle Aggregate CCI</Text>
+                <Text style={styles.cciSubtitle}>One CCI for entire circle · No individual attribution</Text>
               </View>
-              <Text style={styles.cciAggregateNotice}>
-                Available on request. Contact support for early access.
-              </Text>
             </View>
-          </Animated.View>
-        )}
+            <View style={styles.cciPricing}>
+              <View style={styles.cciPriceRow}>
+                <Text style={styles.cciPriceLabel}>Issuance Fee:</Text>
+                <Text style={styles.cciPriceValue}>{formatPrice(CCI_GROUP_PRICING.circleAll)}</Text>
+              </View>
+            </View>
+            {hasCircle ? (
+              <Pressable
+                style={[styles.cciButton, { backgroundColor: '#9C27B0' }, isPurchasing && styles.cciButtonDisabled]}
+                onPress={() => handlePurchase(PRODUCT_IDS.CCI_CIRCLE_ALL, 'Circle Aggregate CCI')}
+                disabled={isPurchasing}
+              >
+                <Text style={styles.cciButtonText}>Get Circle Aggregate CCI · {formatPrice(CCI_GROUP_PRICING.circleAll)}</Text>
+              </Pressable>
+            ) : (
+              <Text style={styles.cciRequiresNote}>Requires Circle subscription</Text>
+            )}
+          </View>
+        </Animated.View>
+
+        {/* =============================================================== */}
+        {/* BUNDLE AGGREGATE CCI - $999 - Always visible */}
+        {/* =============================================================== */}
+        <Animated.View entering={FadeInDown.delay(400).duration(400)}>
+          <View style={styles.cciCard}>
+            <View style={styles.cciHeader}>
+              <Users size={24} color="#FF5722" />
+              <View style={styles.cciHeaderText}>
+                <Text style={[styles.cciTitle, { color: '#FF5722' }]}>Bundle Aggregate CCI</Text>
+                <Text style={styles.cciSubtitle}>One CCI for entire bundle · No individual attribution</Text>
+              </View>
+            </View>
+            <View style={styles.cciPricing}>
+              <View style={styles.cciPriceRow}>
+                <Text style={styles.cciPriceLabel}>Issuance Fee:</Text>
+                <Text style={styles.cciPriceValue}>{formatPrice(CCI_GROUP_PRICING.bundleAll)}</Text>
+              </View>
+            </View>
+            {bundleSize !== null ? (
+              <Pressable
+                style={[styles.cciButton, { backgroundColor: '#FF5722' }, isPurchasing && styles.cciButtonDisabled]}
+                onPress={() => handlePurchase(PRODUCT_IDS.CCI_BUNDLE_ALL, 'Bundle Aggregate CCI')}
+                disabled={isPurchasing}
+              >
+                <Text style={styles.cciButtonText}>Get Bundle Aggregate CCI · {formatPrice(CCI_GROUP_PRICING.bundleAll)}</Text>
+              </Pressable>
+            ) : (
+              <Text style={styles.cciRequiresNote}>Requires Bundle subscription</Text>
+            )}
+          </View>
+        </Animated.View>
 
         {/* =============================================================== */}
         {/* SPONSOR CODE */}
@@ -871,10 +956,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   planCardCtaButton: {
-    flexDirection: 'row',
+    flex: 1,
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.xs,
     backgroundColor: '#FFD700',
     paddingVertical: spacing.md,
     borderRadius: borderRadius.md,
@@ -889,6 +974,30 @@ const styles = StyleSheet.create({
   },
   planCardCtaButtonTextDisabled: {
     color: 'rgba(255,255,255,0.4)',
+  },
+  planCardButtonRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  planCardCtaButtonSecondary: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  planCardCtaButtonSecondaryText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.7)',
+  },
+  savingsBadge: {
+    fontSize: 10,
+    color: '#4CAF50',
+    marginTop: 2,
   },
   currentBadge: {
     backgroundColor: 'rgba(76,175,80,0.2)',
@@ -1452,6 +1561,13 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginTop: spacing.sm,
     textAlign: 'center',
+  },
+  cciRequiresNote: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.4)',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingVertical: spacing.md,
   },
 
   // Sponsor Card

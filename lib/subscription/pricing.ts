@@ -67,6 +67,8 @@ export const PRODUCT_IDS = {
   // CCI-Q4 Issuance (one-time, tiered pricing)
   CCI_FREE: 'orbital_cci_free',    // $199 for Free users
   CCI_PRO: 'orbital_cci_pro',      // $149 for Pro users
+  CCI_CIRCLE_ALL: 'orbital_cci_circle_all',  // $399 for all circle members
+  CCI_BUNDLE_ALL: 'orbital_cci_bundle_all',  // $999 for all bundle members
 
   // Legacy IDs (keep for migration / PRICING_TIERS compatibility)
   INDIVIDUAL_MONTHLY: 'orbital_individual_monthly',
@@ -498,6 +500,16 @@ export const CCI_PRICING = {
 } as const;
 
 /**
+ * CCI Group pricing (all members on one CCI)
+ * - Circle: $399 for all circle members together
+ * - Bundle: $999 flat rate for any bundle size
+ */
+export const CCI_GROUP_PRICING = {
+  circleAll: 399,   // All circle members on one CCI
+  bundleAll: 999,   // All bundle members on one CCI (flat)
+} as const;
+
+/**
  * Get CCI price based on user's Pro status
  */
 export function getCCIPrice(isPro: boolean): number {
@@ -509,6 +521,20 @@ export function getCCIPrice(isPro: boolean): number {
  */
 export function getCCIProductId(isPro: boolean): ProductId {
   return isPro ? PRODUCT_IDS.CCI_PRO : PRODUCT_IDS.CCI_FREE;
+}
+
+/**
+ * Get CCI group price (all members on one CCI)
+ */
+export function getCCIGroupPrice(type: 'circle' | 'bundle'): number {
+  return type === 'circle' ? CCI_GROUP_PRICING.circleAll : CCI_GROUP_PRICING.bundleAll;
+}
+
+/**
+ * Get CCI group product ID
+ */
+export function getCCIGroupProductId(type: 'circle' | 'bundle'): ProductId {
+  return type === 'circle' ? PRODUCT_IDS.CCI_CIRCLE_ALL : PRODUCT_IDS.CCI_BUNDLE_ALL;
 }
 
 // =============================================================================

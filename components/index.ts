@@ -15,6 +15,7 @@ export { MilestonesPanel } from './MilestonesPanel';
 export { PatternLanguagePanel } from './PatternLanguagePanel';
 export { OrgRoleBanner } from './OrgRoleBanner';
 export { EmptyState } from './EmptyState';
+export { WeeklyCapacityRecord } from './WeeklyCapacityRecord';
 
 // Legal components
 export {
