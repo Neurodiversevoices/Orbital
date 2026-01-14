@@ -214,7 +214,7 @@ function generateCategoryInsights(
     let recommendation: string | undefined;
 
     if (impactScore > 50) {
-      const recommendations = {
+      const recommendations: Record<Category, Record<string, string>> = {
         sensory: {
           en: 'Consider environmental modifications to reduce sensory load',
           es: 'Considere modificaciones ambientales para reducir la carga sensorial',
@@ -228,7 +228,8 @@ function generateCategoryInsights(
           es: 'Evalúe compromisos sociales y asignación de tiempo de recuperación',
         },
       };
-      recommendation = recommendations[category][locale];
+      // Use locale if available, otherwise default to English
+      recommendation = recommendations[category][locale] || recommendations[category]['en'];
     }
 
     return { category, impactScore, recommendation };
