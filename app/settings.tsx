@@ -44,20 +44,18 @@ import { localeNames, Locale } from '../locales';
 import { useDemoMode, FOUNDER_DEMO_ENABLED, DemoDuration } from '../lib/hooks/useDemoMode';
 import { useAppMode } from '../lib/hooks/useAppMode';
 import { useTutorial } from '../lib/hooks/useTutorial';
-import { useSubscription, shouldBypassSubscription, FREE_TIER_LIMITS } from '../lib/subscription';
 import { useAccess } from '../lib/access';
 import { DELETION_DISCLOSURE } from '../lib/storage';
 import { ProprietaryFooter } from '../components/legal';
 import { APP_MODE_CONFIGS } from '../types';
 import { ModeSelector } from '../components';
-import { Crown, Gift } from 'lucide-react-native';
 import { generateClinicalBrief } from '../lib/pdf';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { logs, clearAll, refresh, currentMonthSignalCount } = useEnergyLogs();
+  const { logs, clearAll, refresh } = useEnergyLogs();
   const { t, locale, setLocale } = useLocale();
   const {
     isDemoMode,
@@ -70,7 +68,6 @@ export default function SettingsScreen() {
   } = useDemoMode();
   const { resetTutorial } = useTutorial();
   const { currentMode, modeConfig, orgName, orgCode, leaveOrg } = useAppMode();
-  const { isPro, isLoading: subscriptionLoading } = useSubscription();
   const {
     qaFreeModeEnabled,
     enableQAFreeMode,
@@ -83,7 +80,6 @@ export default function SettingsScreen() {
     enableFreeUserView,
     disableFreeUserView,
   } = useAccess();
-  const bypassesSubscription = shouldBypassSubscription(currentMode);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
   const [showDemoPicker, setShowDemoPicker] = useState(false);
@@ -280,64 +276,7 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Plans & Pricing - Primary entry point for B2C */}
-        {!bypassesSubscription && currentMode !== 'demo' && (
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>PLANS & PRICING</Text>
-            <SettingsRow
-              icon={Sparkles}
-              label="View All Plans"
-              sublabel="Free · Pro · Family · Circles · Bundles"
-              onPress={() => router.push('/upgrade')}
-              disabled={isProcessing}
-            />
-          </View>
-        )}
 
-        {/* Subscription Status */}
-        {!bypassesSubscription && currentMode !== 'demo' && (
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>YOUR STATUS</Text>
-            {isPro ? (
-              <SettingsRow
-                icon={Crown}
-                label="Orbital Pro"
-                sublabel="Unlimited signals & full history"
-                onPress={() => router.push('/upgrade')}
-                disabled={isProcessing}
-                highlight
-              />
-            ) : (
-              <View style={styles.subscriptionCard}>
-                <View style={styles.subscriptionHeader}>
-                  <View style={styles.starterBadge}>
-                    <Text style={styles.starterBadgeText}>STARTER</Text>
-                  </View>
-                  <Text style={styles.signalCount}>
-                    {logs.length > 0 ? `${Math.min(currentMonthSignalCount, FREE_TIER_LIMITS.maxSignalsPerMonth)}/${FREE_TIER_LIMITS.maxSignalsPerMonth}` : '—'} signals this month
-                  </Text>
-                </View>
-                <Text style={styles.subscriptionDescription}>
-                  Upgrade to Pro for unlimited signals and full pattern history
-                </Text>
-                <Pressable
-                  style={styles.upgradeButton}
-                  onPress={() => router.push('/upgrade')}
-                >
-                  <Crown size={16} color="#000" />
-                  <Text style={styles.upgradeButtonText}>Upgrade · $29/mo</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.redeemButton}
-                  onPress={() => router.push('/redeem')}
-                >
-                  <Gift size={14} color="#00E5FF" />
-                  <Text style={styles.redeemButtonText}>Have a sponsor code?</Text>
-                </Pressable>
-              </View>
-            )}
-          </View>
-        )}
 
         {/* DEVELOPER TOOLS — FREE USER VIEW (Hard Override) */}
         {isFounderDemo && (
