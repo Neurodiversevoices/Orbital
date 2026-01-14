@@ -234,47 +234,49 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Explore Demo Modes Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>EXPLORE DEMO MODES</Text>
-          <View style={[styles.modeCard, { borderColor: `${modeConfig.accentColor}40` }]}>
-            <View style={styles.modeCardHeader}>
-              <Text style={[styles.modeCardLabel, { color: modeConfig.accentColor }]}>
-                {modeConfig.label}
-              </Text>
-              {orgCode && (
-                <View style={[styles.orgCodeBadge, { backgroundColor: `${modeConfig.accentColor}20` }]}>
-                  <Text style={[styles.orgCodeText, { color: modeConfig.accentColor }]}>{orgCode}</Text>
-                </View>
+        {/* Explore Demo Modes Section - FOUNDER ONLY */}
+        {isFounderDemo && (
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>EXPLORE DEMO MODES</Text>
+            <View style={[styles.modeCard, { borderColor: `${modeConfig.accentColor}40` }]}>
+              <View style={styles.modeCardHeader}>
+                <Text style={[styles.modeCardLabel, { color: modeConfig.accentColor }]}>
+                  {modeConfig.label}
+                </Text>
+                {orgCode && (
+                  <View style={[styles.orgCodeBadge, { backgroundColor: `${modeConfig.accentColor}20` }]}>
+                    <Text style={[styles.orgCodeText, { color: modeConfig.accentColor }]}>{orgCode}</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.modeCardDescription}>{modeConfig.description}</Text>
+              <Text style={styles.demoNotice}>Demo modes are read-only previews. No pricing or activation.</Text>
+              {orgName && (
+                <Text style={styles.orgNameText}>Organization: {orgName}</Text>
               )}
-            </View>
-            <Text style={styles.modeCardDescription}>{modeConfig.description}</Text>
-            <Text style={styles.demoNotice}>Demo modes are read-only previews. No pricing or activation.</Text>
-            {orgName && (
-              <Text style={styles.orgNameText}>Organization: {orgName}</Text>
-            )}
-            <View style={styles.modeCardActions}>
-              <ModeSelector />
-              {modeConfig.requiresOrgCode && orgCode && (
-                <Pressable
-                  style={styles.leaveOrgButton}
-                  onPress={() => {
-                    Alert.alert(
-                      'Leave Organization',
-                      `Are you sure you want to leave ${orgName || orgCode}?`,
-                      [
-                        { text: 'Cancel', style: 'cancel' },
-                        { text: 'Leave', style: 'destructive', onPress: leaveOrg },
-                      ]
-                    );
-                  }}
-                >
-                  <Text style={styles.leaveOrgText}>Leave Org</Text>
-                </Pressable>
-              )}
+              <View style={styles.modeCardActions}>
+                <ModeSelector />
+                {modeConfig.requiresOrgCode && orgCode && (
+                  <Pressable
+                    style={styles.leaveOrgButton}
+                    onPress={() => {
+                      Alert.alert(
+                        'Leave Organization',
+                        `Are you sure you want to leave ${orgName || orgCode}?`,
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          { text: 'Leave', style: 'destructive', onPress: leaveOrg },
+                        ]
+                      );
+                    }}
+                  >
+                    <Text style={styles.leaveOrgText}>Leave Org</Text>
+                  </Pressable>
+                )}
+              </View>
             </View>
           </View>
-        </View>
+        )}
 
 
 
