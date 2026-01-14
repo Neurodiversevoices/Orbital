@@ -1,4 +1,4 @@
-import { CapacityLog, CapacityState, Category, ExecutiveReportConfig, ExecutiveReportData, ExportSummary } from '../../types';
+import { CapacityLog, CapacityState, Category, ExecutiveReportConfig, ExecutiveReportData, ExportSummary, Locale } from '../../types';
 import { getLogs, getVaultedLogs, getFullHistoryRange } from '../storage';
 import { generateExportSummary } from './summaryGenerator';
 
@@ -9,7 +9,7 @@ const PERIOD_MS = {
 
 export async function generateExecutiveReport(
   config: ExecutiveReportConfig,
-  locale: 'en' | 'es' = 'en'
+  locale: Locale = 'en'
 ): Promise<ExecutiveReportData> {
   const now = Date.now();
   let periodStart: number;
@@ -107,7 +107,7 @@ function determineTrend(weeklyAverages: number[]): 'improving' | 'stable' | 'dec
   return 'stable';
 }
 
-function identifyPatterns(logs: CapacityLog[], locale: 'en' | 'es'): string[] {
+function identifyPatterns(logs: CapacityLog[], locale: Locale): string[] {
   const patterns: string[] = [];
 
   if (logs.length < 7) {
@@ -200,7 +200,7 @@ function identifyPatterns(logs: CapacityLog[], locale: 'en' | 'es'): string[] {
 
 function generateCategoryInsights(
   logs: CapacityLog[],
-  locale: 'en' | 'es'
+  locale: Locale
 ): { category: Category; impactScore: number; recommendation?: string }[] {
   const categories: Category[] = ['sensory', 'demand', 'social'];
 
@@ -235,11 +235,21 @@ function generateCategoryInsights(
   });
 }
 
+const localeCodeMap: Record<Locale, string> = {
+  en: 'en-US',
+  es: 'es-MX',
+  fr: 'fr-FR',
+  de: 'de-DE',
+  'pt-BR': 'pt-BR',
+  it: 'it-IT',
+  ja: 'ja-JP',
+};
+
 export function formatExecutiveReportAsText(
   data: ExecutiveReportData,
-  locale: 'en' | 'es' = 'en'
+  locale: Locale = 'en'
 ): string {
-  const dateFormatter = new Intl.DateTimeFormat(locale === 'es' ? 'es-MX' : 'en-US', {
+  const dateFormatter = new Intl.DateTimeFormat(localeCodeMap[locale] || 'en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

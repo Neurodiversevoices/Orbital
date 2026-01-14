@@ -19,7 +19,7 @@ import {
 import { CapacityLog, Tag, CapacityState, Category } from '../types';
 import { colors, spacing } from '../theme';
 import { useLocale } from '../lib/hooks/useLocale';
-import { TranslationKeys } from '../locales';
+import { TranslationKeys, Locale } from '../locales';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -55,18 +55,28 @@ interface HistoryItemProps {
   onDelete?: (id: string) => void;
 }
 
-function formatTime(timestamp: number, locale: 'en' | 'es'): string {
+const localeCodeMap: Record<Locale, string> = {
+  en: 'en-US',
+  es: 'es-MX',
+  fr: 'fr-FR',
+  de: 'de-DE',
+  'pt-BR': 'pt-BR',
+  it: 'it-IT',
+  ja: 'ja-JP',
+};
+
+function formatTime(timestamp: number, locale: Locale): string {
   const date = new Date(timestamp);
-  const localeCode = locale === 'es' ? 'es-MX' : 'en-US';
+  const localeCode = localeCodeMap[locale] || 'en-US';
   return date.toLocaleTimeString(localeCode, { hour: 'numeric', minute: '2-digit' });
 }
 
-function formatDate(timestamp: number, t: TranslationKeys, locale: 'en' | 'es'): string {
+function formatDate(timestamp: number, t: TranslationKeys, locale: Locale): string {
   const date = new Date(timestamp);
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-  const localeCode = locale === 'es' ? 'es-MX' : 'en-US';
+  const localeCode = localeCodeMap[locale] || 'en-US';
 
   if (date.toDateString() === today.toDateString()) {
     return t.time.today;

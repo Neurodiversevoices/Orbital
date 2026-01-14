@@ -29,9 +29,20 @@ import { colors, spacing } from '../theme';
 import { useEnergyLogs } from '../lib/hooks/useEnergyLogs';
 import { useLocale } from '../lib/hooks/useLocale';
 import { CapacityState } from '../types';
+import { Locale } from '../locales';
 
-function formatDate(locale: 'en' | 'es'): string {
-  const localeCode = locale === 'es' ? 'es-MX' : 'en-US';
+const localeCodeMap: Record<Locale, string> = {
+  en: 'en-US',
+  es: 'es-MX',
+  fr: 'fr-FR',
+  de: 'de-DE',
+  'pt-BR': 'pt-BR',
+  it: 'it-IT',
+  ja: 'ja-JP',
+};
+
+function formatDate(locale: Locale): string {
+  const localeCode = localeCodeMap[locale] || 'en-US';
   return new Date().toLocaleDateString(localeCode, {
     weekday: 'long',
     month: 'short',

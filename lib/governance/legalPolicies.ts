@@ -3,6 +3,7 @@ import {
   PolicyDocument,
   PolicyAcceptance,
   PolicyType,
+  Locale,
 } from '../../types';
 import { logImmutableAuditEntry } from './immutableAuditLog';
 import { getRequiredPolicies } from './jurisdictionDeployment';
@@ -33,7 +34,7 @@ export async function getPolicyDocuments(): Promise<PolicyDocument[]> {
 
 export async function getPolicyDocument(
   type: PolicyType,
-  locale: 'en' | 'es' = 'en'
+  locale: Locale = 'en'
 ): Promise<PolicyDocument | null> {
   const policies = await getPolicyDocuments();
   return policies.find((p) => p.type === type && p.locale === locale) || null;
@@ -47,7 +48,7 @@ export async function getCurrentPolicyVersion(type: PolicyType): Promise<string 
 export async function createPolicyDocument(
   type: PolicyType,
   content: string,
-  locale: 'en' | 'es',
+  locale: Locale,
   version: string
 ): Promise<PolicyDocument> {
   const policy: PolicyDocument = {
@@ -80,7 +81,7 @@ export async function createPolicyDocument(
 export async function updatePolicyDocument(
   type: PolicyType,
   content: string,
-  locale: 'en' | 'es',
+  locale: Locale,
   newVersion: string
 ): Promise<PolicyDocument> {
   const existing = await getPolicyDocument(type, locale);

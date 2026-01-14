@@ -370,6 +370,11 @@ export const fr = {
   accessibility: {
     title: 'Accessibilité',
     subtitle: 'Personnalisez votre expérience',
+
+    // Simple Mode (quick toggle for max accessibility)
+    simpleMode: 'Mode Simple',
+    simpleModeDesc: 'Accessibilité maximale en un toucher',
+
     visualSection: 'VISUEL',
     motorSection: 'MOTEUR ET SAISIE',
     cognitiveSection: 'COGNITIF',
@@ -434,6 +439,127 @@ export const fr = {
   },
 
   // ============================================
+  // TEAM MODE (Enterprise Capacity Pulse)
+  // ============================================
+  teamMode: {
+    title: 'Mode Équipe',
+    subtitle: 'Pouls de capacité sur le lieu de travail (optionnel)',
+    joinTeam: 'Rejoindre l\'Équipe',
+    leaveTeam: 'Quitter l\'Équipe',
+    teamCode: 'Code d\'Équipe',
+    teamCodePlaceholder: 'Entrez le code d\'équipe',
+    teamCodeInvalid: 'Code d\'équipe invalide',
+    noTeam: 'Vous ne faites pas partie d\'une équipe',
+    noTeamDesc: 'Entrez un code d\'équipe pour rejoindre le pouls de votre lieu de travail',
+    joinSuccess: 'Équipe rejointe avec succès',
+    leaveSuccess: 'Équipe quittée avec succès',
+    leaveConfirmTitle: 'Quitter l\'Équipe',
+    leaveConfirmMessage: 'Vous pouvez rejoindre à tout moment avec le code d\'équipe.',
+
+    // Privacy banner
+    privacyBanner: 'Vos données individuelles ne sont jamais partagées. Seules les données agrégées de l\'équipe sont visibles.',
+
+    // Threshold warning
+    thresholdWarning: 'L\'équipe a besoin d\'au moins {min} participants pour afficher les données agrégées',
+    participantCount: '{count} participants',
+
+    // Aggregate display
+    aggregateTitle: 'Pouls de Capacité de l\'Équipe',
+    capacityDistribution: 'Distribution de Capacité',
+    plenty: 'Abondant',
+    elevated: 'Élevé',
+    nearLimit: 'Proche de la Limite',
+    topDrivers: 'Principaux Facteurs',
+    weeklyTrend: 'Tendance Hebdomadaire',
+    trendImproving: 'En amélioration',
+    trendStable: 'Stable',
+    trendDeclining: 'En déclin',
+    participationConfidence: 'Confiance des Données',
+    confidenceHigh: 'Élevée',
+    confidenceMedium: 'Moyenne',
+    confidenceLow: 'Faible',
+    totalSignals: '{count} signaux cette période',
+
+    // Action panel
+    actionPanelTitle: 'Actions Suggérées',
+    noSuggestions: 'Aucune suggestion pour le moment',
+  },
+
+  // ============================================
+  // SCHOOL ZONE (Student/Caregiver/Educator)
+  // ============================================
+  schoolZone: {
+    title: 'Zone Scolaire',
+    subtitle: 'Soutien de capacité pour les environnements éducatifs',
+    joinSchool: 'Rejoindre l\'École',
+    leaveSchool: 'Quitter l\'École',
+    schoolCode: 'Code de l\'École',
+    schoolCodePlaceholder: 'Entrez le code de l\'école',
+    schoolCodeInvalid: 'Code d\'école invalide',
+    noSchool: 'Vous n\'êtes pas inscrit dans une zone scolaire',
+    noSchoolDesc: 'Entrez un code d\'école pour accéder aux fonctionnalités scolaires',
+    joinSuccess: 'Zone scolaire rejointe avec succès',
+    leaveSuccess: 'Zone scolaire quittée avec succès',
+    leaveConfirmTitle: 'Quitter la Zone Scolaire',
+    leaveConfirmMessage: 'Vous pouvez rejoindre à tout moment avec le code de l\'école.',
+
+    // Role selection
+    roleLabel: 'Je suis',
+    roleStudent: 'Élève',
+    roleCaregiver: 'Parent/Aidant',
+    roleEducator: 'Éducateur',
+
+    // Privacy banner
+    privacyBanner: 'Les données individuelles des élèves ne sont jamais partagées avec les éducateurs. Seules les données agrégées de la classe sont visibles.',
+
+    // Threshold warning
+    thresholdWarning: 'La classe a besoin d\'au moins {min} élèves pour afficher les données agrégées',
+    studentCount: '{count} élèves',
+
+    // Student view
+    studentViewTitle: 'Votre Capacité',
+    studentViewDesc: 'Enregistrez votre capacité pour vous aider et recevoir du soutien',
+    goToLog: 'Enregistrer Maintenant',
+
+    // Caregiver view
+    caregiverViewTitle: 'Carte de Résumé Scolaire',
+    caregiverViewDesc: 'Générez un résumé à partager avec les éducateurs',
+    generateCard: 'Générer la Carte de Résumé',
+    shareCard: 'Partager la Carte',
+    cardDateRange: 'Période: {start} à {end}',
+    cardCapacityTrend: 'Tendance de Capacité',
+    cardAverageCapacity: 'Capacité Moyenne',
+    cardCommonDrivers: 'Facteurs Communs',
+    cardWhatHelps: 'Ce qui Aide',
+    cardWhatDrains: 'Ce qui Épuise',
+    cardEntriesCount: '{count} entrées dans la période',
+    notesExcluded: 'Notes personnelles exclues pour la confidentialité',
+
+    // Educator view
+    educatorViewTitle: 'Vue d\'Ensemble de la Capacité de Classe',
+    educatorViewDesc: 'Vue agrégée des schémas de capacité de la classe',
+    classCapacity: 'Distribution de Capacité de la Classe',
+    classDrivers: 'Facteurs de la Classe',
+    classConfidence: 'Confiance des Données',
+
+    // Environment factors (School Summary Card)
+    envFactors: {
+      quiet_space: 'Espace calme',
+      sensory_tools: 'Outils sensoriels',
+      movement_breaks: 'Pauses mouvement',
+      extra_time: 'Temps supplémentaire',
+      small_groups: 'Petits groupes',
+      check_ins: 'Points de contrôle',
+      loud_environment: 'Environnement bruyant',
+      bright_lights: 'Lumières vives',
+      time_pressure: 'Pression temporelle',
+      multiple_instructions: 'Instructions multiples',
+      crowded_spaces: 'Espaces bondés',
+      social_demands: 'Demandes sociales',
+    },
+  },
+
+  // ============================================
   // DEMO MODE
   // ============================================
   demo: {
@@ -449,10 +575,13 @@ export const fr = {
     clearDemoData: 'Effacer les Données Démo',
     clearDemoDataDesc: "Réinitialiser à l'état vide",
     duration: {
-      '30d': '30 Signaux',
-      '90d': '90 Signaux',
-      '180d': '180 Signaux',
-      '365d': '365 Signaux',
+      '30d': '1 Mois',
+      '90d': '3 Mois',
+      '180d': '6 Mois',
+      '365d': '1 An',
+      '3y': '3 Ans',
+      '5y': '5 Ans',
+      '10y': '10 Ans',
     },
     durationLabel: 'Plage de Données',
     unlockHint: 'Appuyez 5x sur le logo pour débloquer les paramètres avancés',

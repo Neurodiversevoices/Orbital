@@ -1,5 +1,5 @@
 import { Share } from 'react-native';
-import { CapacityLog, ExportConfig, ExportRange, ExportFormat } from '../../types';
+import { CapacityLog, ExportConfig, ExportRange, ExportFormat, Locale } from '../../types';
 import { getLogs } from '../storage';
 import { logAuditEntry } from '../storage';
 import { formatLogsAsCsv } from './csvFormatter';
@@ -21,7 +21,7 @@ export async function getLogsForRange(range: ExportRange): Promise<CapacityLog[]
 
 export async function exportData(
   config: ExportConfig,
-  locale: 'en' | 'es' = 'en'
+  locale: Locale = 'en'
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const logs = await getLogsForRange(config.range);
@@ -81,11 +81,11 @@ function formatAsJson(logs: CapacityLog[]): string {
 }
 
 // Quick export helpers for common use cases
-export async function exportNinetyDaySummary(locale: 'en' | 'es' = 'en') {
+export async function exportNinetyDaySummary(locale: Locale = 'en') {
   return exportData({ format: 'summary', range: '90d', includeNotes: false }, locale);
 }
 
-export async function exportAnnualSummary(locale: 'en' | 'es' = 'en') {
+export async function exportAnnualSummary(locale: Locale = 'en') {
   return exportData({ format: 'summary', range: '1y', includeNotes: false }, locale);
 }
 

@@ -3,6 +3,7 @@ import {
   ExportWatermark,
   WatermarkedExport,
   JurisdictionCode,
+  Locale,
 } from '../../types';
 import { logImmutableAuditEntry } from './immutableAuditLog';
 
@@ -39,25 +40,29 @@ export function generateWatermark(
     recordCount: number;
     exportedBy: string;
     jurisdiction?: JurisdictionCode;
-    locale?: 'en' | 'es';
+    locale?: Locale;
   },
   contentForHash: string
 ): ExportWatermark {
   const locale = params.locale || 'en';
+  // Use English or Spanish for watermarks, defaulting to English for other locales
+  const watermarkLocale = locale === 'es' ? 'es' : 'en';
 
   return {
     orgName: params.orgName,
     exportDate: Date.now(),
     scope: params.scope,
     recordCount: params.recordCount,
-    disclaimer: WATERMARK_DISCLAIMERS[locale],
+    disclaimer: WATERMARK_DISCLAIMERS[watermarkLocale],
     exportedBy: params.exportedBy,
     integrityHash: generateIntegrityHash(contentForHash),
     jurisdiction: params.jurisdiction,
   };
 }
 
-export function formatWatermarkHeader(watermark: ExportWatermark, locale: 'en' | 'es' = 'en'): string {
+export function formatWatermarkHeader(watermark: ExportWatermark, locale: Locale = 'en'): string {
+  // Use English or Spanish for watermark labels, defaulting to English for other locales
+  const labelLocale = locale === 'es' ? 'es' : 'en';
   const date = new Date(watermark.exportDate);
   const dateStr = date.toISOString().split('T')[0];
 
@@ -108,7 +113,7 @@ export function formatWatermarkHeader(watermark: ExportWatermark, locale: 'en' |
   return header;
 }
 
-export function formatWatermarkFooter(watermark: ExportWatermark, locale: 'en' | 'es' = 'en'): string {
+export function formatWatermarkFooter(watermark: ExportWatermark, locale: Locale = 'en'): string {
   const labels = locale === 'es' ? {
     endOfExport: 'FIN DE LA EXPORTACIÓN',
     verifyWith: 'Verificar integridad con hash',
@@ -223,7 +228,7 @@ export async function verifyExportIntegrity(
 export function wrapContentWithWatermark(
   content: string,
   watermark: ExportWatermark,
-  locale: 'en' | 'es' = 'en'
+  locale: Locale = 'en'
 ): string {
   const header = formatWatermarkHeader(watermark, locale);
   const footer = formatWatermarkFooter(watermark, locale);
@@ -240,7 +245,7 @@ export async function createWatermarkedExport(
     format: 'pdf' | 'csv' | 'json';
     content: string;
     jurisdiction?: JurisdictionCode;
-    locale?: 'en' | 'es';
+    locale?: Locale;
     expiresInDays?: number;
   }
 ): Promise<{

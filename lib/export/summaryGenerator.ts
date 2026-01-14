@@ -1,4 +1,14 @@
-import { CapacityLog, CapacityState, Category, ExportSummary } from '../../types';
+import { CapacityLog, CapacityState, Category, ExportSummary, Locale } from '../../types';
+
+const localeCodeMap: Record<Locale, string> = {
+  en: 'en-US',
+  es: 'es-MX',
+  fr: 'fr-FR',
+  de: 'de-DE',
+  'pt-BR': 'pt-BR',
+  it: 'it-IT',
+  ja: 'ja-JP',
+};
 
 const STATE_CAPACITY_VALUES: Record<CapacityState, number> = {
   resourced: 100,
@@ -71,10 +81,10 @@ export function generateExportSummary(logs: CapacityLog[]): ExportSummary {
 
 export function formatSummaryAsText(
   summary: ExportSummary,
-  locale: 'en' | 'es' = 'en'
+  locale: Locale = 'en'
 ): string {
   const formatDate = (ts: number) =>
-    new Date(ts).toLocaleDateString(locale === 'es' ? 'es-MX' : 'en-US', {
+    new Date(ts).toLocaleDateString(localeCodeMap[locale] || 'en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
