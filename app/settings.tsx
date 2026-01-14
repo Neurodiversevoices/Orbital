@@ -28,7 +28,6 @@ import {
   GraduationCap,
   Database,
   Heart,
-  FileText,
   Cloud,
   UserCircle,
   Briefcase,
@@ -49,7 +48,6 @@ import { DELETION_DISCLOSURE } from '../lib/storage';
 import { ProprietaryFooter } from '../components/legal';
 import { APP_MODE_CONFIGS } from '../types';
 import { ModeSelector } from '../components';
-import { generateClinicalBrief } from '../lib/pdf';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -182,23 +180,6 @@ export default function SettingsScreen() {
     await resetTutorial();
     router.replace('/tutorial');
   }, [resetTutorial, router]);
-
-  const handleGenerateClinicalBrief = useCallback(async () => {
-    if (logs.length === 0) {
-      Alert.alert('No Data', 'Log some capacity signals first to generate a clinical brief.');
-      return;
-    }
-    setIsProcessing(true);
-    try {
-      const { share } = await generateClinicalBrief({ days: 30 });
-      await share();
-    } catch (error) {
-      console.error('[ClinicalBrief] Generation failed:', error);
-      Alert.alert('Error', 'Failed to generate clinical brief. Please try again.');
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [logs.length]);
 
   const demoT = (t as any).demo || {};
   const demoStatusLabel = isDemoMode ? (demoT.demoModeActive || 'Demo Active') : (demoT.demoMode || 'Demo Mode');
@@ -412,13 +393,6 @@ export default function SettingsScreen() {
             label={t.export.title}
             sublabel={interpolate(t.settings.exportSublabel, { count: logs.length })}
             onPress={() => router.push('/export')}
-            disabled={isProcessing}
-          />
-          <SettingsRow
-            icon={FileText}
-            label="Generate Clinical Brief"
-            sublabel="Professional PDF for healthcare providers"
-            onPress={handleGenerateClinicalBrief}
             disabled={isProcessing}
           />
           <SettingsRow
