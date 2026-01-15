@@ -501,6 +501,13 @@ export default function SettingsScreen() {
             disabled={isProcessing}
           />
           <SettingsRow
+            icon={Building2}
+            label="Institutional Dashboard"
+            sublabel="Demo preview — Sample aggregate data"
+            onPress={() => router.push('/dashboard')}
+            disabled={isProcessing}
+          />
+          <SettingsRow
             icon={Briefcase}
             label="B2B Add-Ons"
             sublabel="Demo preview — Vertical signal authority licensing"
