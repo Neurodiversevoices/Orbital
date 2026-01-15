@@ -27,7 +27,6 @@ import {
   Database,
   Heart,
   Cloud,
-  UserCircle,
   Briefcase,
   TrendingUp,
   Phone,
@@ -524,13 +523,6 @@ export default function SettingsScreen() {
         {/* Account Section */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>ACCOUNT</Text>
-          <SettingsRow
-            icon={UserCircle}
-            label="Profile"
-            sublabel="Optional demographics for aggregate insights"
-            onPress={() => router.push('/profile')}
-            disabled={isProcessing}
-          />
           {hasCircle && (
             <SettingsRow
               icon={Users}
