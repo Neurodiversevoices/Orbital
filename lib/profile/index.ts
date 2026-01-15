@@ -55,3 +55,21 @@ export {
 // Hook
 export { useProfile } from './useProfile';
 export type { UseProfileReturn } from './useProfile';
+
+// Identity (display name, avatar)
+export {
+  loadIdentity,
+  saveIdentity,
+  updateDisplayName,
+  updateAvatar,
+  clearIdentity,
+  getInitials,
+  getAvatarColor,
+  useIdentity,
+  DEFAULT_IDENTITY,
+} from './identity';
+export type {
+  AvatarSource,
+  UserIdentity,
+  UseIdentityResult,
+} from './identity';

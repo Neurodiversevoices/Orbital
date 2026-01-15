@@ -23,6 +23,7 @@ import {
   LogOut,
   RotateCcw,
   Users,
+  User,
   GraduationCap,
   Database,
   Heart,
@@ -477,6 +478,13 @@ export default function SettingsScreen() {
         {/* Account Section */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>ACCOUNT</Text>
+          <SettingsRow
+            icon={User}
+            label="Account"
+            sublabel="Display name, sessions, and identity"
+            onPress={() => router.push('/account')}
+            disabled={isProcessing}
+          />
           {hasCircle && (
             <SettingsRow
               icon={Users}

@@ -1,14 +1,15 @@
 import 'react-native-gesture-handler';
 
-import { useEffect } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Sentry from '@sentry/react-native';
 import * as Linking from 'expo-linking';
 import Constants from 'expo-constants';
 
-import { colors } from '../theme';
+import { colors, spacing, borderRadius } from '../theme';
 import { LocaleProvider } from '../lib/hooks/useLocale';
 import { AccessibilityProvider } from '../lib/hooks/useAccessibility';
 import { DemoModeProvider } from '../lib/hooks/useDemoMode';
@@ -17,6 +18,9 @@ import { SubscriptionProvider } from '../lib/subscription';
 import { TermsAcceptanceProvider } from '../lib/hooks/useTermsAcceptance';
 import { ErrorBoundary } from '../components';
 import { AgeGate } from '../components/legal/AgeGate';
+import { useIdleTimeout, updateLastActivity } from '../lib/session';
+import { useAuth } from '../lib/supabase';
+import { logSessionExpired, createDeviceSession } from '../lib/session';
 
 // =============================================================================
 // SENTRY CONFIGURATION - 24/7 Watchdog (Only Bark on Critical Failures)
@@ -113,6 +117,117 @@ Sentry.init({
 });
 
 
+// =============================================================================
+// IDLE TIMEOUT WRAPPER - Auto-logout after inactivity
+// =============================================================================
+
+function IdleTimeoutWrapper({ children }: { children: React.ReactNode }) {
+  const auth = useAuth();
+  const router = useRouter();
+  const [showWarning, setShowWarning] = useState(false);
+
+  const handleTimeout = useCallback(async () => {
+    if (auth.isAuthenticated) {
+      await logSessionExpired();
+      await auth.signOut();
+      setShowWarning(false);
+      // Navigate to cloud-sync for re-authentication
+      router.replace('/cloud-sync');
+    }
+  }, [auth, router]);
+
+  const handleWarning = useCallback(() => {
+    setShowWarning(true);
+  }, []);
+
+  const idleState = useIdleTimeout({
+    enabled: auth.isAuthenticated,
+    onTimeout: handleTimeout,
+    onWarning: handleWarning,
+  });
+
+  // Register device session on auth
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      createDeviceSession();
+    }
+  }, [auth.isAuthenticated]);
+
+  // Dismiss warning on activity
+  const handleDismissWarning = useCallback(() => {
+    updateLastActivity();
+    setShowWarning(false);
+  }, []);
+
+  return (
+    <>
+      {children}
+      <Modal
+        visible={showWarning && idleState.showWarning}
+        transparent
+        animationType="fade"
+      >
+        <View style={idleStyles.overlay}>
+          <View style={idleStyles.card}>
+            <Text style={idleStyles.title}>Session Timeout</Text>
+            <Text style={idleStyles.message}>
+              You will be signed out in {idleState.remainingSeconds} seconds due to inactivity.
+            </Text>
+            <Pressable style={idleStyles.button} onPress={handleDismissWarning}>
+              <Text style={idleStyles.buttonText}>Stay Signed In</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+    </>
+  );
+}
+
+const idleStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.lg,
+  },
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.xl,
+    width: '100%',
+    maxWidth: 320,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,152,0,0.3)',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#FF9800',
+    marginBottom: spacing.md,
+  },
+  message: {
+    fontSize: 15,
+    color: 'rgba(255,255,255,0.7)',
+    textAlign: 'center',
+    marginBottom: spacing.lg,
+    lineHeight: 22,
+  },
+  button: {
+    backgroundColor: '#00E5FF',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xl,
+    borderRadius: borderRadius.md,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+  },
+});
+
+
 function RootLayout() {
   const router = useRouter();
 
@@ -152,6 +267,7 @@ function RootLayout() {
               <TermsAcceptanceProvider>
                 {/* AGE GATE — LEGAL REQUIRED: Blocks ALL access until 13+ verified */}
                 <AgeGate>
+                <IdleTimeoutWrapper>
                 <StatusBar style="light" />
                 <Stack
                   screenOptions={{
@@ -280,7 +396,22 @@ function RootLayout() {
                       animation: 'slide_from_bottom',
                     }}
                   />
+                  <Stack.Screen
+                    name="account"
+                    options={{
+                      presentation: 'modal',
+                      animation: 'slide_from_bottom',
+                    }}
+                  />
+                  <Stack.Screen
+                    name="active-sessions"
+                    options={{
+                      presentation: 'modal',
+                      animation: 'slide_from_bottom',
+                    }}
+                  />
                 </Stack>
+                </IdleTimeoutWrapper>
                 </AgeGate>
               </TermsAcceptanceProvider>
             </SubscriptionProvider>
