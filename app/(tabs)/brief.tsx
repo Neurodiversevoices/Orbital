@@ -68,23 +68,87 @@ interface CircleMember {
   trend: 'improving' | 'declining' | 'flat';
   participation: string;
   notes?: string;
+  capacityHistory: number[]; // 90 days of capacity data (1=depleted, 2=stretched, 3=resourced)
+  color: string; // Line color for chart
 }
 
+// Generate synthetic 90-day capacity history for a member
+function generateCapacityHistory(pattern: 'stable_high' | 'declining' | 'improving' | 'volatile' | 'stable_low'): number[] {
+  const data: number[] = [];
+  let value: number;
+
+  switch (pattern) {
+    case 'stable_high':
+      value = 2.8;
+      for (let i = 0; i < 90; i++) {
+        value = Math.max(2.2, Math.min(3, value + (Math.random() - 0.5) * 0.3));
+        data.push(value);
+      }
+      break;
+    case 'declining':
+      value = 2.7;
+      for (let i = 0; i < 90; i++) {
+        const progress = i / 90;
+        const targetValue = 2.7 - progress * 1.2;
+        value = Math.max(1.3, Math.min(3, targetValue + (Math.random() - 0.5) * 0.4));
+        data.push(value);
+      }
+      break;
+    case 'improving':
+      value = 1.8;
+      for (let i = 0; i < 90; i++) {
+        const progress = i / 90;
+        const targetValue = 1.8 + progress * 1.0;
+        value = Math.max(1.3, Math.min(3, targetValue + (Math.random() - 0.5) * 0.3));
+        data.push(value);
+      }
+      break;
+    case 'volatile':
+      value = 2.2;
+      for (let i = 0; i < 90; i++) {
+        value = Math.max(1.2, Math.min(3, value + (Math.random() - 0.5) * 0.8));
+        data.push(value);
+      }
+      break;
+    case 'stable_low':
+      value = 1.9;
+      for (let i = 0; i < 90; i++) {
+        value = Math.max(1.4, Math.min(2.4, value + (Math.random() - 0.5) * 0.3));
+        data.push(value);
+      }
+      break;
+  }
+  return data;
+}
+
+// Member colors for chart lines
+const MEMBER_COLORS = {
+  mia: '#00D7FF',    // Cyan
+  zach: '#F97316',   // Orange
+  lily: '#10B981',   // Green
+  tyler: '#A855F7',  // Purple
+  emma: '#F43F5E',   // Rose
+};
+
 const DEMO_CIRCLE_MEMBERS: CircleMember[] = [
-  { id: '1', name: 'Mia', username: 'Mia Anderson', avatar: 'https://i.pravatar.cc/100?u=mia', capacityState: 'stretched', trend: 'flat', participation: '6 / 7', notes: 'Sensory sensitivity noted' },
-  { id: '2', name: 'Zach', username: 'Zach Teguns', avatar: 'https://i.pravatar.cc/100?u=zach', capacityState: 'stretched', trend: 'declining', participation: '7 / 7', notes: 'Sleep disruption' },
-  { id: '3', name: 'Lily', username: 'Lily Teguns', avatar: 'https://i.pravatar.cc/100?u=lily', capacityState: 'resourced', trend: 'improving', participation: '5 / 5', notes: 'Steady progress' },
-  { id: '4', name: 'Tyler', username: 'Tyler Ramirez', avatar: 'https://i.pravatar.cc/100?u=tyler', capacityState: 'stretched', trend: 'flat', participation: '5 / 5', notes: 'Transition support' },
-  { id: '5', name: 'Emma', username: 'Emily Zhang', avatar: 'https://i.pravatar.cc/100?u=emma', capacityState: 'stretched', trend: 'declining', participation: '5 / 5', notes: 'Schedule changes' },
+  { id: '1', name: 'Mia', username: 'Mia Anderson', avatar: 'https://i.pravatar.cc/100?u=mia', capacityState: 'stretched', trend: 'flat', participation: '6 / 7', notes: 'Sensory sensitivity noted', capacityHistory: generateCapacityHistory('stable_low'), color: MEMBER_COLORS.mia },
+  { id: '2', name: 'Zach', username: 'Zach Teguns', avatar: 'https://i.pravatar.cc/100?u=zach', capacityState: 'stretched', trend: 'declining', participation: '7 / 7', notes: 'Sleep disruption', capacityHistory: generateCapacityHistory('declining'), color: MEMBER_COLORS.zach },
+  { id: '3', name: 'Lily', username: 'Lily Teguns', avatar: 'https://i.pravatar.cc/100?u=lily', capacityState: 'resourced', trend: 'improving', participation: '5 / 5', notes: 'Steady progress', capacityHistory: generateCapacityHistory('improving'), color: MEMBER_COLORS.lily },
+  { id: '4', name: 'Tyler', username: 'Tyler Ramirez', avatar: 'https://i.pravatar.cc/100?u=tyler', capacityState: 'stretched', trend: 'flat', participation: '5 / 5', notes: 'Transition support', capacityHistory: generateCapacityHistory('volatile'), color: MEMBER_COLORS.tyler },
+  { id: '5', name: 'Emma', username: 'Emily Zhang', avatar: 'https://i.pravatar.cc/100?u=emma', capacityState: 'stretched', trend: 'declining', participation: '5 / 5', notes: 'Schedule changes', capacityHistory: generateCapacityHistory('declining'), color: MEMBER_COLORS.emma },
 ];
 
 // =============================================================================
-// CAPACITY TREND CHART COMPONENT
+// CAPACITY TREND CHART COMPONENT (90-DAY, 5 MEMBER LINES)
 // =============================================================================
 
-function CapacityTrendChart() {
-  const chartWidth = 280;
-  const chartHeight = 160;
+interface CapacityTrendChartProps {
+  members: CircleMember[];
+}
+
+function CapacityTrendChart({ members }: CapacityTrendChartProps) {
+  const chartWidth = 320;
+  const chartHeight = 200;
   const padding = { top: 10, right: 90, bottom: 25, left: 35 };
   const graphWidth = chartWidth - padding.left - padding.right;
   const graphHeight = chartHeight - padding.top - padding.bottom;
@@ -92,58 +156,43 @@ function CapacityTrendChart() {
   // Band heights (Resourced top, Stretched middle, Sentinel bottom)
   const bandHeight = graphHeight / 3;
 
-  // Demo trend data - capacity values over 26 days (0 = depleted, 1 = sentinel, 2 = stretched, 3 = resourced)
-  const trendData = [
-    2.8, 2.7, 2.5, 2.6, 2.4, 2.3, 2.5, 2.4, 2.2, 2.0,
-    1.9, 2.1, 2.3, 2.2, 2.0, 1.8, 1.9, 2.1, 2.0, 1.8,
-    1.7, 1.9, 2.0, 1.8, 1.6, 1.7
-  ];
-
-  // Convert data to path
-  const xScale = graphWidth / (trendData.length - 1);
+  // Scale for 90 days
+  const dataPoints = 90;
+  const xScale = graphWidth / (dataPoints - 1);
   const yScale = graphHeight / 3;
 
-  const pathData = trendData.map((value, index) => {
-    const x = padding.left + index * xScale;
-    const y = padding.top + (3 - value) * yScale;
-    return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
-  }).join(' ');
-
-  // Area path (fill below line)
-  const areaPath = pathData +
-    ` L ${padding.left + graphWidth} ${padding.top + graphHeight}` +
-    ` L ${padding.left} ${padding.top + graphHeight} Z`;
+  // Generate path for a member's capacity history
+  const generateMemberPath = (history: number[]) => {
+    return history.map((value, index) => {
+      const x = padding.left + index * xScale;
+      const y = padding.top + (3 - value) * yScale;
+      return `${index === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
+    }).join(' ');
+  };
 
   return (
     <Svg width={chartWidth} height={chartHeight}>
-      <Defs>
-        <LinearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0%" stopColor="#E8A830" stopOpacity="0.4" />
-          <Stop offset="100%" stopColor="#E8A830" stopOpacity="0.05" />
-        </LinearGradient>
-      </Defs>
-
       {/* Background bands */}
       <Rect
         x={padding.left}
         y={padding.top}
         width={graphWidth}
         height={bandHeight}
-        fill="rgba(16, 185, 129, 0.15)"
+        fill="rgba(16, 185, 129, 0.12)"
       />
       <Rect
         x={padding.left}
         y={padding.top + bandHeight}
         width={graphWidth}
         height={bandHeight}
-        fill="rgba(232, 168, 48, 0.15)"
+        fill="rgba(232, 168, 48, 0.12)"
       />
       <Rect
         x={padding.left}
         y={padding.top + bandHeight * 2}
         width={graphWidth}
         height={bandHeight}
-        fill="rgba(249, 115, 22, 0.15)"
+        fill="rgba(249, 115, 22, 0.12)"
       />
 
       {/* Grid lines */}
@@ -164,18 +213,19 @@ function CapacityTrendChart() {
         strokeWidth={1}
       />
 
-      {/* Area fill */}
-      <Path d={areaPath} fill="url(#areaGradient)" />
-
-      {/* Trend line */}
-      <Path
-        d={pathData}
-        stroke="#E8A830"
-        strokeWidth={2.5}
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      {/* Member trend lines */}
+      {members.map((member) => (
+        <Path
+          key={member.id}
+          d={generateMemberPath(member.capacityHistory)}
+          stroke={member.color}
+          strokeWidth={1.5}
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          opacity={0.85}
+        />
+      ))}
 
       {/* Y-axis labels */}
       <SvgText
@@ -203,25 +253,33 @@ function CapacityTrendChart() {
         fontSize={10}
         fontWeight="600"
       >
-        Sentinel Range
+        Sentinel
       </SvgText>
 
-      {/* X-axis labels */}
+      {/* X-axis labels - 90 days */}
       <SvgText
         x={padding.left}
         y={chartHeight - 5}
         fill="rgba(255,255,255,0.5)"
         fontSize={9}
       >
-        -26d
+        -90d
       </SvgText>
       <SvgText
-        x={padding.left + graphWidth / 2 - 10}
+        x={padding.left + graphWidth / 3 - 10}
         y={chartHeight - 5}
         fill="rgba(255,255,255,0.5)"
         fontSize={9}
       >
-        -14d
+        -60d
+      </SvgText>
+      <SvgText
+        x={padding.left + (graphWidth * 2) / 3 - 10}
+        y={chartHeight - 5}
+        fill="rgba(255,255,255,0.5)"
+        fontSize={9}
+      >
+        -30d
       </SvgText>
       <SvgText
         x={padding.left + graphWidth - 20}
@@ -231,6 +289,45 @@ function CapacityTrendChart() {
       >
         Today
       </SvgText>
+    </Svg>
+  );
+}
+
+// =============================================================================
+// SPARKLINE COMPONENT FOR TABLE ROWS
+// =============================================================================
+
+interface MemberSparklineProps {
+  data: number[];
+  color: string;
+  width?: number;
+  height?: number;
+}
+
+function MemberSparkline({ data, color, width = 60, height = 20 }: MemberSparklineProps) {
+  // Use last 30 days for sparkline
+  const sparkData = data.slice(-30);
+  const xScale = width / (sparkData.length - 1);
+  const minVal = 1;
+  const maxVal = 3;
+  const yScale = height / (maxVal - minVal);
+
+  const pathData = sparkData.map((value, index) => {
+    const x = index * xScale;
+    const y = height - (value - minVal) * yScale;
+    return `${index === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
+  }).join(' ');
+
+  return (
+    <Svg width={width} height={height}>
+      <Path
+        d={pathData}
+        stroke={color}
+        strokeWidth={1.5}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </Svg>
   );
 }
@@ -429,7 +526,7 @@ function CirclesCCIBrief() {
             <View style={styles.tableHeader}>
               <Text style={[styles.tableHeaderCell, { flex: 1.3 }]}>MEMBER</Text>
               <Text style={[styles.tableHeaderCell, { flex: 0.9 }]}>CAPACITY STATE</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 0.8 }]}>7 DAY TREND</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 0.8 }]}>30-DAY TREND</Text>
               <Text style={[styles.tableHeaderCell, { flex: 0.6 }]}>PARTICIPATION</Text>
               <Text style={[styles.tableHeaderCell, { flex: 1 }]}>NOTES</Text>
             </View>
@@ -466,19 +563,9 @@ function CirclesCCIBrief() {
                   </View>
                 </View>
 
-                {/* 7 Day Trend */}
-                <View style={[styles.tableCell, { flex: 0.8, flexDirection: 'row', alignItems: 'center', gap: 4 }]}>
-                  {member.trend === 'improving' && <TrendingUp color="#10B981" size={14} />}
-                  {member.trend === 'declining' && <TrendingDown color="#F44336" size={14} />}
-                  {member.trend === 'flat' && <Minus color="#E8A830" size={14} />}
-                  <Text style={[
-                    styles.trendText,
-                    member.trend === 'improving' && { color: '#10B981' },
-                    member.trend === 'declining' && { color: '#F44336' },
-                    member.trend === 'flat' && { color: '#E8A830' },
-                  ]}>
-                    {member.trend.charAt(0).toUpperCase() + member.trend.slice(1)}
-                  </Text>
+                {/* 30 Day Trend Sparkline */}
+                <View style={[styles.tableCell, { flex: 0.8, flexDirection: 'row', alignItems: 'center' }]}>
+                  <MemberSparkline data={member.capacityHistory} color={member.color} />
                 </View>
 
                 {/* Participation */}
@@ -516,7 +603,17 @@ function CirclesCCIBrief() {
         <View style={[styles.rightColumn, isWideScreen && { flex: 0.45, marginLeft: spacing.md }]}>
           {/* Capacity Trend Chart */}
           <View style={styles.chartContainer}>
-            <CapacityTrendChart />
+            <Text style={styles.chartTitle}>90-Day Capacity Trends</Text>
+            <CapacityTrendChart members={DEMO_CIRCLE_MEMBERS} />
+            {/* Legend */}
+            <View style={styles.chartLegend}>
+              {DEMO_CIRCLE_MEMBERS.map((member) => (
+                <View key={member.id} style={styles.legendItem}>
+                  <View style={[styles.legendDot, { backgroundColor: member.color }]} />
+                  <Text style={styles.legendText}>{member.name}</Text>
+                </View>
+              ))}
+            </View>
           </View>
 
           {/* Aggregate Capacity Section */}
@@ -794,7 +891,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  // Chart Placeholder
+  // Chart Container
   chartContainer: {
     backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: borderRadius.lg,
@@ -802,7 +899,36 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.1)',
     padding: spacing.lg,
     marginBottom: spacing.md,
-    minHeight: 180,
+    minHeight: 260,
+  },
+  chartTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.95)',
+    marginBottom: spacing.sm,
+  },
+  chartLegend: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  legendDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  legendText: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.7)',
   },
   chartPlaceholder: {
     flex: 1,
