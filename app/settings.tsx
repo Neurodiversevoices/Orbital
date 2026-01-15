@@ -11,8 +11,6 @@ import {
   Trash2,
   Sparkles,
   ChevronRight,
-  FileOutput,
-  Share2,
   Scale,
   Globe,
   Check,
@@ -398,20 +396,6 @@ export default function SettingsScreen() {
         {/* Data Section */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{t.settings.dataSection}</Text>
-          <SettingsRow
-            icon={FileOutput}
-            label={t.export.title}
-            sublabel={interpolate(t.settings.exportSublabel, { count: logs.length })}
-            onPress={() => router.push('/export')}
-            disabled={isProcessing}
-          />
-          <SettingsRow
-            icon={Share2}
-            label={t.sharing.title}
-            sublabel={t.sharing.subtitle}
-            onPress={() => router.push('/sharing')}
-            disabled={isProcessing}
-          />
           <SettingsRow
             icon={Sparkles}
             label={t.settings.generateData}
