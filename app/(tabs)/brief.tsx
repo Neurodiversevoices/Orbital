@@ -37,7 +37,7 @@ import {
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../../theme';
 import { useAccess } from '../../lib/access';
-import { CCIChart, calculateAggregateCapacity } from '../../components/CCIChart';
+import { CCIChart, calculateAggregateCapacity, type CCITimeRange } from '../../components/CCIChart';
 
 // =============================================================================
 // TYPES
@@ -566,9 +566,20 @@ function PersonalBrief() {
 // CIRCLES TAB — Circle CCI Demo (Pro Only)
 // =============================================================================
 
+// Time range options for Circle CCI
+const TIME_RANGE_OPTIONS: { value: CCITimeRange; label: string }[] = [
+  { value: '7d', label: '7D' },
+  { value: '30d', label: '30D' },
+  { value: '90d', label: '90D' },
+  { value: '6m', label: '6M' },
+  { value: '1y', label: '1Y' },
+  { value: '3y', label: '3Y' },
+];
+
 function CirclesCCIBrief() {
   const { width } = useWindowDimensions();
   const isWideScreen = width >= 768;
+  const [selectedTimeRange, setSelectedTimeRange] = useState<CCITimeRange>('90d');
 
   return (
     <Animated.View entering={FadeInDown.duration(400)}>
@@ -723,9 +734,33 @@ function CirclesCCIBrief() {
               <Text style={styles.chartTitle}>CIRCLE CAPACITY INDICATOR</Text>
               <Text style={styles.chartSubtitle}>— AGGREGATE, NON-DIAGNOSTIC</Text>
             </View>
+
+            {/* Time Range Selector */}
+            <View style={styles.timeRangeSelector}>
+              {TIME_RANGE_OPTIONS.map((option) => (
+                <Pressable
+                  key={option.value}
+                  style={[
+                    styles.timeRangeButton,
+                    selectedTimeRange === option.value && styles.timeRangeButtonActive,
+                  ]}
+                  onPress={() => setSelectedTimeRange(option.value)}
+                >
+                  <Text
+                    style={[
+                      styles.timeRangeButtonText,
+                      selectedTimeRange === option.value && styles.timeRangeButtonTextActive,
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+
             <CCIChart
               data={calculateAggregateCapacity(DEMO_CIRCLE_MEMBERS.map(m => m.capacityHistory))}
-              timeRange="90d"
+              timeRange={selectedTimeRange}
               showLegend={true}
               showDisclaimer={false}
             />
@@ -1030,6 +1065,33 @@ const styles = StyleSheet.create({
   chartSubtitle: {
     fontSize: 11,
     color: 'rgba(255,255,255,0.5)',
+  },
+  timeRangeSelector: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 4,
+    marginBottom: spacing.md,
+    paddingVertical: spacing.xs,
+  },
+  timeRangeButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  timeRangeButtonActive: {
+    backgroundColor: 'rgba(0,215,255,0.15)',
+    borderColor: 'rgba(0,215,255,0.4)',
+  },
+  timeRangeButtonText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.5)',
+  },
+  timeRangeButtonTextActive: {
+    color: '#00D7FF',
   },
   chartLegend: {
     flexDirection: 'row',
