@@ -22,6 +22,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import Svg, { Path, Rect, Line, Text as SvgText, Defs, LinearGradient, Stop } from 'react-native-svg';
 import {
   User,
   Users,
@@ -73,6 +74,163 @@ const DEMO_CIRCLE_MEMBERS: CircleMember[] = [
   { id: '4', name: 'Tyler', username: 'Tyler Ramirez', avatar: 'https://i.pravatar.cc/100?u=tyler', capacityState: 'stretched', trend: 'flat', participation: '5 / 5' },
   { id: '5', name: 'Emma', username: 'Emily Zhang', avatar: 'https://i.pravatar.cc/100?u=emma', capacityState: 'stretched', trend: 'declining', participation: '5 / 5' },
 ];
+
+// =============================================================================
+// CAPACITY TREND CHART COMPONENT
+// =============================================================================
+
+function CapacityTrendChart() {
+  const chartWidth = 280;
+  const chartHeight = 160;
+  const padding = { top: 10, right: 90, bottom: 25, left: 35 };
+  const graphWidth = chartWidth - padding.left - padding.right;
+  const graphHeight = chartHeight - padding.top - padding.bottom;
+
+  // Band heights (Resourced top, Stretched middle, Sentinel bottom)
+  const bandHeight = graphHeight / 3;
+
+  // Demo trend data - capacity values over 26 days (0 = depleted, 1 = sentinel, 2 = stretched, 3 = resourced)
+  const trendData = [
+    2.8, 2.7, 2.5, 2.6, 2.4, 2.3, 2.5, 2.4, 2.2, 2.0,
+    1.9, 2.1, 2.3, 2.2, 2.0, 1.8, 1.9, 2.1, 2.0, 1.8,
+    1.7, 1.9, 2.0, 1.8, 1.6, 1.7
+  ];
+
+  // Convert data to path
+  const xScale = graphWidth / (trendData.length - 1);
+  const yScale = graphHeight / 3;
+
+  const pathData = trendData.map((value, index) => {
+    const x = padding.left + index * xScale;
+    const y = padding.top + (3 - value) * yScale;
+    return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+  }).join(' ');
+
+  // Area path (fill below line)
+  const areaPath = pathData +
+    ` L ${padding.left + graphWidth} ${padding.top + graphHeight}` +
+    ` L ${padding.left} ${padding.top + graphHeight} Z`;
+
+  return (
+    <Svg width={chartWidth} height={chartHeight}>
+      <Defs>
+        <LinearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+          <Stop offset="0%" stopColor="#E8A830" stopOpacity="0.4" />
+          <Stop offset="100%" stopColor="#E8A830" stopOpacity="0.05" />
+        </LinearGradient>
+      </Defs>
+
+      {/* Background bands */}
+      <Rect
+        x={padding.left}
+        y={padding.top}
+        width={graphWidth}
+        height={bandHeight}
+        fill="rgba(16, 185, 129, 0.15)"
+      />
+      <Rect
+        x={padding.left}
+        y={padding.top + bandHeight}
+        width={graphWidth}
+        height={bandHeight}
+        fill="rgba(232, 168, 48, 0.15)"
+      />
+      <Rect
+        x={padding.left}
+        y={padding.top + bandHeight * 2}
+        width={graphWidth}
+        height={bandHeight}
+        fill="rgba(249, 115, 22, 0.15)"
+      />
+
+      {/* Grid lines */}
+      <Line
+        x1={padding.left}
+        y1={padding.top + bandHeight}
+        x2={padding.left + graphWidth}
+        y2={padding.top + bandHeight}
+        stroke="rgba(255,255,255,0.1)"
+        strokeWidth={1}
+      />
+      <Line
+        x1={padding.left}
+        y1={padding.top + bandHeight * 2}
+        x2={padding.left + graphWidth}
+        y2={padding.top + bandHeight * 2}
+        stroke="rgba(255,255,255,0.1)"
+        strokeWidth={1}
+      />
+
+      {/* Area fill */}
+      <Path d={areaPath} fill="url(#areaGradient)" />
+
+      {/* Trend line */}
+      <Path
+        d={pathData}
+        stroke="#E8A830"
+        strokeWidth={2.5}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      {/* Y-axis labels */}
+      <SvgText
+        x={padding.left + graphWidth + 8}
+        y={padding.top + bandHeight / 2 + 4}
+        fill="#10B981"
+        fontSize={10}
+        fontWeight="600"
+      >
+        Resourced
+      </SvgText>
+      <SvgText
+        x={padding.left + graphWidth + 8}
+        y={padding.top + bandHeight * 1.5 + 4}
+        fill="#E8A830"
+        fontSize={10}
+        fontWeight="600"
+      >
+        Stretched
+      </SvgText>
+      <SvgText
+        x={padding.left + graphWidth + 8}
+        y={padding.top + bandHeight * 2.5 + 4}
+        fill="#F97316"
+        fontSize={10}
+        fontWeight="600"
+      >
+        Sentinel Range
+      </SvgText>
+
+      {/* X-axis labels */}
+      <SvgText
+        x={padding.left}
+        y={chartHeight - 5}
+        fill="rgba(255,255,255,0.5)"
+        fontSize={9}
+      >
+        -26d
+      </SvgText>
+      <SvgText
+        x={padding.left + graphWidth / 2 - 10}
+        y={chartHeight - 5}
+        fill="rgba(255,255,255,0.5)"
+        fontSize={9}
+      >
+        -14d
+      </SvgText>
+      <SvgText
+        x={padding.left + graphWidth - 20}
+        y={chartHeight - 5}
+        fill="rgba(255,255,255,0.5)"
+        fontSize={9}
+      >
+        Today
+      </SvgText>
+    </Svg>
+  );
+}
 
 // =============================================================================
 // MAIN COMPONENT
@@ -333,29 +491,9 @@ function CirclesCCIBrief() {
 
         {/* RIGHT COLUMN: Chart + Aggregate Info */}
         <View style={[styles.rightColumn, isWideScreen && { flex: 0.45, marginLeft: spacing.md }]}>
-          {/* Capacity Chart Placeholder */}
+          {/* Capacity Trend Chart */}
           <View style={styles.chartContainer}>
-            <View style={styles.chartPlaceholder}>
-              {/* Chart bands */}
-              <View style={styles.chartBand}>
-                <View style={[styles.chartBandLine, { backgroundColor: '#10B981' }]} />
-                <Text style={[styles.chartBandLabel, { color: '#10B981' }]}>Resourced</Text>
-              </View>
-              <View style={styles.chartBand}>
-                <View style={[styles.chartBandLine, { backgroundColor: '#E8A830' }]} />
-                <Text style={[styles.chartBandLabel, { color: '#E8A830' }]}>Stretched</Text>
-              </View>
-              <View style={styles.chartBand}>
-                <View style={[styles.chartBandLine, { backgroundColor: '#F97316' }]} />
-                <Text style={[styles.chartBandLabel, { color: '#F97316' }]}>Sentinel Range</Text>
-              </View>
-              {/* X-axis labels */}
-              <View style={styles.chartXAxis}>
-                <Text style={styles.chartXLabel}>-26d</Text>
-                <Text style={styles.chartXLabel}>-14d</Text>
-                <Text style={styles.chartXLabel}>Today</Text>
-              </View>
-            </View>
+            <CapacityTrendChart />
           </View>
 
           {/* Aggregate Capacity Section */}
