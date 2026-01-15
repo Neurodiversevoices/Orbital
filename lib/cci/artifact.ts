@@ -646,7 +646,7 @@ export function generateCCIArtifactHTML(metadata?: Partial<CCIIssuanceMetadata>)
 
       <!-- STABILITY & VOLATILITY CHART -->
       <div class="bar-chart-card">
-        <div class="bar-chart-title">Stability & Volatility Index</div>
+        <div class="bar-chart-title">Capacity Stability Summary</div>
         <svg width="100%" height="100" viewBox="0 0 320 100" preserveAspectRatio="xMidYMid meet">
           <!-- Y-axis -->
           <line x1="36" y1="10" x2="36" y2="75" stroke="#cbd5e1" stroke-width="1"/>
