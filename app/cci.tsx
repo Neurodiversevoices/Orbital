@@ -84,12 +84,24 @@ export default function CCIInstrumentScreen() {
     }
   }, [artifactHTML]);
 
-  // Export to PDF (requires server-side Playwright - show instructions)
+  // Export to PDF (opens print dialog)
   const handleExportPDF = useCallback(() => {
-    setIsExporting(true);
-    // Show instructions for PDF export (requires Node.js script)
-    setTimeout(() => setIsExporting(false), 2000);
-  }, []);
+    if (Platform.OS === 'web') {
+      setIsExporting(true);
+      const printWindow = window.open('', '_blank', 'width=650,height=850');
+      if (printWindow) {
+        printWindow.document.write(artifactHTML);
+        printWindow.document.close();
+        // Wait for content to load, then trigger print
+        setTimeout(() => {
+          printWindow.print();
+          setIsExporting(false);
+        }, 500);
+      } else {
+        setIsExporting(false);
+      }
+    }
+  }, [artifactHTML]);
 
   return (
     <SafeAreaView style={commonStyles.screen}>
@@ -185,7 +197,7 @@ export default function CCIInstrumentScreen() {
             <View style={styles.actionContent}>
               <Text style={[styles.actionTitle, styles.actionTitlePrimary]}>Export PDF</Text>
               <Text style={[styles.actionDesc, styles.actionDescPrimary]}>
-                {isExporting ? 'See console for instructions...' : 'Generate print-ready PDF'}
+                {isExporting ? 'Opening print dialog...' : 'Save as PDF via print dialog'}
               </Text>
             </View>
           </Pressable>
@@ -204,21 +216,6 @@ export default function CCIInstrumentScreen() {
             </View>
             <ExternalLink size={16} color="rgba(255,255,255,0.4)" />
           </Pressable>
-        </View>
-
-        {/* PDF Export Instructions */}
-        <View style={styles.instructionsCard}>
-          <Text style={styles.instructionsTitle}>PDF Export (Command Line)</Text>
-          <Text style={styles.instructionsText}>
-            To generate the exact PDF matching the golden master:
-          </Text>
-          <View style={styles.codeBlock}>
-            <Text style={styles.codeText}>cd output</Text>
-            <Text style={styles.codeText}>node render_ultra.js</Text>
-          </View>
-          <Text style={styles.instructionsNote}>
-            Requires Node.js and Playwright. Output: CCI_Q4_2025_Ultra_PatternReadable.pdf
-          </Text>
         </View>
 
         {/* Golden Master Notice */}
