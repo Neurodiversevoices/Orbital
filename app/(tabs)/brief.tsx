@@ -17,6 +17,7 @@ import {
   ScrollView,
   Pressable,
   Image,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -192,6 +193,9 @@ function PersonalBrief() {
 // =============================================================================
 
 function CirclesCCIBrief() {
+  const { width } = useWindowDimensions();
+  const isWideScreen = width >= 768;
+
   return (
     <Animated.View entering={FadeInDown.duration(400)}>
       {/* Demo Banner */}
@@ -210,20 +214,23 @@ function CirclesCCIBrief() {
         </View>
       </View>
 
-      {/* Circle Capacity Index Card */}
-      <View style={styles.circleCCICard}>
-        <Text style={styles.circleCCITitle}>CIRCLE CAPACITY INDEX (CCI)</Text>
-        <Text style={styles.circleCCIDescription}>
-          A non-diagnostic, aggregate snapshot of a group's{' '}
-          <Text style={styles.circleCCIHighlight}>functional regulation bandwidth</Text>
-          {' '}over time — reflecting how much emotional, cognitive, sensory, and social load the group can tolerate before regulation begins to degrade.
-        </Text>
-        <Text style={styles.circleCCINote}>
-          This report summarizes patterns, not individuals. No diagnoses. No symptom scoring
-        </Text>
+      {/* CCI Description Row - Side by side on wide screens */}
+      <View style={[styles.cciDescriptionRow, isWideScreen && styles.cciDescriptionRowWide]}>
+        {/* Left: CCI Description */}
+        <View style={[styles.circleCCICard, isWideScreen && { flex: 1, marginRight: spacing.md }]}>
+          <Text style={styles.circleCCITitle}>CIRCLE CAPACITY INDEX (CCI)</Text>
+          <Text style={styles.circleCCIDescription}>
+            A non-diagnostic, aggregate snapshot of a group's{' '}
+            <Text style={styles.circleCCIHighlight}>functional regulation bandwidth</Text>
+            {' '}over time — reflecting how much emotional, cognitive, sensory, and social load the group can tolerate before regulation begins to degrade.
+          </Text>
+          <Text style={styles.circleCCINote}>
+            This report summarizes patterns, not individuals. No diagnoses. No symptom scoring
+          </Text>
+        </View>
 
-        {/* Data Confidence Badge */}
-        <View style={styles.dataConfidenceCard}>
+        {/* Right: Data Confidence */}
+        <View style={[styles.dataConfidenceCard, isWideScreen && { flex: 0.4 }]}>
           <View style={styles.dataConfidenceHeader}>
             <CheckCircle color="#10B981" size={20} />
             <Text style={styles.dataConfidenceTitle}>Data Confidence:</Text>
@@ -235,102 +242,136 @@ function CirclesCCIBrief() {
         </View>
       </View>
 
-      {/* Circle Status Table */}
-      <View style={styles.circleStatusSection}>
-        <Text style={styles.circleStatusTitle}>Circle Status</Text>
+      {/* Two Column Layout - Table left, Chart right */}
+      <View style={[styles.twoColumnContainer, isWideScreen && styles.twoColumnContainerWide]}>
+        {/* LEFT COLUMN: Table + CTAs */}
+        <View style={[styles.leftColumn, isWideScreen && { flex: 0.55 }]}>
+          {/* Circle Status Table */}
+          <View style={styles.circleStatusSection}>
+            <Text style={styles.circleStatusTitle}>Circle Status</Text>
 
-        {/* Table Header */}
-        <View style={styles.tableHeader}>
-          <Text style={[styles.tableHeaderCell, { flex: 1.5 }]}>MEMBER</Text>
-          <Text style={[styles.tableHeaderCell, { flex: 1 }]}>CAPACITY STATE</Text>
-          <Text style={[styles.tableHeaderCell, { flex: 1 }]}>7 DAY TREND</Text>
-          <Text style={[styles.tableHeaderCell, { flex: 0.8 }]}>PARTICIPATION</Text>
-        </View>
+            {/* Table Header */}
+            <View style={styles.tableHeader}>
+              <Text style={[styles.tableHeaderCell, { flex: 1.5 }]}>MEMBER</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 1 }]}>CAPACITY STATE</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 1 }]}>7 DAY TREND</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 0.8 }]}>PARTICIPATION</Text>
+            </View>
 
-        {/* Table Rows */}
-        {DEMO_CIRCLE_MEMBERS.map((member) => (
-          <View key={member.id} style={styles.tableRow}>
-            {/* Member */}
-            <View style={[styles.tableCell, { flex: 1.5, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
-              {member.avatar ? (
-                <Image source={{ uri: member.avatar }} style={styles.avatarImage} />
-              ) : (
-                <View style={styles.avatarPlaceholder}>
-                  <Text style={styles.avatarText}>{member.name[0]}</Text>
+            {/* Table Rows */}
+            {DEMO_CIRCLE_MEMBERS.map((member) => (
+              <View key={member.id} style={styles.tableRow}>
+                {/* Member */}
+                <View style={[styles.tableCell, { flex: 1.5, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
+                  {member.avatar ? (
+                    <Image source={{ uri: member.avatar }} style={styles.avatarImage} />
+                  ) : (
+                    <View style={styles.avatarPlaceholder}>
+                      <Text style={styles.avatarText}>{member.name[0]}</Text>
+                    </View>
+                  )}
+                  <View>
+                    <Text style={styles.memberName}>{member.name}</Text>
+                    <Text style={styles.memberUsername}>{member.username}</Text>
+                  </View>
                 </View>
-              )}
-              <View>
-                <Text style={styles.memberName}>{member.name}</Text>
-                <Text style={styles.memberUsername}>{member.username}</Text>
+
+                {/* Capacity State */}
+                <View style={[styles.tableCell, { flex: 1 }]}>
+                  <View style={[
+                    styles.capacityBadge,
+                    member.capacityState === 'resourced' && styles.capacityBadgeResourced,
+                    member.capacityState === 'stretched' && styles.capacityBadgeStretched,
+                    member.capacityState === 'depleted' && styles.capacityBadgeDepleted,
+                  ]}>
+                    <Text style={styles.capacityBadgeText}>
+                      {member.capacityState.charAt(0).toUpperCase() + member.capacityState.slice(1)}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* 7 Day Trend */}
+                <View style={[styles.tableCell, { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 4 }]}>
+                  {member.trend === 'improving' && <TrendingUp color="#10B981" size={14} />}
+                  {member.trend === 'declining' && <TrendingDown color="#F44336" size={14} />}
+                  {member.trend === 'flat' && <Minus color="#E8A830" size={14} />}
+                  <Text style={[
+                    styles.trendText,
+                    member.trend === 'improving' && { color: '#10B981' },
+                    member.trend === 'declining' && { color: '#F44336' },
+                    member.trend === 'flat' && { color: '#E8A830' },
+                  ]}>
+                    {member.trend.charAt(0).toUpperCase() + member.trend.slice(1)}
+                  </Text>
+                </View>
+
+                {/* Participation */}
+                <View style={[styles.tableCell, { flex: 0.8 }]}>
+                  <Text style={styles.participationText}>{member.participation}</Text>
+                </View>
               </View>
-            </View>
+            ))}
 
-            {/* Capacity State */}
-            <View style={[styles.tableCell, { flex: 1 }]}>
-              <View style={[
-                styles.capacityBadge,
-                member.capacityState === 'resourced' && styles.capacityBadgeResourced,
-                member.capacityState === 'stretched' && styles.capacityBadgeStretched,
-                member.capacityState === 'depleted' && styles.capacityBadgeDepleted,
-              ]}>
-                <Text style={styles.capacityBadgeText}>
-                  {member.capacityState.charAt(0).toUpperCase() + member.capacityState.slice(1)}
-                </Text>
-              </View>
-            </View>
-
-            {/* 7 Day Trend */}
-            <View style={[styles.tableCell, { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 4 }]}>
-              {member.trend === 'improving' && <TrendingUp color="#10B981" size={14} />}
-              {member.trend === 'declining' && <TrendingDown color="#F44336" size={14} />}
-              {member.trend === 'flat' && <Minus color="#E8A830" size={14} />}
-              <Text style={[
-                styles.trendText,
-                member.trend === 'improving' && { color: '#10B981' },
-                member.trend === 'declining' && { color: '#F44336' },
-                member.trend === 'flat' && { color: '#E8A830' },
-              ]}>
-                {member.trend.charAt(0).toUpperCase() + member.trend.slice(1)}
-              </Text>
-            </View>
-
-            {/* Participation */}
-            <View style={[styles.tableCell, { flex: 0.8 }]}>
-              <Text style={styles.participationText}>{member.participation}</Text>
+            {/* Pagination hint */}
+            <View style={styles.paginationHint}>
+              <Text style={styles.paginationText}>1–5 of 5 members</Text>
             </View>
           </View>
-        ))}
 
-        {/* Pagination hint */}
-        <View style={styles.paginationHint}>
-          <Text style={styles.paginationText}>1–5 of 5 members</Text>
+          {/* CTA Section */}
+          <View style={styles.ctaSection}>
+            <Pressable style={styles.ctaPrimary}>
+              <Text style={styles.ctaPrimaryText}>Generate Circle Capacity Summary (CCI)</Text>
+              <Text style={styles.ctaPriceText}>$399</Text>
+            </Pressable>
+            <Pressable style={styles.ctaSecondary}>
+              <Text style={styles.ctaSecondaryText}>Generate Individual Capacity Summaries</Text>
+              <Text style={styles.ctaSecondaryPrice}>$149 each</Text>
+            </Pressable>
+          </View>
         </View>
-      </View>
 
-      {/* Aggregate Capacity Section */}
-      <View style={styles.aggregateSection}>
-        <Text style={styles.aggregateSectionTitle}>Aggregate Capacity Over Time</Text>
-        <View style={styles.aggregateBullets}>
-          <Text style={styles.aggregateBullet}>• Identifies patterns of rising or <Text style={styles.boldText}>sustained load</Text></Text>
-          <Text style={styles.aggregateBullet}>• Supports pacing, scheduling, and environmental <Text style={styles.boldText}>adjustments</Text></Text>
-          <Text style={styles.aggregateBullet}>• Informs <Text style={styles.boldText}>preventive interventions</Text> before dysregulation <Text style={styles.boldText}>escalates</Text></Text>
-          <Text style={styles.aggregateBullet}>• <Text style={styles.boldText}>Complements</Text> — does <Text style={styles.boldText}>not replace</Text> — clinical judgment</Text>
+        {/* RIGHT COLUMN: Chart + Aggregate Info */}
+        <View style={[styles.rightColumn, isWideScreen && { flex: 0.45, marginLeft: spacing.md }]}>
+          {/* Capacity Chart Placeholder */}
+          <View style={styles.chartContainer}>
+            <View style={styles.chartPlaceholder}>
+              {/* Chart bands */}
+              <View style={styles.chartBand}>
+                <View style={[styles.chartBandLine, { backgroundColor: '#10B981' }]} />
+                <Text style={[styles.chartBandLabel, { color: '#10B981' }]}>Resourced</Text>
+              </View>
+              <View style={styles.chartBand}>
+                <View style={[styles.chartBandLine, { backgroundColor: '#E8A830' }]} />
+                <Text style={[styles.chartBandLabel, { color: '#E8A830' }]}>Stretched</Text>
+              </View>
+              <View style={styles.chartBand}>
+                <View style={[styles.chartBandLine, { backgroundColor: '#F97316' }]} />
+                <Text style={[styles.chartBandLabel, { color: '#F97316' }]}>Sentinel Range</Text>
+              </View>
+              {/* X-axis labels */}
+              <View style={styles.chartXAxis}>
+                <Text style={styles.chartXLabel}>-26d</Text>
+                <Text style={styles.chartXLabel}>-14d</Text>
+                <Text style={styles.chartXLabel}>Today</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Aggregate Capacity Section */}
+          <View style={styles.aggregateSection}>
+            <Text style={styles.aggregateSectionTitle}>Aggregate Capacity Over Time</Text>
+            <View style={styles.aggregateBullets}>
+              <Text style={styles.aggregateBullet}>• Identifies patterns of rising or <Text style={styles.boldText}>sustained load</Text></Text>
+              <Text style={styles.aggregateBullet}>• Supports pacing, scheduling, and environmental <Text style={styles.boldText}>adjustments</Text></Text>
+              <Text style={styles.aggregateBullet}>• Informs <Text style={styles.boldText}>preventive interventions</Text> before dysregulation <Text style={styles.boldText}>escalates</Text></Text>
+              <Text style={styles.aggregateBullet}>• <Text style={styles.boldText}>Complements</Text> — does <Text style={styles.boldText}>not replace</Text> — clinical judgment</Text>
+            </View>
+            <Text style={styles.aggregateDisclaimer}>
+              Not a diagnostic tool. Not a symptom severity scale.
+            </Text>
+          </View>
         </View>
-        <Text style={styles.aggregateDisclaimer}>
-          Not a diagnostic tool. Not a symptom severity scale.
-        </Text>
-      </View>
-
-      {/* CTA Section */}
-      <View style={styles.ctaSection}>
-        <Pressable style={styles.ctaPrimary}>
-          <Text style={styles.ctaPrimaryText}>Generate Circle Capacity Summary (CCI)</Text>
-          <Text style={styles.ctaPriceText}>$399</Text>
-        </Pressable>
-        <Pressable style={styles.ctaSecondary}>
-          <Text style={styles.ctaSecondaryText}>Generate Individual Capacity Summaries</Text>
-          <Text style={styles.ctaSecondaryPrice}>$149 each</Text>
-        </Pressable>
       </View>
 
       {/* Footer */}
@@ -527,6 +568,71 @@ const styles = StyleSheet.create({
     color: '#00D7FF',
   },
 
+  // Two Column Layout
+  cciDescriptionRow: {
+    marginBottom: spacing.md,
+  },
+  cciDescriptionRowWide: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+  },
+  twoColumnContainer: {
+    marginBottom: spacing.md,
+  },
+  twoColumnContainerWide: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  leftColumn: {
+    flex: 1,
+  },
+  rightColumn: {
+    flex: 1,
+  },
+
+  // Chart Placeholder
+  chartContainer: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+    minHeight: 180,
+  },
+  chartPlaceholder: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  chartBand: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  chartBandLine: {
+    height: 3,
+    flex: 1,
+    borderRadius: 2,
+    marginRight: spacing.sm,
+  },
+  chartBandLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    width: 100,
+  },
+  chartXAxis: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: spacing.md,
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  chartXLabel: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.4)',
+  },
+
   // Circle CCI Card
   circleCCICard: {
     backgroundColor: 'rgba(255,255,255,0.03)',
@@ -557,7 +663,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'rgba(255,255,255,0.5)',
     fontStyle: 'italic',
-    marginBottom: spacing.md,
   },
   dataConfidenceCard: {
     backgroundColor: 'rgba(16,185,129,0.1)',
