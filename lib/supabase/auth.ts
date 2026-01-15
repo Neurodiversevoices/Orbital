@@ -15,6 +15,68 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import { getSupabase, isSupabaseConfigured } from './client';
 
 // =============================================================================
+// PASSWORD VALIDATION
+// =============================================================================
+
+export interface PasswordValidation {
+  isValid: boolean;
+  errors: string[];
+  strength: 'weak' | 'fair' | 'strong' | 'excellent';
+}
+
+/**
+ * Validate password complexity requirements.
+ * Requirements:
+ * - Minimum 12 characters
+ * - At least one uppercase letter
+ * - At least one lowercase letter
+ * - At least one number
+ * - At least one special character
+ */
+export function validatePassword(password: string): PasswordValidation {
+  const errors: string[] = [];
+
+  if (password.length < 12) {
+    errors.push('At least 12 characters required');
+  }
+  if (!/[A-Z]/.test(password)) {
+    errors.push('At least one uppercase letter required');
+  }
+  if (!/[a-z]/.test(password)) {
+    errors.push('At least one lowercase letter required');
+  }
+  if (!/[0-9]/.test(password)) {
+    errors.push('At least one number required');
+  }
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    errors.push('At least one special character required');
+  }
+
+  // Calculate strength
+  let strength: PasswordValidation['strength'] = 'weak';
+  const checks = [
+    password.length >= 12,
+    password.length >= 16,
+    /[A-Z]/.test(password),
+    /[a-z]/.test(password),
+    /[0-9]/.test(password),
+    /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+    password.length >= 20,
+  ];
+  const passed = checks.filter(Boolean).length;
+
+  if (passed >= 7) strength = 'excellent';
+  else if (passed >= 5) strength = 'strong';
+  else if (passed >= 3) strength = 'fair';
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    strength,
+  };
+}
+
+// =============================================================================
 // TYPES
 // =============================================================================
 
@@ -26,8 +88,25 @@ export interface AuthState {
   error: string | null;
 }
 
+export interface MFAFactor {
+  id: string;
+  type: 'totp';
+  status: 'verified' | 'unverified';
+  createdAt: string;
+}
+
+export interface MFAEnrollment {
+  id: string;
+  type: 'totp';
+  totp: {
+    qr_code: string;
+    secret: string;
+    uri: string;
+  };
+}
+
 export interface AuthActions {
-  signInWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signInWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string; mfaRequired?: boolean }>;
   signUpWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signInWithMagicLink: (email: string) => Promise<{ success: boolean; error?: string }>;
   signInWithApple: () => Promise<{ success: boolean; error?: string }>;
@@ -35,6 +114,12 @@ export interface AuthActions {
   resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   updatePassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>;
   deleteAccount: () => Promise<{ success: boolean; error?: string }>;
+  // MFA actions
+  getMFAFactors: () => Promise<{ factors: MFAFactor[]; error?: string }>;
+  enrollMFA: () => Promise<{ enrollment: MFAEnrollment | null; error?: string }>;
+  verifyMFAEnrollment: (factorId: string, code: string) => Promise<{ success: boolean; error?: string }>;
+  verifyMFAChallenge: (factorId: string, code: string) => Promise<{ success: boolean; error?: string }>;
+  unenrollMFA: (factorId: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 export type AuthContext = AuthState & AuthActions;
@@ -325,6 +410,170 @@ export function useAuth(): AuthContext {
     }
   }, [state.user]);
 
+  // Get enrolled MFA factors
+  const getMFAFactors = useCallback(async () => {
+    if (!isSupabaseConfigured()) {
+      return { factors: [], error: 'Cloud sync not configured' };
+    }
+
+    try {
+      const supabase = getSupabase();
+      const { data, error } = await supabase.auth.mfa.listFactors();
+
+      if (error) {
+        return { factors: [], error: error.message };
+      }
+
+      const factors: MFAFactor[] = (data.totp || []).map((f) => ({
+        id: f.id,
+        type: 'totp' as const,
+        status: f.status === 'verified' ? 'verified' : 'unverified',
+        createdAt: f.created_at,
+      }));
+
+      return { factors };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Failed to get MFA factors';
+      return { factors: [], error: message };
+    }
+  }, []);
+
+  // Enroll in MFA (TOTP)
+  const enrollMFA = useCallback(async () => {
+    if (!isSupabaseConfigured()) {
+      return { enrollment: null, error: 'Cloud sync not configured' };
+    }
+
+    try {
+      const supabase = getSupabase();
+      const { data, error } = await supabase.auth.mfa.enroll({
+        factorType: 'totp',
+        issuer: 'Orbital',
+        friendlyName: 'Orbital Authenticator',
+      });
+
+      if (error) {
+        return { enrollment: null, error: error.message };
+      }
+
+      const enrollment: MFAEnrollment = {
+        id: data.id,
+        type: 'totp',
+        totp: {
+          qr_code: data.totp.qr_code,
+          secret: data.totp.secret,
+          uri: data.totp.uri,
+        },
+      };
+
+      return { enrollment };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'MFA enrollment failed';
+      return { enrollment: null, error: message };
+    }
+  }, []);
+
+  // Verify MFA enrollment with TOTP code
+  const verifyMFAEnrollment = useCallback(async (factorId: string, code: string) => {
+    if (!isSupabaseConfigured()) {
+      return { success: false, error: 'Cloud sync not configured' };
+    }
+
+    try {
+      const supabase = getSupabase();
+
+      // First create a challenge
+      const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+        factorId,
+      });
+
+      if (challengeError) {
+        return { success: false, error: challengeError.message };
+      }
+
+      // Then verify it
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId,
+        challengeId: challengeData.id,
+        code,
+      });
+
+      if (verifyError) {
+        return { success: false, error: verifyError.message };
+      }
+
+      return { success: true };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'MFA verification failed';
+      return { success: false, error: message };
+    }
+  }, []);
+
+  // Verify MFA challenge during sign-in
+  const verifyMFAChallenge = useCallback(async (factorId: string, code: string) => {
+    if (!isSupabaseConfigured()) {
+      return { success: false, error: 'Cloud sync not configured' };
+    }
+
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      const supabase = getSupabase();
+
+      // Create a challenge for the factor
+      const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+        factorId,
+      });
+
+      if (challengeError) {
+        setState(prev => ({ ...prev, isLoading: false, error: challengeError.message }));
+        return { success: false, error: challengeError.message };
+      }
+
+      // Verify the challenge with the TOTP code
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId,
+        challengeId: challengeData.id,
+        code,
+      });
+
+      if (verifyError) {
+        setState(prev => ({ ...prev, isLoading: false, error: verifyError.message }));
+        return { success: false, error: verifyError.message };
+      }
+
+      setState(prev => ({ ...prev, isLoading: false }));
+      return { success: true };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'MFA challenge verification failed';
+      setState(prev => ({ ...prev, isLoading: false, error: message }));
+      return { success: false, error: message };
+    }
+  }, []);
+
+  // Unenroll from MFA
+  const unenrollMFA = useCallback(async (factorId: string) => {
+    if (!isSupabaseConfigured()) {
+      return { success: false, error: 'Cloud sync not configured' };
+    }
+
+    try {
+      const supabase = getSupabase();
+      const { error } = await supabase.auth.mfa.unenroll({
+        factorId,
+      });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'MFA unenrollment failed';
+      return { success: false, error: message };
+    }
+  }, []);
+
   return {
     ...state,
     signInWithEmail,
@@ -335,6 +584,11 @@ export function useAuth(): AuthContext {
     resetPassword,
     updatePassword,
     deleteAccount,
+    getMFAFactors,
+    enrollMFA,
+    verifyMFAEnrollment,
+    verifyMFAChallenge,
+    unenrollMFA,
   };
 }
 

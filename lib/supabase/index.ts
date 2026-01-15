@@ -20,8 +20,8 @@
 export { getSupabase, supabase, isSupabaseConfigured, isSupabaseReachable } from './client';
 
 // Auth
-export { useAuth, getCurrentUserId, isAuthenticated } from './auth';
-export type { AuthState, AuthActions, AuthContext } from './auth';
+export { useAuth, getCurrentUserId, isAuthenticated, validatePassword } from './auth';
+export type { AuthState, AuthActions, AuthContext, PasswordValidation, MFAFactor, MFAEnrollment } from './auth';
 
 // Sync
 export { useCapacitySync, exportUserData, deleteUserData } from './sync';

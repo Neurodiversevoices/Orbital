@@ -32,11 +32,19 @@ import {
   Wand2,
   Smartphone,
   Clock,
+  Shield,
+  Key,
+  Fingerprint,
+  Eye,
+  EyeOff,
+  ChevronRight,
+  Trash2,
 } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { colors, spacing, borderRadius } from '../theme';
-import { useAuth, isSupabaseConfigured } from '../lib/supabase';
+import { useAuth, isSupabaseConfigured, validatePassword, MFAFactor, MFAEnrollment } from '../lib/supabase';
 import { useCloudSync, getDeviceId } from '../lib/cloud';
+import { useBiometric, getBiometricDisplayName } from '../lib/biometric';
 
 type AuthMode = 'signin' | 'signup' | 'magic' | null;
 
@@ -44,13 +52,24 @@ export default function CloudSyncScreen() {
   const router = useRouter();
   const auth = useAuth();
   const cloudSync = useCloudSync();
+  const biometric = useBiometric();
 
   const [authMode, setAuthMode] = useState<AuthMode>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [deviceId, setDeviceId] = useState<string>('');
+
+  // MFA state
+  const [mfaFactors, setMfaFactors] = useState<MFAFactor[]>([]);
+  const [mfaEnrollment, setMfaEnrollment] = useState<MFAEnrollment | null>(null);
+  const [mfaCode, setMfaCode] = useState('');
+  const [showMFASetup, setShowMFASetup] = useState(false);
+
+  // Password validation
+  const passwordValidation = validatePassword(password);
 
   const isConfigured = isSupabaseConfigured();
 
@@ -58,6 +77,82 @@ export default function CloudSyncScreen() {
   useEffect(() => {
     getDeviceId().then(setDeviceId);
   }, []);
+
+  // Load MFA factors when authenticated
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      auth.getMFAFactors().then(({ factors }) => {
+        setMfaFactors(factors);
+      });
+    }
+  }, [auth.isAuthenticated]);
+
+  // Handle MFA enrollment
+  const handleEnrollMFA = async () => {
+    setIsSubmitting(true);
+    setMessage(null);
+    const { enrollment, error } = await auth.enrollMFA();
+    setIsSubmitting(false);
+    if (error) {
+      setMessage({ type: 'error', text: error });
+    } else if (enrollment) {
+      setMfaEnrollment(enrollment);
+      setShowMFASetup(true);
+    }
+  };
+
+  // Handle MFA verification
+  const handleVerifyMFA = async () => {
+    if (!mfaEnrollment || mfaCode.length !== 6) return;
+    setIsSubmitting(true);
+    setMessage(null);
+    const { success, error } = await auth.verifyMFAEnrollment(mfaEnrollment.id, mfaCode);
+    setIsSubmitting(false);
+    if (success) {
+      setMessage({ type: 'success', text: 'Two-factor authentication enabled' });
+      setShowMFASetup(false);
+      setMfaEnrollment(null);
+      setMfaCode('');
+      // Refresh factors
+      const { factors } = await auth.getMFAFactors();
+      setMfaFactors(factors);
+    } else {
+      setMessage({ type: 'error', text: error || 'Invalid code' });
+    }
+  };
+
+  // Handle MFA removal
+  const handleRemoveMFA = async (factorId: string) => {
+    setIsSubmitting(true);
+    const { success, error } = await auth.unenrollMFA(factorId);
+    setIsSubmitting(false);
+    if (success) {
+      setMessage({ type: 'success', text: 'Two-factor authentication disabled' });
+      setMfaFactors(factors => factors.filter(f => f.id !== factorId));
+    } else {
+      setMessage({ type: 'error', text: error || 'Failed to remove MFA' });
+    }
+  };
+
+  // Handle biometric toggle
+  const handleBiometricToggle = async () => {
+    setIsSubmitting(true);
+    setMessage(null);
+    if (biometric.settings.enabled) {
+      const { success, error } = await biometric.disable();
+      if (!success && error !== 'cancelled') {
+        setMessage({ type: 'error', text: error || 'Failed to disable biometric' });
+      }
+    } else {
+      const { success, error } = await biometric.enable();
+      if (success) {
+        setMessage({ type: 'success', text: `${biometric.displayName} enabled` });
+      } else if (error !== 'cancelled') {
+        setMessage({ type: 'error', text: error || 'Failed to enable biometric' });
+      }
+    }
+    setIsSubmitting(false);
+  };
 
   // Handle auth submission
   const handleAuth = async () => {
@@ -79,8 +174,9 @@ export default function CloudSyncScreen() {
       }
       result = await auth.signInWithEmail(email, password);
     } else if (authMode === 'signup') {
-      if (!password || password.length < 8) {
-        setMessage({ type: 'error', text: 'Password must be at least 8 characters' });
+      const validation = validatePassword(password);
+      if (!validation.isValid) {
+        setMessage({ type: 'error', text: validation.errors[0] });
         setIsSubmitting(false);
         return;
       }
@@ -269,17 +365,62 @@ export default function CloudSyncScreen() {
             </View>
 
             {authMode !== 'magic' && (
-              <View style={styles.inputContainer}>
-                <Lock size={18} color="rgba(255,255,255,0.4)" />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Password"
-                  placeholderTextColor="rgba(255,255,255,0.3)"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                />
-              </View>
+              <>
+                <View style={styles.inputContainer}>
+                  <Lock size={18} color="rgba(255,255,255,0.4)" />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Password"
+                    placeholderTextColor="rgba(255,255,255,0.3)"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                  />
+                  <Pressable onPress={() => setShowPassword(!showPassword)}>
+                    {showPassword ? (
+                      <EyeOff size={18} color="rgba(255,255,255,0.4)" />
+                    ) : (
+                      <Eye size={18} color="rgba(255,255,255,0.4)" />
+                    )}
+                  </Pressable>
+                </View>
+
+                {/* Password strength indicator for signup */}
+                {authMode === 'signup' && password.length > 0 && (
+                  <View style={styles.passwordStrength}>
+                    <View style={styles.strengthBar}>
+                      <View
+                        style={[
+                          styles.strengthFill,
+                          {
+                            width: passwordValidation.strength === 'weak' ? '25%' :
+                                   passwordValidation.strength === 'fair' ? '50%' :
+                                   passwordValidation.strength === 'strong' ? '75%' : '100%',
+                            backgroundColor: passwordValidation.strength === 'weak' ? '#F44336' :
+                                             passwordValidation.strength === 'fair' ? '#FF9800' :
+                                             passwordValidation.strength === 'strong' ? '#4CAF50' : '#00E5FF',
+                          },
+                        ]}
+                      />
+                    </View>
+                    <Text style={[
+                      styles.strengthText,
+                      {
+                        color: passwordValidation.strength === 'weak' ? '#F44336' :
+                               passwordValidation.strength === 'fair' ? '#FF9800' :
+                               passwordValidation.strength === 'strong' ? '#4CAF50' : '#00E5FF',
+                      }
+                    ]}>
+                      {passwordValidation.strength.charAt(0).toUpperCase() + passwordValidation.strength.slice(1)}
+                    </Text>
+                    {!passwordValidation.isValid && (
+                      <Text style={styles.passwordHint}>
+                        {passwordValidation.errors[0]}
+                      </Text>
+                    )}
+                  </View>
+                )}
+              </>
             )}
 
             {message && (
@@ -363,6 +504,151 @@ export default function CloudSyncScreen() {
               </View>
             </Pressable>
           </Animated.View>
+        )}
+
+        {/* Security Section - Only shown when authenticated */}
+        {auth.isAuthenticated && (
+          <>
+            <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.section}>
+              <Text style={styles.sectionTitle}>Security</Text>
+            </Animated.View>
+
+            <Animated.View entering={FadeInDown.delay(250).duration(400)} style={styles.securityCard}>
+              {/* Two-Factor Authentication */}
+              <View style={styles.securityItem}>
+                <View style={styles.securityItemLeft}>
+                  <View style={[styles.securityIconContainer, mfaFactors.length > 0 && styles.securityIconEnabled]}>
+                    <Shield size={20} color={mfaFactors.length > 0 ? '#00E5FF' : 'rgba(255,255,255,0.5)'} />
+                  </View>
+                  <View style={styles.securityItemText}>
+                    <Text style={styles.securityItemTitle}>Two-Factor Authentication</Text>
+                    <Text style={styles.securityItemDesc}>
+                      {mfaFactors.length > 0 ? 'Enabled with authenticator app' : 'Add extra security to your account'}
+                    </Text>
+                  </View>
+                </View>
+                {mfaFactors.length > 0 ? (
+                  <Pressable
+                    style={styles.securityRemoveButton}
+                    onPress={() => handleRemoveMFA(mfaFactors[0].id)}
+                    disabled={isSubmitting}
+                  >
+                    <Trash2 size={16} color="#FF5252" />
+                  </Pressable>
+                ) : (
+                  <Pressable
+                    style={styles.securityEnableButton}
+                    onPress={handleEnrollMFA}
+                    disabled={isSubmitting}
+                  >
+                    <Text style={styles.securityEnableText}>Enable</Text>
+                    <ChevronRight size={16} color="#00E5FF" />
+                  </Pressable>
+                )}
+              </View>
+
+              {/* MFA Setup Modal */}
+              {showMFASetup && mfaEnrollment && (
+                <View style={styles.mfaSetup}>
+                  <Text style={styles.mfaSetupTitle}>Set Up Authenticator</Text>
+                  <Text style={styles.mfaSetupDesc}>
+                    Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)
+                  </Text>
+
+                  {/* QR Code placeholder - in production, render actual QR */}
+                  <View style={styles.qrContainer}>
+                    <Text style={styles.qrPlaceholder}>QR Code</Text>
+                    <Text style={styles.secretCode}>{mfaEnrollment.totp.secret}</Text>
+                  </View>
+
+                  <View style={styles.mfaCodeInput}>
+                    <Key size={18} color="rgba(255,255,255,0.4)" />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter 6-digit code"
+                      placeholderTextColor="rgba(255,255,255,0.3)"
+                      value={mfaCode}
+                      onChangeText={setMfaCode}
+                      keyboardType="number-pad"
+                      maxLength={6}
+                    />
+                  </View>
+
+                  <View style={styles.mfaButtons}>
+                    <Pressable
+                      style={styles.mfaCancelButton}
+                      onPress={() => {
+                        setShowMFASetup(false);
+                        setMfaEnrollment(null);
+                        setMfaCode('');
+                      }}
+                    >
+                      <Text style={styles.mfaCancelText}>Cancel</Text>
+                    </Pressable>
+                    <Pressable
+                      style={[styles.mfaVerifyButton, mfaCode.length !== 6 && styles.mfaVerifyDisabled]}
+                      onPress={handleVerifyMFA}
+                      disabled={mfaCode.length !== 6 || isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <ActivityIndicator size="small" color="#000" />
+                      ) : (
+                        <Text style={styles.mfaVerifyText}>Verify</Text>
+                      )}
+                    </Pressable>
+                  </View>
+                </View>
+              )}
+
+              {/* Biometric Authentication - Only show if available */}
+              {biometric.status.isAvailable && (
+                <>
+                  <View style={styles.securityDivider} />
+                  <View style={styles.securityItem}>
+                    <View style={styles.securityItemLeft}>
+                      <View style={[styles.securityIconContainer, biometric.settings.enabled && styles.securityIconEnabled]}>
+                        <Fingerprint size={20} color={biometric.settings.enabled ? '#00E5FF' : 'rgba(255,255,255,0.5)'} />
+                      </View>
+                      <View style={styles.securityItemText}>
+                        <Text style={styles.securityItemTitle}>{biometric.displayName}</Text>
+                        <Text style={styles.securityItemDesc}>
+                          {biometric.settings.enabled ? 'Enabled for app unlock' : 'Unlock app with biometrics'}
+                        </Text>
+                      </View>
+                    </View>
+                    <Pressable
+                      style={[
+                        styles.securityToggle,
+                        biometric.settings.enabled && styles.securityToggleEnabled,
+                      ]}
+                      onPress={handleBiometricToggle}
+                      disabled={isSubmitting || biometric.isLoading}
+                    >
+                      <View
+                        style={[
+                          styles.securityToggleKnob,
+                          biometric.settings.enabled && styles.securityToggleKnobEnabled,
+                        ]}
+                      />
+                    </Pressable>
+                  </View>
+                </>
+              )}
+            </Animated.View>
+
+            {message && (
+              <Animated.View entering={FadeInDown.duration(200)} style={[styles.messageBox, message.type === 'error' ? styles.errorBox : styles.successBox, { marginTop: spacing.md }]}>
+                {message.type === 'error' ? (
+                  <AlertCircle size={14} color="#FF5252" />
+                ) : (
+                  <CheckCircle size={14} color="#4CAF50" />
+                )}
+                <Text style={[styles.messageText, message.type === 'error' ? styles.errorText : styles.successText]}>
+                  {message.text}
+                </Text>
+              </Animated.View>
+            )}
+          </>
         )}
 
         {/* Privacy Note */}
@@ -727,5 +1013,193 @@ const styles = StyleSheet.create({
   appleAuthDesc: {
     fontSize: 12,
     color: 'rgba(0,0,0,0.6)',
+  },
+  // Password strength styles
+  passwordStrength: {
+    marginBottom: spacing.md,
+  },
+  strengthBar: {
+    height: 4,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 2,
+    marginBottom: spacing.xs,
+    overflow: 'hidden',
+  },
+  strengthFill: {
+    height: '100%',
+    borderRadius: 2,
+  },
+  strengthText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  passwordHint: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: spacing.xs,
+  },
+  // Security section styles
+  securityCard: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+  },
+  securityItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  securityItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: spacing.md,
+  },
+  securityIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  securityIconEnabled: {
+    backgroundColor: 'rgba(0,229,255,0.1)',
+  },
+  securityItemText: {
+    flex: 1,
+  },
+  securityItemTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.9)',
+  },
+  securityItemDesc: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: 2,
+  },
+  securityEnableButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  securityEnableText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#00E5FF',
+  },
+  securityRemoveButton: {
+    padding: spacing.sm,
+  },
+  securityDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    marginVertical: spacing.md,
+  },
+  securityToggle: {
+    width: 50,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    padding: 2,
+    justifyContent: 'center',
+  },
+  securityToggleEnabled: {
+    backgroundColor: 'rgba(0,229,255,0.3)',
+  },
+  securityToggleKnob: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+  },
+  securityToggleKnobEnabled: {
+    backgroundColor: '#00E5FF',
+    alignSelf: 'flex-end',
+  },
+  // MFA setup styles
+  mfaSetup: {
+    marginTop: spacing.lg,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.06)',
+  },
+  mfaSetupTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.9)',
+    marginBottom: spacing.sm,
+  },
+  mfaSetupDesc: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.5)',
+    lineHeight: 18,
+    marginBottom: spacing.lg,
+  },
+  qrContainer: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: borderRadius.md,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
+  },
+  qrPlaceholder: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.3)',
+    marginBottom: spacing.sm,
+  },
+  secretCode: {
+    fontSize: 12,
+    fontFamily: 'monospace',
+    color: 'rgba(255,255,255,0.6)',
+    textAlign: 'center',
+  },
+  mfaCodeInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.md,
+  },
+  mfaButtons: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  mfaCancelButton: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  mfaCancelText: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.6)',
+  },
+  mfaVerifyButton: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    borderRadius: borderRadius.md,
+    backgroundColor: '#00E5FF',
+  },
+  mfaVerifyDisabled: {
+    opacity: 0.5,
+  },
+  mfaVerifyText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#000',
   },
 });
