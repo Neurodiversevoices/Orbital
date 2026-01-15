@@ -34,6 +34,7 @@ import {
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../../theme';
 import { useAccess } from '../../lib/access';
+import { FOUNDER_DEMO_ENABLED } from '../../lib/hooks/useDemoMode';
 
 // =============================================================================
 // TYPES
@@ -83,8 +84,8 @@ export default function BriefingsScreen() {
   const [scope, setScope] = useState<BriefScope>('personal');
   const { hasTier, freeUserViewActive, freeUserViewBanner } = useAccess();
 
-  // B2C: Circles tab requires Pro tier
-  const canAccessCircles = hasTier('individual_pro');
+  // B2C: Circles tab requires Pro tier (or founder demo)
+  const canAccessCircles = hasTier('individual_pro') || FOUNDER_DEMO_ENABLED;
 
   // Filter tabs based on access level
   const visibleTabs = useMemo(() => {
