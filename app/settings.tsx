@@ -455,13 +455,6 @@ export default function SettingsScreen() {
             onPress={() => router.push('/security-controls')}
             disabled={isProcessing}
           />
-          <SettingsRow
-            icon={Users}
-            label="Circles"
-            sublabel="Peer-to-peer capacity signaling"
-            onPress={() => router.push('/circles')}
-            disabled={isProcessing}
-          />
         </View>
 
         {/* Compliance Section */}

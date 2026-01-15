@@ -588,7 +588,7 @@ function CirclesCCIBrief() {
       <View style={styles.circleHeader}>
         <View style={styles.circleHeaderLeft}>
           <Text style={styles.circleTitle}>SENSORY SUPPORT GROUP</Text>
-          <Text style={styles.circleSubtitle}>Lead Parent: Emily Zhang</Text>
+          <Text style={styles.circleSubtitle}>Circle Coordinator: Emily Zhang</Text>
         </View>
         <View style={styles.circleHeaderRight}>
           <View style={styles.circleMemberBadge}>

@@ -9,7 +9,18 @@ Use this skill when working with access control, subscription tiers, feature gat
 |------|--------------|
 | `starter` | Free users - limited signals, limited history |
 | `individual` | Paid - unlimited signals |
-| `individual_pro` | Pro - full features |
+| `individual_pro` | Pro - full features, includes Circles |
+
+### Circle Roles
+| Role | Definition |
+|------|------------|
+| **Circle Coordinator** | Administrator of a Circle. Can invite members, view aggregate status. Neutral term (not "Lead Parent"). |
+| **Circle Member** | Participant in a Circle. Shares capacity signals with coordinator and other members. |
+
+### Navigation Structure
+- **Circles discovery/purchase**: Pricing page (`/upgrade`) — Primary entry point
+- **Circles demo/access**: Briefings tab → Circles view — Functional access for demo and active Circles
+- **Settings tab**: Reserved for secondary management only (e.g., "Leave Circle")
 
 ### Access Check Methods
 ```tsx
