@@ -79,3 +79,27 @@ Example: `claude/locate-file-MUWxC`
 
 ## Website URL
 Production: https://orbital-jet.vercel.app
+
+## REQUIRED: Post-Fix Output Format
+
+**ALWAYS provide this after every fix/change:**
+
+```
+Done. [brief description of what was fixed]
+
+**Deploy:**
+git fetch origin && git checkout master && git merge origin/<branch-name> && git push origin master
+
+**Verify:** https://orbital-jet.vercel.app/<affected-page>
+```
+
+### Common Page Routes
+| Page | URL |
+|------|-----|
+| Home | https://orbital-jet.vercel.app |
+| Briefings | https://orbital-jet.vercel.app/brief |
+| CCI | https://orbital-jet.vercel.app/cci |
+| Settings | https://orbital-jet.vercel.app/settings |
+| Patterns | https://orbital-jet.vercel.app/patterns |
+
+**Never skip the verify URL.** The user needs to check the change immediately.
