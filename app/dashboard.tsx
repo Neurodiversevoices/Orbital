@@ -1,13 +1,14 @@
 /**
- * Institutional Dashboard — DEMO ONLY
+ * Capacity Brief — DEMO ONLY
  *
  * GOVERNANCE: This is a DEMONSTRATION surface only.
  * - Shows sample/simulated data
  * - Non-configurable, non-exportable
  * - For real institutional access, contact Orbital sales
  *
- * Aggregate-only capacity monitoring for institutions.
- * NO individual surveillance. NO personally identifiable data.
+ * Time-boxed, periodic advisory artifact for leadership review.
+ * NOT a real-time monitoring tool. NOT an operational dashboard.
+ * Aggregate-only capacity snapshot. NO individual identification.
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -85,7 +86,7 @@ export default function DashboardScreen() {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Building2 color={DASHBOARD_STATE_COLORS.high} size={24} />
-          <Text style={styles.headerTitle}>Institutional Dashboard</Text>
+          <Text style={styles.headerTitle}>Capacity Brief</Text>
         </View>
         <Pressable onPress={() => router.back()} style={styles.closeButton}>
           <X color={colors.textPrimary} size={24} />
@@ -94,9 +95,9 @@ export default function DashboardScreen() {
 
       {/* DEMO MODE BANNER — GOVERNANCE REQUIRED */}
       <View style={styles.demoBanner}>
-        <Text style={styles.demoBannerText}>DEMO / SAMPLE DATA</Text>
+        <Text style={styles.demoBannerText}>PERIODIC ADVISORY · DEMO</Text>
         <Text style={styles.demoBannerSubtext}>
-          For institutional access, contact Orbital sales
+          Time-boxed snapshot for leadership review
         </Text>
       </View>
 
@@ -104,7 +105,7 @@ export default function DashboardScreen() {
       <View style={styles.warningBanner}>
         <AlertTriangle color={DASHBOARD_STATE_COLORS.stable} size={16} />
         <Text style={styles.warningText}>
-          Aggregate data only. No individual identification.
+          Aggregate snapshot only. No individual identification.
         </Text>
       </View>
 
@@ -126,7 +127,7 @@ export default function DashboardScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {isLoading ? (
           <View style={styles.loadingState}>
-            <Text style={styles.loadingText}>Aggregating data...</Text>
+            <Text style={styles.loadingText}>Preparing brief...</Text>
           </View>
         ) : reportData && reportData.summary.totalSignals > 0 ? (
           <>
@@ -138,7 +139,7 @@ export default function DashboardScreen() {
                   <Text style={styles.metricLabel}>Avg Capacity</Text>
                 </View>
                 <Text style={styles.metricValue}>{reportData.summary.averageCapacity}%</Text>
-                <Text style={styles.metricSubtext}>population baseline</Text>
+                <Text style={styles.metricSubtext}>period average</Text>
               </View>
 
               <View style={styles.metricCard}>
@@ -161,7 +162,7 @@ export default function DashboardScreen() {
                   <Text style={styles.metricLabel}>Signals</Text>
                 </View>
                 <Text style={styles.metricValue}>{reportData.summary.totalSignals}</Text>
-                <Text style={styles.metricSubtext}>total recorded</Text>
+                <Text style={styles.metricSubtext}>in period</Text>
               </View>
 
               <View style={styles.metricCard}>
@@ -296,9 +297,9 @@ export default function DashboardScreen() {
         ) : (
           <View style={styles.emptyState}>
             <Building2 color="rgba(255,255,255,0.2)" size={48} />
-            <Text style={styles.emptyTitle}>No Aggregate Data</Text>
+            <Text style={styles.emptyTitle}>No Brief Available</Text>
             <Text style={styles.emptyText}>
-              Capacity signals will appear here when available.
+              Capacity data for the selected period will appear here.
             </Text>
           </View>
         )}
