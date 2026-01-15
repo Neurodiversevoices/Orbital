@@ -81,23 +81,26 @@ const DEMO_CIRCLE_MEMBERS: CircleMember[] = [
 
 export default function BriefingsScreen() {
   const [scope, setScope] = useState<BriefScope>('personal');
-  const { showBriefingsOrgGlobal, freeUserViewActive, freeUserViewBanner } = useAccess();
+  const { hasTier, freeUserViewActive, freeUserViewBanner } = useAccess();
+
+  // B2C: Circles tab requires Pro tier
+  const canAccessCircles = hasTier('individual_pro');
 
   // Filter tabs based on access level
   const visibleTabs = useMemo(() => {
-    if (!showBriefingsOrgGlobal) {
-      // Free User View: only show Personal tab
+    if (!canAccessCircles) {
+      // Free/Individual users: only show Personal tab
       return SCOPE_TABS.filter((tab) => !tab.proOnly);
     }
     return SCOPE_TABS;
-  }, [showBriefingsOrgGlobal]);
+  }, [canAccessCircles]);
 
   // If current scope is not visible, reset to personal
   React.useEffect(() => {
-    if (!showBriefingsOrgGlobal && scope === 'circles') {
+    if (!canAccessCircles && scope === 'circles') {
       setScope('personal');
     }
-  }, [showBriefingsOrgGlobal, scope]);
+  }, [canAccessCircles, scope]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -148,7 +151,7 @@ export default function BriefingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {scope === 'personal' && <PersonalBrief />}
-        {scope === 'circles' && showBriefingsOrgGlobal && <CirclesCCIBrief />}
+        {scope === 'circles' && canAccessCircles && <CirclesCCIBrief />}
       </ScrollView>
     </SafeAreaView>
   );
