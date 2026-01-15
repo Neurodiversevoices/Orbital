@@ -16,6 +16,7 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -65,11 +66,11 @@ interface CircleMember {
 }
 
 const DEMO_CIRCLE_MEMBERS: CircleMember[] = [
-  { id: '1', name: 'Mia', username: 'Mia Anderson', capacityState: 'stretched', trend: 'flat', participation: '6 / 7' },
-  { id: '2', name: 'Zach', username: 'That teguns', capacityState: 'stretched', trend: 'declining', participation: '7 / 7' },
-  { id: '3', name: 'Lily', username: 'Traa teguns', capacityState: 'resourced', trend: 'improving', participation: '5 / 5' },
-  { id: '4', name: 'Tyler', username: 'Tyia Ramirez', capacityState: 'stretched', trend: 'flat', participation: '5 / 5' },
-  { id: '5', name: 'Emma', username: 'Emily Zhang', capacityState: 'stretched', trend: 'declining', participation: '5 / 5' },
+  { id: '1', name: 'Mia', username: 'Mia Anderson', avatar: 'https://i.pravatar.cc/100?u=mia', capacityState: 'stretched', trend: 'flat', participation: '6 / 7' },
+  { id: '2', name: 'Zach', username: 'Zach Teguns', avatar: 'https://i.pravatar.cc/100?u=zach', capacityState: 'stretched', trend: 'declining', participation: '7 / 7' },
+  { id: '3', name: 'Lily', username: 'Lily Teguns', avatar: 'https://i.pravatar.cc/100?u=lily', capacityState: 'resourced', trend: 'improving', participation: '5 / 5' },
+  { id: '4', name: 'Tyler', username: 'Tyler Ramirez', avatar: 'https://i.pravatar.cc/100?u=tyler', capacityState: 'stretched', trend: 'flat', participation: '5 / 5' },
+  { id: '5', name: 'Emma', username: 'Emily Zhang', avatar: 'https://i.pravatar.cc/100?u=emma', capacityState: 'stretched', trend: 'declining', participation: '5 / 5' },
 ];
 
 // =============================================================================
@@ -251,9 +252,13 @@ function CirclesCCIBrief() {
           <View key={member.id} style={styles.tableRow}>
             {/* Member */}
             <View style={[styles.tableCell, { flex: 1.5, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
-              <View style={styles.avatarPlaceholder}>
-                <Text style={styles.avatarText}>{member.name[0]}</Text>
-              </View>
+              {member.avatar ? (
+                <Image source={{ uri: member.avatar }} style={styles.avatarImage} />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <Text style={styles.avatarText}>{member.name[0]}</Text>
+                </View>
+              )}
               <View>
                 <Text style={styles.memberName}>{member.name}</Text>
                 <Text style={styles.memberUsername}>{member.username}</Text>
@@ -622,6 +627,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,215,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  avatarImage: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: 'rgba(0,215,255,0.3)',
   },
   avatarText: {
     fontSize: 14,
