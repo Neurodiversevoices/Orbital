@@ -85,7 +85,8 @@ export default function BriefingsScreen() {
   const { hasTier, freeUserViewActive, freeUserViewBanner } = useAccess();
 
   // B2C: Circles tab requires Pro tier (or founder demo)
-  const canAccessCircles = hasTier('individual_pro') || FOUNDER_DEMO_ENABLED;
+  // TODO: Restore access check after demo verification
+  const canAccessCircles = true;
 
   // Filter tabs based on access level
   const visibleTabs = useMemo(() => {
