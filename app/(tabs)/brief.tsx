@@ -65,14 +65,15 @@ interface CircleMember {
   capacityState: 'resourced' | 'stretched' | 'depleted';
   trend: 'improving' | 'declining' | 'flat';
   participation: string;
+  notes?: string;
 }
 
 const DEMO_CIRCLE_MEMBERS: CircleMember[] = [
-  { id: '1', name: 'Mia', username: 'Mia Anderson', avatar: 'https://i.pravatar.cc/100?u=mia', capacityState: 'stretched', trend: 'flat', participation: '6 / 7' },
-  { id: '2', name: 'Zach', username: 'Zach Teguns', avatar: 'https://i.pravatar.cc/100?u=zach', capacityState: 'stretched', trend: 'declining', participation: '7 / 7' },
-  { id: '3', name: 'Lily', username: 'Lily Teguns', avatar: 'https://i.pravatar.cc/100?u=lily', capacityState: 'resourced', trend: 'improving', participation: '5 / 5' },
-  { id: '4', name: 'Tyler', username: 'Tyler Ramirez', avatar: 'https://i.pravatar.cc/100?u=tyler', capacityState: 'stretched', trend: 'flat', participation: '5 / 5' },
-  { id: '5', name: 'Emma', username: 'Emily Zhang', avatar: 'https://i.pravatar.cc/100?u=emma', capacityState: 'stretched', trend: 'declining', participation: '5 / 5' },
+  { id: '1', name: 'Mia', username: 'Mia Anderson', avatar: 'https://i.pravatar.cc/100?u=mia', capacityState: 'stretched', trend: 'flat', participation: '6 / 7', notes: 'Sensory sensitivity noted' },
+  { id: '2', name: 'Zach', username: 'Zach Teguns', avatar: 'https://i.pravatar.cc/100?u=zach', capacityState: 'stretched', trend: 'declining', participation: '7 / 7', notes: 'Sleep disruption' },
+  { id: '3', name: 'Lily', username: 'Lily Teguns', avatar: 'https://i.pravatar.cc/100?u=lily', capacityState: 'resourced', trend: 'improving', participation: '5 / 5', notes: 'Steady progress' },
+  { id: '4', name: 'Tyler', username: 'Tyler Ramirez', avatar: 'https://i.pravatar.cc/100?u=tyler', capacityState: 'stretched', trend: 'flat', participation: '5 / 5', notes: 'Transition support' },
+  { id: '5', name: 'Emma', username: 'Emily Zhang', avatar: 'https://i.pravatar.cc/100?u=emma', capacityState: 'stretched', trend: 'declining', participation: '5 / 5', notes: 'Schedule changes' },
 ];
 
 // =============================================================================
@@ -410,17 +411,18 @@ function CirclesCCIBrief() {
 
             {/* Table Header */}
             <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderCell, { flex: 1.5 }]}>MEMBER</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 1 }]}>CAPACITY STATE</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 1 }]}>7 DAY TREND</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 0.8 }]}>PARTICIPATION</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 1.3 }]}>MEMBER</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 0.9 }]}>CAPACITY STATE</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 0.8 }]}>7 DAY TREND</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 0.6 }]}>PARTICIPATION</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 1 }]}>NOTES</Text>
             </View>
 
             {/* Table Rows */}
             {DEMO_CIRCLE_MEMBERS.map((member) => (
               <View key={member.id} style={styles.tableRow}>
                 {/* Member */}
-                <View style={[styles.tableCell, { flex: 1.5, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
+                <View style={[styles.tableCell, { flex: 1.3, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
                   {member.avatar ? (
                     <Image source={{ uri: member.avatar }} style={styles.avatarImage} />
                   ) : (
@@ -435,7 +437,7 @@ function CirclesCCIBrief() {
                 </View>
 
                 {/* Capacity State */}
-                <View style={[styles.tableCell, { flex: 1 }]}>
+                <View style={[styles.tableCell, { flex: 0.9 }]}>
                   <View style={[
                     styles.capacityBadge,
                     member.capacityState === 'resourced' && styles.capacityBadgeResourced,
@@ -449,7 +451,7 @@ function CirclesCCIBrief() {
                 </View>
 
                 {/* 7 Day Trend */}
-                <View style={[styles.tableCell, { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 4 }]}>
+                <View style={[styles.tableCell, { flex: 0.8, flexDirection: 'row', alignItems: 'center', gap: 4 }]}>
                   {member.trend === 'improving' && <TrendingUp color="#10B981" size={14} />}
                   {member.trend === 'declining' && <TrendingDown color="#F44336" size={14} />}
                   {member.trend === 'flat' && <Minus color="#E8A830" size={14} />}
@@ -464,8 +466,13 @@ function CirclesCCIBrief() {
                 </View>
 
                 {/* Participation */}
-                <View style={[styles.tableCell, { flex: 0.8 }]}>
+                <View style={[styles.tableCell, { flex: 0.6 }]}>
                   <Text style={styles.participationText}>{member.participation}</Text>
+                </View>
+
+                {/* Notes */}
+                <View style={[styles.tableCell, { flex: 1 }]}>
+                  <Text style={styles.notesText}>{member.notes || '—'}</Text>
                 </View>
               </View>
             ))}
@@ -925,6 +932,11 @@ const styles = StyleSheet.create({
   participationText: {
     fontSize: 12,
     color: 'rgba(255,255,255,0.7)',
+  },
+  notesText: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.6)',
+    fontStyle: 'italic',
   },
   paginationHint: {
     alignItems: 'center',
