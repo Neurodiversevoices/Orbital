@@ -24,6 +24,7 @@ import {
   Building2,
   LogOut,
   RotateCcw,
+  Users,
   GraduationCap,
   Database,
   Heart,
