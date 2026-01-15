@@ -22,7 +22,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
-import Svg, { Path, Rect, Line, Text as SvgText, Defs, LinearGradient, Stop } from 'react-native-svg';
+import Svg, { Path, Rect, Line, Text as SvgText, Defs, LinearGradient, Stop, Circle as SvgCircle } from 'react-native-svg';
 import {
   User,
   Users,
@@ -69,89 +69,113 @@ interface CircleMember {
   participation: string;
   notes?: string;
   capacityHistory: number[]; // 90 days of capacity data (1=depleted, 2=stretched, 3=resourced)
-  color: string; // Line color for chart
 }
 
-// Generate synthetic 90-day capacity history for a member
-function generateCapacityHistory(pattern: 'stable_high' | 'declining' | 'improving' | 'volatile' | 'stable_low'): number[] {
-  const data: number[] = [];
-  let value: number;
+// =============================================================================
+// CAPACITY COLOR SYSTEM — Matches Individual CCI
+// =============================================================================
 
-  switch (pattern) {
-    case 'stable_high':
-      value = 2.8;
-      for (let i = 0; i < 90; i++) {
-        value = Math.max(2.2, Math.min(3, value + (Math.random() - 0.5) * 0.3));
-        data.push(value);
-      }
-      break;
-    case 'declining':
-      value = 2.7;
-      for (let i = 0; i < 90; i++) {
-        const progress = i / 90;
-        const targetValue = 2.7 - progress * 1.2;
-        value = Math.max(1.3, Math.min(3, targetValue + (Math.random() - 0.5) * 0.4));
-        data.push(value);
-      }
-      break;
-    case 'improving':
-      value = 1.8;
-      for (let i = 0; i < 90; i++) {
-        const progress = i / 90;
-        const targetValue = 1.8 + progress * 1.0;
-        value = Math.max(1.3, Math.min(3, targetValue + (Math.random() - 0.5) * 0.3));
-        data.push(value);
-      }
-      break;
-    case 'volatile':
-      value = 2.2;
-      for (let i = 0; i < 90; i++) {
-        value = Math.max(1.2, Math.min(3, value + (Math.random() - 0.5) * 0.8));
-        data.push(value);
-      }
-      break;
-    case 'stable_low':
-      value = 1.9;
-      for (let i = 0; i < 90; i++) {
-        value = Math.max(1.4, Math.min(2.4, value + (Math.random() - 0.5) * 0.3));
-        data.push(value);
-      }
-      break;
-  }
-  return data;
+// Get color based on capacity value (cyan=high, yellow=middle, red=low)
+function getCapacityColor(value: number): string {
+  if (value >= 2.5) return '#00D7FF'; // Cyan - Resourced
+  if (value >= 2.0) return '#10B981'; // Green - Good
+  if (value >= 1.5) return '#E8A830'; // Yellow - Stretched
+  return '#F44336'; // Red - Depleted
 }
 
-// Member colors for chart lines
-const MEMBER_COLORS = {
-  mia: '#00D7FF',    // Cyan
-  zach: '#F97316',   // Orange
-  lily: '#10B981',   // Green
-  tyler: '#A855F7',  // Purple
-  emma: '#F43F5E',   // Rose
+// =============================================================================
+// FABRICATED DEMO DATA — Simulating years of real user tracking
+// =============================================================================
+
+// Fabricate realistic 90-day capacity pattern for demo
+// These patterns simulate what real users would see after months/years of tracking
+const FABRICATED_HISTORIES: Record<string, number[]> = {
+  // Mia: Stable in stretched range with some good days
+  mia: [
+    2.1, 2.0, 1.9, 2.0, 2.2, 2.3, 2.1, 2.0, 1.8, 1.9,
+    2.0, 2.1, 2.2, 2.0, 1.9, 2.0, 2.1, 2.0, 1.9, 1.8,
+    1.9, 2.0, 2.1, 2.2, 2.1, 2.0, 2.0, 1.9, 2.0, 2.1,
+    2.0, 1.9, 1.8, 1.9, 2.0, 2.1, 2.2, 2.1, 2.0, 1.9,
+    2.0, 2.1, 2.0, 1.9, 2.0, 2.1, 2.0, 1.9, 1.8, 1.9,
+    2.0, 2.1, 2.2, 2.1, 2.0, 1.9, 2.0, 2.1, 2.0, 1.9,
+    1.8, 1.9, 2.0, 2.1, 2.0, 1.9, 2.0, 2.1, 2.2, 2.1,
+    2.0, 1.9, 2.0, 2.1, 2.0, 1.9, 1.8, 1.9, 2.0, 2.1,
+    2.0, 1.9, 2.0, 2.1, 2.2, 2.1, 2.0, 1.9, 2.0, 2.0,
+  ],
+  // Zach: Clear declining pattern - started resourced, now in sentinel range
+  zach: [
+    2.8, 2.7, 2.8, 2.6, 2.7, 2.5, 2.6, 2.4, 2.5, 2.3,
+    2.4, 2.3, 2.2, 2.3, 2.1, 2.2, 2.0, 2.1, 2.0, 1.9,
+    2.0, 1.9, 1.8, 1.9, 1.8, 1.7, 1.8, 1.7, 1.6, 1.7,
+    1.6, 1.7, 1.6, 1.5, 1.6, 1.5, 1.6, 1.5, 1.4, 1.5,
+    1.4, 1.5, 1.4, 1.5, 1.4, 1.3, 1.4, 1.3, 1.4, 1.3,
+    1.4, 1.3, 1.4, 1.3, 1.2, 1.3, 1.2, 1.3, 1.4, 1.3,
+    1.2, 1.3, 1.2, 1.3, 1.2, 1.3, 1.2, 1.1, 1.2, 1.3,
+    1.2, 1.1, 1.2, 1.3, 1.2, 1.1, 1.2, 1.1, 1.2, 1.1,
+    1.2, 1.1, 1.2, 1.1, 1.0, 1.1, 1.2, 1.1, 1.0, 1.1,
+  ],
+  // Lily: Improving pattern - started low, now resourced
+  lily: [
+    1.4, 1.5, 1.4, 1.5, 1.6, 1.5, 1.6, 1.7, 1.6, 1.7,
+    1.8, 1.7, 1.8, 1.9, 1.8, 1.9, 2.0, 1.9, 2.0, 2.1,
+    2.0, 2.1, 2.2, 2.1, 2.2, 2.3, 2.2, 2.3, 2.4, 2.3,
+    2.4, 2.3, 2.4, 2.5, 2.4, 2.5, 2.4, 2.5, 2.6, 2.5,
+    2.6, 2.5, 2.6, 2.5, 2.6, 2.7, 2.6, 2.7, 2.6, 2.7,
+    2.6, 2.7, 2.8, 2.7, 2.8, 2.7, 2.8, 2.7, 2.8, 2.9,
+    2.8, 2.7, 2.8, 2.9, 2.8, 2.7, 2.8, 2.9, 2.8, 2.9,
+    2.8, 2.9, 2.8, 2.9, 2.8, 2.9, 3.0, 2.9, 2.8, 2.9,
+    3.0, 2.9, 2.8, 2.9, 3.0, 2.9, 2.8, 2.9, 3.0, 2.9,
+  ],
+  // Tyler: Volatile pattern - unpredictable swings
+  tyler: [
+    2.2, 1.8, 2.4, 1.6, 2.6, 1.9, 2.1, 1.4, 2.5, 1.7,
+    2.3, 1.5, 2.7, 1.8, 2.0, 1.3, 2.4, 1.6, 2.2, 1.9,
+    2.5, 1.4, 2.1, 1.7, 2.6, 1.5, 2.3, 1.8, 2.0, 1.4,
+    2.4, 1.6, 2.2, 1.9, 2.5, 1.3, 2.1, 1.7, 2.6, 1.5,
+    2.3, 1.8, 2.0, 1.4, 2.4, 1.6, 2.2, 1.9, 2.5, 1.3,
+    2.1, 1.7, 2.6, 1.5, 2.3, 1.8, 2.0, 1.4, 2.4, 1.6,
+    2.2, 1.9, 2.5, 1.3, 2.1, 1.7, 2.6, 1.5, 2.3, 1.8,
+    2.0, 1.4, 2.4, 1.6, 2.2, 1.9, 2.5, 1.3, 2.1, 1.7,
+    2.6, 1.5, 2.3, 1.8, 2.0, 1.4, 2.4, 1.6, 2.2, 1.8,
+  ],
+  // Emma: Gradual decline with recent dip
+  emma: [
+    2.6, 2.5, 2.6, 2.5, 2.4, 2.5, 2.4, 2.3, 2.4, 2.3,
+    2.4, 2.3, 2.2, 2.3, 2.2, 2.3, 2.2, 2.1, 2.2, 2.1,
+    2.2, 2.1, 2.0, 2.1, 2.0, 2.1, 2.0, 1.9, 2.0, 1.9,
+    2.0, 1.9, 2.0, 1.9, 1.8, 1.9, 1.8, 1.9, 1.8, 1.7,
+    1.8, 1.7, 1.8, 1.7, 1.8, 1.7, 1.6, 1.7, 1.6, 1.7,
+    1.6, 1.7, 1.6, 1.5, 1.6, 1.5, 1.6, 1.5, 1.6, 1.5,
+    1.4, 1.5, 1.4, 1.5, 1.4, 1.5, 1.4, 1.3, 1.4, 1.3,
+    1.4, 1.3, 1.4, 1.3, 1.2, 1.3, 1.2, 1.3, 1.2, 1.3,
+    1.2, 1.1, 1.2, 1.1, 1.2, 1.1, 1.2, 1.1, 1.2, 1.2,
+  ],
 };
 
 const DEMO_CIRCLE_MEMBERS: CircleMember[] = [
-  { id: '1', name: 'Mia', username: 'Mia Anderson', avatar: 'https://i.pravatar.cc/100?u=mia', capacityState: 'stretched', trend: 'flat', participation: '6 / 7', notes: 'Sensory sensitivity noted', capacityHistory: generateCapacityHistory('stable_low'), color: MEMBER_COLORS.mia },
-  { id: '2', name: 'Zach', username: 'Zach Teguns', avatar: 'https://i.pravatar.cc/100?u=zach', capacityState: 'stretched', trend: 'declining', participation: '7 / 7', notes: 'Sleep disruption', capacityHistory: generateCapacityHistory('declining'), color: MEMBER_COLORS.zach },
-  { id: '3', name: 'Lily', username: 'Lily Teguns', avatar: 'https://i.pravatar.cc/100?u=lily', capacityState: 'resourced', trend: 'improving', participation: '5 / 5', notes: 'Steady progress', capacityHistory: generateCapacityHistory('improving'), color: MEMBER_COLORS.lily },
-  { id: '4', name: 'Tyler', username: 'Tyler Ramirez', avatar: 'https://i.pravatar.cc/100?u=tyler', capacityState: 'stretched', trend: 'flat', participation: '5 / 5', notes: 'Transition support', capacityHistory: generateCapacityHistory('volatile'), color: MEMBER_COLORS.tyler },
-  { id: '5', name: 'Emma', username: 'Emily Zhang', avatar: 'https://i.pravatar.cc/100?u=emma', capacityState: 'stretched', trend: 'declining', participation: '5 / 5', notes: 'Schedule changes', capacityHistory: generateCapacityHistory('declining'), color: MEMBER_COLORS.emma },
+  { id: '1', name: 'Mia', username: 'Mia Anderson', avatar: 'https://i.pravatar.cc/100?u=mia', capacityState: 'stretched', trend: 'flat', participation: '6 / 7', notes: 'Sensory sensitivity noted', capacityHistory: FABRICATED_HISTORIES.mia },
+  { id: '2', name: 'Zach', username: 'Zach Teguns', avatar: 'https://i.pravatar.cc/100?u=zach', capacityState: 'depleted', trend: 'declining', participation: '7 / 7', notes: 'Sleep disruption', capacityHistory: FABRICATED_HISTORIES.zach },
+  { id: '3', name: 'Lily', username: 'Lily Teguns', avatar: 'https://i.pravatar.cc/100?u=lily', capacityState: 'resourced', trend: 'improving', participation: '5 / 5', notes: 'Steady progress', capacityHistory: FABRICATED_HISTORIES.lily },
+  { id: '4', name: 'Tyler', username: 'Tyler Ramirez', avatar: 'https://i.pravatar.cc/100?u=tyler', capacityState: 'stretched', trend: 'flat', participation: '5 / 5', notes: 'Transition support', capacityHistory: FABRICATED_HISTORIES.tyler },
+  { id: '5', name: 'Emma', username: 'Emily Zhang', avatar: 'https://i.pravatar.cc/100?u=emma', capacityState: 'depleted', trend: 'declining', participation: '5 / 5', notes: 'Schedule changes', capacityHistory: FABRICATED_HISTORIES.emma },
 ];
 
 // =============================================================================
-// CAPACITY TREND CHART COMPONENT (90-DAY, 5 MEMBER LINES)
+// CAPACITY TREND CHART COMPONENT (90-DAY, INDIVIDUAL CCI STYLE)
 // =============================================================================
 
 interface CapacityTrendChartProps {
   members: CircleMember[];
+  width?: number;
 }
 
-function CapacityTrendChart({ members }: CapacityTrendChartProps) {
-  const chartWidth = 320;
-  const chartHeight = 200;
-  const padding = { top: 10, right: 90, bottom: 25, left: 35 };
-  const graphWidth = chartWidth - padding.left - padding.right;
-  const graphHeight = chartHeight - padding.top - padding.bottom;
+function CapacityTrendChart({ members, width: containerWidth }: CapacityTrendChartProps) {
+  // Responsive dimensions - use viewBox for scaling
+  const viewBoxWidth = 500;
+  const viewBoxHeight = 200;
+  const padding = { top: 15, right: 70, bottom: 30, left: 5 };
+  const graphWidth = viewBoxWidth - padding.left - padding.right;
+  const graphHeight = viewBoxHeight - padding.top - padding.bottom;
 
   // Band heights (Resourced top, Stretched middle, Sentinel bottom)
   const bandHeight = graphHeight / 3;
@@ -159,40 +183,82 @@ function CapacityTrendChart({ members }: CapacityTrendChartProps) {
   // Scale for 90 days
   const dataPoints = 90;
   const xScale = graphWidth / (dataPoints - 1);
-  const yScale = graphHeight / 3;
 
-  // Generate path for a member's capacity history
-  const generateMemberPath = (history: number[]) => {
-    return history.map((value, index) => {
-      const x = padding.left + index * xScale;
-      const y = padding.top + (3 - value) * yScale;
-      return `${index === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
-    }).join(' ');
+  // Convert capacity value (1-3) to Y coordinate
+  const valueToY = (value: number) => {
+    // value 3 = top, value 1 = bottom
+    const normalized = (value - 1) / 2; // 0 to 1
+    return padding.top + graphHeight - (normalized * graphHeight);
+  };
+
+  // Generate smooth bezier curve path for a member's capacity history
+  const generateSmoothPath = (history: number[]) => {
+    if (history.length < 2) return '';
+
+    const points = history.map((value, index) => ({
+      x: padding.left + index * xScale,
+      y: valueToY(value),
+    }));
+
+    // Create smooth bezier curve
+    let path = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+
+    for (let i = 1; i < points.length; i++) {
+      const prev = points[i - 1];
+      const curr = points[i];
+      const tension = 0.3;
+
+      // Control points for smooth curve
+      const cp1x = prev.x + (curr.x - prev.x) * tension;
+      const cp1y = prev.y;
+      const cp2x = curr.x - (curr.x - prev.x) * tension;
+      const cp2y = curr.y;
+
+      path += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${curr.x.toFixed(1)} ${curr.y.toFixed(1)}`;
+    }
+
+    return path;
+  };
+
+  // Get key data points for dots (monthly markers: day 0, 30, 60, 89)
+  const getKeyPoints = (history: number[]) => {
+    const indices = [0, 30, 60, 89];
+    return indices.map(i => ({
+      x: padding.left + i * xScale,
+      y: valueToY(history[i]),
+      value: history[i],
+      color: getCapacityColor(history[i]),
+    }));
   };
 
   return (
-    <Svg width={chartWidth} height={chartHeight}>
+    <Svg
+      width="100%"
+      height={containerWidth ? containerWidth * 0.4 : 180}
+      viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
+      preserveAspectRatio="xMidYMid meet"
+    >
       {/* Background bands */}
       <Rect
         x={padding.left}
         y={padding.top}
         width={graphWidth}
         height={bandHeight}
-        fill="rgba(16, 185, 129, 0.12)"
+        fill="rgba(0, 215, 255, 0.08)"
       />
       <Rect
         x={padding.left}
         y={padding.top + bandHeight}
         width={graphWidth}
         height={bandHeight}
-        fill="rgba(232, 168, 48, 0.12)"
+        fill="rgba(232, 168, 48, 0.08)"
       />
       <Rect
         x={padding.left}
         y={padding.top + bandHeight * 2}
         width={graphWidth}
         height={bandHeight}
-        fill="rgba(249, 115, 22, 0.12)"
+        fill="rgba(244, 67, 54, 0.08)"
       />
 
       {/* Grid lines */}
@@ -201,39 +267,55 @@ function CapacityTrendChart({ members }: CapacityTrendChartProps) {
         y1={padding.top + bandHeight}
         x2={padding.left + graphWidth}
         y2={padding.top + bandHeight}
-        stroke="rgba(255,255,255,0.1)"
-        strokeWidth={1}
+        stroke="rgba(255,255,255,0.15)"
+        strokeWidth={0.5}
+        strokeDasharray="4,4"
       />
       <Line
         x1={padding.left}
         y1={padding.top + bandHeight * 2}
         x2={padding.left + graphWidth}
         y2={padding.top + bandHeight * 2}
-        stroke="rgba(255,255,255,0.1)"
-        strokeWidth={1}
+        stroke="rgba(255,255,255,0.15)"
+        strokeWidth={0.5}
+        strokeDasharray="4,4"
       />
 
-      {/* Member trend lines */}
+      {/* Member trend lines - smooth curves */}
       {members.map((member) => (
         <Path
-          key={member.id}
-          d={generateMemberPath(member.capacityHistory)}
-          stroke={member.color}
-          strokeWidth={1.5}
+          key={`line-${member.id}`}
+          d={generateSmoothPath(member.capacityHistory)}
+          stroke="rgba(255,255,255,0.6)"
+          strokeWidth={2}
           fill="none"
           strokeLinecap="round"
           strokeLinejoin="round"
-          opacity={0.85}
         />
       ))}
+
+      {/* Colored dots at key data points for each member */}
+      {members.map((member) =>
+        getKeyPoints(member.capacityHistory).map((point, idx) => (
+          <SvgCircle
+            key={`dot-${member.id}-${idx}`}
+            cx={point.x}
+            cy={point.y}
+            r={6}
+            fill={point.color}
+            stroke="rgba(0,0,0,0.3)"
+            strokeWidth={1}
+          />
+        ))
+      )}
 
       {/* Y-axis labels */}
       <SvgText
         x={padding.left + graphWidth + 8}
         y={padding.top + bandHeight / 2 + 4}
-        fill="#10B981"
-        fontSize={10}
-        fontWeight="600"
+        fill="#00D7FF"
+        fontSize={11}
+        fontWeight="500"
       >
         Resourced
       </SvgText>
@@ -241,51 +323,51 @@ function CapacityTrendChart({ members }: CapacityTrendChartProps) {
         x={padding.left + graphWidth + 8}
         y={padding.top + bandHeight * 1.5 + 4}
         fill="#E8A830"
-        fontSize={10}
-        fontWeight="600"
+        fontSize={11}
+        fontWeight="500"
       >
         Stretched
       </SvgText>
       <SvgText
         x={padding.left + graphWidth + 8}
         y={padding.top + bandHeight * 2.5 + 4}
-        fill="#F97316"
-        fontSize={10}
-        fontWeight="600"
+        fill="#F44336"
+        fontSize={11}
+        fontWeight="500"
       >
         Sentinel
       </SvgText>
 
-      {/* X-axis labels - 90 days */}
+      {/* X-axis labels - months */}
       <SvgText
         x={padding.left}
-        y={chartHeight - 5}
+        y={viewBoxHeight - 8}
         fill="rgba(255,255,255,0.5)"
-        fontSize={9}
+        fontSize={10}
       >
-        -90d
+        Oct
       </SvgText>
       <SvgText
-        x={padding.left + graphWidth / 3 - 10}
-        y={chartHeight - 5}
+        x={padding.left + graphWidth / 3}
+        y={viewBoxHeight - 8}
         fill="rgba(255,255,255,0.5)"
-        fontSize={9}
+        fontSize={10}
       >
-        -60d
+        Nov
       </SvgText>
       <SvgText
-        x={padding.left + (graphWidth * 2) / 3 - 10}
-        y={chartHeight - 5}
+        x={padding.left + (graphWidth * 2) / 3}
+        y={viewBoxHeight - 8}
         fill="rgba(255,255,255,0.5)"
-        fontSize={9}
+        fontSize={10}
       >
-        -30d
+        Dec
       </SvgText>
       <SvgText
-        x={padding.left + graphWidth - 20}
-        y={chartHeight - 5}
+        x={padding.left + graphWidth - 5}
+        y={viewBoxHeight - 8}
         fill="rgba(255,255,255,0.5)"
-        fontSize={9}
+        fontSize={10}
       >
         Today
       </SvgText>
@@ -294,40 +376,73 @@ function CapacityTrendChart({ members }: CapacityTrendChartProps) {
 }
 
 // =============================================================================
-// SPARKLINE COMPONENT FOR TABLE ROWS
+// SPARKLINE COMPONENT FOR TABLE ROWS — Matches Individual CCI Style
 // =============================================================================
 
 interface MemberSparklineProps {
   data: number[];
-  color: string;
   width?: number;
   height?: number;
 }
 
-function MemberSparkline({ data, color, width = 60, height = 20 }: MemberSparklineProps) {
+function MemberSparkline({ data, width = 100, height = 24 }: MemberSparklineProps) {
   // Use last 30 days for sparkline
   const sparkData = data.slice(-30);
   const xScale = width / (sparkData.length - 1);
   const minVal = 1;
   const maxVal = 3;
-  const yScale = height / (maxVal - minVal);
 
-  const pathData = sparkData.map((value, index) => {
-    const x = index * xScale;
-    const y = height - (value - minVal) * yScale;
-    return `${index === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
-  }).join(' ');
+  // Convert value to Y coordinate
+  const valueToY = (value: number) => {
+    const normalized = (value - minVal) / (maxVal - minVal);
+    return height - (normalized * height);
+  };
+
+  // Generate smooth bezier path
+  const points = sparkData.map((value, index) => ({
+    x: index * xScale,
+    y: valueToY(value),
+  }));
+
+  let pathData = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+  for (let i = 1; i < points.length; i++) {
+    const prev = points[i - 1];
+    const curr = points[i];
+    const tension = 0.3;
+    const cp1x = prev.x + (curr.x - prev.x) * tension;
+    const cp2x = curr.x - (curr.x - prev.x) * tension;
+    pathData += ` C ${cp1x.toFixed(1)} ${prev.y.toFixed(1)}, ${cp2x.toFixed(1)} ${curr.y.toFixed(1)}, ${curr.x.toFixed(1)} ${curr.y.toFixed(1)}`;
+  }
+
+  // Key points for dots (start, middle, end)
+  const keyIndices = [0, Math.floor(sparkData.length / 2), sparkData.length - 1];
+  const keyPoints = keyIndices.map(i => ({
+    x: i * xScale,
+    y: valueToY(sparkData[i]),
+    color: getCapacityColor(sparkData[i]),
+  }));
 
   return (
     <Svg width={width} height={height}>
+      {/* Smooth line */}
       <Path
         d={pathData}
-        stroke={color}
+        stroke="rgba(255,255,255,0.5)"
         strokeWidth={1.5}
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+      {/* Colored dots at key points */}
+      {keyPoints.map((point, idx) => (
+        <SvgCircle
+          key={idx}
+          cx={point.x}
+          cy={point.y}
+          r={3}
+          fill={point.color}
+        />
+      ))}
     </Svg>
   );
 }
@@ -565,7 +680,7 @@ function CirclesCCIBrief() {
 
                 {/* 30 Day Trend Sparkline */}
                 <View style={[styles.tableCell, { flex: 0.8, flexDirection: 'row', alignItems: 'center' }]}>
-                  <MemberSparkline data={member.capacityHistory} color={member.color} />
+                  <MemberSparkline data={member.capacityHistory} />
                 </View>
 
                 {/* Participation */}
@@ -603,16 +718,29 @@ function CirclesCCIBrief() {
         <View style={[styles.rightColumn, isWideScreen && { flex: 0.45, marginLeft: spacing.md }]}>
           {/* Capacity Trend Chart */}
           <View style={styles.chartContainer}>
-            <Text style={styles.chartTitle}>90-Day Capacity Trends</Text>
+            <View style={styles.chartHeader}>
+              <Text style={styles.chartTitle}>CAPACITY OVER TIME</Text>
+              <Text style={styles.chartSubtitle}>— NORMALIZED, NON-DIAGNOSTIC</Text>
+            </View>
             <CapacityTrendChart members={DEMO_CIRCLE_MEMBERS} />
-            {/* Legend */}
+            {/* Color Legend - Capacity based */}
             <View style={styles.chartLegend}>
-              {DEMO_CIRCLE_MEMBERS.map((member) => (
-                <View key={member.id} style={styles.legendItem}>
-                  <View style={[styles.legendDot, { backgroundColor: member.color }]} />
-                  <Text style={styles.legendText}>{member.name}</Text>
-                </View>
-              ))}
+              <View style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: '#00D7FF' }]} />
+                <Text style={styles.legendText}>Resourced</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: '#10B981' }]} />
+                <Text style={styles.legendText}>Good</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: '#E8A830' }]} />
+                <Text style={styles.legendText}>Stretched</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: '#F44336' }]} />
+                <Text style={styles.legendText}>Depleted</Text>
+              </View>
             </View>
           </View>
 
@@ -899,13 +1027,22 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.1)',
     padding: spacing.lg,
     marginBottom: spacing.md,
-    minHeight: 260,
+  },
+  chartHeader: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: spacing.xs,
+    marginBottom: spacing.sm,
   },
   chartTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.95)',
-    marginBottom: spacing.sm,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#00D7FF',
+    letterSpacing: 0.5,
+  },
+  chartSubtitle: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.5)',
   },
   chartLegend: {
     flexDirection: 'row',
