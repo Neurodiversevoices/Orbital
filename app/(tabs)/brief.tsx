@@ -37,6 +37,7 @@ import {
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../../theme';
 import { useAccess } from '../../lib/access';
+import { CCIChart, calculateAggregateCapacity } from '../../components/CCIChart';
 
 // =============================================================================
 // TYPES
@@ -605,7 +606,7 @@ function CirclesCCIBrief() {
       <View style={[styles.cciDescriptionRow, isWideScreen && styles.cciDescriptionRowWide]}>
         {/* Left: CCI Description */}
         <View style={[styles.circleCCICard, isWideScreen && { flex: 1, marginRight: spacing.md }]}>
-          <Text style={styles.circleCCITitle}>CIRCLE CAPACITY INDEX (CCI)</Text>
+          <Text style={styles.circleCCITitle}>CIRCLE CAPACITY INDICATOR (CCI)</Text>
           <Text style={styles.circleCCIDescription}>
             A non-diagnostic, aggregate snapshot of a group's{' '}
             <Text style={styles.circleCCIHighlight}>functional regulation bandwidth</Text>
@@ -716,32 +717,18 @@ function CirclesCCIBrief() {
 
         {/* RIGHT COLUMN: Chart + Aggregate Info */}
         <View style={[styles.rightColumn, isWideScreen && { flex: 0.45, marginLeft: spacing.md }]}>
-          {/* Capacity Trend Chart */}
+          {/* Circle Aggregate CCI Chart — Uses shared CCIChart component */}
           <View style={styles.chartContainer}>
             <View style={styles.chartHeader}>
-              <Text style={styles.chartTitle}>CAPACITY OVER TIME</Text>
-              <Text style={styles.chartSubtitle}>— NORMALIZED, NON-DIAGNOSTIC</Text>
+              <Text style={styles.chartTitle}>CIRCLE CAPACITY INDICATOR</Text>
+              <Text style={styles.chartSubtitle}>— AGGREGATE, NON-DIAGNOSTIC</Text>
             </View>
-            <CapacityTrendChart members={DEMO_CIRCLE_MEMBERS} />
-            {/* Color Legend - Capacity based */}
-            <View style={styles.chartLegend}>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: '#00D7FF' }]} />
-                <Text style={styles.legendText}>Resourced</Text>
-              </View>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: '#10B981' }]} />
-                <Text style={styles.legendText}>Good</Text>
-              </View>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: '#E8A830' }]} />
-                <Text style={styles.legendText}>Stretched</Text>
-              </View>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: '#F44336' }]} />
-                <Text style={styles.legendText}>Depleted</Text>
-              </View>
-            </View>
+            <CCIChart
+              data={calculateAggregateCapacity(DEMO_CIRCLE_MEMBERS.map(m => m.capacityHistory))}
+              timeRange="90d"
+              showLegend={true}
+              showDisclaimer={false}
+            />
           </View>
 
           {/* Aggregate Capacity Section */}
