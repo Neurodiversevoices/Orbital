@@ -1,21 +1,13 @@
 /**
- * Briefings Tab — 3 Scope Modes
+ * Briefings Tab — B2C Only
  *
- * 1. Personal     → CCI Demo Brief (links to /cci)
- * 2. Organization → Sentinel Demo Mode Selector:
- *                   - K–12 Education Sentinel Demo (PNG golden master)
- *                   - University Sentinel Demo (derived from K-12)
- * 3. Global       → Sentinel Demo (PNG golden master, different copy)
- *
- * CANONICAL:
- * - K–12 Education Sentinel Demo v1
- * - University Sentinel Demo v1 (derived)
+ * 1. Personal → Individual CCI Demo Brief (links to /cci)
+ * 2. Circles  → Circle CCI Demo (Pro only)
  *
  * GOVERNANCE:
  * - All views are DEMO-ONLY
- * - No export, no tuning, no activation, no pricing
- * - Organization/Global CTAs route to contact flow
- * - University cohorts derived from Year of Birth (not manual selection)
+ * - No Organization/Global tabs (those are B2B/enterprise)
+ * - Circles tab requires Pro subscription
  */
 
 import React, { useState, useMemo } from 'react';
@@ -25,80 +17,62 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
-  Linking,
-  Platform,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import {
   User,
-  Building2,
-  Globe,
-  FileText,
-  ExternalLink,
-  Mail,
-  ChevronRight,
-  ChevronDown,
   Users,
+  FileText,
+  ChevronRight,
+  CheckCircle,
+  TrendingUp,
+  TrendingDown,
+  Minus,
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../../theme';
-import {
-  SENTINEL_CONTACT_URL,
-  SENTINEL_DEMO_LABELS,
-  // K-12 Education Sentinel
-  SCHOOL_AGE_COHORTS,
-  SCHOOL_AGE_COHORT_LABELS,
-  getSchoolDistrictSentinelData,
-  getSchoolCohortSampleSize,
-  SCHOOL_DISTRICT_SENTINEL,
-  SchoolAgeCohort,
-  // University Sentinel
-  UNIVERSITY_AGE_COHORTS,
-  UNIVERSITY_AGE_COHORT_LABELS,
-  getUniversitySentinelData,
-  getUniversityCohortSampleSize,
-  UNIVERSITY_SENTINEL,
-  UniversityAgeCohort,
-  // Truthful Demo Engine (generated charts)
-  buildSentinelDemoData,
-  AGE_COHORT_BANDS,
-  AGE_COHORT_LABELS,
-  AgeCohortBand,
-  getCohortsForVertical,
-  getCohortSampleSize,
-} from '../../lib/sentinel';
-import { SentinelChart } from '../../components/SentinelChart';
-import { VegaSentinelChart } from '../../components/VegaSentinelChart';
 import { useAccess } from '../../lib/access';
 
 // =============================================================================
 // TYPES
 // =============================================================================
 
-type BriefScope = 'personal' | 'organization' | 'global';
-type SentinelDemoMode = 'k12' | 'university';
+type BriefScope = 'personal' | 'circles';
 
 interface ScopeTab {
   id: BriefScope;
   label: string;
   icon: React.ComponentType<{ color: string; size: number }>;
-}
-
-interface DemoModeTab {
-  id: SentinelDemoMode;
-  label: string;
+  proOnly?: boolean;
 }
 
 const SCOPE_TABS: ScopeTab[] = [
   { id: 'personal', label: 'Personal', icon: User },
-  { id: 'organization', label: 'Organization', icon: Building2 },
-  { id: 'global', label: 'Global', icon: Globe },
+  { id: 'circles', label: 'Circles', icon: Users, proOnly: true },
 ];
 
-const DEMO_MODE_TABS: DemoModeTab[] = [
-  { id: 'k12', label: 'K–12 Education' },
-  { id: 'university', label: 'University' },
+// =============================================================================
+// DEMO DATA FOR CIRCLES
+// =============================================================================
+
+interface CircleMember {
+  id: string;
+  name: string;
+  username: string;
+  avatar?: string;
+  capacityState: 'resourced' | 'stretched' | 'depleted';
+  trend: 'improving' | 'declining' | 'flat';
+  participation: string;
+}
+
+const DEMO_CIRCLE_MEMBERS: CircleMember[] = [
+  { id: '1', name: 'Mia', username: 'Mia Anderson', capacityState: 'stretched', trend: 'flat', participation: '6 / 7' },
+  { id: '2', name: 'Zach', username: 'That teguns', capacityState: 'stretched', trend: 'declining', participation: '7 / 7' },
+  { id: '3', name: 'Lily', username: 'Traa teguns', capacityState: 'resourced', trend: 'improving', participation: '5 / 5' },
+  { id: '4', name: 'Tyler', username: 'Tyia Ramirez', capacityState: 'stretched', trend: 'flat', participation: '5 / 5' },
+  { id: '5', name: 'Emma', username: 'Emily Zhang', capacityState: 'stretched', trend: 'declining', participation: '5 / 5' },
 ];
 
 // =============================================================================
@@ -113,14 +87,14 @@ export default function BriefingsScreen() {
   const visibleTabs = useMemo(() => {
     if (!showBriefingsOrgGlobal) {
       // Free User View: only show Personal tab
-      return SCOPE_TABS.filter((tab) => tab.id === 'personal');
+      return SCOPE_TABS.filter((tab) => !tab.proOnly);
     }
     return SCOPE_TABS;
   }, [showBriefingsOrgGlobal]);
 
   // If current scope is not visible, reset to personal
   React.useEffect(() => {
-    if (!showBriefingsOrgGlobal && scope !== 'personal') {
+    if (!showBriefingsOrgGlobal && scope === 'circles') {
       setScope('personal');
     }
   }, [showBriefingsOrgGlobal, scope]);
@@ -174,8 +148,7 @@ export default function BriefingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {scope === 'personal' && <PersonalBrief />}
-        {scope === 'organization' && showBriefingsOrgGlobal && <OrganizationBrief />}
-        {scope === 'global' && showBriefingsOrgGlobal && <GlobalBrief />}
+        {scope === 'circles' && showBriefingsOrgGlobal && <CirclesCCIBrief />}
       </ScrollView>
     </SafeAreaView>
   );
@@ -233,520 +206,150 @@ function PersonalBrief() {
 }
 
 // =============================================================================
-// ORGANIZATION TAB — Sentinel Demo Mode Selector (K-12 / University)
+// CIRCLES TAB — Circle CCI Demo (Pro Only)
 // =============================================================================
 
-function OrganizationBrief() {
-  const [demoMode, setDemoMode] = useState<SentinelDemoMode>('k12');
-
-  return (
-    <Animated.View entering={FadeInDown.duration(400)}>
-      {/* Demo Mode Selector */}
-      <View style={styles.demoModeSelector}>
-        <Text style={styles.demoModeSelectorLabel}>Select Demo:</Text>
-        <View style={styles.demoModeButtons}>
-          {DEMO_MODE_TABS.map((tab) => {
-            const isActive = demoMode === tab.id;
-            return (
-              <Pressable
-                key={tab.id}
-                style={[styles.demoModeButton, isActive && styles.demoModeButtonActive]}
-                onPress={() => setDemoMode(tab.id)}
-              >
-                <Text style={[styles.demoModeButtonText, isActive && styles.demoModeButtonTextActive]}>
-                  {tab.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      </View>
-
-      {/* Render selected demo */}
-      {demoMode === 'k12' ? <K12SentinelBrief /> : <UniversitySentinelBrief />}
-    </Animated.View>
-  );
-}
-
-// =============================================================================
-// K-12 EDUCATION SENTINEL BRIEF (Truthful Demo Engine)
-// =============================================================================
-
-// K-12 cohorts: starting at age 5 per governance constraints
-const K12_COHORTS: AgeCohortBand[] = ['5-10', '11-13', '14-18', '18-24', '25-34', '35-44', '45-54', '55-64', '65+'];
-
-function K12SentinelBrief() {
-  const [selectedCohort, setSelectedCohort] = useState<AgeCohortBand>('5-10');
-  const [showCohortPicker, setShowCohortPicker] = useState(false);
-
-  const handleContact = () => {
-    Linking.openURL(SENTINEL_CONTACT_URL);
-  };
-
-  // Generate demo data using truthful engine
-  const sentinelData = useMemo(() => {
-    return buildSentinelDemoData('k12', selectedCohort);
-  }, [selectedCohort]);
-
-  const cohortSampleSize = getCohortSampleSize('k12', selectedCohort);
-
-  return (
-    <>
-      {/* Demo Banner — Full Width */}
-      <View style={styles.demoBannerFull}>
-        <Text style={styles.demoBannerFullText}>
-          {SCHOOL_DISTRICT_SENTINEL.demoBanner}
-        </Text>
-      </View>
-
-      {/* Sentinel Header */}
-      <View style={styles.sentinelHeader}>
-        <Text style={styles.sentinelTitle}>{SCHOOL_DISTRICT_SENTINEL.title}</Text>
-        <Text style={styles.sentinelSubtitle}>{SCHOOL_DISTRICT_SENTINEL.subtitle}</Text>
-      </View>
-
-      {/* District Label */}
-      <View style={styles.districtRow}>
-        <Building2 color="#00D7FF" size={14} />
-        <Text style={styles.districtText}>
-          {SCHOOL_DISTRICT_SENTINEL.vertical} · {SCHOOL_DISTRICT_SENTINEL.districtLabel}
-        </Text>
-      </View>
-
-      {/* Age Cohort Selector */}
-      <Pressable
-        style={styles.cohortSelector}
-        onPress={() => setShowCohortPicker(!showCohortPicker)}
-      >
-        <View style={styles.cohortSelectorLeft}>
-          <Users color="#00D7FF" size={16} />
-          <Text style={styles.cohortSelectorLabel}>Age Cohort:</Text>
-          <Text style={styles.cohortSelectorValue}>
-            {AGE_COHORT_LABELS[selectedCohort]} (DEMO)
-          </Text>
-        </View>
-        <ChevronDown
-          color="rgba(255,255,255,0.5)"
-          size={18}
-          style={{ transform: [{ rotate: showCohortPicker ? '180deg' : '0deg' }] }}
-        />
-      </Pressable>
-
-      {/* Cohort Picker Dropdown */}
-      {showCohortPicker && (
-        <View style={styles.cohortPickerDropdown}>
-          {K12_COHORTS.map((cohort) => {
-            const isSelected = cohort === selectedCohort;
-            const sampleSize = getCohortSampleSize('k12', cohort);
-            return (
-              <Pressable
-                key={cohort}
-                style={[styles.cohortOption, isSelected && styles.cohortOptionSelected]}
-                onPress={() => {
-                  setSelectedCohort(cohort);
-                  setShowCohortPicker(false);
-                }}
-              >
-                <Text style={[styles.cohortOptionText, isSelected && styles.cohortOptionTextSelected]}>
-                  {AGE_COHORT_LABELS[cohort]}
-                </Text>
-                <Text style={styles.cohortOptionCount}>n={sampleSize}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      )}
-
-      {/* Sample Size Badge */}
-      <View style={styles.sampleInfoRow}>
-        <Text style={styles.sampleInfoText}>
-          Based on {SCHOOL_DISTRICT_SENTINEL.totalSampleSize.toLocaleString()} synthetic inputs
-          {cohortSampleSize > 0 && ` · Cohort n=${cohortSampleSize}`}
-        </Text>
-      </View>
-
-      {/* Sentinel Chart — Vega-Lite K-12 Demo (Web) / Legacy (Native) */}
-      {Platform.OS === 'web' ? (
-        <VegaSentinelChart
-          points={sentinelData.volatilityTrend}
-          baseline={sentinelData.baselineValue}
-          systemState={sentinelData.systemState}
-          consecutiveDays={sentinelData.consecutiveDaysAboveBaseline}
-          cohortLabel={`K-12 Education · ${AGE_COHORT_LABELS[selectedCohort]}`}
-          sampleSize={cohortSampleSize}
-        />
-      ) : (
-        <>
-          <View style={styles.sentinelContainer}>
-            <SentinelChart
-              points={sentinelData.volatilityTrend}
-              baseline={sentinelData.baselineValue}
-              upperBand={70}
-              systemState={sentinelData.systemState}
-              consecutiveDays={sentinelData.consecutiveDaysAboveBaseline}
-              title={sentinelData.cohortLabel}
-              height={220}
-              accentColor="#00D7FF"
-            />
-          </View>
-
-          {/* Cohort-specific status */}
-          <View style={styles.statusCard}>
-            <Text style={styles.statusLabel}>SYSTEM STATE</Text>
-            <Text style={styles.statusValue}>
-              {sentinelData.systemState === 'sustained_volatility'
-                ? 'Sentinel Triggered'
-                : sentinelData.systemState === 'critical'
-                ? 'Critical Volatility'
-                : sentinelData.systemState === 'elevated'
-                ? 'Elevated volatility'
-                : 'Within baseline'}
-            </Text>
-            <Text style={styles.statusDetail}>
-              {sentinelData.consecutiveDaysAboveBaseline} consecutive days above baseline
-            </Text>
-          </View>
-        </>
-      )}
-
-      {/* Governance Notice */}
-      <View style={styles.governanceNotice}>
-        <Text style={styles.governanceTitle}>Institutional Access Only</Text>
-        <Text style={styles.governanceText}>
-          Live Sentinel dashboards are available through direct engagement with
-          Orbital. No self-serve activation. No pricing in-app.
-        </Text>
-      </View>
-
-      {/* Contact CTA */}
-      <Pressable style={styles.contactButton} onPress={handleContact}>
-        <Mail color="#000" size={18} />
-        <Text style={styles.contactButtonText}>Contact Orbital</Text>
-        <ExternalLink color="#000" size={14} />
-      </Pressable>
-
-      {/* Footer — K-12 Education Baseline */}
-      <View style={styles.footer}>
-        <Text style={styles.footerBadge}>DEMO · K–12 EDUCATION BASELINE</Text>
-        <Text style={styles.footerText}>
-          Simulated aggregate data for demonstration only.
-          {'\n'}No personal data is tracked or collected.
-        </Text>
-      </View>
-    </>
-  );
-}
-
-// =============================================================================
-// UNIVERSITY SENTINEL BRIEF (Truthful Demo Engine)
-// =============================================================================
-
-// University cohorts: 18+ only (no children)
-const UNIVERSITY_COHORTS: AgeCohortBand[] = ['18-24', '25-34', '35-44', '45-54', '55-64', '65+'];
-
-function UniversitySentinelBrief() {
-  const [selectedCohort, setSelectedCohort] = useState<AgeCohortBand>('18-24');
-  const [showCohortPicker, setShowCohortPicker] = useState(false);
-
-  const handleContact = () => {
-    Linking.openURL(SENTINEL_CONTACT_URL);
-  };
-
-  const handleRequestAccess = () => {
-    Linking.openURL('mailto:contact@orbital.health?subject=Orbital%20University%20Sentinel%20%E2%80%94%20Request%20Institutional%20Access');
-  };
-
-  // Generate demo data using truthful engine
-  const sentinelData = useMemo(() => {
-    return buildSentinelDemoData('university', selectedCohort);
-  }, [selectedCohort]);
-
-  const cohortSampleSize = getCohortSampleSize('university', selectedCohort);
-
-  return (
-    <>
-      {/* Demo Banner — Full Width */}
-      <View style={[styles.demoBannerFull, { backgroundColor: '#6B5B95' }]}>
-        <Text style={[styles.demoBannerFullText, { color: '#fff' }]}>
-          {UNIVERSITY_SENTINEL.demoBanner}
-        </Text>
-      </View>
-
-      {/* Sentinel Header */}
-      <View style={styles.sentinelHeader}>
-        <Text style={[styles.sentinelTitle, { color: '#6B5B95' }]}>
-          {UNIVERSITY_SENTINEL.title}
-        </Text>
-        <Text style={styles.sentinelSubtitle}>{UNIVERSITY_SENTINEL.subtitle}</Text>
-      </View>
-
-      {/* Institution Label */}
-      <View style={styles.districtRow}>
-        <Building2 color="#6B5B95" size={14} />
-        <Text style={[styles.districtText, { color: '#6B5B95' }]}>
-          {UNIVERSITY_SENTINEL.vertical} · {UNIVERSITY_SENTINEL.institutionLabel}
-        </Text>
-      </View>
-
-      {/* Age Cohort Display (NOT manual selection — derived from Year of Birth) */}
-      <Pressable
-        style={[styles.cohortSelector, { borderColor: 'rgba(107,91,149,0.3)', backgroundColor: 'rgba(107,91,149,0.08)' }]}
-        onPress={() => setShowCohortPicker(!showCohortPicker)}
-      >
-        <View style={styles.cohortSelectorLeft}>
-          <Users color="#6B5B95" size={16} />
-          <Text style={styles.cohortSelectorLabel}>Age Cohort:</Text>
-          <Text style={[styles.cohortSelectorValue, { color: '#6B5B95' }]}>
-            {AGE_COHORT_LABELS[selectedCohort]} (DEMO)
-          </Text>
-        </View>
-        <ChevronDown
-          color="rgba(255,255,255,0.5)"
-          size={18}
-          style={{ transform: [{ rotate: showCohortPicker ? '180deg' : '0deg' }] }}
-        />
-      </Pressable>
-
-      {/* Cohort Picker Dropdown */}
-      {showCohortPicker && (
-        <View style={styles.cohortPickerDropdown}>
-          {UNIVERSITY_COHORTS.map((cohort) => {
-            const isSelected = cohort === selectedCohort;
-            const sampleSize = getCohortSampleSize('university', cohort);
-            return (
-              <Pressable
-                key={cohort}
-                style={[styles.cohortOption, isSelected && styles.cohortOptionSelectedUniversity]}
-                onPress={() => {
-                  setSelectedCohort(cohort);
-                  setShowCohortPicker(false);
-                }}
-              >
-                <Text style={[styles.cohortOptionText, isSelected && styles.cohortOptionTextSelectedUniversity]}>
-                  {AGE_COHORT_LABELS[cohort]}
-                </Text>
-                <Text style={styles.cohortOptionCount}>n={sampleSize}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      )}
-
-      {/* Sample Size Badge */}
-      <View style={styles.sampleInfoRow}>
-        <Text style={styles.sampleInfoText}>
-          Based on {UNIVERSITY_SENTINEL.totalSampleSize.toLocaleString()} synthetic inputs
-          {cohortSampleSize > 0 && ` · Cohort n=${cohortSampleSize}`}
-        </Text>
-      </View>
-
-      {/* Sentinel Chart — Truthful Demo Engine */}
-      <View style={styles.sentinelContainer}>
-        <SentinelChart
-          points={sentinelData.volatilityTrend}
-          baseline={sentinelData.baselineValue}
-          upperBand={70}
-          systemState={sentinelData.systemState}
-          consecutiveDays={sentinelData.consecutiveDaysAboveBaseline}
-          title={sentinelData.cohortLabel}
-          height={220}
-          accentColor="#6B5B95"
-        />
-      </View>
-
-      {/* Cohort-specific status — Academic framing */}
-      <View style={[styles.statusCard, { backgroundColor: 'rgba(107,91,149,0.1)', borderColor: 'rgba(107,91,149,0.3)' }]}>
-        <Text style={styles.statusLabel}>SYSTEM STATE</Text>
-        <Text style={[styles.statusValue, { color: '#6B5B95' }]}>
-          {sentinelData.systemState === 'sustained_volatility'
-            ? 'Sentinel Triggered'
-            : sentinelData.systemState === 'critical'
-            ? 'Critical Volatility'
-            : sentinelData.systemState === 'elevated'
-            ? 'Elevated disruption risk'
-            : 'Within baseline'}
-        </Text>
-        <Text style={styles.statusDetail}>
-          {sentinelData.consecutiveDaysAboveBaseline} consecutive days above baseline
-        </Text>
-      </View>
-
-      {/* Governance Notice — University framing */}
-      <View style={styles.governanceNotice}>
-        <Text style={styles.governanceTitle}>Institutional Access Only</Text>
-        <Text style={styles.governanceText}>
-          University Sentinel dashboards are available through direct engagement
-          with Orbital. Academic continuity and disruption risk signals for
-          institutional planning. No self-serve activation. No pricing in-app.
-        </Text>
-      </View>
-
-      {/* CTAs — Contact Orbital / Request Institutional Access */}
-      <View style={styles.ctaRow}>
-        <Pressable style={[styles.contactButton, { flex: 1, backgroundColor: '#6B5B95' }]} onPress={handleContact}>
-          <Mail color="#fff" size={16} />
-          <Text style={[styles.contactButtonText, { color: '#fff' }]}>Contact Orbital</Text>
-        </Pressable>
-      </View>
-
-      <Pressable style={styles.secondaryCta} onPress={handleRequestAccess}>
-        <Text style={styles.secondaryCtaText}>Request Institutional Access</Text>
-        <ExternalLink color="rgba(255,255,255,0.5)" size={14} />
-      </Pressable>
-
-      {/* Footer — University Sentinel */}
-      <View style={styles.footer}>
-        <Text style={[styles.footerBadge, { color: '#6B5B95' }]}>DEMO · UNIVERSITY SENTINEL</Text>
-        <Text style={styles.footerText}>
-          {UNIVERSITY_SENTINEL.footerText}
-        </Text>
-      </View>
-    </>
-  );
-}
-
-// =============================================================================
-// GLOBAL TAB — Sentinel Demo (Truthful Demo Engine)
-// =============================================================================
-
-// Global cohorts: 18+ adult population
-const GLOBAL_COHORTS: AgeCohortBand[] = ['18-24', '25-34', '35-44', '45-54', '55-64', '65+'];
-
-function GlobalBrief() {
-  const [selectedCohort, setSelectedCohort] = useState<AgeCohortBand>('25-34');
-  const [showCohortPicker, setShowCohortPicker] = useState(false);
-
-  const handleContact = () => {
-    Linking.openURL(SENTINEL_CONTACT_URL);
-  };
-
-  // Generate demo data using truthful engine
-  const sentinelData = useMemo(() => {
-    return buildSentinelDemoData('global', selectedCohort);
-  }, [selectedCohort]);
-
-  const cohortSampleSize = getCohortSampleSize('global', selectedCohort);
-
+function CirclesCCIBrief() {
   return (
     <Animated.View entering={FadeInDown.duration(400)}>
       {/* Demo Banner */}
       <View style={styles.demoBanner}>
-        <Text style={styles.demoBannerText}>
-          {SENTINEL_DEMO_LABELS.global.banner}
-        </Text>
+        <Text style={styles.demoBannerText}>DEMO / SAMPLE</Text>
       </View>
 
-      {/* Cohort Label */}
-      <View style={styles.cohortBadge}>
-        <Globe color="#9C27B0" size={14} />
-        <Text style={[styles.cohortText, { color: '#9C27B0' }]}>
-          Global Population · {AGE_COHORT_LABELS[selectedCohort]}
-        </Text>
+      {/* Circle Header */}
+      <View style={styles.circleHeader}>
+        <View style={styles.circleHeaderLeft}>
+          <Text style={styles.circleTitle}>SENSORY SUPPORT GROUP</Text>
+          <Text style={styles.circleSubtitle}>Lead Parent: Emily Zhang</Text>
+        </View>
+        <View style={styles.circleMemberBadge}>
+          <Text style={styles.circleMemberBadgeText}>5 / 5 Members</Text>
+        </View>
       </View>
 
-      {/* Age Cohort Selector */}
-      <Pressable
-        style={[styles.cohortSelector, { borderColor: 'rgba(156,39,176,0.3)', backgroundColor: 'rgba(156,39,176,0.08)' }]}
-        onPress={() => setShowCohortPicker(!showCohortPicker)}
-      >
-        <View style={styles.cohortSelectorLeft}>
-          <Users color="#9C27B0" size={16} />
-          <Text style={styles.cohortSelectorLabel}>Age Cohort:</Text>
-          <Text style={[styles.cohortSelectorValue, { color: '#9C27B0' }]}>
-            {AGE_COHORT_LABELS[selectedCohort]} (DEMO)
+      {/* Circle Capacity Index Card */}
+      <View style={styles.circleCCICard}>
+        <Text style={styles.circleCCITitle}>CIRCLE CAPACITY INDEX (CCI)</Text>
+        <Text style={styles.circleCCIDescription}>
+          A non-diagnostic, aggregate snapshot of a group's{' '}
+          <Text style={styles.circleCCIHighlight}>functional regulation bandwidth</Text>
+          {' '}over time — reflecting how much emotional, cognitive, sensory, and social load the group can tolerate before regulation begins to degrade.
+        </Text>
+        <Text style={styles.circleCCINote}>
+          This report summarizes patterns, not individuals. No diagnoses. No symptom scoring
+        </Text>
+
+        {/* Data Confidence Badge */}
+        <View style={styles.dataConfidenceCard}>
+          <View style={styles.dataConfidenceHeader}>
+            <CheckCircle color="#10B981" size={20} />
+            <Text style={styles.dataConfidenceTitle}>Data Confidence:</Text>
+            <Text style={styles.dataConfidenceValue}>High</Text>
+          </View>
+          <Text style={styles.dataConfidenceText}>
+            Based on consistent participation and stable reporting patterns across members.
           </Text>
         </View>
-        <ChevronDown
-          color="rgba(255,255,255,0.5)"
-          size={18}
-          style={{ transform: [{ rotate: showCohortPicker ? '180deg' : '0deg' }] }}
-        />
-      </Pressable>
+      </View>
 
-      {/* Cohort Picker Dropdown */}
-      {showCohortPicker && (
-        <View style={styles.cohortPickerDropdown}>
-          {GLOBAL_COHORTS.map((cohort) => {
-            const isSelected = cohort === selectedCohort;
-            const sampleSize = getCohortSampleSize('global', cohort);
-            return (
-              <Pressable
-                key={cohort}
-                style={[styles.cohortOption, isSelected && styles.cohortOptionSelectedGlobal]}
-                onPress={() => {
-                  setSelectedCohort(cohort);
-                  setShowCohortPicker(false);
-                }}
-              >
-                <Text style={[styles.cohortOptionText, isSelected && styles.cohortOptionTextSelectedGlobal]}>
-                  {AGE_COHORT_LABELS[cohort]}
+      {/* Circle Status Table */}
+      <View style={styles.circleStatusSection}>
+        <Text style={styles.circleStatusTitle}>Circle Status</Text>
+
+        {/* Table Header */}
+        <View style={styles.tableHeader}>
+          <Text style={[styles.tableHeaderCell, { flex: 1.5 }]}>MEMBER</Text>
+          <Text style={[styles.tableHeaderCell, { flex: 1 }]}>CAPACITY STATE</Text>
+          <Text style={[styles.tableHeaderCell, { flex: 1 }]}>7 DAY TREND</Text>
+          <Text style={[styles.tableHeaderCell, { flex: 0.8 }]}>PARTICIPATION</Text>
+        </View>
+
+        {/* Table Rows */}
+        {DEMO_CIRCLE_MEMBERS.map((member) => (
+          <View key={member.id} style={styles.tableRow}>
+            {/* Member */}
+            <View style={[styles.tableCell, { flex: 1.5, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
+              <View style={styles.avatarPlaceholder}>
+                <Text style={styles.avatarText}>{member.name[0]}</Text>
+              </View>
+              <View>
+                <Text style={styles.memberName}>{member.name}</Text>
+                <Text style={styles.memberUsername}>{member.username}</Text>
+              </View>
+            </View>
+
+            {/* Capacity State */}
+            <View style={[styles.tableCell, { flex: 1 }]}>
+              <View style={[
+                styles.capacityBadge,
+                member.capacityState === 'resourced' && styles.capacityBadgeResourced,
+                member.capacityState === 'stretched' && styles.capacityBadgeStretched,
+                member.capacityState === 'depleted' && styles.capacityBadgeDepleted,
+              ]}>
+                <Text style={styles.capacityBadgeText}>
+                  {member.capacityState.charAt(0).toUpperCase() + member.capacityState.slice(1)}
                 </Text>
-                <Text style={styles.cohortOptionCount}>n={sampleSize}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      )}
+              </View>
+            </View>
 
-      {/* Sample Size Badge */}
-      <View style={styles.sampleInfoRow}>
-        <Text style={styles.sampleInfoText}>
-          Based on 3,000 synthetic inputs{cohortSampleSize > 0 && ` · Cohort n=${cohortSampleSize}`}
+            {/* 7 Day Trend */}
+            <View style={[styles.tableCell, { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 4 }]}>
+              {member.trend === 'improving' && <TrendingUp color="#10B981" size={14} />}
+              {member.trend === 'declining' && <TrendingDown color="#F44336" size={14} />}
+              {member.trend === 'flat' && <Minus color="#E8A830" size={14} />}
+              <Text style={[
+                styles.trendText,
+                member.trend === 'improving' && { color: '#10B981' },
+                member.trend === 'declining' && { color: '#F44336' },
+                member.trend === 'flat' && { color: '#E8A830' },
+              ]}>
+                {member.trend.charAt(0).toUpperCase() + member.trend.slice(1)}
+              </Text>
+            </View>
+
+            {/* Participation */}
+            <View style={[styles.tableCell, { flex: 0.8 }]}>
+              <Text style={styles.participationText}>{member.participation}</Text>
+            </View>
+          </View>
+        ))}
+
+        {/* Pagination hint */}
+        <View style={styles.paginationHint}>
+          <Text style={styles.paginationText}>1–5 of 5 members</Text>
+        </View>
+      </View>
+
+      {/* Aggregate Capacity Section */}
+      <View style={styles.aggregateSection}>
+        <Text style={styles.aggregateSectionTitle}>Aggregate Capacity Over Time</Text>
+        <View style={styles.aggregateBullets}>
+          <Text style={styles.aggregateBullet}>• Identifies patterns of rising or <Text style={styles.boldText}>sustained load</Text></Text>
+          <Text style={styles.aggregateBullet}>• Supports pacing, scheduling, and environmental <Text style={styles.boldText}>adjustments</Text></Text>
+          <Text style={styles.aggregateBullet}>• Informs <Text style={styles.boldText}>preventive interventions</Text> before dysregulation <Text style={styles.boldText}>escalates</Text></Text>
+          <Text style={styles.aggregateBullet}>• <Text style={styles.boldText}>Complements</Text> — does <Text style={styles.boldText}>not replace</Text> — clinical judgment</Text>
+        </View>
+        <Text style={styles.aggregateDisclaimer}>
+          Not a diagnostic tool. Not a symptom severity scale.
         </Text>
       </View>
 
-      {/* Sentinel Chart — Vega-Lite Global Demo (Web) / Legacy (Native) */}
-      {Platform.OS === 'web' ? (
-        <VegaSentinelChart
-          points={sentinelData.volatilityTrend}
-          baseline={sentinelData.baselineValue}
-          systemState={sentinelData.systemState}
-          consecutiveDays={sentinelData.consecutiveDaysAboveBaseline}
-          cohortLabel={`Global Population · ${AGE_COHORT_LABELS[selectedCohort]}`}
-          sampleSize={3000}
-        />
-      ) : (
-        <View style={styles.sentinelContainer}>
-          <SentinelChart
-            points={sentinelData.volatilityTrend}
-            baseline={sentinelData.baselineValue}
-            upperBand={70}
-            systemState={sentinelData.systemState}
-            consecutiveDays={sentinelData.consecutiveDaysAboveBaseline}
-            title={sentinelData.cohortLabel}
-            height={220}
-            accentColor="#9C27B0"
-          />
-        </View>
-      )}
-
-      {/* Governance Notice */}
-      <View style={styles.governanceNotice}>
-        <Text style={styles.governanceTitle}>Synthetic Data Only</Text>
-        <Text style={styles.governanceText}>
-          Global benchmarks use synthetic cohort modeling. Real institutional
-          data requires direct engagement with Orbital.
-        </Text>
+      {/* CTA Section */}
+      <View style={styles.ctaSection}>
+        <Pressable style={styles.ctaPrimary}>
+          <Text style={styles.ctaPrimaryText}>Generate Circle Capacity Summary (CCI)</Text>
+          <Text style={styles.ctaPriceText}>$399</Text>
+        </Pressable>
+        <Pressable style={styles.ctaSecondary}>
+          <Text style={styles.ctaSecondaryText}>Generate Individual Capacity Summaries</Text>
+          <Text style={styles.ctaSecondaryPrice}>$149 each</Text>
+        </Pressable>
       </View>
-
-      {/* Contact CTA */}
-      <Pressable
-        style={[styles.contactButton, { backgroundColor: '#9C27B0' }]}
-        onPress={handleContact}
-      >
-        <Mail color="#fff" size={18} />
-        <Text style={[styles.contactButtonText, { color: '#fff' }]}>
-          Contact Orbital
-        </Text>
-        <ExternalLink color="#fff" size={14} />
-      </Pressable>
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          Illustrative aggregate-level capacity intelligence view.
-          {'\n'}No personal data is tracked or collected.
-        </Text>
+        <Text style={styles.footerText}>Orbital – Assembled in the USA</Text>
       </View>
     </Animated.View>
   );
@@ -903,101 +506,273 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 
-  // Sentinel Tabs - Cohort Badge
-  cohortBadge: {
+  // Circles Tab
+  circleHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    alignSelf: 'flex-start',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: spacing.md,
+  },
+  circleHeaderLeft: {
+    flex: 1,
+  },
+  circleTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.95)',
+    letterSpacing: 0.5,
+  },
+  circleSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: 4,
+  },
+  circleMemberBadge: {
     backgroundColor: 'rgba(0,215,255,0.1)',
     paddingVertical: 6,
-    paddingHorizontal: spacing.sm,
+    paddingHorizontal: 12,
     borderRadius: borderRadius.sm,
-    marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(0,215,255,0.3)',
   },
-  cohortText: {
+  circleMemberBadgeText: {
     fontSize: 12,
     fontWeight: '600',
     color: '#00D7FF',
   },
-  sampleSizeBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(156,39,176,0.1)',
-    paddingVertical: 4,
-    paddingHorizontal: spacing.sm,
-    borderRadius: borderRadius.sm,
-    marginBottom: spacing.xs,
-  },
-  sampleSizeText: {
-    fontSize: 11,
-    color: '#9C27B0',
-    fontWeight: '500',
-  },
-  ageCohortBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    paddingVertical: 4,
-    paddingHorizontal: spacing.sm,
-    borderRadius: borderRadius.sm,
-    marginBottom: spacing.md,
-  },
-  ageCohortText: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.6)',
-    fontWeight: '500',
-  },
 
-  // Sentinel PNG Container
-  sentinelContainer: {
-    backgroundColor: 'rgba(0,0,0,0.3)',
+  // Circle CCI Card
+  circleCCICard: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    overflow: 'hidden',
+    borderColor: 'rgba(0,215,255,0.2)',
+    padding: spacing.lg,
     marginBottom: spacing.md,
   },
-  sentinelImage: {
-    width: '100%',
-    height: undefined,
-    aspectRatio: 1200 / 600, // Approximate aspect ratio of PNG
-  },
-
-  // Governance Notice
-  governanceNotice: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-  },
-  governanceTitle: {
+  circleCCITitle: {
     fontSize: 12,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.7)',
-    marginBottom: spacing.xs,
+    fontWeight: '700',
+    color: '#00D7FF',
+    letterSpacing: 1,
+    marginBottom: spacing.sm,
   },
-  governanceText: {
+  circleCCIDescription: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+    lineHeight: 22,
+    marginBottom: spacing.sm,
+  },
+  circleCCIHighlight: {
+    color: '#00D7FF',
+    fontWeight: '600',
+  },
+  circleCCINote: {
     fontSize: 12,
     color: 'rgba(255,255,255,0.5)',
+    fontStyle: 'italic',
+    marginBottom: spacing.md,
+  },
+  dataConfidenceCard: {
+    backgroundColor: 'rgba(16,185,129,0.1)',
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(16,185,129,0.3)',
+  },
+  dataConfidenceHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginBottom: 4,
+  },
+  dataConfidenceTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.8)',
+  },
+  dataConfidenceValue: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#10B981',
+  },
+  dataConfidenceText: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.6)',
     lineHeight: 18,
   },
 
-  // Contact Button
-  contactButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    backgroundColor: '#00D7FF',
-    paddingVertical: spacing.md,
-    borderRadius: borderRadius.md,
+  // Circle Status Table
+  circleStatusSection: {
     marginBottom: spacing.md,
   },
-  contactButtonText: {
+  circleStatusTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.95)',
+    marginBottom: spacing.md,
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.1)',
+  },
+  tableHeaderCell: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.5)',
+    letterSpacing: 0.5,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+    alignItems: 'center',
+  },
+  tableCell: {
+    justifyContent: 'center',
+  },
+  avatarPlaceholder: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0,215,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
+    color: '#00D7FF',
+  },
+  memberName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.9)',
+  },
+  memberUsername: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.5)',
+  },
+  capacityBadge: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: borderRadius.sm,
+    alignSelf: 'flex-start',
+  },
+  capacityBadgeResourced: {
+    backgroundColor: 'rgba(16,185,129,0.2)',
+    borderWidth: 1,
+    borderColor: '#10B981',
+  },
+  capacityBadgeStretched: {
+    backgroundColor: 'rgba(232,168,48,0.2)',
+    borderWidth: 1,
+    borderColor: '#E8A830',
+  },
+  capacityBadgeDepleted: {
+    backgroundColor: 'rgba(244,67,54,0.2)',
+    borderWidth: 1,
+    borderColor: '#F44336',
+  },
+  capacityBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.9)',
+  },
+  trendText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  participationText: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.7)',
+  },
+  paginationHint: {
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+  },
+  paginationText: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.4)',
+  },
+
+  // Aggregate Section
+  aggregateSection: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+  },
+  aggregateSectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.95)',
+    marginBottom: spacing.md,
+  },
+  aggregateBullets: {
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  aggregateBullet: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.7)',
+    lineHeight: 20,
+  },
+  boldText: {
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.9)',
+  },
+  aggregateDisclaimer: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.4)',
+    fontStyle: 'italic',
+  },
+
+  // CTA Section
+  ctaSection: {
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  ctaPrimary: {
+    backgroundColor: 'rgba(0,215,255,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(0,215,255,0.3)',
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  ctaPrimaryText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#00D7FF',
+  },
+  ctaPriceText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#00D7FF',
+  },
+  ctaSecondary: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  ctaSecondaryText: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.7)',
+  },
+  ctaSecondaryPrice: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.5)',
   },
 
   // Footer
@@ -1005,226 +780,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: spacing.lg,
   },
-  footerBadge: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#E8A830',
-    letterSpacing: 1,
-    marginBottom: spacing.xs,
-  },
   footerText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
-    textAlign: 'center',
-    lineHeight: 16,
-  },
-
-  // School District Sentinel - Enhanced Styles
-  demoBannerFull: {
-    backgroundColor: '#E8A830',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: borderRadius.sm,
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  demoBannerFullText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#000',
-    letterSpacing: 0.5,
-    textAlign: 'center',
-  },
-  sentinelHeader: {
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  sentinelTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#00D7FF',
-    letterSpacing: 1,
-  },
-  sentinelSubtitle: {
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
-    letterSpacing: 0.5,
-    marginTop: 2,
-  },
-  districtRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginBottom: spacing.sm,
-  },
-  districtText: {
-    fontSize: 12,
-    color: '#00D7FF',
-    fontWeight: '500',
-  },
-  cohortSelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(0,215,255,0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(0,215,255,0.2)',
-    borderRadius: borderRadius.md,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.xs,
-  },
-  cohortSelectorLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  cohortSelectorLabel: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
-  },
-  cohortSelectorValue: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#00D7FF',
-  },
-  cohortPickerDropdown: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: borderRadius.md,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    marginBottom: spacing.sm,
-    overflow: 'hidden',
-  },
-  cohortOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
-  },
-  cohortOptionSelected: {
-    backgroundColor: 'rgba(0,215,255,0.1)',
-  },
-  cohortOptionText: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
-  },
-  cohortOptionTextSelected: {
-    color: '#00D7FF',
-    fontWeight: '600',
-  },
-  cohortOptionCount: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
-  },
-  sampleInfoRow: {
-    marginBottom: spacing.md,
-  },
-  sampleInfoText: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
-    textAlign: 'center',
-  },
-  statusCard: {
-    backgroundColor: 'rgba(232,168,48,0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(232,168,48,0.3)',
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-  },
-  statusLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
-    letterSpacing: 0.5,
-    marginBottom: 4,
-  },
-  statusValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#E8A830',
-    marginBottom: 2,
-  },
-  statusDetail: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
-  },
-
-  // Demo Mode Selector
-  demoModeSelector: {
-    marginBottom: spacing.md,
-  },
-  demoModeSelectorLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
-    letterSpacing: 0.5,
-    marginBottom: spacing.xs,
-  },
-  demoModeButtons: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  demoModeButton: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: borderRadius.md,
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    alignItems: 'center',
-  },
-  demoModeButtonActive: {
-    backgroundColor: 'rgba(0,215,255,0.1)',
-    borderColor: 'rgba(0,215,255,0.3)',
-  },
-  demoModeButtonText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.5)',
-  },
-  demoModeButtonTextActive: {
-    color: '#00D7FF',
-    fontWeight: '600',
-  },
-
-  // University-specific styles
-  cohortOptionSelectedUniversity: {
-    backgroundColor: 'rgba(107,91,149,0.1)',
-  },
-  cohortOptionTextSelectedUniversity: {
-    color: '#6B5B95',
-    fontWeight: '600',
-  },
-  // Global-specific styles
-  cohortOptionSelectedGlobal: {
-    backgroundColor: 'rgba(156,39,176,0.1)',
-  },
-  cohortOptionTextSelectedGlobal: {
-    color: '#9C27B0',
-    fontWeight: '600',
-  },
-  ctaRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  secondaryCta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.xs,
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  secondaryCtaText: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
-    fontWeight: '500',
+    color: 'rgba(255,255,255,0.3)',
   },
 });
