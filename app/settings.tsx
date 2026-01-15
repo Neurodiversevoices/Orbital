@@ -535,7 +535,7 @@ export default function SettingsScreen() {
           <SettingsRow
             icon={LogOut}
             label="Data Exit"
-            sublabel="Export and delete all data"
+            sublabel="Delete all data"
             onPress={() => router.push('/data-exit')}
             disabled={isProcessing}
             danger
