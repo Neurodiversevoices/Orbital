@@ -2,22 +2,20 @@
  * Briefings Tab — B2C Only
  *
  * 1. Personal → Individual CCI Demo Brief (links to /cci)
- * 2. Circles  → Circle CCI Demo (Pro only)
+ * 2. Circles  → Circle CCI Demo
  *
  * GOVERNANCE:
- * - All views are DEMO-ONLY
+ * - All views are DEMO-ONLY (visible to all users)
  * - No Organization/Global tabs (those are B2B/enterprise)
- * - Circles tab requires Pro subscription
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   Pressable,
-  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -34,7 +32,6 @@ import {
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../../theme';
 import { useAccess } from '../../lib/access';
-import { FOUNDER_DEMO_ENABLED } from '../../lib/hooks/useDemoMode';
 
 // =============================================================================
 // TYPES
@@ -46,12 +43,11 @@ interface ScopeTab {
   id: BriefScope;
   label: string;
   icon: React.ComponentType<{ color: string; size: number }>;
-  proOnly?: boolean;
 }
 
 const SCOPE_TABS: ScopeTab[] = [
   { id: 'personal', label: 'Personal', icon: User },
-  { id: 'circles', label: 'Circles', icon: Users, proOnly: true },
+  { id: 'circles', label: 'Circles', icon: Users },
 ];
 
 // =============================================================================
@@ -82,27 +78,7 @@ const DEMO_CIRCLE_MEMBERS: CircleMember[] = [
 
 export default function BriefingsScreen() {
   const [scope, setScope] = useState<BriefScope>('personal');
-  const { hasTier, freeUserViewActive, freeUserViewBanner } = useAccess();
-
-  // B2C: Circles tab requires Pro tier (or founder demo)
-  // TODO: Restore access check after demo verification
-  const canAccessCircles = true;
-
-  // Filter tabs based on access level
-  const visibleTabs = useMemo(() => {
-    if (!canAccessCircles) {
-      // Free/Individual users: only show Personal tab
-      return SCOPE_TABS.filter((tab) => !tab.proOnly);
-    }
-    return SCOPE_TABS;
-  }, [canAccessCircles]);
-
-  // If current scope is not visible, reset to personal
-  React.useEffect(() => {
-    if (!canAccessCircles && scope === 'circles') {
-      setScope('personal');
-    }
-  }, [canAccessCircles, scope]);
+  const { freeUserViewActive, freeUserViewBanner } = useAccess();
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -125,7 +101,7 @@ export default function BriefingsScreen() {
 
       {/* Scope Tabs */}
       <View style={styles.tabContainer}>
-        {visibleTabs.map((tab) => {
+        {SCOPE_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = scope === tab.id;
           return (
@@ -153,7 +129,7 @@ export default function BriefingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {scope === 'personal' && <PersonalBrief />}
-        {scope === 'circles' && canAccessCircles && <CirclesCCIBrief />}
+        {scope === 'circles' && <CirclesCCIBrief />}
       </ScrollView>
     </SafeAreaView>
   );
