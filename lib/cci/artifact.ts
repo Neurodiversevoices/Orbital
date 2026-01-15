@@ -533,8 +533,8 @@ export function generateCCIArtifactHTML(metadata?: Partial<CCIIssuanceMetadata>)
         <span class="audit-note">Signals internal consistency</span>
       </div>
       <div class="audit-row verdict-row">
-        <span class="audit-label">Verdict:</span>
-        <span class="audit-verdict">INTERPRETIVE CONFIDENCE</span>
+        <span class="audit-label">Pattern Summary:</span>
+        <span class="audit-verdict">Interpretable Capacity Trends</span>
       </div>
     </div>
 
