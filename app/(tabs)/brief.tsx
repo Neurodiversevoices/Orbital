@@ -32,6 +32,8 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  LayoutGrid,
+  Link2,
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../../theme';
 import { useAccess } from '../../lib/access';
@@ -362,14 +364,28 @@ function CirclesCCIBrief() {
         <Text style={styles.demoBannerText}>DEMO / SAMPLE</Text>
       </View>
 
+      {/* Admin Breadcrumb */}
+      <View style={styles.breadcrumb}>
+        <LayoutGrid color="rgba(255,255,255,0.5)" size={14} />
+        <Text style={styles.breadcrumbText}>Admin</Text>
+        <Text style={styles.breadcrumbSeparator}>/</Text>
+        <Text style={styles.breadcrumbActive}>Sensory Support Group</Text>
+      </View>
+
       {/* Circle Header */}
       <View style={styles.circleHeader}>
         <View style={styles.circleHeaderLeft}>
           <Text style={styles.circleTitle}>SENSORY SUPPORT GROUP</Text>
           <Text style={styles.circleSubtitle}>Lead Parent: Emily Zhang</Text>
         </View>
-        <View style={styles.circleMemberBadge}>
-          <Text style={styles.circleMemberBadgeText}>5 / 5 Members</Text>
+        <View style={styles.circleHeaderRight}>
+          <View style={styles.circleMemberBadge}>
+            <Text style={styles.circleMemberBadgeText}>5 / 5 Members</Text>
+          </View>
+          <Pressable style={styles.lingsButton}>
+            <Link2 color="#00D7FF" size={14} />
+            <Text style={styles.lingsButtonText}>LINGS</Text>
+          </Pressable>
         </View>
       </View>
 
@@ -679,6 +695,27 @@ const styles = StyleSheet.create({
   },
 
   // Circles Tab
+  // Breadcrumb
+  breadcrumb: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginBottom: spacing.sm,
+  },
+  breadcrumbText: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+  },
+  breadcrumbSeparator: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.3)',
+  },
+  breadcrumbActive: {
+    fontSize: 12,
+    color: '#00D7FF',
+    fontWeight: '500',
+  },
+
   circleHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -687,6 +724,11 @@ const styles = StyleSheet.create({
   },
   circleHeaderLeft: {
     flex: 1,
+  },
+  circleHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   circleTitle: {
     fontSize: 20,
@@ -711,6 +753,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#00D7FF',
+  },
+  lingsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    backgroundColor: 'rgba(0,215,255,0.1)',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: borderRadius.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(0,215,255,0.3)',
+  },
+  lingsButtonText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#00D7FF',
+    letterSpacing: 0.5,
   },
 
   // Two Column Layout
