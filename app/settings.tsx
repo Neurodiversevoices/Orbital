@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet, Pressable, Text, Alert, Modal, ScrollView } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -49,6 +49,7 @@ import { DELETION_DISCLOSURE } from '../lib/storage';
 import { ProprietaryFooter } from '../components/legal';
 import { APP_MODE_CONFIGS } from '../types';
 import { ModeSelector } from '../components';
+import { getUserEntitlements, type UserEntitlements } from '../lib/entitlements';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -82,6 +83,14 @@ export default function SettingsScreen() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
   const [showDemoPicker, setShowDemoPicker] = useState(false);
+  const [entitlements, setEntitlements] = useState<UserEntitlements | null>(null);
+
+  // Load entitlements for Circle membership check
+  useEffect(() => {
+    getUserEntitlements().then(setEntitlements).catch(() => setEntitlements(null));
+  }, []);
+
+  const hasCircle = entitlements?.hasCircle ?? false;
 
   const handleToggleQAFreeMode = useCallback(async () => {
     setIsProcessing(true);
@@ -531,6 +540,15 @@ export default function SettingsScreen() {
             onPress={() => router.push('/profile')}
             disabled={isProcessing}
           />
+          {hasCircle && (
+            <SettingsRow
+              icon={Users}
+              label="Circle Membership"
+              sublabel="Manage your Circle settings"
+              onPress={() => router.push('/circle-settings')}
+              disabled={isProcessing}
+            />
+          )}
           <SettingsRow
             icon={LogOut}
             label="Data Exit"
