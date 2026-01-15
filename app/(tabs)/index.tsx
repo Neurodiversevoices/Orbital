@@ -266,32 +266,6 @@ export default function HomeScreen() {
             {/* Org Role Banner - shows participant status for org modes */}
             <OrgRoleBanner mode={currentMode} compact />
 
-            {/* Signal limit banner for free users */}
-            {!bypassesSubscription && !isPro && currentMode !== 'demo' && signalsRemaining <= 10 && signalsRemaining > 0 && (
-              <Pressable
-                onPress={() => router.push('/upgrade')}
-                style={styles.limitBanner}
-              >
-                <Text style={styles.limitBannerText}>
-                  {signalsRemaining} signals remaining this month
-                </Text>
-                <Text style={styles.limitBannerLink}>Upgrade to Pro</Text>
-              </Pressable>
-            )}
-
-            {/* Signal limit hit - blocked state */}
-            {!bypassesSubscription && !isPro && currentMode !== 'demo' && hasHitSignalLimit && (
-              <Pressable
-                onPress={() => router.push('/upgrade')}
-                style={[styles.limitBanner, styles.limitBannerBlocked]}
-              >
-                <Text style={styles.limitBannerTextBlocked}>
-                  You've reached your monthly limit
-                </Text>
-                <Text style={styles.limitBannerLinkBlocked}>Upgrade to continue</Text>
-              </Pressable>
-            )}
-
             {/* Mode-specific insights panel */}
             {currentMode !== 'personal' && (
               <ModeInsightsPanel logs={logs} />
