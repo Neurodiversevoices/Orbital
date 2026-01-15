@@ -24,7 +24,6 @@ import {
   Building2,
   LogOut,
   RotateCcw,
-  Users,
   GraduationCap,
   Database,
   Heart,
@@ -451,7 +450,7 @@ export default function SettingsScreen() {
           <SettingsRow
             icon={ShieldCheck}
             label="Security Controls"
-            sublabel="Circles security architecture"
+            sublabel="Data protection & access controls"
             onPress={() => router.push('/security-controls')}
             disabled={isProcessing}
           />
@@ -472,13 +471,6 @@ export default function SettingsScreen() {
             label={t.governance?.legal || 'Legal & Policies'}
             sublabel={t.governance?.legalSublabel || 'Terms, privacy, disclaimers'}
             onPress={() => router.push('/legal')}
-            disabled={isProcessing}
-          />
-          <SettingsRow
-            icon={Building2}
-            label="Institutional Dashboard"
-            sublabel="Demo preview — Sample aggregate data"
-            onPress={() => router.push('/dashboard')}
             disabled={isProcessing}
           />
         </View>
