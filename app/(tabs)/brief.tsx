@@ -359,6 +359,11 @@ function CirclesCCIBrief() {
         <Text style={styles.demoBannerText}>DEMO / SAMPLE</Text>
       </View>
 
+      {/* TEMP MARKER - DELETE AFTER VERIFY */}
+      <View style={{ backgroundColor: '#FF0000', padding: 20, marginBottom: 16 }}>
+        <Text style={{ color: '#FFFFFF', fontSize: 24, fontWeight: 'bold', textAlign: 'center' }}>WEB MARKER 999</Text>
+      </View>
+
       {/* Admin Breadcrumb */}
       <View style={styles.breadcrumb}>
         <LayoutGrid color="rgba(255,255,255,0.5)" size={14} />
