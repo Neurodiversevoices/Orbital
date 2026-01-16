@@ -11,7 +11,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { Session, User, AuthError } from '@supabase/supabase-js';
-import * as AppleAuthentication from 'expo-apple-authentication';
+// Lazy-load AppleAuthentication only on iOS (crashes on web)
+const AppleAuthentication = Platform.OS === 'ios'
+  ? require('expo-apple-authentication')
+  : null;
 import { getSupabase, isSupabaseConfigured } from './client';
 
 // =============================================================================

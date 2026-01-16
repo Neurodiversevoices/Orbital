@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
+import { AppState, AppStateStatus, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // =============================================================================
@@ -125,8 +125,30 @@ export function useIdleTimeout(options: UseIdleTimeoutOptions): IdleTimeoutState
     }
   }, [enabled, timeoutMs, warningBeforeMs, onTimeout, onWarning]);
 
-  // Handle app state changes
+  // Handle app state changes (native) or visibility changes (web)
   useEffect(() => {
+    // Web: use document visibility API
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          getLastActivity().then((lastActivity) => {
+            const elapsed = Date.now() - lastActivity;
+            if (elapsed >= timeoutMs) {
+              setState({ isIdle: true, showWarning: false, remainingSeconds: 0 });
+              onTimeout();
+            } else {
+              lastActivityRef.current = lastActivity;
+              checkIdle();
+            }
+          });
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    // Native: use AppState
     const subscription = AppState.addEventListener('change', (nextState) => {
       const prevState = appStateRef.current;
       appStateRef.current = nextState;
