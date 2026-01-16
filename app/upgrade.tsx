@@ -506,6 +506,27 @@ export default function UpgradeScreen() {
             <View style={styles.planCardCta}>
               <Text style={styles.planCardCtaText}>{isPro ? 'Basic tier' : 'Your current plan'}</Text>
             </View>
+
+            {/* CCI for Free users */}
+            {!isPro && (
+              <View style={styles.cciInlineSection}>
+                <View style={styles.cciInlineHeader}>
+                  <FileText size={16} color="#7A9AAA" />
+                  <Text style={styles.cciInlineTitle}>Individual CCI</Text>
+                  <Text style={styles.cciInlinePrice}>{formatPrice(CCI_PRICING.freeUser)}</Text>
+                </View>
+                <Pressable
+                  style={[styles.cciInlineButton, (isPurchasing || hasCCIPurchased) && styles.cciInlineButtonDisabled]}
+                  onPress={() => handlePurchase(PRODUCT_IDS.CCI_FREE, 'Individual CCI')}
+                  disabled={isPurchasing || hasCCIPurchased}
+                >
+                  <Text style={styles.cciInlineButtonText}>
+                    {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.freeUser)}`}
+                  </Text>
+                </Pressable>
+                <Text style={styles.cciInlineHint}>Upgrade to Pro for {formatPrice(CCI_PRICING.proUser)}</Text>
+              </View>
+            )}
           </View>
         </Animated.View>
 
@@ -547,6 +568,29 @@ export default function UpgradeScreen() {
                 </Text>
               </Pressable>
             </View>
+
+            {/* CCI for Pro users */}
+            {isPro && (
+              <View style={styles.cciInlineSection}>
+                <View style={styles.cciInlineHeader}>
+                  <FileText size={16} color="#FFD700" />
+                  <Text style={styles.cciInlineTitle}>Individual CCI</Text>
+                  <Text style={[styles.cciInlinePrice, { color: '#FFD700' }]}>{formatPrice(CCI_PRICING.proUser)}</Text>
+                  <View style={styles.cciProDiscountBadge}>
+                    <Text style={styles.cciProDiscountText}>PRO PRICE</Text>
+                  </View>
+                </View>
+                <Pressable
+                  style={[styles.cciInlineButtonPro, (isPurchasing || hasCCIPurchased) && styles.cciInlineButtonDisabled]}
+                  onPress={() => handlePurchase(PRODUCT_IDS.CCI_PRO, 'Individual CCI')}
+                  disabled={isPurchasing || hasCCIPurchased}
+                >
+                  <Text style={styles.cciInlineButtonText}>
+                    {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.proUser)}`}
+                  </Text>
+                </Pressable>
+              </View>
+            )}
           </View>
         </Animated.View>
 
@@ -796,25 +840,6 @@ export default function UpgradeScreen() {
           )}
         </Animated.View>
         )}
-
-        {/* =============================================================== */}
-        {/* SPONSOR CODE */}
-        {/* =============================================================== */}
-        <Animated.View entering={FadeInDown.delay(400).duration(400)}>
-          <Pressable
-            style={styles.sponsorCard}
-            onPress={() => router.push('/redeem')}
-          >
-            <Gift size={24} color="#00E5FF" />
-            <View style={styles.sponsorCardContent}>
-              <Text style={styles.sponsorCardTitle}>Have a Sponsor Code?</Text>
-              <Text style={styles.sponsorCardDescription}>
-                Redeem a code from your organization
-              </Text>
-            </View>
-            <ChevronRight size={20} color="rgba(255,255,255,0.4)" />
-          </Pressable>
-        </Animated.View>
 
         {/* =============================================================== */}
         {/* FOOTER */}
@@ -1700,5 +1725,72 @@ const styles = StyleSheet.create({
   footerDot: {
     fontSize: 11,
     color: 'rgba(255,255,255,0.2)',
+  },
+
+  // =============================================================================
+  // INLINE CCI STYLES (Plan Card Integration)
+  // =============================================================================
+  cciInlineSection: {
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  cciInlineHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+    flexWrap: 'wrap',
+  },
+  cciInlineTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.85)',
+  },
+  cciInlinePrice: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#7A9AAA',
+  },
+  cciInlineButton: {
+    backgroundColor: '#7A9AAA',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.md,
+    alignItems: 'center',
+  },
+  cciInlineButtonPro: {
+    backgroundColor: '#FFD700',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.md,
+    alignItems: 'center',
+  },
+  cciInlineButtonDisabled: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  cciInlineButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#000',
+  },
+  cciInlineHint: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.4)',
+    marginTop: spacing.sm,
+    textAlign: 'center',
+  },
+  cciProDiscountBadge: {
+    backgroundColor: 'rgba(255,215,0,0.2)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  cciProDiscountText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#FFD700',
+    letterSpacing: 0.5,
   },
 });
