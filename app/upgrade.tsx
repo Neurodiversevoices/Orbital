@@ -669,6 +669,25 @@ export default function UpgradeScreen() {
                 </Text>
               </Pressable>
             </View>
+
+            {/* Circle Aggregate CCI $399 - Always visible in Circles panel */}
+            <View style={styles.cciInlineSection}>
+              <View style={styles.cciInlineHeader}>
+                <FileText size={16} color="#00E5FF" />
+                <Text style={styles.cciInlineTitle}>Circle Aggregate CCI</Text>
+                <Text style={[styles.cciInlinePrice, { color: '#00E5FF' }]}>{formatPrice(CCI_GROUP_PRICING.circleAll)}</Text>
+              </View>
+              <Text style={styles.cciInlineDescription}>One CCI covering all Circle members · No individual attribution</Text>
+              <Pressable
+                style={[styles.cciInlineButtonCircle, (isPurchasing || !hasCircle) && styles.cciInlineButtonDisabled]}
+                onPress={() => handlePurchase(PRODUCT_IDS.CCI_CIRCLE_ALL, 'Circle Aggregate CCI')}
+                disabled={isPurchasing || !hasCircle}
+              >
+                <Text style={styles.cciInlineButtonText}>
+                  {`Get Circle CCI · ${formatPrice(CCI_GROUP_PRICING.circleAll)}`}
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </Animated.View>
 
@@ -713,6 +732,25 @@ export default function UpgradeScreen() {
               >
                 <Text style={[styles.bundleOptionText, bundleSize === 20 && styles.bundleOptionTextActive]}>20 seats</Text>
                 <Text style={[styles.bundleOptionPrice, bundleSize === 20 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_20.annual)}</Text>
+              </Pressable>
+            </View>
+
+            {/* Bundle Aggregate CCI $999 - Always visible in Bundles panel */}
+            <View style={styles.cciInlineSection}>
+              <View style={styles.cciInlineHeader}>
+                <FileText size={16} color="#9C27B0" />
+                <Text style={styles.cciInlineTitle}>Bundle Aggregate CCI</Text>
+                <Text style={[styles.cciInlinePrice, { color: '#9C27B0' }]}>{formatPrice(CCI_GROUP_PRICING.bundleAll)}</Text>
+              </View>
+              <Text style={styles.cciInlineDescription}>One CCI covering all Bundle seats · No individual attribution</Text>
+              <Pressable
+                style={[styles.cciInlineButtonBundle, (isPurchasing || bundleSize === null) && styles.cciInlineButtonDisabled]}
+                onPress={() => handlePurchase(PRODUCT_IDS.CCI_BUNDLE_ALL, 'Bundle Aggregate CCI')}
+                disabled={isPurchasing || bundleSize === null}
+              >
+                <Text style={styles.cciInlineButtonText}>
+                  {`Get Bundle CCI · ${formatPrice(CCI_GROUP_PRICING.bundleAll)}`}
+                </Text>
               </Pressable>
             </View>
           </View>
@@ -1702,5 +1740,19 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFD700',
     letterSpacing: 0.5,
+  },
+  cciInlineButtonCircle: {
+    backgroundColor: '#00E5FF',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.md,
+    alignItems: 'center',
+  },
+  cciInlineButtonBundle: {
+    backgroundColor: '#9C27B0',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.md,
+    alignItems: 'center',
   },
 });
