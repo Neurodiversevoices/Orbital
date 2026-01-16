@@ -33,6 +33,9 @@ import Svg, {
   Line,
   Text as SvgText,
   Circle as SvgCircle,
+  Defs,
+  LinearGradient,
+  Stop,
 } from 'react-native-svg';
 
 // =============================================================================
@@ -201,127 +204,166 @@ export function CCIChart({
   const keyPoints = getKeyPoints(data);
   const chartHeight = containerWidth ? containerWidth * heightRatio : 180;
 
+  // Generate area fill path (closes to bottom)
+  const generateAreaPath = (values: number[]) => {
+    if (values.length < 2) return '';
+    const linePath = generateSmoothPath(values);
+    if (!linePath) return '';
+
+    const lastX = padding.left + (values.length - 1) * xScale;
+    const bottomY = padding.top + graphHeight;
+    const firstX = padding.left;
+
+    return `${linePath} L ${lastX.toFixed(1)} ${bottomY.toFixed(1)} L ${firstX.toFixed(1)} ${bottomY.toFixed(1)} Z`;
+  };
+
   return (
     <View style={styles.container}>
       {title && <Text style={styles.title}>{title}</Text>}
 
-      <Svg
-        width="100%"
-        height={chartHeight}
-        viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
-        preserveAspectRatio="xMidYMid meet"
-      >
-        {/* Background bands */}
-        <Rect
-          x={padding.left}
-          y={padding.top}
-          width={graphWidth}
-          height={bandHeight}
-          fill="rgba(0, 215, 255, 0.08)"
-        />
-        <Rect
-          x={padding.left}
-          y={padding.top + bandHeight}
-          width={graphWidth}
-          height={bandHeight}
-          fill="rgba(232, 168, 48, 0.08)"
-        />
-        <Rect
-          x={padding.left}
-          y={padding.top + bandHeight * 2}
-          width={graphWidth}
-          height={bandHeight}
-          fill="rgba(244, 67, 54, 0.08)"
-        />
+      {/* Dark card wrapper - matches Individual CCI artifact */}
+      <View style={styles.chartCard}>
+        <Svg
+          width="100%"
+          height={chartHeight}
+          viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
+          preserveAspectRatio="xMidYMid meet"
+        >
+          {/* Gradient definitions */}
+          <Defs>
+            <LinearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <Stop offset="0%" stopColor="#00D7FF" stopOpacity={0.20} />
+              <Stop offset="50%" stopColor="#E8A830" stopOpacity={0.12} />
+              <Stop offset="100%" stopColor="#F44336" stopOpacity={0.20} />
+            </LinearGradient>
+            <LinearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <Stop offset="0%" stopColor="#00D7FF" />
+              <Stop offset="50%" stopColor="#E8A830" />
+              <Stop offset="100%" stopColor="#F44336" />
+            </LinearGradient>
+          </Defs>
 
-        {/* Grid lines */}
-        <Line
-          x1={padding.left}
-          y1={padding.top + bandHeight}
-          x2={padding.left + graphWidth}
-          y2={padding.top + bandHeight}
-          stroke="rgba(255,255,255,0.15)"
-          strokeWidth={0.5}
-          strokeDasharray="4,4"
-        />
-        <Line
-          x1={padding.left}
-          y1={padding.top + bandHeight * 2}
-          x2={padding.left + graphWidth}
-          y2={padding.top + bandHeight * 2}
-          stroke="rgba(255,255,255,0.15)"
-          strokeWidth={0.5}
-          strokeDasharray="4,4"
-        />
-
-        {/* Capacity trend line - smooth bezier curve */}
-        {data.length > 0 && (
-          <Path
-            d={generateSmoothPath(data)}
-            stroke="rgba(255,255,255,0.8)"
-            strokeWidth={2.5}
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+          {/* Background bands */}
+          <Rect
+            x={padding.left}
+            y={padding.top}
+            width={graphWidth}
+            height={bandHeight}
+            fill="#00D7FF"
+            fillOpacity={0.06}
           />
-        )}
+          <Rect
+            x={padding.left}
+            y={padding.top + bandHeight}
+            width={graphWidth}
+            height={bandHeight}
+            fill="#E8A830"
+            fillOpacity={0.04}
+          />
+          <Rect
+            x={padding.left}
+            y={padding.top + bandHeight * 2}
+            width={graphWidth}
+            height={bandHeight}
+            fill="#F44336"
+            fillOpacity={0.06}
+          />
 
-        {/* Capacity-colored dots at key data points */}
-        {keyPoints.map((point, idx) => (
-          <SvgCircle
-            key={`dot-${idx}`}
-            cx={point.x}
-            cy={point.y}
-            r={6}
-            fill={point.color}
-            stroke="rgba(0,0,0,0.3)"
+          {/* Zone divider lines (dashed) */}
+          <Line
+            x1={padding.left}
+            y1={padding.top + bandHeight}
+            x2={padding.left + graphWidth}
+            y2={padding.top + bandHeight}
+            stroke="rgba(255,255,255,0.12)"
             strokeWidth={1}
+            strokeDasharray="3,3"
           />
-        ))}
+          <Line
+            x1={padding.left}
+            y1={padding.top + bandHeight * 2}
+            x2={padding.left + graphWidth}
+            y2={padding.top + bandHeight * 2}
+            stroke="rgba(255,255,255,0.12)"
+            strokeWidth={1}
+            strokeDasharray="3,3"
+          />
 
-        {/* Y-axis labels */}
-        <SvgText
-          x={padding.left + graphWidth + 8}
-          y={padding.top + bandHeight / 2 + 4}
-          fill="#00D7FF"
-          fontSize={11}
-          fontWeight="500"
-        >
-          Resourced
-        </SvgText>
-        <SvgText
-          x={padding.left + graphWidth + 8}
-          y={padding.top + bandHeight * 1.5 + 4}
-          fill="#E8A830"
-          fontSize={11}
-          fontWeight="500"
-        >
-          Stretched
-        </SvgText>
-        <SvgText
-          x={padding.left + graphWidth + 8}
-          y={padding.top + bandHeight * 2.5 + 4}
-          fill="#F44336"
-          fontSize={11}
-          fontWeight="500"
-        >
-          Depleted
-        </SvgText>
+          {/* Border lines */}
+          <Line x1={padding.left} y1={padding.top} x2={padding.left + graphWidth} y2={padding.top} stroke="rgba(255,255,255,0.08)" strokeWidth={1} />
+          <Line x1={padding.left} y1={padding.top + graphHeight} x2={padding.left + graphWidth} y2={padding.top + graphHeight} stroke="rgba(255,255,255,0.08)" strokeWidth={1} />
+          <Line x1={padding.left} y1={padding.top} x2={padding.left} y2={padding.top + graphHeight} stroke="rgba(255,255,255,0.15)" strokeWidth={1} />
 
-        {/* X-axis labels */}
-        {config.labels.map((label, i) => (
-          <SvgText
-            key={`xlabel-${i}`}
-            x={labelPositions[i]}
-            y={viewBoxHeight - 8}
-            fill="rgba(255,255,255,0.5)"
-            fontSize={10}
-            textAnchor={i === 0 ? 'start' : i === config.labels.length - 1 ? 'end' : 'middle'}
-          >
-            {label}
-          </SvgText>
-        ))}
-      </Svg>
+          {/* Zone indicator circles (left side) - matches artifact */}
+          <SvgCircle cx={12} cy={padding.top + bandHeight / 2} r={4} fill="#00D7FF" fillOpacity={0.9} />
+          <SvgCircle cx={12} cy={padding.top + bandHeight * 1.5} r={4} fill="#E8A830" fillOpacity={0.9} />
+          <SvgCircle cx={12} cy={padding.top + bandHeight * 2.5} r={4} fill="#F44336" fillOpacity={0.9} />
+
+          {/* Zone labels (H/M/L) */}
+          <SvgText x={4} y={padding.top + bandHeight / 2 + 3} fill="#00D7FF" fontSize={7} fontWeight="600">H</SvgText>
+          <SvgText x={4} y={padding.top + bandHeight * 1.5 + 3} fill="#E8A830" fontSize={7} fontWeight="600">M</SvgText>
+          <SvgText x={4} y={padding.top + bandHeight * 2.5 + 3} fill="#F44336" fontSize={7} fontWeight="600">L</SvgText>
+
+          {/* Area fill under curve */}
+          {data.length > 0 && (
+            <Path
+              d={generateAreaPath(data)}
+              fill="url(#areaGradient)"
+            />
+          )}
+
+          {/* Under-stroke (dark shadow) */}
+          {data.length > 0 && (
+            <Path
+              d={generateSmoothPath(data)}
+              stroke="#0a0b10"
+              strokeWidth={5}
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          )}
+
+          {/* Main gradient stroke */}
+          {data.length > 0 && (
+            <Path
+              d={generateSmoothPath(data)}
+              stroke="url(#lineGradient)"
+              strokeWidth={2.5}
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          )}
+
+          {/* Multi-layer data point nodes - matches artifact exactly */}
+          {keyPoints.map((point, idx) => (
+            <React.Fragment key={`node-${idx}`}>
+              {/* Outer dark ring */}
+              <SvgCircle cx={point.x} cy={point.y} r={5} fill="#0a0b10" />
+              {/* Inner colored core */}
+              <SvgCircle cx={point.x} cy={point.y} r={3.5} fill={point.color} />
+              {/* White highlight center */}
+              <SvgCircle cx={point.x} cy={point.y} r={1.5} fill="white" fillOpacity={0.9} />
+            </React.Fragment>
+          ))}
+
+          {/* X-axis labels */}
+          {config.labels.map((label, i) => (
+            <SvgText
+              key={`xlabel-${i}`}
+              x={labelPositions[i]}
+              y={viewBoxHeight - 8}
+              fill="rgba(255,255,255,0.6)"
+              fontSize={9}
+              fontWeight="500"
+              textAnchor="middle"
+            >
+              {label}
+            </SvgText>
+          ))}
+        </Svg>
+      </View>
 
       {/* Legend */}
       {showLegend && (
@@ -386,6 +428,11 @@ export function calculateAggregateCapacity(memberData: number[][]): number[] {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+  },
+  chartCard: {
+    backgroundColor: '#0a0b10',
+    borderRadius: 4,
+    padding: 8,
   },
   title: {
     fontSize: 14,

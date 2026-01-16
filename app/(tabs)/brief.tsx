@@ -349,6 +349,7 @@ function PersonalBrief() {
 // =============================================================================
 
 function CirclesCCIBrief() {
+  const router = useRouter();
   const { width } = useWindowDimensions();
   const isWideScreen = width >= 768;
 
