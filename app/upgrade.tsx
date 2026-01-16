@@ -509,7 +509,7 @@ export default function UpgradeScreen() {
 
             {/* CCI for Free users */}
             {!isPro && (
-              <View style={styles.cciInlineSectionFree}>
+              <View style={styles.cciInlineSection}>
                 <View style={styles.cciInlineHeader}>
                   <FileText size={16} color="#7A9AAA" />
                   <Text style={styles.cciInlineTitle}>Individual CCI</Text>
@@ -570,7 +570,7 @@ export default function UpgradeScreen() {
             </View>
 
             {/* CCI for Pro users */}
-            {isPro && !hasCircle && bundleSize === null && (
+            {isPro && (
               <View style={styles.cciInlineSection}>
                 <View style={styles.cciInlineHeader}>
                   <FileText size={16} color="#FFD700" />
@@ -633,29 +633,6 @@ export default function UpgradeScreen() {
                 </Text>
               </Pressable>
             </View>
-
-            {/* CCI for Family users */}
-            {hasFamily && (
-              <View style={styles.cciInlineSection}>
-                <View style={styles.cciInlineHeader}>
-                  <FileText size={16} color="#FF9800" />
-                  <Text style={styles.cciInlineTitle}>Individual CCI</Text>
-                  <Text style={[styles.cciInlinePrice, { color: '#FF9800' }]}>{formatPrice(CCI_PRICING.proUser)}</Text>
-                  <View style={[styles.cciProDiscountBadge, { backgroundColor: 'rgba(255,152,0,0.2)' }]}>
-                    <Text style={[styles.cciProDiscountText, { color: '#FF9800' }]}>PRO PRICE</Text>
-                  </View>
-                </View>
-                <Pressable
-                  style={[styles.cciInlineButton, { backgroundColor: '#FF9800' }, (isPurchasing || hasCCIPurchased) && styles.cciInlineButtonDisabled]}
-                  onPress={() => handlePurchase(PRODUCT_IDS.CCI_PRO, 'Individual CCI')}
-                  disabled={isPurchasing || hasCCIPurchased}
-                >
-                  <Text style={styles.cciInlineButtonText}>
-                    {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.proUser)}`}
-                  </Text>
-                </Pressable>
-              </View>
-            )}
           </View>
         </Animated.View>
 
@@ -698,45 +675,6 @@ export default function UpgradeScreen() {
                 </Text>
               </Pressable>
             </View>
-
-            {/* CCI for Circle owners */}
-            {hasCircle && (
-              <View style={styles.cciInlineSection}>
-                <Text style={styles.cciInlineSectionLabel}>CAPACITY INSTRUMENTS</Text>
-
-                {/* Individual CCI */}
-                <View style={styles.cciInlineRow}>
-                  <View style={styles.cciInlineRowLeft}>
-                    <FileText size={14} color="#00E5FF" />
-                    <Text style={styles.cciInlineRowTitle}>Individual CCI</Text>
-                  </View>
-                  <Pressable
-                    style={[styles.cciInlineRowButton, (isPurchasing || hasCCIPurchased) && styles.cciInlineRowButtonDisabled]}
-                    onPress={() => handlePurchase(PRODUCT_IDS.CCI_PRO, 'Individual CCI')}
-                    disabled={isPurchasing || hasCCIPurchased}
-                  >
-                    <Text style={[styles.cciInlineRowButtonText, (isPurchasing || hasCCIPurchased) && styles.cciInlineRowButtonTextDisabled]}>
-                      {hasCCIPurchased ? 'Issued' : formatPrice(CCI_PRICING.proUser)}
-                    </Text>
-                  </Pressable>
-                </View>
-
-                {/* Circle Aggregate CCI */}
-                <View style={styles.cciInlineRow}>
-                  <View style={styles.cciInlineRowLeft}>
-                    <Users size={14} color="#9C27B0" />
-                    <Text style={styles.cciInlineRowTitle}>Circle Aggregate CCI</Text>
-                  </View>
-                  <Pressable
-                    style={[styles.cciInlineRowButtonPurple, isPurchasing && styles.cciInlineRowButtonDisabled]}
-                    onPress={() => handlePurchase(PRODUCT_IDS.CCI_CIRCLE_ALL, 'Circle Aggregate CCI')}
-                    disabled={isPurchasing}
-                  >
-                    <Text style={styles.cciInlineRowButtonText}>{formatPrice(CCI_GROUP_PRICING.circleAll)}</Text>
-                  </Pressable>
-                </View>
-              </View>
-            )}
           </View>
         </Animated.View>
 
@@ -783,45 +721,6 @@ export default function UpgradeScreen() {
                 <Text style={[styles.bundleOptionPrice, bundleSize === 20 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_20.annual)}</Text>
               </Pressable>
             </View>
-
-            {/* CCI for Bundle owners */}
-            {bundleSize !== null && (
-              <View style={styles.cciInlineSection}>
-                <Text style={styles.cciInlineSectionLabel}>CAPACITY INSTRUMENTS</Text>
-
-                {/* Individual CCI */}
-                <View style={styles.cciInlineRow}>
-                  <View style={styles.cciInlineRowLeft}>
-                    <FileText size={14} color="#9C27B0" />
-                    <Text style={styles.cciInlineRowTitle}>Individual CCI</Text>
-                  </View>
-                  <Pressable
-                    style={[styles.cciInlineRowButtonPurple, (isPurchasing || hasCCIPurchased) && styles.cciInlineRowButtonDisabled]}
-                    onPress={() => handlePurchase(PRODUCT_IDS.CCI_PRO, 'Individual CCI')}
-                    disabled={isPurchasing || hasCCIPurchased}
-                  >
-                    <Text style={[styles.cciInlineRowButtonText, (isPurchasing || hasCCIPurchased) && styles.cciInlineRowButtonTextDisabled]}>
-                      {hasCCIPurchased ? 'Issued' : formatPrice(CCI_PRICING.proUser)}
-                    </Text>
-                  </Pressable>
-                </View>
-
-                {/* Bundle Aggregate CCI */}
-                <View style={styles.cciInlineRow}>
-                  <View style={styles.cciInlineRowLeft}>
-                    <Users size={14} color="#FF5722" />
-                    <Text style={styles.cciInlineRowTitle}>Bundle Aggregate CCI</Text>
-                  </View>
-                  <Pressable
-                    style={[styles.cciInlineRowButtonOrange, isPurchasing && styles.cciInlineRowButtonDisabled]}
-                    onPress={() => handlePurchase(PRODUCT_IDS.CCI_BUNDLE_ALL, 'Bundle Aggregate CCI')}
-                    disabled={isPurchasing}
-                  >
-                    <Text style={styles.cciInlineRowButtonText}>{formatPrice(CCI_GROUP_PRICING.bundleAll)}</Text>
-                  </Pressable>
-                </View>
-              </View>
-            )}
           </View>
         </Animated.View>
 
@@ -854,23 +753,93 @@ export default function UpgradeScreen() {
         )}
 
         {/* =============================================================== */}
-        {/* SPONSOR CODE */}
+        {/* ONE-TIME PURCHASES — CCI (Clinical Capacity Instrument) */}
+        {/* DOCTRINE: Hidden in institutional demo modes */}
         {/* =============================================================== */}
-        <Animated.View entering={FadeInDown.delay(400).duration(400)}>
-          <Pressable
-            style={styles.sponsorCard}
-            onPress={() => router.push('/redeem')}
-          >
-            <Gift size={24} color="#00E5FF" />
-            <View style={styles.sponsorCardContent}>
-              <Text style={styles.sponsorCardTitle}>Have a Sponsor Code?</Text>
-              <Text style={styles.sponsorCardDescription}>
-                Redeem a code from your organization
-              </Text>
+        {!isInstitutionalDemoMode && (
+        <Animated.View entering={FadeInDown.delay(350).duration(400)}>
+          <Text style={styles.oneTimePurchasesHeader}>One-Time Purchases</Text>
+          <Text style={styles.oneTimePurchasesSubheader}>
+            CCI is a clinical-grade capacity artifact — issued once, not a subscription
+          </Text>
+
+          {/* INDIVIDUAL CCI — Always visible */}
+          <View style={styles.cciSectionCard}>
+            <Text style={styles.cciSectionLabel}>INDIVIDUAL CCI</Text>
+            <Text style={styles.cciSectionPriceHint}>
+              {isPro
+                ? `Your price: ${formatPrice(CCI_PRICING.proUser)}`
+                : `Free: ${formatPrice(CCI_PRICING.freeUser)} · Pro: ${formatPrice(CCI_PRICING.proUser)}`}
+            </Text>
+
+            <CCICard
+              isPro={isPro}
+              onPurchase={(confirmed) => {
+                if (confirmed) {
+                  handlePurchase(
+                    isPro ? PRODUCT_IDS.CCI_PRO : PRODUCT_IDS.CCI_FREE,
+                    'Individual CCI Issuance'
+                  );
+                }
+              }}
+              disabled={isPurchasing}
+              hasPurchased={hasCCIPurchased}
+            />
+          </View>
+
+          {/* CIRCLE CCI — Only visible if hasCircle AND all members Pro */}
+          {hasCircle && circleMembersAllPro && (
+            <View style={styles.cciCard}>
+              <View style={styles.cciHeader}>
+                <Users size={24} color="#9C27B0" />
+                <View style={styles.cciHeaderText}>
+                  <Text style={[styles.cciTitle, { color: '#9C27B0' }]}>Circle CCI</Text>
+                  <Text style={styles.cciSubtitle}>One CCI covering all Circle members</Text>
+                </View>
+              </View>
+              <View style={styles.cciPricing}>
+                <View style={styles.cciPriceRow}>
+                  <Text style={styles.cciPriceLabel}>Issuance Fee:</Text>
+                  <Text style={styles.cciPriceValue}>{formatPrice(CCI_GROUP_PRICING.circleAll)}</Text>
+                </View>
+              </View>
+              <Pressable
+                style={[styles.cciButton, { backgroundColor: '#9C27B0' }, isPurchasing && styles.cciButtonDisabled]}
+                onPress={() => handlePurchase(PRODUCT_IDS.CCI_CIRCLE_ALL, 'Circle CCI')}
+                disabled={isPurchasing}
+              >
+                <Text style={styles.cciButtonText}>Issue Circle CCI · {formatPrice(CCI_GROUP_PRICING.circleAll)}</Text>
+              </Pressable>
             </View>
-            <ChevronRight size={20} color="rgba(255,255,255,0.4)" />
-          </Pressable>
+          )}
+
+          {/* BUNDLE CCI — Only visible if hasBundle AND all seats Pro */}
+          {bundleSize !== null && bundleSeatsAllPro && (
+            <View style={styles.cciCard}>
+              <View style={styles.cciHeader}>
+                <Users size={24} color="#FF5722" />
+                <View style={styles.cciHeaderText}>
+                  <Text style={[styles.cciTitle, { color: '#FF5722' }]}>Bundle CCI</Text>
+                  <Text style={styles.cciSubtitle}>One CCI covering all Bundle seats ({bundleSize} seats)</Text>
+                </View>
+              </View>
+              <View style={styles.cciPricing}>
+                <View style={styles.cciPriceRow}>
+                  <Text style={styles.cciPriceLabel}>Issuance Fee:</Text>
+                  <Text style={styles.cciPriceValue}>{formatPrice(CCI_GROUP_PRICING.bundleAll)}</Text>
+                </View>
+              </View>
+              <Pressable
+                style={[styles.cciButton, { backgroundColor: '#FF5722' }, isPurchasing && styles.cciButtonDisabled]}
+                onPress={() => handlePurchase(PRODUCT_IDS.CCI_BUNDLE_ALL, 'Bundle CCI')}
+                disabled={isPurchasing}
+              >
+                <Text style={styles.cciButtonText}>Issue Bundle CCI · {formatPrice(CCI_GROUP_PRICING.bundleAll)}</Text>
+              </Pressable>
+            </View>
+          )}
         </Animated.View>
+        )}
 
         {/* =============================================================== */}
         {/* FOOTER */}
@@ -1767,22 +1736,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.1)',
   },
-  cciInlineSectionFree: {
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(122,154,170,0.2)',
-    backgroundColor: 'rgba(122,154,170,0.05)',
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-  },
-  cciInlineSectionLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.4)',
-    letterSpacing: 1,
-    marginBottom: spacing.sm,
-  },
   cciInlineHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1839,53 +1792,5 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFD700',
     letterSpacing: 0.5,
-  },
-
-  // CCI Inline Row (for Circle/Bundle multi-CCI display)
-  cciInlineRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
-  },
-  cciInlineRowLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  cciInlineRowTitle: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.8)',
-  },
-  cciInlineRowButton: {
-    backgroundColor: '#00E5FF',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: borderRadius.sm,
-  },
-  cciInlineRowButtonPurple: {
-    backgroundColor: '#9C27B0',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: borderRadius.sm,
-  },
-  cciInlineRowButtonOrange: {
-    backgroundColor: '#FF5722',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: borderRadius.sm,
-  },
-  cciInlineRowButtonDisabled: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
-  },
-  cciInlineRowButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#000',
-  },
-  cciInlineRowButtonTextDisabled: {
-    color: 'rgba(255,255,255,0.4)',
   },
 });
