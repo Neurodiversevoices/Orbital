@@ -165,11 +165,11 @@ export function CCIChart({
     return padding.top + graphHeight - (normalized * graphHeight);
   };
 
-  // Generate smooth bezier curve path - Catmull-Rom style for natural curves
+  // Generate smooth bezier curve - matches artifact style
+  // Uses standard Catmull-Rom with tension 0.5 (same as D3.js default)
   const generateSmoothPath = (values: number[]) => {
     if (values.length < 2) return '';
 
-    // Use sampledXScale for proper spacing of downsampled points
     const scale = graphWidth / Math.max(values.length - 1, 1);
     const points = values.map((value, index) => ({
       x: padding.left + index * scale,
@@ -178,18 +178,18 @@ export function CCIChart({
 
     let path = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
 
-    for (let i = 1; i < points.length; i++) {
-      const p0 = points[Math.max(0, i - 2)];
-      const p1 = points[i - 1];
-      const p2 = points[i];
-      const p3 = points[Math.min(points.length - 1, i + 1)];
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[Math.max(0, i - 1)];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = points[Math.min(points.length - 1, i + 2)];
 
-      // Catmull-Rom to Bezier conversion for smooth natural curves
-      const tension = 6; // Higher = smoother
-      const cp1x = p1.x + (p2.x - p0.x) / tension;
-      const cp1y = p1.y + (p2.y - p0.y) / tension;
-      const cp2x = p2.x - (p3.x - p1.x) / tension;
-      const cp2y = p2.y - (p3.y - p1.y) / tension;
+      // Standard Catmull-Rom to cubic Bezier (tension = 0.5)
+      const t = 0.5;
+      const cp1x = p1.x + (p2.x - p0.x) * t / 3;
+      const cp1y = p1.y + (p2.y - p0.y) * t / 3;
+      const cp2x = p2.x - (p3.x - p1.x) * t / 3;
+      const cp2y = p2.y - (p3.y - p1.y) * t / 3;
 
       path += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
     }
@@ -341,11 +341,11 @@ export function CCIChart({
             />
           )}
 
-          {/* Main gradient stroke */}
+          {/* Main stroke - white for visibility */}
           {sampledData.length > 0 && (
             <Path
               d={generateSmoothPath(sampledData)}
-              stroke="url(#lineGradient)"
+              stroke="rgba(255,255,255,0.9)"
               strokeWidth={2.5}
               fill="none"
               strokeLinecap="round"
