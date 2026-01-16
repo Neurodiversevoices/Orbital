@@ -165,8 +165,7 @@ export function CCIChart({
     return padding.top + graphHeight - (normalized * graphHeight);
   };
 
-  // Generate smooth bezier curve - matches artifact style
-  // Uses standard Catmull-Rom with tension 0.5 (same as D3.js default)
+  // Generate smooth bezier curve - simple 1/3 control points (matches artifact style)
   const generateSmoothPath = (values: number[]) => {
     if (values.length < 2) return '';
 
@@ -179,17 +178,17 @@ export function CCIChart({
     let path = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
 
     for (let i = 0; i < points.length - 1; i++) {
-      const p0 = points[Math.max(0, i - 1)];
       const p1 = points[i];
       const p2 = points[i + 1];
-      const p3 = points[Math.min(points.length - 1, i + 2)];
 
-      // Standard Catmull-Rom to cubic Bezier (tension = 0.5)
-      const t = 0.5;
-      const cp1x = p1.x + (p2.x - p0.x) * t / 3;
-      const cp1y = p1.y + (p2.y - p0.y) * t / 3;
-      const cp2x = p2.x - (p3.x - p1.x) * t / 3;
-      const cp2y = p2.y - (p3.y - p1.y) * t / 3;
+      // Simple 1/3 control points - matches artifact hand-crafted style
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+
+      const cp1x = p1.x + dx / 3;
+      const cp1y = p1.y + dy / 3;
+      const cp2x = p2.x - dx / 3;
+      const cp2y = p2.y - dy / 3;
 
       path += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
     }
