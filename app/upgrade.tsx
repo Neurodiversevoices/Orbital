@@ -34,7 +34,7 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   X,
@@ -68,7 +68,12 @@ import {
   PAYMENTS_ENABLED,
   executePurchase,
 } from '../lib/payments';
-import { getUserEntitlements, type UserEntitlements } from '../lib/entitlements';
+import {
+  getUserEntitlements,
+  checkCircleAllMembersPro,
+  checkBundleAllSeatsPro,
+  type UserEntitlements,
+} from '../lib/entitlements';
 
 // =============================================================================
 // PURCHASE HANDLER (Mock Checkout)
@@ -359,11 +364,19 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
 
 export default function UpgradeScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ demoMode?: string }>();
   const { isLoading: subscriptionLoading, restore } = useSubscription();
+
+  // DOCTRINE: Do not surface CCI purchase options inside demo-only institutional modes
+  // Check for demo mode via query param (e.g., from Sentinel institutional views)
+  const isInstitutionalDemoMode = params.demoMode === 'institutional';
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [entitlements, setEntitlements] = useState<UserEntitlements | null>(null);
   const [loadingEntitlements, setLoadingEntitlements] = useState(true);
+  // CCI eligibility state (Circle/Bundle Pro verification)
+  const [circleMembersAllPro, setCircleMembersAllPro] = useState(false);
+  const [bundleSeatsAllPro, setBundleSeatsAllPro] = useState(false);
 
   // Load entitlements
   useEffect(() => {
@@ -375,6 +388,16 @@ export default function UpgradeScreen() {
     try {
       const ent = await getUserEntitlements();
       setEntitlements(ent);
+
+      // Check Circle/Bundle Pro status for CCI eligibility
+      if (ent.hasCircle) {
+        const allPro = await checkCircleAllMembersPro();
+        setCircleMembersAllPro(allPro);
+      }
+      if (ent.hasBundle) {
+        const allPro = await checkBundleAllSeatsPro();
+        setBundleSeatsAllPro(allPro);
+      }
     } catch {
       // Default to free
       setEntitlements(null);
@@ -686,92 +709,93 @@ export default function UpgradeScreen() {
         )}
 
         {/* =============================================================== */}
-        {/* INDIVIDUAL CCI */}
+        {/* ONE-TIME PURCHASES — CCI (Clinical Capacity Instrument) */}
+        {/* DOCTRINE: Hidden in institutional demo modes */}
         {/* =============================================================== */}
+        {!isInstitutionalDemoMode && (
         <Animated.View entering={FadeInDown.delay(350).duration(400)}>
-          <Text style={styles.sectionTitle}>INDIVIDUAL CCI</Text>
-          <Text style={styles.sectionSubtitle}>
-            {isPro ? `Pro price: ${formatPrice(CCI_PRICING.proUser)}` : `Free user: ${formatPrice(CCI_PRICING.freeUser)} · Pro: ${formatPrice(CCI_PRICING.proUser)}`}
+          <Text style={styles.oneTimePurchasesHeader}>One-Time Purchases</Text>
+          <Text style={styles.oneTimePurchasesSubheader}>
+            CCI is a clinical-grade capacity artifact — issued once, not a subscription
           </Text>
 
-          <CCICard
-            isPro={isPro}
-            onPurchase={(confirmed) => {
-              if (confirmed) {
-                handlePurchase(
-                  isPro ? PRODUCT_IDS.CCI_PRO : PRODUCT_IDS.CCI_FREE,
-                  'Individual CCI Issuance'
-                );
-              }
-            }}
-            disabled={isPurchasing}
-            hasPurchased={hasCCIPurchased}
-          />
-        </Animated.View>
+          {/* INDIVIDUAL CCI — Always visible */}
+          <View style={styles.cciSectionCard}>
+            <Text style={styles.cciSectionLabel}>INDIVIDUAL CCI</Text>
+            <Text style={styles.cciSectionPriceHint}>
+              {isPro
+                ? `Your price: ${formatPrice(CCI_PRICING.proUser)}`
+                : `Free: ${formatPrice(CCI_PRICING.freeUser)} · Pro: ${formatPrice(CCI_PRICING.proUser)}`}
+            </Text>
 
-        {/* =============================================================== */}
-        {/* CIRCLE AGGREGATE CCI - $399 - Always visible */}
-        {/* =============================================================== */}
-        <Animated.View entering={FadeInDown.delay(375).duration(400)}>
-          <View style={styles.cciCard}>
-            <View style={styles.cciHeader}>
-              <Users size={24} color="#9C27B0" />
-              <View style={styles.cciHeaderText}>
-                <Text style={[styles.cciTitle, { color: '#9C27B0' }]}>Circle Aggregate CCI</Text>
-                <Text style={styles.cciSubtitle}>One CCI for entire circle · No individual attribution</Text>
+            <CCICard
+              isPro={isPro}
+              onPurchase={(confirmed) => {
+                if (confirmed) {
+                  handlePurchase(
+                    isPro ? PRODUCT_IDS.CCI_PRO : PRODUCT_IDS.CCI_FREE,
+                    'Individual CCI Issuance'
+                  );
+                }
+              }}
+              disabled={isPurchasing}
+              hasPurchased={hasCCIPurchased}
+            />
+          </View>
+
+          {/* CIRCLE CCI — Only visible if hasCircle AND all members Pro */}
+          {hasCircle && circleMembersAllPro && (
+            <View style={styles.cciCard}>
+              <View style={styles.cciHeader}>
+                <Users size={24} color="#9C27B0" />
+                <View style={styles.cciHeaderText}>
+                  <Text style={[styles.cciTitle, { color: '#9C27B0' }]}>Circle CCI</Text>
+                  <Text style={styles.cciSubtitle}>One CCI covering all Circle members</Text>
+                </View>
               </View>
-            </View>
-            <View style={styles.cciPricing}>
-              <View style={styles.cciPriceRow}>
-                <Text style={styles.cciPriceLabel}>Issuance Fee:</Text>
-                <Text style={styles.cciPriceValue}>{formatPrice(CCI_GROUP_PRICING.circleAll)}</Text>
+              <View style={styles.cciPricing}>
+                <View style={styles.cciPriceRow}>
+                  <Text style={styles.cciPriceLabel}>Issuance Fee:</Text>
+                  <Text style={styles.cciPriceValue}>{formatPrice(CCI_GROUP_PRICING.circleAll)}</Text>
+                </View>
               </View>
-            </View>
-            {hasCircle ? (
               <Pressable
                 style={[styles.cciButton, { backgroundColor: '#9C27B0' }, isPurchasing && styles.cciButtonDisabled]}
-                onPress={() => handlePurchase(PRODUCT_IDS.CCI_CIRCLE_ALL, 'Circle Aggregate CCI')}
+                onPress={() => handlePurchase(PRODUCT_IDS.CCI_CIRCLE_ALL, 'Circle CCI')}
                 disabled={isPurchasing}
               >
-                <Text style={styles.cciButtonText}>Get Circle Aggregate CCI · {formatPrice(CCI_GROUP_PRICING.circleAll)}</Text>
+                <Text style={styles.cciButtonText}>Issue Circle CCI · {formatPrice(CCI_GROUP_PRICING.circleAll)}</Text>
               </Pressable>
-            ) : (
-              <Text style={styles.cciRequiresNote}>Requires Circle subscription</Text>
-            )}
-          </View>
-        </Animated.View>
+            </View>
+          )}
 
-        {/* =============================================================== */}
-        {/* BUNDLE AGGREGATE CCI - $999 - Always visible */}
-        {/* =============================================================== */}
-        <Animated.View entering={FadeInDown.delay(400).duration(400)}>
-          <View style={styles.cciCard}>
-            <View style={styles.cciHeader}>
-              <Users size={24} color="#FF5722" />
-              <View style={styles.cciHeaderText}>
-                <Text style={[styles.cciTitle, { color: '#FF5722' }]}>Bundle Aggregate CCI</Text>
-                <Text style={styles.cciSubtitle}>One CCI for entire bundle · No individual attribution</Text>
+          {/* BUNDLE CCI — Only visible if hasBundle AND all seats Pro */}
+          {bundleSize !== null && bundleSeatsAllPro && (
+            <View style={styles.cciCard}>
+              <View style={styles.cciHeader}>
+                <Users size={24} color="#FF5722" />
+                <View style={styles.cciHeaderText}>
+                  <Text style={[styles.cciTitle, { color: '#FF5722' }]}>Bundle CCI</Text>
+                  <Text style={styles.cciSubtitle}>One CCI covering all Bundle seats ({bundleSize} seats)</Text>
+                </View>
               </View>
-            </View>
-            <View style={styles.cciPricing}>
-              <View style={styles.cciPriceRow}>
-                <Text style={styles.cciPriceLabel}>Issuance Fee:</Text>
-                <Text style={styles.cciPriceValue}>{formatPrice(CCI_GROUP_PRICING.bundleAll)}</Text>
+              <View style={styles.cciPricing}>
+                <View style={styles.cciPriceRow}>
+                  <Text style={styles.cciPriceLabel}>Issuance Fee:</Text>
+                  <Text style={styles.cciPriceValue}>{formatPrice(CCI_GROUP_PRICING.bundleAll)}</Text>
+                </View>
               </View>
-            </View>
-            {bundleSize !== null ? (
               <Pressable
                 style={[styles.cciButton, { backgroundColor: '#FF5722' }, isPurchasing && styles.cciButtonDisabled]}
-                onPress={() => handlePurchase(PRODUCT_IDS.CCI_BUNDLE_ALL, 'Bundle Aggregate CCI')}
+                onPress={() => handlePurchase(PRODUCT_IDS.CCI_BUNDLE_ALL, 'Bundle CCI')}
                 disabled={isPurchasing}
               >
-                <Text style={styles.cciButtonText}>Get Bundle Aggregate CCI · {formatPrice(CCI_GROUP_PRICING.bundleAll)}</Text>
+                <Text style={styles.cciButtonText}>Issue Bundle CCI · {formatPrice(CCI_GROUP_PRICING.bundleAll)}</Text>
               </Pressable>
-            ) : (
-              <Text style={styles.cciRequiresNote}>Requires Bundle subscription</Text>
-            )}
-          </View>
+            </View>
+          )}
         </Animated.View>
+        )}
 
         {/* =============================================================== */}
         {/* SPONSOR CODE */}
@@ -900,6 +924,37 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.95)',
     marginBottom: spacing.lg,
     textAlign: 'center',
+  },
+
+  // One-Time Purchases Section
+  oneTimePurchasesHeader: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.95)',
+    marginBottom: spacing.xs,
+    marginTop: spacing.xl,
+    textAlign: 'center',
+  },
+  oneTimePurchasesSubheader: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+    textAlign: 'center',
+    marginBottom: spacing.lg,
+  },
+  cciSectionCard: {
+    marginBottom: spacing.md,
+  },
+  cciSectionLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.4)',
+    letterSpacing: 1,
+    marginBottom: spacing.xs,
+  },
+  cciSectionPriceHint: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+    marginBottom: spacing.sm,
   },
 
   // Plan Card (equal for all plans)

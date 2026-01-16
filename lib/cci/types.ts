@@ -100,3 +100,14 @@ export interface CCIArtifactJSON {
  * All other content is LOCKED.
  */
 export const CCI_GOLDEN_MASTER_PATH = 'output/CCI_Q4_2025_Ultra_PatternReadable.pdf';
+
+// =============================================================================
+// CCI PRICING TYPES (re-exported from pricing.ts)
+// =============================================================================
+
+export type {
+  CCITierId,
+  CCIScope,
+  CCIPricingTier,
+  CCIPricingResult,
+} from './pricing';
