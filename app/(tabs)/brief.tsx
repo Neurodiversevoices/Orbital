@@ -22,7 +22,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
-import Svg, { Path, Circle as SvgCircle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import {
   User,
   Users,
@@ -157,104 +156,6 @@ const DEMO_CIRCLE_MEMBERS: CircleMember[] = [
   { id: '4', name: 'Tyler', username: 'Tyler Ramirez', avatar: 'https://i.pravatar.cc/100?u=tyler', capacityState: 'stretched', trend: 'flat', participation: '5 / 5', notes: 'Transition support', capacityHistory: FABRICATED_HISTORIES.tyler },
   { id: '5', name: 'Emma', username: 'Emily Zhang', avatar: 'https://i.pravatar.cc/100?u=emma', capacityState: 'depleted', trend: 'declining', participation: '5 / 5', notes: 'Schedule changes', capacityHistory: FABRICATED_HISTORIES.emma },
 ];
-
-// =============================================================================
-// SPARKLINE COMPONENT FOR TABLE ROWS
-// =============================================================================
-
-interface MemberSparklineProps {
-  data: number[];
-  width?: number;
-  height?: number;
-}
-
-function MemberSparkline({ data, width = 100, height = 32 }: MemberSparklineProps) {
-  // Use last 30 days, downsampled to 6 points for smooth curves
-  const rawData = data.slice(-30);
-  const targetPoints = 6;
-
-  // Downsample to 6 representative points
-  const downsample = (values: number[], target: number): number[] => {
-    if (values.length <= target) return values;
-    const result: number[] = [];
-    const step = (values.length - 1) / (target - 1);
-    for (let i = 0; i < target; i++) {
-      result.push(values[Math.round(i * step)]);
-    }
-    return result;
-  };
-
-  const sparkData = downsample(rawData, targetPoints);
-  const padding = 4; // Breathing room
-  const innerWidth = width - padding * 2;
-  const innerHeight = height - padding * 2;
-  const xScale = innerWidth / (sparkData.length - 1);
-  const minVal = 1;
-  const maxVal = 3;
-
-  // Convert value to Y coordinate
-  const valueToY = (value: number) => {
-    const normalized = (value - minVal) / (maxVal - minVal);
-    return padding + innerHeight - (normalized * innerHeight);
-  };
-
-  // Generate points for path
-  const points = sparkData.map((value, index) => ({
-    x: padding + index * xScale,
-    y: valueToY(value),
-    value,
-    color: getCapacityColor(value),
-  }));
-
-  // Generate individual segments with colors based on average of endpoints
-  const segments: { path: string; color: string }[] = [];
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[Math.max(0, i - 1)];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[Math.min(points.length - 1, i + 2)];
-
-    const dx = p2.x - p1.x;
-    const cp1x = p1.x + dx * 0.3;
-    const cp1y = p1.y + (p2.y - p0.y) * 0.15;
-    const cp2x = p2.x - dx * 0.3;
-    const cp2y = p2.y - (p3.y - p1.y) * 0.15;
-
-    // Color based on the midpoint value of this segment
-    const avgValue = (p1.value + p2.value) / 2;
-    segments.push({
-      path: `M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`,
-      color: getCapacityColor(avgValue),
-    });
-  }
-
-  return (
-    <Svg width={width} height={height}>
-      {/* Colored line segments */}
-      {segments.map((seg, idx) => (
-        <Path
-          key={idx}
-          d={seg.path}
-          stroke={seg.color}
-          strokeWidth={2}
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      ))}
-      {/* Colored dots at all sampled points */}
-      {points.map((point, idx) => (
-        <SvgCircle
-          key={idx}
-          cx={point.x}
-          cy={point.y}
-          r={3}
-          fill={point.color}
-        />
-      ))}
-    </Svg>
-  );
-}
 
 // =============================================================================
 // MAIN COMPONENT
@@ -455,18 +356,17 @@ function CirclesCCIBrief() {
 
             {/* Table Header */}
             <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderCell, { flex: 1.3 }]}>MEMBER</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 0.9 }]}>CAPACITY STATE</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 0.8 }]}>30-DAY TREND</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 0.6 }]}>PARTICIPATION</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 1 }]}>NOTES</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 1.5 }]}>MEMBER</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 1 }]}>CAPACITY STATE</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 0.7 }]}>PARTICIPATION</Text>
+              <Text style={[styles.tableHeaderCell, { flex: 1.2 }]}>NOTES</Text>
             </View>
 
             {/* Table Rows */}
             {DEMO_CIRCLE_MEMBERS.map((member) => (
               <View key={member.id} style={styles.tableRow}>
                 {/* Member */}
-                <View style={[styles.tableCell, { flex: 1.3, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
+                <View style={[styles.tableCell, { flex: 1.5, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
                   {member.avatar ? (
                     <Image source={{ uri: member.avatar }} style={styles.avatarImage} />
                   ) : (
@@ -481,7 +381,7 @@ function CirclesCCIBrief() {
                 </View>
 
                 {/* Capacity State */}
-                <View style={[styles.tableCell, { flex: 0.9 }]}>
+                <View style={[styles.tableCell, { flex: 1 }]}>
                   <View style={[
                     styles.capacityBadge,
                     member.capacityState === 'resourced' && styles.capacityBadgeResourced,
@@ -494,18 +394,13 @@ function CirclesCCIBrief() {
                   </View>
                 </View>
 
-                {/* 30 Day Trend Sparkline */}
-                <View style={[styles.tableCell, { flex: 0.8, flexDirection: 'row', alignItems: 'center' }]}>
-                  <MemberSparkline data={member.capacityHistory} />
-                </View>
-
                 {/* Participation */}
-                <View style={[styles.tableCell, { flex: 0.6 }]}>
+                <View style={[styles.tableCell, { flex: 0.7 }]}>
                   <Text style={styles.participationText}>{member.participation}</Text>
                 </View>
 
                 {/* Notes */}
-                <View style={[styles.tableCell, { flex: 1 }]}>
+                <View style={[styles.tableCell, { flex: 1.2 }]}>
                   <Text style={styles.notesText}>{member.notes || '—'}</Text>
                 </View>
               </View>
@@ -849,29 +744,28 @@ const styles = StyleSheet.create({
   },
   // Member Chart Grid (Circles)
   memberChartGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
+    flexDirection: 'column',
+    gap: spacing.md,
   },
   memberChartGridNarrow: {
     flexDirection: 'column',
   },
   memberChartCard: {
-    width: '48%',
+    width: '100%',
     backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: borderRadius.md,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
-    padding: spacing.sm,
+    padding: spacing.md,
   },
   memberChartCardNarrow: {
     width: '100%',
   },
   memberChartName: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
     color: 'rgba(255,255,255,0.9)',
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   gridDisclaimer: {
     fontSize: 10,
