@@ -3,6 +3,9 @@
  *
  * Bar chart showing frequency distribution of capacity drivers.
  * Clinical styling - no gamification.
+ *
+ * DOCTRINE: State-First Rendering
+ * Use isLoading prop to show skeleton until data is resolved.
  */
 
 import React from 'react';
@@ -15,12 +18,15 @@ import {
   CHART_COLORS,
   CHART_TITLE_STYLE,
 } from './types';
+import { ChartSkeleton } from './ChartSkeleton';
 
 interface DriverFrequencyChartProps {
   data: DriverFrequencyData[];
   dimensions?: Partial<ChartDimensions>;
   title?: string;
   showStrainRate?: boolean;
+  /** Show loading skeleton while data is being fetched */
+  isLoading?: boolean;
 }
 
 const DRIVER_LABELS: Record<string, string> = {
@@ -40,12 +46,24 @@ export function DriverFrequencyChart({
   dimensions: customDimensions,
   title = 'Driver Frequency Distribution',
   showStrainRate = true,
+  isLoading = false,
 }: DriverFrequencyChartProps) {
   const dims: ChartDimensions = {
     ...DEFAULT_CHART_DIMENSIONS,
     height: 160,
     ...customDimensions,
   };
+
+  // DOCTRINE: State-First Rendering - show skeleton until data resolved
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>{title}</Text>
+        <ChartSkeleton dimensions={dims} variant="bar" />
+      </View>
+    );
+  }
+
   const { width, height, paddingLeft, paddingRight, paddingTop, paddingBottom } = dims;
 
   const chartWidth = width - paddingLeft - paddingRight;

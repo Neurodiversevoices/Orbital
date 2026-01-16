@@ -3,6 +3,9 @@
  *
  * Shows weekly aggregated capacity with variance bands.
  * Clinical styling - institutional grade.
+ *
+ * DOCTRINE: State-First Rendering
+ * Use isLoading prop to show skeleton until data is resolved.
  */
 
 import React, { useMemo } from 'react';
@@ -15,12 +18,15 @@ import {
   CHART_COLORS,
   CHART_TITLE_STYLE,
 } from './types';
+import { ChartSkeleton } from './ChartSkeleton';
 
 interface WeeklyMeanChartProps {
   data: WeeklyMeanPoint[];
   dimensions?: Partial<ChartDimensions>;
   title?: string;
   showVarianceBand?: boolean;
+  /** Show loading skeleton while data is being fetched */
+  isLoading?: boolean;
 }
 
 export function WeeklyMeanChart({
@@ -28,8 +34,20 @@ export function WeeklyMeanChart({
   dimensions: customDimensions,
   title = 'Weekly Mean Capacity',
   showVarianceBand = true,
+  isLoading = false,
 }: WeeklyMeanChartProps) {
   const dims: ChartDimensions = { ...DEFAULT_CHART_DIMENSIONS, ...customDimensions };
+
+  // DOCTRINE: State-First Rendering - show skeleton until data resolved
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>{title}</Text>
+        <ChartSkeleton dimensions={dims} variant="bar" />
+      </View>
+    );
+  }
+
   const { width, height, paddingLeft, paddingRight, paddingTop, paddingBottom } = dims;
 
   const chartWidth = width - paddingLeft - paddingRight;

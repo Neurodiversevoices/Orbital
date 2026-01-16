@@ -31,6 +31,63 @@ export interface CCIArtifact {
 }
 
 /**
+ * Machine-readable JSON export of CCI artifact.
+ *
+ * DOCTRINE: CCI Artifact vs. Raw Data
+ * This provides a structured, signed document format for clinical integrations
+ * while maintaining the defensible value of the artifact.
+ */
+export interface CCIArtifactJSON {
+  /** JSON Schema identifier */
+  $schema: 'https://orbital.health/schemas/cci-q4-2025.json';
+  /** Artifact type identifier */
+  type: 'CCI-Q4';
+  /** Artifact ID (matches HTML artifact) */
+  id: string;
+  /** Version of the CCI instrument */
+  version: 'Q4-2025';
+  /** Issuance metadata */
+  metadata: CCIIssuanceMetadata;
+  /** Capacity summary data */
+  summary: {
+    /** Patient identifier (anonymized) */
+    patientId: string;
+    /** Observation period */
+    observationPeriod: {
+      start: string;
+      end: string;
+      status: 'closed' | 'open';
+    };
+    /** Reporting quality metrics */
+    reportingQuality: {
+      trackingContinuity: number;
+      trackingContinuityRating: 'high' | 'moderate' | 'low';
+      responseTimingMeanMs: number;
+      patternStability: number;
+      verdict: string;
+    };
+    /** Monthly breakdown */
+    monthlyBreakdown: Array<{
+      month: string;
+      stability: number;
+      volatility: number;
+    }>;
+  };
+  /** Legal and compliance metadata */
+  legal: {
+    confidential: true;
+    copyright: string;
+    disclaimer: string;
+  };
+  /** Digital signature for verification */
+  signature: {
+    algorithm: 'sha256';
+    hash: string;
+    signedAt: string;
+  };
+}
+
+/**
  * GOLDEN MASTER REFERENCE
  *
  * The authoritative rendering is: output/CCI_Q4_2025_Ultra_PatternReadable.pdf

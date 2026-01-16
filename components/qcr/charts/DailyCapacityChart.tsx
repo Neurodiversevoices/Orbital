@@ -3,6 +3,9 @@
  *
  * Time-series visualization of daily capacity over the quarter.
  * Clinical styling - no gamification.
+ *
+ * DOCTRINE: State-First Rendering
+ * Use isLoading prop to show skeleton until data is resolved.
  */
 
 import React, { useMemo } from 'react';
@@ -15,12 +18,15 @@ import {
   CHART_COLORS,
   CHART_TITLE_STYLE,
 } from './types';
+import { ChartSkeleton } from './ChartSkeleton';
 
 interface DailyCapacityChartProps {
   data: DailyCapacityPoint[];
   dimensions?: Partial<ChartDimensions>;
   title?: string;
   showTrendLine?: boolean;
+  /** Show loading skeleton while data is being fetched */
+  isLoading?: boolean;
 }
 
 export function DailyCapacityChart({
@@ -28,8 +34,19 @@ export function DailyCapacityChart({
   dimensions: customDimensions,
   title = 'Daily Capacity Index',
   showTrendLine = true,
+  isLoading = false,
 }: DailyCapacityChartProps) {
   const dims: ChartDimensions = { ...DEFAULT_CHART_DIMENSIONS, ...customDimensions };
+
+  // DOCTRINE: State-First Rendering - show skeleton until data resolved
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>{title}</Text>
+        <ChartSkeleton dimensions={dims} variant="line" />
+      </View>
+    );
+  }
   const { width, height, paddingLeft, paddingRight, paddingTop, paddingBottom } = dims;
 
   const chartWidth = width - paddingLeft - paddingRight;

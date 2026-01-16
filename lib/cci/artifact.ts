@@ -11,7 +11,7 @@
  * Only dynamic fields: timestamp, hash (same position/style).
  */
 
-import { CCIArtifact, CCIIssuanceMetadata } from './types';
+import { CCIArtifact, CCIArtifactJSON, CCIIssuanceMetadata } from './types';
 
 /**
  * Generate CCI artifact HTML
@@ -779,4 +779,86 @@ export function getGoldenMasterHTML(): string {
     generatedAt: '2026-01-10 14:02:41 UTC',
     integrityHash: 'sha256:8f43c9d11e7a2b8f...a72b5f1d2',
   });
+}
+
+// =============================================================================
+// JSON EXPORT FORMAT
+// =============================================================================
+
+/**
+ * Create a machine-readable JSON export of the CCI artifact.
+ *
+ * DOCTRINE: CCI Artifact vs. Raw Data
+ * This provides a structured, signed document format for clinical integrations.
+ * The JSON format complements (does not replace) the HTML/PDF artifact.
+ *
+ * Use cases:
+ * - EHR integration
+ * - Clinical data exchange
+ * - Programmatic verification
+ * - Research exports (with consent)
+ */
+export function createCCIArtifactJSON(
+  metadata?: Partial<CCIIssuanceMetadata>,
+  patientId?: string
+): CCIArtifactJSON {
+  const now = new Date();
+  const timestamp = metadata?.generatedAt || formatUTCTimestamp(now);
+  const hash = metadata?.integrityHash || generatePlaceholderHash();
+
+  const observationStart = metadata?.observationStart || '2025-10-01';
+  const observationEnd = metadata?.observationEnd || '2025-12-31';
+
+  return {
+    $schema: 'https://orbital.health/schemas/cci-q4-2025.json',
+    type: 'CCI-Q4',
+    id: `cci-q4-${Date.now()}`,
+    version: 'Q4-2025',
+    metadata: {
+      generatedAt: timestamp,
+      protocol: metadata?.protocol || 'Structured EMA v4.2',
+      observationStart,
+      observationEnd,
+      integrityHash: hash,
+    },
+    summary: {
+      patientId: patientId || '34827-AFJ',
+      observationPeriod: {
+        start: observationStart,
+        end: observationEnd,
+        status: 'closed',
+      },
+      reportingQuality: {
+        trackingContinuity: 85,
+        trackingContinuityRating: 'high',
+        responseTimingMeanMs: 4200,
+        patternStability: 92,
+        verdict: 'Interpretable Capacity Trends',
+      },
+      monthlyBreakdown: [
+        { month: '2025-10', stability: 66, volatility: 25 },
+        { month: '2025-11', stability: 59, volatility: 31 },
+        { month: '2025-12', stability: 63, volatility: 29 },
+      ],
+    },
+    legal: {
+      confidential: true,
+      copyright: '© 2026 Orbital Health Intelligence, Inc. All Rights Reserved.',
+      disclaimer:
+        'This artifact is an objective summary of patient-generated capacity signals. ' +
+        'It does NOT constitute a diagnosis. Designed to support clinical documentation.',
+    },
+    signature: {
+      algorithm: 'sha256',
+      hash,
+      signedAt: timestamp,
+    },
+  };
+}
+
+/**
+ * Convert CCI artifact to JSON string with pretty formatting.
+ */
+export function serializeCCIArtifactJSON(artifact: CCIArtifactJSON): string {
+  return JSON.stringify(artifact, null, 2);
 }

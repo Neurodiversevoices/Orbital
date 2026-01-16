@@ -3,6 +3,9 @@
  *
  * Horizontal bar chart showing distribution of capacity states.
  * Clinical styling - institutional grade.
+ *
+ * DOCTRINE: State-First Rendering
+ * Use isLoading prop to show skeleton until data is resolved.
  */
 
 import React from 'react';
@@ -15,12 +18,15 @@ import {
   CHART_COLORS,
   CHART_TITLE_STYLE,
 } from './types';
+import { ChartSkeleton } from './ChartSkeleton';
 
 interface StateDistributionChartProps {
   data: StateDistributionData[];
   dimensions?: Partial<ChartDimensions>;
   title?: string;
   totalObservations?: number;
+  /** Show loading skeleton while data is being fetched */
+  isLoading?: boolean;
 }
 
 const STATE_LABELS: Record<string, string> = {
@@ -40,6 +46,7 @@ export function StateDistributionChart({
   dimensions: customDimensions,
   title = 'Capacity State Distribution',
   totalObservations,
+  isLoading = false,
 }: StateDistributionChartProps) {
   const dims: ChartDimensions = {
     ...DEFAULT_CHART_DIMENSIONS,
@@ -47,6 +54,17 @@ export function StateDistributionChart({
     paddingLeft: 70,
     ...customDimensions,
   };
+
+  // DOCTRINE: State-First Rendering - show skeleton until data resolved
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>{title}</Text>
+        <ChartSkeleton dimensions={dims} variant="distribution" />
+      </View>
+    );
+  }
+
   const { width, height, paddingLeft, paddingRight, paddingTop, paddingBottom } = dims;
 
   const chartWidth = width - paddingLeft - paddingRight;
