@@ -164,7 +164,7 @@ export function useIdentity(email?: string | null): UseIdentityResult {
     isLoading,
     displayName: identity.displayName,
     initials: getInitials(identity.displayName, email ?? null),
-    avatarColor: getAvatarColor(identity.displayName || email ?? null),
+    avatarColor: getAvatarColor((identity.displayName || email) ?? null),
     updateName: handleUpdateName,
     updateAvatar: handleUpdateAvatar,
     refresh,
