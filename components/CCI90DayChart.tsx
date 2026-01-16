@@ -30,6 +30,8 @@ import Svg, {
 
 import {
   generateChartProps,
+  dayToX,
+  valueToY,
   type CCI90DayChartData,
   type CCISeriesData,
   CCI_DAYS,
@@ -175,8 +177,6 @@ export function CCI90DayChart({
               return null;
             }
 
-            // Import coordinate helpers
-            const { dayToX, valueToY } = require('../lib/charts');
             const x = dayToX(dayIndex);
             const y = valueToY(value);
 
