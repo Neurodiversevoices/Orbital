@@ -401,7 +401,8 @@ function CirclesCCIBrief() {
                 timeRange="90d"
                 showLegend={false}
                 showDisclaimer={false}
-                heightRatio={0.22}
+                width={isWideScreen ? width - 280 : width - 48}
+                heightRatio={0.18}
               />
             </View>
           </View>
