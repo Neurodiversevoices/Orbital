@@ -1,7 +1,14 @@
 /**
  * Orbital ESLint Configuration
  * Strict linting for medical-grade reliability
+ *
+ * DOCTRINE: Anti-Engagement & Capacity Taxonomy
+ * Custom rules enforce product doctrine at lint time.
+ *
+ * Custom rule plugin: scripts/eslint-rules/
+ * Run `npm run lint:terminology` for full terminology audit.
  */
+
 module.exports = {
   root: true,
   extends: [
@@ -54,6 +61,12 @@ module.exports = {
     'prefer-const': 'error',
     'no-var': 'error',
     'eqeqeq': ['error', 'always'],
+
+    // ==========================================================================
+    // ORBITAL DOCTRINE RULES
+    // ==========================================================================
+    // Terminology enforcement: Run `npm run lint:terminology`
+    // See scripts/lint-terminology.js for prohibited terms list.
   },
   ignorePatterns: [
     'node_modules/',
