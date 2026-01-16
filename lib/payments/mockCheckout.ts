@@ -20,6 +20,7 @@ import {
   BUNDLE_PRICING,
   ADMIN_ADDON_PRICING,
   CCI_PRICING,
+  CCI_GROUP_PRICING,
   getCCIPrice,
   ProductId,
 } from '../subscription/pricing';
@@ -215,6 +216,23 @@ export const PRODUCT_CATALOG: Record<string, ProductInfo> = {
     billingCycle: 'one_time',
     entitlementId: 'cci_purchased',
   },
+  [PRODUCT_IDS.CCI_CIRCLE_ALL]: {
+    id: PRODUCT_IDS.CCI_CIRCLE_ALL,
+    name: 'Circle Aggregate CCI',
+    description: 'One CCI covering all Circle members',
+    price: CCI_GROUP_PRICING.circleAll,
+    billingCycle: 'one_time',
+    entitlementId: 'cci_circle_purchased',
+    requiresEntitlement: 'circle_access',
+  },
+  [PRODUCT_IDS.CCI_BUNDLE_ALL]: {
+    id: PRODUCT_IDS.CCI_BUNDLE_ALL,
+    name: 'Bundle Aggregate CCI',
+    description: 'One CCI covering all Bundle seats',
+    price: CCI_GROUP_PRICING.bundleAll,
+    billingCycle: 'one_time',
+    entitlementId: 'cci_bundle_purchased',
+  },
 };
 
 // =============================================================================
@@ -370,6 +388,20 @@ export async function executePurchase(
         success: false,
         purchaseId: '',
         error: `Requires Circle or Bundle first`,
+      };
+    }
+  }
+
+  // Special case: Bundle CCI requires any Bundle entitlement
+  if (product.entitlementId === 'cci_bundle_purchased') {
+    const hasBundle10 = await hasEntitlement('bundle_10_access');
+    const hasBundle15 = await hasEntitlement('bundle_15_access');
+    const hasBundle20 = await hasEntitlement('bundle_20_access');
+    if (!hasBundle10 && !hasBundle15 && !hasBundle20) {
+      return {
+        success: false,
+        purchaseId: '',
+        error: 'Requires Bundle subscription first',
       };
     }
   }
