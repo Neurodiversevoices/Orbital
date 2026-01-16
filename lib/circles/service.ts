@@ -114,6 +114,8 @@ import {
   assertValidInviteToken,
 } from './ids';
 
+import { checkIsPro } from '../entitlements';
+
 // =============================================================================
 // INITIALIZATION
 // =============================================================================
@@ -148,6 +150,16 @@ export async function circlesGetMyId(): Promise<string | null> {
  * @throws CirclesLawViolation if connection limit would be exceeded
  */
 export async function circlesCreateInvite(targetHint?: string): Promise<CreateInviteResult> {
+  // DOCTRINE: Circles requires Pro subscription
+  const isPro = await checkIsPro();
+  if (!isPro) {
+    throw new CircleSecurityError(
+      CircleSecurityEvent.PRO_REQUIRED_CREATOR,
+      'Pro subscription required to create Circle invites',
+      {}
+    );
+  }
+
   const user = await ensureLocalUser();
 
   // L1: NO AGGREGATION — check connection limit before creating invite
@@ -184,6 +196,17 @@ export async function circlesCreateInvite(targetHint?: string): Promise<CreateIn
  * @returns The established connection
  */
 export async function circlesAcceptInvite(token: string): Promise<AcceptInviteResult> {
+  // DOCTRINE: Circles requires Pro subscription
+  const isPro = await checkIsPro();
+  if (!isPro) {
+    return {
+      connection: null as unknown as ConnectionSummary,
+      success: false,
+      error: 'Pro subscription required to join Circles',
+      code: CircleSecurityEvent.PRO_REQUIRED_REDEEMER,
+    };
+  }
+
   // Validate token format
   try {
     assertValidInviteToken(token);
@@ -391,6 +414,16 @@ export async function circlesSetMySignal(
   color: 'cyan' | 'amber' | 'red',
   ttlMs: number = DEFAULT_SIGNAL_TTL_MS
 ): Promise<void> {
+  // DOCTRINE: Circles requires Pro subscription
+  const isPro = await checkIsPro();
+  if (!isPro) {
+    throw new CircleSecurityError(
+      CircleSecurityEvent.PRO_LAPSED_SHARING_SUSPENDED,
+      'Pro subscription required to share signals',
+      {}
+    );
+  }
+
   // L2: NO HISTORY — validate TTL bounds
   assertValidTTL(ttlMs);
 
@@ -421,6 +454,16 @@ export async function circlesSetMySignalFromCapacity(
   capacityState: 'resourced' | 'stretched' | 'depleted',
   ttlMs: number = DEFAULT_SIGNAL_TTL_MS
 ): Promise<void> {
+  // DOCTRINE: Circles requires Pro subscription
+  const isPro = await checkIsPro();
+  if (!isPro) {
+    throw new CircleSecurityError(
+      CircleSecurityEvent.PRO_LAPSED_SHARING_SUSPENDED,
+      'Pro subscription required to share signals',
+      {}
+    );
+  }
+
   const color = CAPACITY_TO_CIRCLE_COLOR[capacityState];
   if (!color || color === 'unknown') {
     throw new CirclesLawViolation(
@@ -448,6 +491,13 @@ export async function circlesClearMySignal(): Promise<void> {
  * Get my current signal (if any).
  */
 export async function circlesGetMySignal(): Promise<CircleColor> {
+  // DOCTRINE: Circles requires Pro subscription
+  const isPro = await checkIsPro();
+  if (!isPro) {
+    // Pro lapse hides own signal from self (suspended state)
+    return 'unknown';
+  }
+
   const user = await getLocalUser();
   if (!user) return 'unknown';
 
@@ -478,6 +528,14 @@ export async function circlesGetMySignal(): Promise<CircleColor> {
  * @returns A map of connectionId -> ViewerSafeSignal
  */
 export async function circlesGetSignalsForMe(): Promise<SignalMap> {
+  // DOCTRINE: Circles requires Pro subscription
+  // Pro lapse suspends signal viewing (but does not delete connections)
+  const isPro = await checkIsPro();
+  if (!isPro) {
+    // Return empty map — signals are suspended, not deleted
+    return {} as SignalMap;
+  }
+
   const connections = await getActiveConnections();
   const result: Record<string, ViewerSafeSignal> = {};
 

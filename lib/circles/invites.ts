@@ -41,6 +41,7 @@ import {
   CircleSecurityEventType,
   CIRCLES_KEY_PREFIX,
 } from './constants';
+import { checkIsPro } from '../entitlements';
 import { assertNoHistory, assertNoAggregation, assertSymmetry } from './guardrails';
 import {
   generateCircleId,
@@ -406,6 +407,16 @@ export async function createInvite(
 ): Promise<CreateInviteResult> {
   const user = await ensureLocalUser();
 
+  // DOCTRINE: Circles requires Pro subscription
+  const isPro = await checkIsPro();
+  if (!isPro) {
+    throw new CircleSecurityError(
+      CircleSecurityEvent.PRO_REQUIRED_CREATOR,
+      'Pro subscription required to create Circle invites',
+      { userId: user.id }
+    );
+  }
+
   // L1: NO AGGREGATION — check connection limit
   const connections = await getAllConnections();
   assertNoAggregation(connections.length);
@@ -603,6 +614,16 @@ async function processRedemption(
   providedToken: string,
   redeemerDisplayHint?: string
 ): Promise<RedeemResult> {
+  // DOCTRINE: Circles requires Pro subscription for redeemer
+  const isPro = await checkIsPro();
+  if (!isPro) {
+    return {
+      success: false,
+      code: CircleSecurityEvent.PRO_REQUIRED_REDEEMER,
+      error: 'Pro subscription required to join Circles',
+    };
+  }
+
   // Check lockout (too many failed attempts)
   if (invite.lockoutUntil) {
     const lockoutExpiry = new Date(invite.lockoutUntil).getTime();
@@ -784,6 +805,17 @@ export async function confirmInvite(inviteId: string): Promise<ConfirmResult> {
       success: false,
       code: CircleSecurityEvent.HANDSHAKE_UNAUTHORIZED,
       error: 'Only creator can confirm',
+    };
+  }
+
+  // DOCTRINE: Circles requires Pro subscription for confirmer
+  // Check that creator still has Pro before finalizing connection
+  const isPro = await checkIsPro();
+  if (!isPro) {
+    return {
+      success: false,
+      code: CircleSecurityEvent.PRO_REQUIRED_CONFIRMER,
+      error: 'Pro subscription required to confirm Circle connection',
     };
   }
 

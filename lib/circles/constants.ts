@@ -165,6 +165,12 @@ export const CircleSecurityEvent = {
   // Connection limits
   CONNECTION_LIMIT_REACHED: 'CONNECTION_LIMIT_REACHED',
   CONNECTION_BLOCKED_USER: 'CONNECTION_BLOCKED_USER',
+
+  // Pro subscription requirements (DOCTRINE: Circles requires Pro)
+  PRO_REQUIRED_CREATOR: 'PRO_REQUIRED_CREATOR',
+  PRO_REQUIRED_REDEEMER: 'PRO_REQUIRED_REDEEMER',
+  PRO_REQUIRED_CONFIRMER: 'PRO_REQUIRED_CONFIRMER',
+  PRO_LAPSED_SHARING_SUSPENDED: 'PRO_LAPSED_SHARING_SUSPENDED',
 } as const;
 
 export type CircleSecurityEventType = typeof CircleSecurityEvent[keyof typeof CircleSecurityEvent];

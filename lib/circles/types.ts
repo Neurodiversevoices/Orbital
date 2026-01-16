@@ -458,6 +458,7 @@ export interface AcceptInviteResult {
   readonly connection: ConnectionSummary;
   readonly success: boolean;
   readonly error?: string;
+  readonly code?: string; // Security event code for audit trail
 }
 
 export interface SignalMap {
