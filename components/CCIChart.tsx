@@ -258,7 +258,7 @@ export function CCIChart({
               <Stop offset="50%" stopColor="#E8A830" stopOpacity={0.12} />
               <Stop offset="100%" stopColor="#F44336" stopOpacity={0.20} />
             </LinearGradient>
-            <LinearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <LinearGradient id="lineGradient" x1="0" y1={padding.top} x2="0" y2={padding.top + graphHeight} gradientUnits="userSpaceOnUse">
               <Stop offset="0%" stopColor="#00D7FF" />
               <Stop offset="50%" stopColor="#E8A830" />
               <Stop offset="100%" stopColor="#F44336" />
