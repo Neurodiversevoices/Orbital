@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback } from 'react';
 // TYPES
 // =============================================================================
 
-export type AvatarSource = 'initials' | 'upload' | 'gravatar';
+export type AvatarSource = 'initials' | 'preset' | 'upload' | 'gravatar';
 
 export interface UserIdentity {
   displayName: string | null;

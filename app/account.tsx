@@ -15,6 +15,7 @@ import {
   TextInput,
   Image,
   Alert,
+  Modal,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,21 +28,26 @@ import {
   Smartphone,
   Clock,
   Check,
+  Pencil,
 } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { colors, spacing, borderRadius } from '../theme';
 import { useIdentity, getInitials, getAvatarColor } from '../lib/profile';
 import { useAuth } from '../lib/supabase';
+import { AvatarPicker } from '../components/AvatarPicker';
+import { type AvatarOption } from '../lib/avatars';
 
 export default function AccountScreen() {
   const router = useRouter();
   const auth = useAuth();
-  const { identity, isLoading, updateName, refresh } = useIdentity(auth.user?.email);
+  const { identity, isLoading, updateName, updateAvatar, refresh } = useIdentity(auth.user?.email);
 
   // Local form state
   const [nameInput, setNameInput] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [selectedAvatarId, setSelectedAvatarId] = useState<string | null>(null);
 
   // Initialize from identity
   useEffect(() => {
@@ -85,16 +91,26 @@ export default function AccountScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Avatar Section */}
         <Animated.View entering={FadeInDown.duration(400)} style={styles.avatarSection}>
-          <View style={[styles.avatar, { backgroundColor: avatarColor }]}>
-            {identity.avatarUrl ? (
-              <Image source={{ uri: identity.avatarUrl }} style={styles.avatarImage} />
-            ) : (
-              <Text style={styles.avatarInitials}>{initials}</Text>
-            )}
-          </View>
-          <Text style={styles.avatarHint}>
-            Avatar is generated from your display name
-          </Text>
+          <Pressable
+            style={styles.avatarPressable}
+            onPress={() => setShowAvatarPicker(true)}
+          >
+            <View style={[styles.avatar, { backgroundColor: avatarColor }]}>
+              {identity.avatarUrl ? (
+                <Image source={{ uri: identity.avatarUrl }} style={styles.avatarImage} />
+              ) : (
+                <Text style={styles.avatarInitials}>{initials}</Text>
+              )}
+            </View>
+            <View style={styles.editBadge}>
+              <Pencil size={12} color="#000" />
+            </View>
+          </Pressable>
+          <Pressable onPress={() => setShowAvatarPicker(true)}>
+            <Text style={styles.avatarHint}>
+              Tap to change avatar
+            </Text>
+          </Pressable>
         </Animated.View>
 
         {/* Display Name Section */}
@@ -185,6 +201,44 @@ export default function AccountScreen() {
 
         <View style={{ height: spacing.xl }} />
       </ScrollView>
+
+      {/* Avatar Picker Modal */}
+      <Modal
+        visible={showAvatarPicker}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowAvatarPicker(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Pressable onPress={() => setShowAvatarPicker(false)} style={styles.modalClose}>
+              <X size={24} color={colors.textPrimary} />
+            </Pressable>
+            <Text style={styles.modalTitle}>Choose Avatar</Text>
+            <Pressable
+              onPress={async () => {
+                if (selectedAvatarId) {
+                  const avatar = require('../lib/avatars').getAvatarById(selectedAvatarId);
+                  if (avatar) {
+                    await updateAvatar(avatar.url, 'preset');
+                  }
+                }
+                setShowAvatarPicker(false);
+              }}
+              style={styles.modalSave}
+            >
+              <Text style={styles.modalSaveText}>Save</Text>
+            </Pressable>
+          </View>
+          <ScrollView style={styles.modalContent}>
+            <AvatarPicker
+              selectedId={selectedAvatarId}
+              onSelect={(avatar: AvatarOption) => setSelectedAvatarId(avatar.id)}
+              maxHeight={500}
+            />
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -242,6 +296,58 @@ const styles = StyleSheet.create({
   avatarHint: {
     fontSize: 12,
     color: 'rgba(255,255,255,0.4)',
+  },
+  avatarPressable: {
+    position: 'relative',
+    marginBottom: spacing.sm,
+  },
+  editBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: colors.background,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.1)',
+  },
+  modalClose: {
+    padding: spacing.xs,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
+  modalSave: {
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+  },
+  modalSaveText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  modalContent: {
+    flex: 1,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
   },
   section: {
     marginBottom: spacing.xl,

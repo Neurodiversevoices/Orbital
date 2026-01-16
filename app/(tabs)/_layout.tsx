@@ -1,8 +1,37 @@
-import { Tabs } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Tabs, useRouter } from 'expo-router';
 import { Home, BarChart2, FileText } from 'lucide-react-native';
 import { colors } from '../../theme';
+import { useAuth } from '../../lib/supabase';
+import { isProfileSetupComplete } from '../profile-setup';
 
 export default function TabLayout() {
+  const router = useRouter();
+  const auth = useAuth();
+  const [checkingSetup, setCheckingSetup] = useState(true);
+
+  // Check if B2C user needs profile setup
+  useEffect(() => {
+    const checkProfileSetup = async () => {
+      if (auth.isAuthenticated) {
+        const isComplete = await isProfileSetupComplete();
+        if (!isComplete) {
+          // Redirect to profile setup
+          router.replace('/profile-setup');
+          return;
+        }
+      }
+      setCheckingSetup(false);
+    };
+
+    checkProfileSetup();
+  }, [auth.isAuthenticated, router]);
+
+  // Don't render tabs while checking setup
+  if (checkingSetup && auth.isAuthenticated) {
+    return null;
+  }
+
   return (
     <Tabs
       screenOptions={{

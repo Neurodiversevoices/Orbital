@@ -404,6 +404,14 @@ function RootLayout() {
                     }}
                   />
                   <Stack.Screen
+                    name="profile-setup"
+                    options={{
+                      presentation: 'fullScreenModal',
+                      animation: 'fade',
+                      gestureEnabled: false,
+                    }}
+                  />
+                  <Stack.Screen
                     name="active-sessions"
                     options={{
                       presentation: 'modal',
