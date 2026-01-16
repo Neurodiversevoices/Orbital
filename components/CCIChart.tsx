@@ -1,5 +1,19 @@
 /**
- * CCIChart — Shared Clinical Capacity Indicator Chart Component
+ * @deprecated This component is DEPRECATED.
+ *
+ * Use `CCI90DayChart` from `components/CCI90DayChart.tsx` instead.
+ *
+ * The unified chart module ensures pixel-identical rendering between
+ * Individual CCI (1 series) and Circle CCI (5 series).
+ *
+ * MIGRATION:
+ * - Import `CircleCCIChart` or `IndividualCCIChart` from './CCI90DayChart'
+ * - Convert legacy 1-3 scale data to 0-100 using `convertLegacyCapacityData`
+ *
+ * This file will be removed in a future release.
+ *
+ * ---
+ * CCIChart — Shared Clinical Capacity Indicator Chart Component (LEGACY)
  *
  * Used for both Individual CCI and Circle CCI (aggregate view).
  * Visual requirements:

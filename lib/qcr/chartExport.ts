@@ -340,7 +340,120 @@ export function generateAppStyleChartSVG(
 }
 
 // =============================================================================
+// CCI 90-DAY CHART EXPORT (UNIFIED SPEC)
+// =============================================================================
+
+import {
+  renderCCI90DayToSVG,
+  createIndividualCCIData,
+  createCircleCCIData,
+  CCI_STATE_COLORS,
+  type CCI90DayChartData,
+} from '../charts';
+
+/**
+ * Generate Individual CCI chart SVG using the unified 90-day spec.
+ *
+ * DOCTRINE: This function uses the same spec as the React component,
+ * ensuring pixel-identical output between in-app and PDF rendering.
+ */
+export function generateIndividualCCISVG(
+  values: number[],
+  label: string = 'You'
+): string {
+  const data = createIndividualCCIData(label, values);
+  return renderCCI90DayToSVG(data);
+}
+
+/**
+ * Generate Circle CCI chart SVG using the unified 90-day spec.
+ *
+ * DOCTRINE: This function uses the same spec as the React component,
+ * ensuring pixel-identical output between in-app and PDF rendering.
+ *
+ * @param members Array of 5 members with their capacity data
+ */
+export function generateCircleCCISVG(
+  members: Array<{ id: string; label: string; values: number[] }>
+): string {
+  const data = createCircleCCIData(members);
+  return renderCCI90DayToSVG(data);
+}
+
+/**
+ * Generate CCI chart SVG from raw CCI90DayChartData.
+ *
+ * This is the most flexible function — use createIndividualCCIData or
+ * createCircleCCIData to generate the data structure.
+ */
+export function generateCCI90DaySVG(data: CCI90DayChartData): string {
+  return renderCCI90DayToSVG(data);
+}
+
+/**
+ * Convert legacy CapacityLog[] to CCI 90-day values array.
+ *
+ * Maps capacity states to 0-100 scale:
+ * - resourced → 80
+ * - stretched → 50
+ * - depleted → 20
+ */
+export function convertLogsToValues(
+  logs: CapacityLog[],
+  days: number = 90
+): number[] {
+  const now = Date.now();
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const startTime = now - days * msPerDay;
+
+  // Initialize with null for missing days
+  const values: (number | null)[] = new Array(days).fill(null);
+
+  // Bucket logs by day
+  const dayBuckets: Map<number, number[]> = new Map();
+
+  for (const log of logs) {
+    if (log.timestamp < startTime) continue;
+
+    const dayIndex = Math.floor((log.timestamp - startTime) / msPerDay);
+    if (dayIndex < 0 || dayIndex >= days) continue;
+
+    const value =
+      log.state === 'resourced' ? 80 :
+      log.state === 'stretched' ? 50 :
+      20;
+
+    if (!dayBuckets.has(dayIndex)) {
+      dayBuckets.set(dayIndex, []);
+    }
+    dayBuckets.get(dayIndex)!.push(value);
+  }
+
+  // Average values per day
+  for (const [dayIndex, dayValues] of dayBuckets) {
+    const avg = dayValues.reduce((a, b) => a + b, 0) / dayValues.length;
+    values[dayIndex] = avg;
+  }
+
+  // Interpolate missing values
+  let lastValue = 50; // Default to middle
+  for (let i = 0; i < values.length; i++) {
+    if (values[i] !== null) {
+      lastValue = values[i]!;
+    } else {
+      values[i] = lastValue;
+    }
+  }
+
+  return values as number[];
+}
+
+// =============================================================================
 // EXPORT TYPES
 // =============================================================================
 
 export { CHART_COLORS, ZONE_FILLS };
+
+// Re-export CCI chart types for convenience
+export type { CCI90DayChartData };
+export { CCI_STATE_COLORS };

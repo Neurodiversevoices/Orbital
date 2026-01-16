@@ -22,22 +22,22 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
-import Svg, { Path, Rect, Line, Text as SvgText, Defs, LinearGradient, Stop, Circle as SvgCircle } from 'react-native-svg';
+import Svg, { Path, Circle as SvgCircle } from 'react-native-svg';
 import {
   User,
   Users,
   FileText,
   ChevronRight,
   CheckCircle,
-  TrendingUp,
-  TrendingDown,
-  Minus,
   LayoutGrid,
   Link2,
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../../theme';
 import { useAccess } from '../../lib/access';
-import { CCIChart, calculateAggregateCapacity, type CCITimeRange } from '../../components/CCIChart';
+import {
+  CircleCCIChart,
+  convertLegacyCapacityData,
+} from '../../components/CCI90DayChart';
 
 // =============================================================================
 // TYPES
@@ -162,222 +162,7 @@ const DEMO_CIRCLE_MEMBERS: CircleMember[] = [
 ];
 
 // =============================================================================
-// CAPACITY TREND CHART COMPONENT (90-DAY, INDIVIDUAL CCI STYLE)
-// =============================================================================
-
-interface CapacityTrendChartProps {
-  members: CircleMember[];
-  width?: number;
-}
-
-function CapacityTrendChart({ members, width: containerWidth }: CapacityTrendChartProps) {
-  // Responsive dimensions - use viewBox for scaling
-  const viewBoxWidth = 500;
-  const viewBoxHeight = 200;
-  const padding = { top: 15, right: 70, bottom: 30, left: 5 };
-  const graphWidth = viewBoxWidth - padding.left - padding.right;
-  const graphHeight = viewBoxHeight - padding.top - padding.bottom;
-
-  // Band heights (Resourced top, Stretched middle, Sentinel bottom)
-  const bandHeight = graphHeight / 3;
-
-  // Scale for 90 days
-  const dataPoints = 90;
-  const xScale = graphWidth / (dataPoints - 1);
-
-  // Convert capacity value (1-3) to Y coordinate
-  const valueToY = (value: number) => {
-    // value 3 = top, value 1 = bottom
-    const normalized = (value - 1) / 2; // 0 to 1
-    return padding.top + graphHeight - (normalized * graphHeight);
-  };
-
-  // Generate smooth bezier curve path for a member's capacity history
-  const generateSmoothPath = (history: number[]) => {
-    if (history.length < 2) return '';
-
-    const points = history.map((value, index) => ({
-      x: padding.left + index * xScale,
-      y: valueToY(value),
-    }));
-
-    // Create smooth bezier curve
-    let path = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
-
-    for (let i = 1; i < points.length; i++) {
-      const prev = points[i - 1];
-      const curr = points[i];
-      const tension = 0.3;
-
-      // Control points for smooth curve
-      const cp1x = prev.x + (curr.x - prev.x) * tension;
-      const cp1y = prev.y;
-      const cp2x = curr.x - (curr.x - prev.x) * tension;
-      const cp2y = curr.y;
-
-      path += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${curr.x.toFixed(1)} ${curr.y.toFixed(1)}`;
-    }
-
-    return path;
-  };
-
-  // Get key data points for dots (monthly markers: day 0, 30, 60, 89)
-  const getKeyPoints = (history: number[]) => {
-    const indices = [0, 30, 60, 89];
-    return indices.map(i => ({
-      x: padding.left + i * xScale,
-      y: valueToY(history[i]),
-      value: history[i],
-      color: getCapacityColor(history[i]),
-    }));
-  };
-
-  return (
-    <Svg
-      width="100%"
-      height={containerWidth ? containerWidth * 0.4 : 180}
-      viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
-      preserveAspectRatio="xMidYMid meet"
-    >
-      {/* Background bands */}
-      <Rect
-        x={padding.left}
-        y={padding.top}
-        width={graphWidth}
-        height={bandHeight}
-        fill="rgba(0, 215, 255, 0.08)"
-      />
-      <Rect
-        x={padding.left}
-        y={padding.top + bandHeight}
-        width={graphWidth}
-        height={bandHeight}
-        fill="rgba(232, 168, 48, 0.08)"
-      />
-      <Rect
-        x={padding.left}
-        y={padding.top + bandHeight * 2}
-        width={graphWidth}
-        height={bandHeight}
-        fill="rgba(244, 67, 54, 0.08)"
-      />
-
-      {/* Grid lines */}
-      <Line
-        x1={padding.left}
-        y1={padding.top + bandHeight}
-        x2={padding.left + graphWidth}
-        y2={padding.top + bandHeight}
-        stroke="rgba(255,255,255,0.15)"
-        strokeWidth={0.5}
-        strokeDasharray="4,4"
-      />
-      <Line
-        x1={padding.left}
-        y1={padding.top + bandHeight * 2}
-        x2={padding.left + graphWidth}
-        y2={padding.top + bandHeight * 2}
-        stroke="rgba(255,255,255,0.15)"
-        strokeWidth={0.5}
-        strokeDasharray="4,4"
-      />
-
-      {/* Member trend lines - smooth curves */}
-      {members.map((member) => (
-        <Path
-          key={`line-${member.id}`}
-          d={generateSmoothPath(member.capacityHistory)}
-          stroke="rgba(255,255,255,0.6)"
-          strokeWidth={2}
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      ))}
-
-      {/* Colored dots at key data points for each member */}
-      {members.map((member) =>
-        getKeyPoints(member.capacityHistory).map((point, idx) => (
-          <SvgCircle
-            key={`dot-${member.id}-${idx}`}
-            cx={point.x}
-            cy={point.y}
-            r={6}
-            fill={point.color}
-            stroke="rgba(0,0,0,0.3)"
-            strokeWidth={1}
-          />
-        ))
-      )}
-
-      {/* Y-axis labels */}
-      <SvgText
-        x={padding.left + graphWidth + 8}
-        y={padding.top + bandHeight / 2 + 4}
-        fill="#00D7FF"
-        fontSize={11}
-        fontWeight="500"
-      >
-        Resourced
-      </SvgText>
-      <SvgText
-        x={padding.left + graphWidth + 8}
-        y={padding.top + bandHeight * 1.5 + 4}
-        fill="#E8A830"
-        fontSize={11}
-        fontWeight="500"
-      >
-        Stretched
-      </SvgText>
-      <SvgText
-        x={padding.left + graphWidth + 8}
-        y={padding.top + bandHeight * 2.5 + 4}
-        fill="#F44336"
-        fontSize={11}
-        fontWeight="500"
-      >
-        Sentinel
-      </SvgText>
-
-      {/* X-axis labels - months */}
-      <SvgText
-        x={padding.left}
-        y={viewBoxHeight - 8}
-        fill="rgba(255,255,255,0.5)"
-        fontSize={10}
-      >
-        Oct
-      </SvgText>
-      <SvgText
-        x={padding.left + graphWidth / 3}
-        y={viewBoxHeight - 8}
-        fill="rgba(255,255,255,0.5)"
-        fontSize={10}
-      >
-        Nov
-      </SvgText>
-      <SvgText
-        x={padding.left + (graphWidth * 2) / 3}
-        y={viewBoxHeight - 8}
-        fill="rgba(255,255,255,0.5)"
-        fontSize={10}
-      >
-        Dec
-      </SvgText>
-      <SvgText
-        x={padding.left + graphWidth - 5}
-        y={viewBoxHeight - 8}
-        fill="rgba(255,255,255,0.5)"
-        fontSize={10}
-      >
-        Today
-      </SvgText>
-    </Svg>
-  );
-}
-
-// =============================================================================
-// SPARKLINE COMPONENT FOR TABLE ROWS — Matches Individual CCI Style
+// SPARKLINE COMPONENT FOR TABLE ROWS
 // =============================================================================
 
 interface MemberSparklineProps {
@@ -566,20 +351,9 @@ function PersonalBrief() {
 // CIRCLES TAB — Circle CCI Demo (Pro Only)
 // =============================================================================
 
-// Time range options for Circle CCI
-const TIME_RANGE_OPTIONS: { value: CCITimeRange; label: string }[] = [
-  { value: '7d', label: '7D' },
-  { value: '30d', label: '30D' },
-  { value: '90d', label: '90D' },
-  { value: '6m', label: '6M' },
-  { value: '1y', label: '1Y' },
-  { value: '3y', label: '3Y' },
-];
-
 function CirclesCCIBrief() {
   const { width } = useWindowDimensions();
   const isWideScreen = width >= 768;
-  const [selectedTimeRange, setSelectedTimeRange] = useState<CCITimeRange>('90d');
 
   return (
     <Animated.View entering={FadeInDown.duration(400)}>
@@ -728,40 +502,20 @@ function CirclesCCIBrief() {
 
         {/* RIGHT COLUMN: Chart + Aggregate Info */}
         <View style={[styles.rightColumn, isWideScreen && { flex: 0.45, marginLeft: spacing.md }]}>
-          {/* Circle Aggregate CCI Chart — Uses shared CCIChart component */}
+          {/* Circle Aggregate CCI Chart — Uses unified CCI90DayChart */}
           <View style={styles.chartContainer}>
             <View style={styles.chartHeader}>
               <Text style={styles.chartTitle}>CIRCLE CAPACITY INDICATOR</Text>
-              <Text style={styles.chartSubtitle}>— AGGREGATE, NON-DIAGNOSTIC</Text>
+              <Text style={styles.chartSubtitle}>— 90 DAYS, NON-DIAGNOSTIC</Text>
             </View>
 
-            {/* Time Range Selector */}
-            <View style={styles.timeRangeSelector}>
-              {TIME_RANGE_OPTIONS.map((option) => (
-                <Pressable
-                  key={option.value}
-                  style={[
-                    styles.timeRangeButton,
-                    selectedTimeRange === option.value && styles.timeRangeButtonActive,
-                  ]}
-                  onPress={() => setSelectedTimeRange(option.value)}
-                >
-                  <Text
-                    style={[
-                      styles.timeRangeButtonText,
-                      selectedTimeRange === option.value && styles.timeRangeButtonTextActive,
-                    ]}
-                  >
-                    {option.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-
-            <CCIChart
-              data={calculateAggregateCapacity(DEMO_CIRCLE_MEMBERS.map(m => m.capacityHistory))}
-              timeRange={selectedTimeRange}
-              showLegend={true}
+            {/* Unified 90-day Circle CCI Chart */}
+            <CircleCCIChart
+              members={DEMO_CIRCLE_MEMBERS.map((member, index) => ({
+                id: member.id,
+                label: member.name,
+                values: convertLegacyCapacityData(member.capacityHistory),
+              }))}
               showDisclaimer={false}
             />
           </View>
