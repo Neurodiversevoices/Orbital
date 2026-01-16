@@ -34,10 +34,7 @@ import {
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../../theme';
 import { useAccess } from '../../lib/access';
-import {
-  CircleCCIChart,
-  convertLegacyCapacityData,
-} from '../../components/CCI90DayChart';
+import { CCIChart } from '../../components/CCIChart';
 
 // =============================================================================
 // TYPES
@@ -500,39 +497,36 @@ function CirclesCCIBrief() {
           </View>
         </View>
 
-        {/* RIGHT COLUMN: Chart + Aggregate Info */}
-        <View style={[styles.rightColumn, isWideScreen && { flex: 0.45, marginLeft: spacing.md }]}>
-          {/* Circle Aggregate CCI Chart — Uses unified CCI90DayChart */}
-          <View style={styles.chartContainer}>
-            <View style={styles.chartHeader}>
-              <Text style={styles.chartTitle}>CIRCLE CAPACITY INDICATOR</Text>
-              <Text style={styles.chartSubtitle}>— 90 DAYS, NON-DIAGNOSTIC</Text>
-            </View>
-
-            {/* Unified 90-day Circle CCI Chart */}
-            <CircleCCIChart
-              members={DEMO_CIRCLE_MEMBERS.map((member, index) => ({
-                id: member.id,
-                label: member.name,
-                values: convertLegacyCapacityData(member.capacityHistory),
-              }))}
-              showDisclaimer={false}
-            />
+        {/* RIGHT COLUMN: Per-Member Chart Grid */}
+        <View style={[styles.rightColumn, isWideScreen && { flex: 0.55, marginLeft: spacing.md }]}>
+          {/* Section Header */}
+          <View style={styles.chartHeader}>
+            <Text style={styles.chartTitle}>MEMBER CAPACITY — 90 DAYS</Text>
+            <Text style={styles.chartSubtitle}>Non-diagnostic. Per-member view.</Text>
           </View>
 
-          {/* Aggregate Capacity Section */}
-          <View style={styles.aggregateSection}>
-            <Text style={styles.aggregateSectionTitle}>Aggregate Capacity Over Time</Text>
-            <View style={styles.aggregateBullets}>
-              <Text style={styles.aggregateBullet}>• Identifies patterns of rising or <Text style={styles.boldText}>sustained load</Text></Text>
-              <Text style={styles.aggregateBullet}>• Supports pacing, scheduling, and environmental <Text style={styles.boldText}>adjustments</Text></Text>
-              <Text style={styles.aggregateBullet}>• Informs <Text style={styles.boldText}>preventive interventions</Text> before dysregulation <Text style={styles.boldText}>escalates</Text></Text>
-              <Text style={styles.aggregateBullet}>• <Text style={styles.boldText}>Complements</Text> — does <Text style={styles.boldText}>not replace</Text> — clinical judgment</Text>
-            </View>
-            <Text style={styles.aggregateDisclaimer}>
-              Not a diagnostic tool. Not a symptom severity scale.
-            </Text>
+          {/* Grid of 5 mini charts (2 columns) */}
+          <View style={[styles.memberChartGrid, !isWideScreen && styles.memberChartGridNarrow]}>
+            {DEMO_CIRCLE_MEMBERS.map((member) => (
+              <View
+                key={member.id}
+                style={[styles.memberChartCard, !isWideScreen && styles.memberChartCardNarrow]}
+              >
+                <Text style={styles.memberChartName}>{member.name}</Text>
+                <CCIChart
+                  data={member.capacityHistory}
+                  timeRange="90d"
+                  showLegend={false}
+                  showDisclaimer={false}
+                />
+              </View>
+            ))}
           </View>
+
+          {/* Disclaimer */}
+          <Text style={styles.gridDisclaimer}>
+            Not a diagnostic tool. Not a symptom severity scale.
+          </Text>
         </View>
       </View>
 
@@ -819,6 +813,39 @@ const styles = StyleSheet.create({
   chartSubtitle: {
     fontSize: 11,
     color: 'rgba(255,255,255,0.5)',
+  },
+  // Member Chart Grid (Circles)
+  memberChartGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  memberChartGridNarrow: {
+    flexDirection: 'column',
+  },
+  memberChartCard: {
+    width: '48%',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    padding: spacing.sm,
+  },
+  memberChartCardNarrow: {
+    width: '100%',
+  },
+  memberChartName: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.9)',
+    marginBottom: 4,
+  },
+  gridDisclaimer: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.4)',
+    textAlign: 'center',
+    marginTop: spacing.md,
+    fontStyle: 'italic',
   },
   timeRangeSelector: {
     flexDirection: 'row',

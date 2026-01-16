@@ -18,7 +18,7 @@
  * Used for both Individual CCI and Circle CCI (aggregate view).
  * Visual requirements:
  * - Smooth bezier curves
- * - Gradient bands (Resourced/Stretched/Sentinel)
+ * - Gradient bands (Resourced/Stretched/Depleted)
  * - Capacity-colored dots at key data points
  * - Matching legend for all views
  *
@@ -65,17 +65,15 @@ export interface CCIChartProps {
 // =============================================================================
 
 export function getCapacityColor(value: number): string {
-  if (value >= 2.5) return '#00D7FF'; // Cyan - Resourced
-  if (value >= 2.0) return '#10B981'; // Green - Good
-  if (value >= 1.5) return '#E8A830'; // Yellow - Stretched
-  return '#F44336'; // Red - Depleted/Sentinel
+  if (value >= 2.0) return '#00D7FF'; // Cyan - Resourced
+  if (value >= 1.5) return '#E8A830'; // Amber - Stretched
+  return '#F44336'; // Red - Depleted
 }
 
 export function getCapacityLabel(value: number): string {
-  if (value >= 2.5) return 'Resourced';
-  if (value >= 2.0) return 'Good';
+  if (value >= 2.0) return 'Resourced';
   if (value >= 1.5) return 'Stretched';
-  return 'Sentinel';
+  return 'Depleted';
 }
 
 // =============================================================================
@@ -134,7 +132,7 @@ export function CCIChart({
   const graphWidth = viewBoxWidth - padding.left - padding.right;
   const graphHeight = viewBoxHeight - padding.top - padding.bottom;
 
-  // Band heights (Resourced top, Stretched middle, Sentinel bottom)
+  // Band heights (Resourced top, Stretched middle, Depleted bottom)
   const bandHeight = graphHeight / 3;
 
   // Scale for data points
@@ -307,7 +305,7 @@ export function CCIChart({
           fontSize={11}
           fontWeight="500"
         >
-          Sentinel
+          Depleted
         </SvgText>
 
         {/* X-axis labels */}
@@ -338,7 +336,7 @@ export function CCIChart({
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: '#F44336' }]} />
-            <Text style={styles.legendText}>Sentinel</Text>
+            <Text style={styles.legendText}>Depleted</Text>
           </View>
         </View>
       )}
