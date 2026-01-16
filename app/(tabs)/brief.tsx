@@ -22,7 +22,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
-import Svg, { Path, Circle as SvgCircle } from 'react-native-svg';
+import Svg, { Path, Circle as SvgCircle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import {
   User,
   Users,
@@ -169,8 +169,22 @@ interface MemberSparklineProps {
 }
 
 function MemberSparkline({ data, width = 100, height = 24 }: MemberSparklineProps) {
-  // Use last 30 days for sparkline
-  const sparkData = data.slice(-30);
+  // Use last 30 days, downsampled to 6 points for smooth curves
+  const rawData = data.slice(-30);
+  const targetPoints = 6;
+
+  // Downsample to 6 representative points
+  const downsample = (values: number[], target: number): number[] => {
+    if (values.length <= target) return values;
+    const result: number[] = [];
+    const step = (values.length - 1) / (target - 1);
+    for (let i = 0; i < target; i++) {
+      result.push(values[Math.round(i * step)]);
+    }
+    return result;
+  };
+
+  const sparkData = downsample(rawData, targetPoints);
   const xScale = width / (sparkData.length - 1);
   const minVal = 1;
   const maxVal = 3;
@@ -181,48 +195,61 @@ function MemberSparkline({ data, width = 100, height = 24 }: MemberSparklineProp
     return height - (normalized * height);
   };
 
-  // Generate smooth bezier path
+  // Generate points for path
   const points = sparkData.map((value, index) => ({
     x: index * xScale,
     y: valueToY(value),
   }));
 
+  // Option C bezier: 30% control points with slope-based Y
   let pathData = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
-  for (let i = 1; i < points.length; i++) {
-    const prev = points[i - 1];
-    const curr = points[i];
-    const tension = 0.3;
-    const cp1x = prev.x + (curr.x - prev.x) * tension;
-    const cp2x = curr.x - (curr.x - prev.x) * tension;
-    pathData += ` C ${cp1x.toFixed(1)} ${prev.y.toFixed(1)}, ${cp2x.toFixed(1)} ${curr.y.toFixed(1)}, ${curr.x.toFixed(1)} ${curr.y.toFixed(1)}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[Math.max(0, i - 1)];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[Math.min(points.length - 1, i + 2)];
+
+    const dx = p2.x - p1.x;
+    const cp1x = p1.x + dx * 0.3;
+    const cp1y = p1.y + (p2.y - p0.y) * 0.15;
+    const cp2x = p2.x - dx * 0.3;
+    const cp2y = p2.y - (p3.y - p1.y) * 0.15;
+
+    pathData += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
   }
 
-  // Key points for dots (start, middle, end)
-  const keyIndices = [0, Math.floor(sparkData.length / 2), sparkData.length - 1];
-  const keyPoints = keyIndices.map(i => ({
+  // All sampled points get colored dots
+  const keyPoints = sparkData.map((value, i) => ({
     x: i * xScale,
-    y: valueToY(sparkData[i]),
-    color: getCapacityColor(sparkData[i]),
+    y: valueToY(value),
+    color: getCapacityColor(value),
   }));
 
   return (
     <Svg width={width} height={height}>
-      {/* Smooth line */}
+      <Defs>
+        <LinearGradient id="sparkGradient" x1="0" y1="0" x2="0" y2={height} gradientUnits="userSpaceOnUse">
+          <Stop offset="0%" stopColor="#00D7FF" />
+          <Stop offset="50%" stopColor="#E8A830" />
+          <Stop offset="100%" stopColor="#F44336" />
+        </LinearGradient>
+      </Defs>
+      {/* Gradient-colored line */}
       <Path
         d={pathData}
-        stroke="rgba(255,255,255,0.5)"
+        stroke="url(#sparkGradient)"
         strokeWidth={1.5}
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* Colored dots at key points */}
+      {/* Colored dots at all sampled points */}
       {keyPoints.map((point, idx) => (
         <SvgCircle
           key={idx}
           cx={point.x}
           cy={point.y}
-          r={3}
+          r={2.5}
           fill={point.color}
         />
       ))}
