@@ -287,12 +287,6 @@ function CirclesCCIBrief() {
         <Text style={styles.demoBannerText}>DEMO / SAMPLE</Text>
       </View>
 
-      {/* TEMP MARKER - DELETE AFTER VERIFY */}
-      <View style={{ backgroundColor: '#FF0000', padding: 20, marginBottom: 16 }}>
-        <Text style={{ color: '#FFFFFF', fontSize: 24, fontWeight: 'bold', textAlign: 'center' }}>WEB MARKER 999</Text>
-        <Text style={{ color: '#FFFFFF', fontSize: 12, textAlign: 'center', marginTop: 4 }}>Build: {new Date().toISOString()}</Text>
-      </View>
-
       {/* Admin Breadcrumb */}
       <View style={styles.breadcrumb}>
         <LayoutGrid color="rgba(255,255,255,0.5)" size={14} />
@@ -346,42 +340,34 @@ function CirclesCCIBrief() {
         </View>
       </View>
 
-      {/* Two Column Layout - Table left, Chart right */}
-      <View style={[styles.twoColumnContainer, isWideScreen && styles.twoColumnContainerWide]}>
-        {/* LEFT COLUMN: Table + CTAs */}
-        <View style={[styles.leftColumn, isWideScreen && { flex: 0.55 }]}>
-          {/* Circle Status Table */}
-          <View style={styles.circleStatusSection}>
-            <Text style={styles.circleStatusTitle}>Circle Status</Text>
+      {/* Integrated Member Cards - Info + Chart together */}
+      <View style={styles.memberCardsSection}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>MEMBER CAPACITY — 90 DAYS</Text>
+          <Text style={styles.sectionSubtitle}>Non-diagnostic. Per-member view.</Text>
+        </View>
 
-            {/* Table Header */}
-            <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderCell, { flex: 1.5 }]}>MEMBER</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 1 }]}>CAPACITY STATE</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 0.7 }]}>PARTICIPATION</Text>
-              <Text style={[styles.tableHeaderCell, { flex: 1.2 }]}>NOTES</Text>
-            </View>
-
-            {/* Table Rows */}
-            {DEMO_CIRCLE_MEMBERS.map((member) => (
-              <View key={member.id} style={styles.tableRow}>
-                {/* Member */}
-                <View style={[styles.tableCell, { flex: 1.5, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
-                  {member.avatar ? (
-                    <Image source={{ uri: member.avatar }} style={styles.avatarImage} />
-                  ) : (
-                    <View style={styles.avatarPlaceholder}>
-                      <Text style={styles.avatarText}>{member.name[0]}</Text>
-                    </View>
-                  )}
-                  <View>
-                    <Text style={styles.memberName}>{member.name}</Text>
-                    <Text style={styles.memberUsername}>{member.username}</Text>
+        {DEMO_CIRCLE_MEMBERS.map((member) => (
+          <View key={member.id} style={[styles.integratedCard, isWideScreen && styles.integratedCardWide]}>
+            {/* Left: Member Info */}
+            <View style={[styles.memberInfoSection, isWideScreen && styles.memberInfoSectionWide]}>
+              <View style={styles.memberHeader}>
+                {member.avatar ? (
+                  <Image source={{ uri: member.avatar }} style={styles.cardAvatar} />
+                ) : (
+                  <View style={styles.cardAvatarPlaceholder}>
+                    <Text style={styles.cardAvatarText}>{member.name[0]}</Text>
                   </View>
+                )}
+                <View style={styles.memberNameContainer}>
+                  <Text style={styles.cardMemberName}>{member.name}</Text>
+                  <Text style={styles.cardMemberUsername}>{member.username}</Text>
                 </View>
+              </View>
 
-                {/* Capacity State */}
-                <View style={[styles.tableCell, { flex: 1 }]}>
+              <View style={styles.memberDetails}>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Status</Text>
                   <View style={[
                     styles.capacityBadge,
                     member.capacityState === 'resourced' && styles.capacityBadgeResourced,
@@ -394,68 +380,48 @@ function CirclesCCIBrief() {
                   </View>
                 </View>
 
-                {/* Participation */}
-                <View style={[styles.tableCell, { flex: 0.7 }]}>
-                  <Text style={styles.participationText}>{member.participation}</Text>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Participation</Text>
+                  <Text style={styles.detailValue}>{member.participation}</Text>
                 </View>
 
-                {/* Notes */}
-                <View style={[styles.tableCell, { flex: 1.2 }]}>
-                  <Text style={styles.notesText}>{member.notes || '—'}</Text>
-                </View>
+                {member.notes && (
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Notes</Text>
+                    <Text style={styles.detailValue}>{member.notes}</Text>
+                  </View>
+                )}
               </View>
-            ))}
+            </View>
 
-            {/* Pagination hint */}
-            <View style={styles.paginationHint}>
-              <Text style={styles.paginationText}>1–5 of 5 members</Text>
+            {/* Right: Chart */}
+            <View style={[styles.memberChartSection, isWideScreen && styles.memberChartSectionWide]}>
+              <CCIChart
+                data={member.capacityHistory}
+                timeRange="90d"
+                showLegend={false}
+                showDisclaimer={false}
+              />
             </View>
           </View>
+        ))}
 
-          {/* CTA Section */}
-          <View style={styles.ctaSection}>
-            <Pressable style={styles.ctaPrimary}>
-              <Text style={styles.ctaPrimaryText}>Generate Circle Capacity Summary (CCI)</Text>
-              <Text style={styles.ctaPriceText}>$399</Text>
-            </Pressable>
-            <Pressable style={styles.ctaSecondary}>
-              <Text style={styles.ctaSecondaryText}>Generate Individual Capacity Summaries</Text>
-              <Text style={styles.ctaSecondaryPrice}>$149 each</Text>
-            </Pressable>
-          </View>
-        </View>
+        {/* Disclaimer */}
+        <Text style={styles.gridDisclaimer}>
+          Not a diagnostic tool. Not a symptom severity scale.
+        </Text>
+      </View>
 
-        {/* RIGHT COLUMN: Per-Member Chart Grid */}
-        <View style={[styles.rightColumn, isWideScreen && { flex: 0.55, marginLeft: spacing.md }]}>
-          {/* Section Header */}
-          <View style={styles.chartHeader}>
-            <Text style={styles.chartTitle}>MEMBER CAPACITY — 90 DAYS</Text>
-            <Text style={styles.chartSubtitle}>Non-diagnostic. Per-member view.</Text>
-          </View>
-
-          {/* Grid of 5 mini charts (2 columns) */}
-          <View style={[styles.memberChartGrid, !isWideScreen && styles.memberChartGridNarrow]}>
-            {DEMO_CIRCLE_MEMBERS.map((member) => (
-              <View
-                key={member.id}
-                style={[styles.memberChartCard, !isWideScreen && styles.memberChartCardNarrow]}
-              >
-                <Text style={styles.memberChartName}>{member.name}</Text>
-                <CCIChart
-                  data={member.capacityHistory}
-                  timeRange="90d"
-                  showLegend={false}
-                  showDisclaimer={false}
-                />
-              </View>
-            ))}
-          </View>
-
-          {/* Disclaimer */}
-          <Text style={styles.gridDisclaimer}>
-            Not a diagnostic tool. Not a symptom severity scale.
-          </Text>
-        </View>
+      {/* CTA Section */}
+      <View style={styles.ctaSection}>
+        <Pressable style={styles.ctaPrimary}>
+          <Text style={styles.ctaPrimaryText}>Generate Circle Capacity Summary (CCI)</Text>
+          <Text style={styles.ctaPriceText}>$399</Text>
+        </Pressable>
+        <Pressable style={styles.ctaSecondary}>
+          <Text style={styles.ctaSecondaryText}>Generate Individual Capacity Summaries</Text>
+          <Text style={styles.ctaSecondaryPrice}>$149 each</Text>
+        </Pressable>
       </View>
 
       {/* Footer */}
@@ -1110,5 +1076,109 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 11,
     color: 'rgba(255,255,255,0.3)',
+  },
+
+  // Integrated Member Cards
+  memberCardsSection: {
+    marginBottom: spacing.lg,
+  },
+  sectionHeader: {
+    marginBottom: spacing.md,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#00D7FF',
+    letterSpacing: 0.5,
+  },
+  sectionSubtitle: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: 2,
+  },
+  integratedCard: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  integratedCardWide: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+  },
+  memberInfoSection: {
+    marginBottom: spacing.md,
+  },
+  memberInfoSectionWide: {
+    width: 220,
+    marginBottom: 0,
+    marginRight: spacing.md,
+    borderRightWidth: 1,
+    borderRightColor: 'rgba(255,255,255,0.08)',
+    paddingRight: spacing.md,
+  },
+  memberHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  cardAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: 'rgba(0,215,255,0.3)',
+  },
+  cardAvatarPlaceholder: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0,215,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardAvatarText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#00D7FF',
+  },
+  memberNameContainer: {
+    marginLeft: spacing.sm,
+    flex: 1,
+  },
+  cardMemberName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.95)',
+  },
+  cardMemberUsername: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: 1,
+  },
+  memberDetails: {
+    gap: spacing.xs,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  detailLabel: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.5)',
+    fontWeight: '500',
+  },
+  detailValue: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
+  },
+  memberChartSection: {
+    minHeight: 120,
+  },
+  memberChartSectionWide: {
+    flex: 1,
   },
 });
