@@ -346,11 +346,11 @@ export function CCIChart({
             />
           )}
 
-          {/* Main stroke - white for visibility */}
+          {/* Main stroke - gradient colored by capacity zone */}
           {sampledData.length > 0 && (
             <Path
               d={generateSmoothPath(sampledData)}
-              stroke="rgba(255,255,255,0.9)"
+              stroke="url(#lineGradient)"
               strokeWidth={2.5}
               fill="none"
               strokeLinecap="round"
