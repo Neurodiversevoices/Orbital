@@ -507,26 +507,24 @@ export default function UpgradeScreen() {
               <Text style={styles.planCardCtaText}>{isPro ? 'Basic tier' : 'Your current plan'}</Text>
             </View>
 
-            {/* CCI for Free users - $199 */}
-            {!isPro && (
-              <View style={styles.cciInlineSection}>
-                <View style={styles.cciInlineHeader}>
-                  <FileText size={16} color="#7A9AAA" />
-                  <Text style={styles.cciInlineTitle}>Individual CCI</Text>
-                  <Text style={styles.cciInlinePrice}>{formatPrice(CCI_PRICING.freeUser)}</Text>
-                </View>
-                <Text style={styles.cciInlineDescription}>Clinical capacity artifact · Issued once</Text>
-                <Pressable
-                  style={[styles.cciInlineButton, (isPurchasing || hasCCIPurchased) && styles.cciInlineButtonDisabled]}
-                  onPress={() => handlePurchase(PRODUCT_IDS.CCI_FREE, 'Individual CCI')}
-                  disabled={isPurchasing || hasCCIPurchased}
-                >
-                  <Text style={styles.cciInlineButtonText}>
-                    {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.freeUser)}`}
-                  </Text>
-                </Pressable>
+            {/* CCI $199 - Always visible in Free panel */}
+            <View style={styles.cciInlineSection}>
+              <View style={styles.cciInlineHeader}>
+                <FileText size={16} color="#7A9AAA" />
+                <Text style={styles.cciInlineTitle}>Individual CCI</Text>
+                <Text style={styles.cciInlinePrice}>{formatPrice(CCI_PRICING.freeUser)}</Text>
               </View>
-            )}
+              <Text style={styles.cciInlineDescription}>Clinical capacity artifact · Issued once</Text>
+              <Pressable
+                style={[styles.cciInlineButton, (isPurchasing || hasCCIPurchased) && styles.cciInlineButtonDisabled]}
+                onPress={() => handlePurchase(PRODUCT_IDS.CCI_FREE, 'Individual CCI')}
+                disabled={isPurchasing || hasCCIPurchased}
+              >
+                <Text style={styles.cciInlineButtonText}>
+                  {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.freeUser)}`}
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </Animated.View>
 
@@ -569,26 +567,24 @@ export default function UpgradeScreen() {
               </Pressable>
             </View>
 
-            {/* CCI for Pro users - $149 */}
-            {isPro && (
-              <View style={styles.cciInlineSection}>
-                <View style={styles.cciInlineHeader}>
-                  <FileText size={16} color="#FFD700" />
-                  <Text style={styles.cciInlineTitle}>Individual CCI</Text>
-                  <Text style={[styles.cciInlinePrice, { color: '#FFD700' }]}>{formatPrice(CCI_PRICING.proUser)}</Text>
-                </View>
-                <Text style={styles.cciInlineDescription}>Clinical capacity artifact · Issued once</Text>
-                <Pressable
-                  style={[styles.cciInlineButtonPro, (isPurchasing || hasCCIPurchased) && styles.cciInlineButtonDisabled]}
-                  onPress={() => handlePurchase(PRODUCT_IDS.CCI_PRO, 'Individual CCI')}
-                  disabled={isPurchasing || hasCCIPurchased}
-                >
-                  <Text style={styles.cciInlineButtonText}>
-                    {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.proUser)}`}
-                  </Text>
-                </Pressable>
+            {/* CCI $149 - Always visible in Pro panel */}
+            <View style={styles.cciInlineSection}>
+              <View style={styles.cciInlineHeader}>
+                <FileText size={16} color="#FFD700" />
+                <Text style={styles.cciInlineTitle}>Individual CCI</Text>
+                <Text style={[styles.cciInlinePrice, { color: '#FFD700' }]}>{formatPrice(CCI_PRICING.proUser)}</Text>
               </View>
-            )}
+              <Text style={styles.cciInlineDescription}>Clinical capacity artifact · Issued once</Text>
+              <Pressable
+                style={[styles.cciInlineButtonPro, (isPurchasing || hasCCIPurchased || !isPro) && styles.cciInlineButtonDisabled]}
+                onPress={() => handlePurchase(PRODUCT_IDS.CCI_PRO, 'Individual CCI')}
+                disabled={isPurchasing || hasCCIPurchased || !isPro}
+              >
+                <Text style={styles.cciInlineButtonText}>
+                  {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.proUser)}`}
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </Animated.View>
 
