@@ -165,7 +165,9 @@ export function CCIChart({
     return padding.top + graphHeight - (normalized * graphHeight);
   };
 
-  // Generate smooth bezier curve - simple 1/3 control points (matches artifact style)
+  // Generate smooth bezier curve - exact artifact style
+  // Artifact uses: CP1 at 30% from start, CP2 at 30% from end
+  // Y values anticipate curve direction using neighboring point slopes
   const generateSmoothPath = (values: number[]) => {
     if (values.length < 2) return '';
 
@@ -178,17 +180,21 @@ export function CCIChart({
     let path = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
 
     for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[Math.max(0, i - 1)];
       const p1 = points[i];
       const p2 = points[i + 1];
+      const p3 = points[Math.min(points.length - 1, i + 2)];
 
-      // Simple 1/3 control points - matches artifact hand-crafted style
       const dx = p2.x - p1.x;
-      const dy = p2.y - p1.y;
 
-      const cp1x = p1.x + dx / 3;
-      const cp1y = p1.y + dy / 3;
-      const cp2x = p2.x - dx / 3;
-      const cp2y = p2.y - dy / 3;
+      // Artifact style: 30% control point placement with slope-based Y
+      // CP1: 30% from p1, Y influenced by slope from p0 to p2
+      // CP2: 30% from p2 (backward), Y influenced by slope from p1 to p3
+      const cp1x = p1.x + dx * 0.3;
+      const cp1y = p1.y + (p2.y - p0.y) * 0.15;
+
+      const cp2x = p2.x - dx * 0.3;
+      const cp2y = p2.y - (p3.y - p1.y) * 0.15;
 
       path += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
     }
