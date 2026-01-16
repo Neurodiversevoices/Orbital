@@ -402,7 +402,7 @@ function CirclesCCIBrief() {
                 showLegend={false}
                 showDisclaimer={false}
                 width={isWideScreen ? width - 280 : width - 48}
-                heightRatio={0.18}
+                heightRatio={0.14}
               />
             </View>
           </View>
@@ -416,11 +416,11 @@ function CirclesCCIBrief() {
 
       {/* CTA Section */}
       <View style={styles.ctaSection}>
-        <Pressable style={styles.ctaPrimary}>
+        <Pressable style={styles.ctaPrimary} onPress={() => router.push('/cci')}>
           <Text style={styles.ctaPrimaryText}>Generate Circle Capacity Summary (CCI)</Text>
           <Text style={styles.ctaPriceText}>$399</Text>
         </Pressable>
-        <Pressable style={styles.ctaSecondary}>
+        <Pressable style={styles.ctaSecondary} onPress={() => router.push('/cci')}>
           <Text style={styles.ctaSecondaryText}>Generate Individual Capacity Summaries</Text>
           <Text style={styles.ctaSecondaryPrice}>$149 each</Text>
         </Pressable>
@@ -1103,8 +1103,8 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
-    padding: spacing.sm,
-    marginBottom: spacing.sm,
+    padding: spacing.xs,
+    marginBottom: 6,
   },
   integratedCardWide: {
     flexDirection: 'row',
@@ -1177,7 +1177,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.8)',
   },
   memberChartSection: {
-    minHeight: 80,
+    minHeight: 60,
   },
   memberChartSectionWide: {
     flex: 1,
