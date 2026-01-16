@@ -128,15 +128,16 @@ export function CCIChart({
 }: CCIChartProps) {
   const config = getTimeRangeConfig(timeRange);
 
-  // Responsive dimensions using viewBox
-  const viewBoxWidth = 500;
-  const viewBoxHeight = 200;
-  const padding = { top: 15, right: 70, bottom: 30, left: 5 };
-  const graphWidth = viewBoxWidth - padding.left - padding.right;
-  const graphHeight = viewBoxHeight - padding.top - padding.bottom;
+  // Match artifact dimensions exactly: viewBox="0 0 320 140"
+  const viewBoxWidth = 320;
+  const viewBoxHeight = 140;
+  // Artifact: graph from x=32 to x=312, y=8 to y=116
+  const padding = { top: 8, right: 8, bottom: 24, left: 32 };
+  const graphWidth = viewBoxWidth - padding.left - padding.right; // 280
+  const graphHeight = viewBoxHeight - padding.top - padding.bottom; // 108
 
   // Band heights (Resourced top, Stretched middle, Depleted bottom)
-  const bandHeight = graphHeight / 3;
+  const bandHeight = graphHeight / 3; // 36 each
 
   // Scale for data points
   const dataPoints = data.length || config.days;
@@ -148,7 +149,7 @@ export function CCIChart({
     return padding.top + graphHeight - (normalized * graphHeight);
   };
 
-  // Generate smooth bezier curve path
+  // Generate smooth bezier curve path - Catmull-Rom style for natural curves
   const generateSmoothPath = (values: number[]) => {
     if (values.length < 2) return '';
 
@@ -160,16 +161,19 @@ export function CCIChart({
     let path = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
 
     for (let i = 1; i < points.length; i++) {
-      const prev = points[i - 1];
-      const curr = points[i];
-      const tension = 0.3;
+      const p0 = points[Math.max(0, i - 2)];
+      const p1 = points[i - 1];
+      const p2 = points[i];
+      const p3 = points[Math.min(points.length - 1, i + 1)];
 
-      const cp1x = prev.x + (curr.x - prev.x) * tension;
-      const cp1y = prev.y;
-      const cp2x = curr.x - (curr.x - prev.x) * tension;
-      const cp2y = curr.y;
+      // Catmull-Rom to Bezier conversion for smooth natural curves
+      const tension = 6; // Higher = smoother
+      const cp1x = p1.x + (p2.x - p0.x) / tension;
+      const cp1y = p1.y + (p2.y - p0.y) / tension;
+      const cp2x = p2.x - (p3.x - p1.x) / tension;
+      const cp2y = p2.y - (p3.y - p1.y) / tension;
 
-      path += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${curr.x.toFixed(1)} ${curr.y.toFixed(1)}`;
+      path += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
     }
 
     return path;
@@ -294,15 +298,15 @@ export function CCIChart({
           <Line x1={padding.left} y1={padding.top + graphHeight} x2={padding.left + graphWidth} y2={padding.top + graphHeight} stroke="rgba(255,255,255,0.08)" strokeWidth={1} />
           <Line x1={padding.left} y1={padding.top} x2={padding.left} y2={padding.top + graphHeight} stroke="rgba(255,255,255,0.15)" strokeWidth={1} />
 
-          {/* Zone indicator circles (left side) - matches artifact */}
-          <SvgCircle cx={12} cy={padding.top + bandHeight / 2} r={4} fill="#00D7FF" fillOpacity={0.9} />
-          <SvgCircle cx={12} cy={padding.top + bandHeight * 1.5} r={4} fill="#E8A830" fillOpacity={0.9} />
-          <SvgCircle cx={12} cy={padding.top + bandHeight * 2.5} r={4} fill="#F44336" fillOpacity={0.9} />
+          {/* Zone indicator circles (left side) - matches artifact: cx=16, cy at band centers */}
+          <SvgCircle cx={16} cy={padding.top + bandHeight / 2} r={4} fill="#00D7FF" fillOpacity={0.9} />
+          <SvgCircle cx={16} cy={padding.top + bandHeight * 1.5} r={4} fill="#E8A830" fillOpacity={0.9} />
+          <SvgCircle cx={16} cy={padding.top + bandHeight * 2.5} r={4} fill="#F44336" fillOpacity={0.9} />
 
-          {/* Zone labels (H/M/L) */}
-          <SvgText x={4} y={padding.top + bandHeight / 2 + 3} fill="#00D7FF" fontSize={7} fontWeight="600">H</SvgText>
-          <SvgText x={4} y={padding.top + bandHeight * 1.5 + 3} fill="#E8A830" fontSize={7} fontWeight="600">M</SvgText>
-          <SvgText x={4} y={padding.top + bandHeight * 2.5 + 3} fill="#F44336" fontSize={7} fontWeight="600">L</SvgText>
+          {/* Zone labels (H/M/L) - matches artifact: x=6 */}
+          <SvgText x={6} y={padding.top + bandHeight / 2 + 3} fill="#00D7FF" fontSize={7} fontWeight="600">H</SvgText>
+          <SvgText x={6} y={padding.top + bandHeight * 1.5 + 3} fill="#E8A830" fontSize={7} fontWeight="600">M</SvgText>
+          <SvgText x={6} y={padding.top + bandHeight * 2.5 + 3} fill="#F44336" fontSize={7} fontWeight="600">L</SvgText>
 
           {/* Area fill under curve */}
           {data.length > 0 && (
