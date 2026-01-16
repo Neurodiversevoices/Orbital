@@ -41,6 +41,7 @@ import {
   applySignalDelay,
   getDelayWindowMessage,
   getSuppressedDisplayText,
+  getSuppressedExplanation,
   getLoadColor,
   getRiskColor,
   getVelocityArrow,
@@ -248,6 +249,12 @@ function UnitRow({ unit }: UnitRowProps) {
         <Text style={styles.signalCount}>
           {unit.signalCount} signal{unit.signalCount !== 1 ? 's' : ''}
         </Text>
+        {/* K-ANONYMITY: Clear suppressed state indicator */}
+        {isSuppressed && (
+          <Text style={styles.suppressedBadge}>
+            🔒 {getSuppressedExplanation()}
+          </Text>
+        )}
       </View>
 
       {/* Load */}
@@ -406,6 +413,12 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontSize: 12,
     marginTop: 2,
+  },
+  suppressedBadge: {
+    color: '#9CA3AF',
+    fontSize: 10,
+    marginTop: 4,
+    fontStyle: 'italic',
   },
   metricValue: {
     fontSize: 16,

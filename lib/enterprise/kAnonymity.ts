@@ -397,9 +397,21 @@ export function getSuppressedDisplayClass(): string {
 
 /**
  * Get display text for suppressed data.
+ *
+ * DOCTRINE: Privacy by Architecture, K-Anonymity
+ * When data is suppressed due to K-anonymity threshold (min 5),
+ * we show a clear privacy message, not just "insufficient data".
  */
 export function getSuppressedDisplayText(): string {
-  return 'Insufficient Data';
+  return 'Privacy Protected';
+}
+
+/**
+ * Get explanatory message for suppressed data.
+ * Use this in tooltips or detail views.
+ */
+export function getSuppressedExplanation(): string {
+  return `Data suppressed for privacy (minimum ${K_ANONYMITY_THRESHOLD} signals required)`;
 }
 
 /**

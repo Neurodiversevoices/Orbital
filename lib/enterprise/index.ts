@@ -100,6 +100,7 @@ export {
   getDelayWindowMessage,
   getSuppressedDisplayClass,
   getSuppressedDisplayText,
+  getSuppressedExplanation,
   shouldRenderWithColor,
   getLoadColor,
   getRiskColor,
