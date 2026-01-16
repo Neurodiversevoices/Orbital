@@ -139,9 +139,25 @@ export function CCIChart({
   // Band heights (Resourced top, Stretched middle, Depleted bottom)
   const bandHeight = graphHeight / 3; // 36 each
 
-  // Scale for data points
-  const dataPoints = data.length || config.days;
-  const xScale = graphWidth / Math.max(dataPoints - 1, 1);
+  // Downsample data to 6 representative points (matches artifact)
+  // This creates smooth, readable curves instead of dense jagged lines
+  const downsampleData = (values: number[], targetPoints: number): number[] => {
+    if (values.length <= targetPoints) return values;
+
+    const result: number[] = [];
+    const step = (values.length - 1) / (targetPoints - 1);
+
+    for (let i = 0; i < targetPoints; i++) {
+      const idx = Math.round(i * step);
+      result.push(values[idx]);
+    }
+
+    return result;
+  };
+
+  // Use 6 points for 90d (matches artifact), scale for other ranges
+  const targetPoints = timeRange === '90d' ? 6 : config.keyPointCount;
+  const sampledData = downsampleData(data, targetPoints);
 
   // Convert capacity value (1-3) to Y coordinate
   const valueToY = (value: number) => {
@@ -153,8 +169,10 @@ export function CCIChart({
   const generateSmoothPath = (values: number[]) => {
     if (values.length < 2) return '';
 
+    // Use sampledXScale for proper spacing of downsampled points
+    const scale = graphWidth / Math.max(values.length - 1, 1);
     const points = values.map((value, index) => ({
-      x: padding.left + index * xScale,
+      x: padding.left + index * scale,
       y: valueToY(value),
     }));
 
@@ -179,23 +197,16 @@ export function CCIChart({
     return path;
   };
 
-  // Get key points for capacity-colored dots
+  // Get key points for capacity-colored dots - use ALL sampled points
   const getKeyPoints = (values: number[]) => {
     if (values.length === 0) return [];
 
-    const count = config.keyPointCount;
-    const indices: number[] = [];
-
-    for (let i = 0; i < count; i++) {
-      const idx = Math.floor((values.length - 1) * (i / (count - 1)));
-      indices.push(idx);
-    }
-
-    return indices.map(i => ({
-      x: padding.left + i * xScale,
-      y: valueToY(values[i]),
-      value: values[i],
-      color: getCapacityColor(values[i]),
+    const scale = graphWidth / Math.max(values.length - 1, 1);
+    return values.map((value, i) => ({
+      x: padding.left + i * scale,
+      y: valueToY(value),
+      value: value,
+      color: getCapacityColor(value),
     }));
   };
 
@@ -205,7 +216,8 @@ export function CCIChart({
     return padding.left + pos;
   });
 
-  const keyPoints = getKeyPoints(data);
+  // Use sampled data for both curve and key points
+  const keyPoints = getKeyPoints(sampledData);
   const chartHeight = containerWidth ? containerWidth * heightRatio : 180;
 
   // Generate area fill path (closes to bottom)
@@ -214,7 +226,8 @@ export function CCIChart({
     const linePath = generateSmoothPath(values);
     if (!linePath) return '';
 
-    const lastX = padding.left + (values.length - 1) * xScale;
+    const scale = graphWidth / Math.max(values.length - 1, 1);
+    const lastX = padding.left + (values.length - 1) * scale;
     const bottomY = padding.top + graphHeight;
     const firstX = padding.left;
 
@@ -308,18 +321,18 @@ export function CCIChart({
           <SvgText x={6} y={padding.top + bandHeight * 1.5 + 3} fill="#E8A830" fontSize={7} fontWeight="600">M</SvgText>
           <SvgText x={6} y={padding.top + bandHeight * 2.5 + 3} fill="#F44336" fontSize={7} fontWeight="600">L</SvgText>
 
-          {/* Area fill under curve */}
-          {data.length > 0 && (
+          {/* Area fill under curve - uses sampledData for smooth curves */}
+          {sampledData.length > 0 && (
             <Path
-              d={generateAreaPath(data)}
+              d={generateAreaPath(sampledData)}
               fill="url(#areaGradient)"
             />
           )}
 
           {/* Under-stroke (dark shadow) */}
-          {data.length > 0 && (
+          {sampledData.length > 0 && (
             <Path
-              d={generateSmoothPath(data)}
+              d={generateSmoothPath(sampledData)}
               stroke="#0a0b10"
               strokeWidth={5}
               fill="none"
@@ -329,9 +342,9 @@ export function CCIChart({
           )}
 
           {/* Main gradient stroke */}
-          {data.length > 0 && (
+          {sampledData.length > 0 && (
             <Path
-              d={generateSmoothPath(data)}
+              d={generateSmoothPath(sampledData)}
               stroke="url(#lineGradient)"
               strokeWidth={2.5}
               fill="none"
