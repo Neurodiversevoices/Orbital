@@ -401,6 +401,7 @@ function CirclesCCIBrief() {
                 timeRange="90d"
                 showLegend={false}
                 showDisclaimer={false}
+                heightRatio={0.22}
               />
             </View>
           </View>
@@ -1080,10 +1081,10 @@ const styles = StyleSheet.create({
 
   // Integrated Member Cards
   memberCardsSection: {
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   sectionHeader: {
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
   sectionTitle: {
     fontSize: 14,
@@ -1098,68 +1099,67 @@ const styles = StyleSheet.create({
   },
   integratedCard: {
     backgroundColor: 'rgba(255,255,255,0.03)',
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.md,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
-    padding: spacing.md,
-    marginBottom: spacing.md,
+    padding: spacing.sm,
+    marginBottom: spacing.sm,
   },
   integratedCardWide: {
     flexDirection: 'row',
-    alignItems: 'stretch',
+    alignItems: 'center',
   },
   memberInfoSection: {
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
   memberInfoSectionWide: {
-    width: 220,
+    width: 200,
     marginBottom: 0,
-    marginRight: spacing.md,
+    marginRight: spacing.sm,
     borderRightWidth: 1,
     borderRightColor: 'rgba(255,255,255,0.08)',
-    paddingRight: spacing.md,
+    paddingRight: spacing.sm,
   },
   memberHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   cardAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     borderWidth: 2,
     borderColor: 'rgba(0,215,255,0.3)',
   },
   cardAvatarPlaceholder: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: 'rgba(0,215,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   cardAvatarText: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '600',
     color: '#00D7FF',
   },
   memberNameContainer: {
-    marginLeft: spacing.sm,
+    marginLeft: spacing.xs,
     flex: 1,
   },
   cardMemberName: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: '600',
     color: 'rgba(255,255,255,0.95)',
   },
   cardMemberUsername: {
-    fontSize: 11,
+    fontSize: 10,
     color: 'rgba(255,255,255,0.5)',
-    marginTop: 1,
   },
   memberDetails: {
-    gap: spacing.xs,
+    gap: 2,
   },
   detailRow: {
     flexDirection: 'row',
@@ -1167,16 +1167,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   detailLabel: {
-    fontSize: 11,
+    fontSize: 10,
     color: 'rgba(255,255,255,0.5)',
     fontWeight: '500',
   },
   detailValue: {
-    fontSize: 12,
+    fontSize: 10,
     color: 'rgba(255,255,255,0.8)',
   },
   memberChartSection: {
-    minHeight: 120,
+    minHeight: 80,
   },
   memberChartSectionWide: {
     flex: 1,
