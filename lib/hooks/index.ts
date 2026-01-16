@@ -31,3 +31,7 @@ export { useWidgetSync, syncWidgetOnLog } from './useWidgetSync';
 // Capacity Intelligence hooks
 export { useCapacityIntelligence } from './useCapacityIntelligence';
 export type { ProFeature } from './useCapacityIntelligence';
+
+// Gap Analysis hooks (re-exported from lib/absence)
+export { useGapAnalysis, useGapAnalysisFromSpan } from '../absence';
+export type { UseGapAnalysisOptions, UseGapAnalysisReturn } from '../absence';
