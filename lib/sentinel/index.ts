@@ -94,3 +94,82 @@ export const SENTINEL_FEATURES = {
   /** Real-time alerts (NOT PLANNED) */
   realTimeAlerts: false,
 } as const;
+
+// =============================================================================
+// DOCTRINE: INSTITUTIONAL DEMO LOCK
+// =============================================================================
+
+/**
+ * Error thrown when attempting to access real institutional data.
+ *
+ * DOCTRINE: Privacy by Architecture
+ * Sentinel views are DEMO-ONLY in Phase 1. Any attempt to access
+ * real user data through this module is a spec violation.
+ */
+export class SentinelDemoViolation extends Error {
+  constructor(message: string) {
+    super(`[SENTINEL DEMO VIOLATION] ${message}`);
+    this.name = 'SentinelDemoViolation';
+  }
+}
+
+/**
+ * Runtime assertion that Sentinel is in demo mode.
+ *
+ * DOCTRINE: Privacy by Architecture, Institutional Demo Lock
+ * This function MUST be called at the entry point of any data retrieval.
+ * It throws if any attempt is made to access real institutional data.
+ *
+ * This is a HARD LOCK. There is no override. To enable real data,
+ * this guard must be explicitly removed in a future release with
+ * full governance review.
+ */
+export function assertSentinelDemoMode(): void {
+  // HARD LOCK: Sentinel is demo-only in Phase 1
+  // This assertion cannot be bypassed at runtime
+  const DEMO_LOCK_ACTIVE = true as const;
+
+  if (!DEMO_LOCK_ACTIVE) {
+    // This branch is unreachable by design
+    throw new SentinelDemoViolation(
+      'Demo lock has been disabled. This requires governance approval.'
+    );
+  }
+
+  // Verify feature flags are all disabled
+  if (SENTINEL_FEATURES.liveData) {
+    throw new SentinelDemoViolation(
+      'liveData feature flag is enabled. Real data access is forbidden in Phase 1.'
+    );
+  }
+
+  if (SENTINEL_FEATURES.export) {
+    throw new SentinelDemoViolation(
+      'export feature flag is enabled. Data export is forbidden for Sentinel.'
+    );
+  }
+}
+
+/**
+ * Guard function for any Sentinel data retrieval.
+ *
+ * DOCTRINE: Privacy by Architecture
+ * Wrap any function that could potentially access real institutional data.
+ * This ensures synthetic/demo data is always returned.
+ *
+ * @param realDataFn - Function that would fetch real data (NEVER CALLED)
+ * @param demoDataFn - Function that returns demo/synthetic data
+ * @returns Result from demoDataFn (always)
+ */
+export function withSentinelDemoGuard<T>(
+  _realDataFn: () => T,
+  demoDataFn: () => T
+): T {
+  // Assert demo mode is active (throws if not)
+  assertSentinelDemoMode();
+
+  // ALWAYS return demo data - real data function is never invoked
+  // The _realDataFn parameter exists only to make the intent explicit
+  // at the call site: "this is where real data WOULD come from"
+  return demoDataFn();
+}

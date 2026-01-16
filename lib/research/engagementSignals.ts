@@ -1,5 +1,76 @@
+/**
+ * ENGAGEMENT SIGNALS - INTERNAL RESEARCH USE ONLY
+ *
+ * ============================================================================
+ * DOCTRINE: ANTI-ENGAGEMENT
+ * ============================================================================
+ *
+ * This module exists SOLELY for IRB-approved research studies and internal
+ * governance analytics. It tracks usage patterns for aggregate research only.
+ *
+ * CRITICAL RESTRICTIONS:
+ * 1. These signals MUST NEVER be surfaced to users in the UI
+ * 2. These signals MUST NEVER trigger re-engagement (push notifications, emails)
+ * 3. These signals MUST NEVER be used for streaks, badges, or gamification
+ * 4. These signals MUST NEVER inform "you should log more" recommendations
+ * 5. Export is ONLY permitted for consented research participants
+ *
+ * Any violation of these restrictions is a SPEC VIOLATION and must be treated
+ * as a P0 bug.
+ *
+ * If you are reading this and considering using these signals in user-facing
+ * code, STOP. This is forbidden by product doctrine.
+ * ============================================================================
+ */
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { EngagementSignal, EngagementProfile } from '../../types';
+
+// =============================================================================
+// DOCTRINE: ANTI-ENGAGEMENT GUARD
+// =============================================================================
+
+/**
+ * Error thrown when engagement data is accessed in a forbidden context.
+ */
+export class EngagementDoctrineViolation extends Error {
+  constructor(message: string) {
+    super(`[ENGAGEMENT DOCTRINE VIOLATION] ${message}`);
+    this.name = 'EngagementDoctrineViolation';
+  }
+}
+
+/**
+ * Context flag for engagement data access.
+ * MUST be 'research' or 'governance' - user-facing access is forbidden.
+ */
+export type EngagementAccessContext = 'research' | 'governance';
+
+/**
+ * Runtime assertion that engagement data is being accessed in a valid context.
+ *
+ * DOCTRINE: Anti-Engagement
+ * This function MUST be called before any engagement data is returned to
+ * ensure it is not being surfaced to users.
+ *
+ * @param context - The access context ('research' or 'governance')
+ * @throws EngagementDoctrineViolation if context is invalid
+ */
+export function assertEngagementAccessContext(context: EngagementAccessContext): void {
+  if (context !== 'research' && context !== 'governance') {
+    throw new EngagementDoctrineViolation(
+      `Invalid engagement access context: ${context}. ` +
+      'Engagement data may only be accessed for research or governance purposes. ' +
+      'User-facing access is forbidden by product doctrine.'
+    );
+  }
+}
+
+/**
+ * INTERNAL FLAG: Set to true only in research export flows.
+ * This flag is checked by UI components to prevent accidental display.
+ */
+export const ENGAGEMENT_DATA_IS_INTERNAL_ONLY = true as const;
 
 const ENGAGEMENT_SIGNALS_KEY = '@orbital:engagement_signals';
 

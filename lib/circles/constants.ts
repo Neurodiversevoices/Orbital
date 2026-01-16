@@ -50,10 +50,13 @@ export function assertValidConnectionCount(count: number): asserts count is Conn
 // =============================================================================
 
 /**
- * Default signal TTL in milliseconds (90 minutes).
+ * Default signal TTL in milliseconds (1 hour).
  * Signals MUST expire. There is no "permanent" signal.
+ *
+ * DOCTRINE: Six Laws of Circles - Law 2 (NO HISTORY)
+ * Hard 1-hour maximum enforced per product doctrine.
  */
-export const DEFAULT_SIGNAL_TTL_MS: number = 90 * 60 * 1000;
+export const DEFAULT_SIGNAL_TTL_MS: number = 60 * 60 * 1000;
 
 /**
  * Minimum allowed TTL (15 minutes).
@@ -62,10 +65,13 @@ export const DEFAULT_SIGNAL_TTL_MS: number = 90 * 60 * 1000;
 export const MIN_SIGNAL_TTL_MS: number = 15 * 60 * 1000;
 
 /**
- * Maximum allowed TTL (4 hours).
- * Prevents "permanent" signals disguised as long TTL.
+ * Maximum allowed TTL (1 hour).
+ *
+ * DOCTRINE: Six Laws of Circles - Law 2 (NO HISTORY)
+ * This is a HARD LIMIT. No signal may persist beyond 1 hour.
+ * Any attempt to exceed this is a spec violation.
  */
-export const MAX_SIGNAL_TTL_MS: number = 4 * 60 * 60 * 1000;
+export const MAX_SIGNAL_TTL_MS: number = 60 * 60 * 1000;
 
 /**
  * Invite expiration in milliseconds (24 hours).
