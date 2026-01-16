@@ -168,7 +168,7 @@ interface MemberSparklineProps {
   height?: number;
 }
 
-function MemberSparkline({ data, width = 100, height = 24 }: MemberSparklineProps) {
+function MemberSparkline({ data, width = 100, height = 32 }: MemberSparklineProps) {
   // Use last 30 days, downsampled to 6 points for smooth curves
   const rawData = data.slice(-30);
   const targetPoints = 6;
@@ -185,24 +185,29 @@ function MemberSparkline({ data, width = 100, height = 24 }: MemberSparklineProp
   };
 
   const sparkData = downsample(rawData, targetPoints);
-  const xScale = width / (sparkData.length - 1);
+  const padding = 4; // Breathing room
+  const innerWidth = width - padding * 2;
+  const innerHeight = height - padding * 2;
+  const xScale = innerWidth / (sparkData.length - 1);
   const minVal = 1;
   const maxVal = 3;
 
   // Convert value to Y coordinate
   const valueToY = (value: number) => {
     const normalized = (value - minVal) / (maxVal - minVal);
-    return height - (normalized * height);
+    return padding + innerHeight - (normalized * innerHeight);
   };
 
   // Generate points for path
   const points = sparkData.map((value, index) => ({
-    x: index * xScale,
+    x: padding + index * xScale,
     y: valueToY(value),
+    value,
+    color: getCapacityColor(value),
   }));
 
-  // Option C bezier: 30% control points with slope-based Y
-  let pathData = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+  // Generate individual segments with colors based on average of endpoints
+  const segments: { path: string; color: string }[] = [];
   for (let i = 0; i < points.length - 1; i++) {
     const p0 = points[Math.max(0, i - 1)];
     const p1 = points[i];
@@ -215,41 +220,35 @@ function MemberSparkline({ data, width = 100, height = 24 }: MemberSparklineProp
     const cp2x = p2.x - dx * 0.3;
     const cp2y = p2.y - (p3.y - p1.y) * 0.15;
 
-    pathData += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+    // Color based on the midpoint value of this segment
+    const avgValue = (p1.value + p2.value) / 2;
+    segments.push({
+      path: `M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`,
+      color: getCapacityColor(avgValue),
+    });
   }
-
-  // All sampled points get colored dots
-  const keyPoints = sparkData.map((value, i) => ({
-    x: i * xScale,
-    y: valueToY(value),
-    color: getCapacityColor(value),
-  }));
 
   return (
     <Svg width={width} height={height}>
-      <Defs>
-        <LinearGradient id="sparkGradient" x1="0" y1="0" x2="0" y2={height} gradientUnits="userSpaceOnUse">
-          <Stop offset="0%" stopColor="#00D7FF" />
-          <Stop offset="50%" stopColor="#E8A830" />
-          <Stop offset="100%" stopColor="#F44336" />
-        </LinearGradient>
-      </Defs>
-      {/* Gradient-colored line */}
-      <Path
-        d={pathData}
-        stroke="url(#sparkGradient)"
-        strokeWidth={1.5}
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      {/* Colored line segments */}
+      {segments.map((seg, idx) => (
+        <Path
+          key={idx}
+          d={seg.path}
+          stroke={seg.color}
+          strokeWidth={2}
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ))}
       {/* Colored dots at all sampled points */}
-      {keyPoints.map((point, idx) => (
+      {points.map((point, idx) => (
         <SvgCircle
           key={idx}
           cx={point.x}
           cy={point.y}
-          r={2.5}
+          r={3}
           fill={point.color}
         />
       ))}
