@@ -362,6 +362,7 @@ function CirclesCCIBrief() {
       {/* TEMP MARKER - DELETE AFTER VERIFY */}
       <View style={{ backgroundColor: '#FF0000', padding: 20, marginBottom: 16 }}>
         <Text style={{ color: '#FFFFFF', fontSize: 24, fontWeight: 'bold', textAlign: 'center' }}>WEB MARKER 999</Text>
+        <Text style={{ color: '#FFFFFF', fontSize: 12, textAlign: 'center', marginTop: 4 }}>Build: {new Date().toISOString()}</Text>
       </View>
 
       {/* Admin Breadcrumb */}
@@ -382,7 +383,7 @@ function CirclesCCIBrief() {
           <View style={styles.circleMemberBadge}>
             <Text style={styles.circleMemberBadgeText}>5 / 5 Members</Text>
           </View>
-          <Pressable style={styles.lingsButton}>
+          <Pressable style={styles.lingsButton} onPress={() => router.push('/cci')}>
             <Link2 color="#00D7FF" size={14} />
             <Text style={styles.lingsButtonText}>LINGS</Text>
           </Pressable>
