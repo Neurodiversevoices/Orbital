@@ -2,6 +2,7 @@
  * Orbital Subscription Hook
  *
  * Manages RevenueCat subscription state with graceful fallbacks.
+ * Supports both mobile (react-native-purchases) and web (@revenuecat/purchases-js).
  *
  * Key behaviors:
  * - If RevenueCat unavailable → app continues in free mode (no crashes)
@@ -37,14 +38,16 @@ import {
   isUserCancellation,
 } from '../observability';
 
-// Dynamic import for RevenueCat to handle web gracefully
-let Purchases: typeof import('react-native-purchases').default | null = null;
-let PurchasesPackage: typeof import('react-native-purchases').PurchasesPackage | null = null;
+// Dynamic import for RevenueCat to handle platform differences
+let PurchasesMobile: typeof import('react-native-purchases').default | null = null;
+let PurchasesWeb: typeof import('@revenuecat/purchases-js').Purchases | null = null;
+let webPurchasesInstance: import('@revenuecat/purchases-js').Purchases | null = null;
 
 // RevenueCat API keys from environment variables
 // Falls back gracefully to free mode if not configured
 const REVENUECAT_API_KEY_IOS = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY || '';
 const REVENUECAT_API_KEY_ANDROID = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY || '';
+const REVENUECAT_API_KEY_WEB = process.env.EXPO_PUBLIC_REVENUECAT_WEB_KEY || '';
 
 interface SubscriptionContextType extends SubscriptionState {
   /** Purchase the Pro subscription */
@@ -78,21 +81,59 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   }, []);
 
   const initializePurchases = async () => {
-    // Skip on web
+    // Web platform - use @revenuecat/purchases-js
     if (Platform.OS === 'web') {
-      setState({
-        ...DEFAULT_SUBSCRIPTION_STATE,
-        isLoading: false,
-        isAvailable: false,
-        status: 'free',
-      });
+      try {
+        // Skip if API key not configured
+        if (!REVENUECAT_API_KEY_WEB || REVENUECAT_API_KEY_WEB.includes('REPLACE_WITH')) {
+          if (__DEV__) console.log('[Subscription] RevenueCat Web API key not configured, running in free mode');
+          setState({
+            ...DEFAULT_SUBSCRIPTION_STATE,
+            isLoading: false,
+            isAvailable: false,
+            status: 'free',
+          });
+          return;
+        }
+
+        // Dynamic import for web SDK
+        const PurchasesWebModule = await import('@revenuecat/purchases-js');
+        PurchasesWeb = PurchasesWebModule.Purchases;
+
+        // Configure with anonymous user (or use your auth system's user ID)
+        webPurchasesInstance = PurchasesWeb.configure(
+          REVENUECAT_API_KEY_WEB,
+          `web_${Date.now()}_${Math.random().toString(36).substring(7)}`
+        );
+
+        // Check current subscription status
+        await checkSubscriptionStatus();
+
+        setState(prev => ({
+          ...prev,
+          isAvailable: true,
+          isLoading: false,
+        }));
+
+        if (__DEV__) console.log('[Subscription] RevenueCat Web SDK initialized');
+      } catch (error) {
+        if (__DEV__) console.error('[Subscription] Failed to initialize RevenueCat Web:', error);
+        setState({
+          ...DEFAULT_SUBSCRIPTION_STATE,
+          isLoading: false,
+          isAvailable: false,
+          status: 'free',
+          error: 'Subscription service unavailable',
+        });
+      }
       return;
     }
 
+    // Mobile platform - use react-native-purchases
     try {
       // Dynamic import
       const PurchasesModule = await import('react-native-purchases');
-      Purchases = PurchasesModule.default;
+      PurchasesMobile = PurchasesModule.default;
 
       const apiKey = Platform.OS === 'ios'
         ? REVENUECAT_API_KEY_IOS
@@ -110,7 +151,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         return;
       }
 
-      await Purchases.configure({ apiKey });
+      await PurchasesMobile.configure({ apiKey });
 
       // Check current subscription status
       await checkSubscriptionStatus();
@@ -134,10 +175,17 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   };
 
   const checkSubscriptionStatus = async () => {
-    if (!Purchases) return;
-
     try {
-      const customerInfo = await Purchases.getCustomerInfo();
+      let customerInfo: any;
+
+      if (Platform.OS === 'web') {
+        if (!webPurchasesInstance) return;
+        customerInfo = await webPurchasesInstance.getCustomerInfo();
+      } else {
+        if (!PurchasesMobile) return;
+        customerInfo = await PurchasesMobile.getCustomerInfo();
+      }
+
       const entitlement = customerInfo.entitlements.active[ENTITLEMENT_ID];
 
       if (entitlement) {
@@ -174,7 +222,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   };
 
   const purchase = useCallback(async (productId?: string): Promise<boolean> => {
-    if (!Purchases || !state.isAvailable) {
+    if (!state.isAvailable) {
       if (__DEV__) console.log('[Subscription] Purchase not available');
       return false;
     }
@@ -190,9 +238,61 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     });
 
     try {
+      // Web purchase flow
+      if (Platform.OS === 'web') {
+        if (!webPurchasesInstance) {
+          clearPaymentScope();
+          return false;
+        }
+
+        updatePaymentStage('offerings_fetch');
+        const offerings = await webPurchasesInstance.getOfferings();
+        const currentOffering = offerings.current;
+
+        if (!currentOffering) {
+          if (__DEV__) console.error('[Subscription] No offerings available');
+          clearPaymentScope();
+          return false;
+        }
+
+        // Find the requested package
+        updatePaymentStage('package_select');
+        const targetPackage = currentOffering.availablePackages.find(
+          pkg => pkg.rcBillingProduct.identifier === targetProductId ||
+                 (pkg.identifier === '$rc_monthly' && !productId)
+        );
+
+        if (!targetPackage) {
+          if (__DEV__) console.error('[Subscription] Package not found:', targetProductId);
+          clearPaymentScope();
+          return false;
+        }
+
+        // Make web purchase (opens Stripe checkout)
+        updatePaymentStage('confirm');
+        const { customerInfo } = await webPurchasesInstance.purchase({ rcPackage: targetPackage });
+        const isPro = !!customerInfo.entitlements.active[ENTITLEMENT_ID];
+
+        if (isPro) {
+          updatePaymentStage('complete');
+          clearPaymentScope();
+          await checkSubscriptionStatus();
+          return true;
+        }
+
+        clearPaymentScope();
+        return false;
+      }
+
+      // Mobile purchase flow
+      if (!PurchasesMobile) {
+        clearPaymentScope();
+        return false;
+      }
+
       // Get available packages
       updatePaymentStage('offerings_fetch');
-      const offerings = await Purchases.getOfferings();
+      const offerings = await PurchasesMobile.getOfferings();
       const currentOffering = offerings.current;
 
       if (!currentOffering) {
@@ -205,7 +305,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       updatePaymentStage('package_select');
       const targetPackage = currentOffering.availablePackages.find(
         pkg => pkg.product.identifier === targetProductId ||
-               pkg.identifier === '$rc_monthly' && !productId
+               (pkg.identifier === '$rc_monthly' && !productId)
       );
 
       if (!targetPackage) {
@@ -216,7 +316,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
 
       // Make purchase
       updatePaymentStage('confirm');
-      const { customerInfo } = await Purchases.purchasePackage(targetPackage);
+      const { customerInfo } = await PurchasesMobile.purchasePackage(targetPackage);
       const isPro = !!customerInfo.entitlements.active[ENTITLEMENT_ID];
 
       if (isPro) {
@@ -257,7 +357,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   }, [state.isAvailable]);
 
   const restore = useCallback(async (): Promise<boolean> => {
-    if (!Purchases || !state.isAvailable) {
+    if (!state.isAvailable) {
       if (__DEV__) console.log('[Subscription] Restore not available');
       return false;
     }
@@ -271,7 +371,24 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
 
     try {
       updatePaymentStage('restore');
-      const customerInfo = await Purchases.restorePurchases();
+
+      let customerInfo: any;
+
+      if (Platform.OS === 'web') {
+        // Web doesn't have traditional "restore" - just refresh customer info
+        if (!webPurchasesInstance) {
+          clearPaymentScope();
+          return false;
+        }
+        customerInfo = await webPurchasesInstance.getCustomerInfo();
+      } else {
+        if (!PurchasesMobile) {
+          clearPaymentScope();
+          return false;
+        }
+        customerInfo = await PurchasesMobile.restorePurchases();
+      }
+
       const isPro = !!customerInfo.entitlements.active[ENTITLEMENT_ID];
 
       if (isPro) {
