@@ -62,6 +62,8 @@ export const STORAGE_KEYS = {
   SCHOOL_ZONE_CONFIGS: '@orbital:school_configs',
   // App Mode (user-facing modes dropdown)
   APP_MODE_SETTINGS: '@orbital:app_mode',
+  // App Tenure tracking (for 30-day tease feature)
+  FIRST_APP_OPEN: '@orbital:first_app_open',
 } as const;
 
 const LOGS_KEY = STORAGE_KEYS.LOGS;

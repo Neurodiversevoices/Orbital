@@ -3,14 +3,16 @@ import { View, StyleSheet, FlatList, RefreshControl, useWindowDimensions, Text, 
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Circle, Eye, ListTodo, Users, TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Calendar, Clock, Lock, Bug, RefreshCw, Award, FileText, Database } from 'lucide-react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { HistoryItem, EnergyGraph, TimeRangeTabs, TimeRange, getTimeRangeMs, MilestonesPanel, PatternLanguagePanel, OrgRoleBanner, WeeklyCapacityRecord } from '../../components';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { HistoryItem, EnergyGraph, TimeRangeTabs, TimeRange, getTimeRangeMs, MilestonesPanel, PatternLanguagePanel, OrgRoleBanner, WeeklyCapacityRecord, BlurredPatternTease } from '../../components';
 import { QCRButton, QCRScreen, QCRPaywall } from '../../components/qcr';
 import { colors, commonStyles, spacing } from '../../theme';
 import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
 import { useLocale, interpolate } from '../../lib/hooks/useLocale';
 import { useDemoMode, FOUNDER_DEMO_ENABLED } from '../../lib/hooks/useDemoMode';
 import { useAppMode } from '../../lib/hooks/useAppMode';
+import { useAppTenure } from '../../lib/hooks/useAppTenure';
+import { useSubscription } from '../../lib/subscription';
 import { useQCR } from '../../lib/qcr';
 import { STORAGE_KEYS } from '../../lib/storage';
 import { CapacityLog, CapacityState, Category, getUnlockTier, getNextUnlockTier, BaselineStats, WeeklySummary } from '../../types';
@@ -251,6 +253,9 @@ export default function PatternsScreen() {
   const { t } = useLocale();
   const { isDemoMode, enableDemoMode, reseedDemoData } = useDemoMode();
   const { currentMode } = useAppMode();
+  const { isPro } = useSubscription();
+  const { hasUsedAppFor30Days } = useAppTenure();
+  const router = useRouter();
   const graphWidth = width - spacing.md * 2;
   const [timeRange, setTimeRange] = useState<TimeRange>('7d');
   const [debugVisible, setDebugVisible] = useState(showDebug);
@@ -630,14 +635,34 @@ export default function PatternsScreen() {
                   selected={timeRange}
                   onSelect={handleTimeRangeChange}
                   logCount={logCount}
+                  isPro={isPro}
+                  hasUsedAppFor30Days={hasUsedAppFor30Days}
                 />
-                <EnergyGraph
-                  logs={logs}
-                  width={graphWidth}
-                  timeRange={timeRange}
-                  startDate={calendarWeekStart || undefined}
-                  endDate={calendarWeekEnd || undefined}
-                />
+
+                {/* Show blur tease for 30d+ ranges for Free users after 30 days */}
+                {!isPro && hasUsedAppFor30Days && timeRange !== '7d' ? (
+                  <BlurredPatternTease
+                    visible={true}
+                    onUpgradePress={() => router.push('/upgrade')}
+                    timeRange={timeRange}
+                  >
+                    <EnergyGraph
+                      logs={logs}
+                      width={graphWidth}
+                      timeRange={timeRange}
+                      startDate={calendarWeekStart || undefined}
+                      endDate={calendarWeekEnd || undefined}
+                    />
+                  </BlurredPatternTease>
+                ) : (
+                  <EnergyGraph
+                    logs={logs}
+                    width={graphWidth}
+                    timeRange={timeRange}
+                    startDate={calendarWeekStart || undefined}
+                    endDate={calendarWeekEnd || undefined}
+                  />
+                )}
 
                 {/* Stats below graph */}
                 {stats.avg !== null && (

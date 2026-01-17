@@ -16,6 +16,7 @@ export { PatternLanguagePanel } from './PatternLanguagePanel';
 export { OrgRoleBanner } from './OrgRoleBanner';
 export { EmptyState } from './EmptyState';
 export { WeeklyCapacityRecord } from './WeeklyCapacityRecord';
+export { BlurredPatternTease } from './BlurredPatternTease';
 
 // Legal components
 export {

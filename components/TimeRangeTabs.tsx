@@ -6,7 +6,7 @@ import Animated, {
   withTiming,
   useSharedValue,
 } from 'react-native-reanimated';
-import { Lock } from 'lucide-react-native';
+import { Lock, Sparkles } from 'lucide-react-native';
 import { colors, spacing } from '../theme';
 import { getUnlockTier } from '../types';
 
@@ -18,6 +18,10 @@ interface TimeRangeTabsProps {
   selected: TimeRange;
   onSelect: (range: TimeRange) => void;
   logCount?: number;
+  /** Whether user has Pro subscription (unlocks full history) */
+  isPro?: boolean;
+  /** Whether user has used app for 30+ days (eligible for tease) */
+  hasUsedAppFor30Days?: boolean;
 }
 
 const ranges: { key: TimeRange; label: string; requiredLogs: number }[] = [
@@ -33,11 +37,14 @@ function TabButton({
   range,
   isSelected,
   isLocked,
+  isTease,
   onPress,
 }: {
   range: { key: TimeRange; label: string };
   isSelected: boolean;
   isLocked: boolean;
+  /** Whether this is a "tease" tab (Free user with 30+ days, can view blurred) */
+  isTease: boolean;
   onPress: () => void;
 }) {
   const scale = useSharedValue(1);
@@ -46,8 +53,11 @@ function TabButton({
     transform: [{ scale: scale.value }],
   }));
 
+  // Tease tabs are clickable (they show blurred preview)
+  const isClickable = !isLocked || isTease;
+
   const handlePressIn = () => {
-    if (!isLocked) {
+    if (isClickable) {
       scale.value = withTiming(0.95, { duration: 100 });
     }
   };
@@ -58,41 +68,79 @@ function TabButton({
 
   return (
     <AnimatedPressable
-      onPress={isLocked ? undefined : onPress}
+      onPress={isClickable ? onPress : undefined}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       style={[
         styles.tab,
         animatedStyle,
         isSelected && styles.tabSelected,
-        isLocked && styles.tabLocked,
+        isLocked && !isTease && styles.tabLocked,
+        isTease && styles.tabTease,
       ]}
     >
-      {isLocked ? (
+      {isLocked && !isTease ? (
         <Lock size={10} color="rgba(255,255,255,0.2)" />
       ) : (
-        <Text style={[styles.tabText, isSelected && styles.tabTextSelected]}>
-          {range.label}
-        </Text>
+        <View style={styles.tabContent}>
+          <Text style={[
+            styles.tabText,
+            isSelected && styles.tabTextSelected,
+            isTease && styles.tabTextTease,
+          ]}>
+            {range.label}
+          </Text>
+          {isTease && (
+            <View style={styles.proBadge}>
+              <Sparkles size={8} color="#00E5FF" />
+            </View>
+          )}
+        </View>
       )}
-      {isSelected && !isLocked && <View style={styles.tabIndicator} />}
+      {isSelected && isClickable && (
+        <View style={[
+          styles.tabIndicator,
+          isTease && styles.tabIndicatorTease,
+        ]} />
+      )}
     </AnimatedPressable>
   );
 }
 
-export function TimeRangeTabs({ selected, onSelect, logCount = 0 }: TimeRangeTabsProps) {
+export function TimeRangeTabs({
+  selected,
+  onSelect,
+  logCount = 0,
+  isPro = false,
+  hasUsedAppFor30Days = false,
+}: TimeRangeTabsProps) {
   return (
     <View style={styles.container}>
       <View style={styles.tabsRow}>
-        {ranges.map((range) => (
-          <TabButton
-            key={range.key}
-            range={range}
-            isSelected={selected === range.key}
-            isLocked={logCount < range.requiredLogs}
-            onPress={() => onSelect(range.key)}
-          />
-        ))}
+        {ranges.map((range) => {
+          const hasEnoughLogs = logCount >= range.requiredLogs;
+
+          // 7d is always available based on log count (no Pro gating)
+          // 30d+ requires Pro for full access, or shows tease for eligible Free users
+          const isExtendedRange = range.key !== '7d';
+          const isProGated = isExtendedRange && !isPro;
+
+          // Locked: not enough logs AND (not pro-gated OR not eligible for tease)
+          // Tease: enough logs, pro-gated, but user has 30+ days tenure
+          const isTease = hasEnoughLogs && isProGated && hasUsedAppFor30Days;
+          const isLocked = !hasEnoughLogs || (isProGated && !hasUsedAppFor30Days);
+
+          return (
+            <TabButton
+              key={range.key}
+              range={range}
+              isSelected={selected === range.key}
+              isLocked={isLocked}
+              isTease={isTease}
+              onPress={() => onSelect(range.key)}
+            />
+          );
+        })}
       </View>
     </View>
   );
@@ -134,11 +182,20 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
   },
+  tabContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
   tabSelected: {
     backgroundColor: 'rgba(255,255,255,0.08)',
   },
   tabLocked: {
     opacity: 0.5,
+  },
+  tabTease: {
+    // Slight highlight to indicate it's tappable
+    opacity: 0.85,
   },
   tabText: {
     fontSize: 11,
@@ -150,6 +207,13 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.9)',
     fontWeight: '600',
   },
+  tabTextTease: {
+    // Slightly brighter to indicate it's a preview
+    color: 'rgba(255,255,255,0.55)',
+  },
+  proBadge: {
+    marginLeft: 1,
+  },
   tabIndicator: {
     position: 'absolute',
     bottom: 4,
@@ -157,5 +221,9 @@ const styles = StyleSheet.create({
     height: 2,
     borderRadius: 1,
     backgroundColor: '#00E5FF',
+  },
+  tabIndicatorTease: {
+    // Dimmer indicator for tease tabs
+    opacity: 0.5,
   },
 });

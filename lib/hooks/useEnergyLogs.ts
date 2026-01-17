@@ -109,15 +109,16 @@ export function useEnergyLogs(): UseCapacityLogsReturn {
     await loadLogs();
   }, [loadLogs]);
 
-  // Calculate current month's signal count for free tier gating
+  // Calculate current month's signal count (kept for analytics, but no longer used for gating)
   const currentMonthSignalCount = useMemo(() => {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
     return logs.filter(log => log.timestamp >= monthStart).length;
   }, [logs]);
 
-  const hasHitSignalLimit = currentMonthSignalCount >= FREE_TIER_LIMITS.maxSignalsPerMonth;
-  const signalsRemaining = Math.max(0, FREE_TIER_LIMITS.maxSignalsPerMonth - currentMonthSignalCount);
+  // All users now have unlimited signals - these are kept for backward compatibility
+  const hasHitSignalLimit = false;  // Never limited
+  const signalsRemaining = Infinity;
 
   return {
     logs,

@@ -25,6 +25,10 @@ export type { PatternConcept, PatternStrength, PatternLanguageData } from './use
 // First-use experience hooks
 export { useWhyOrbital } from './useWhyOrbital';
 
+// App tenure tracking (for 30-day tease feature)
+export { useAppTenure } from './useAppTenure';
+export type { AppTenure } from './useAppTenure';
+
 // Widget sync hooks
 export { useWidgetSync, syncWidgetOnLog } from './useWidgetSync';
 

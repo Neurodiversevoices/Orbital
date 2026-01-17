@@ -91,8 +91,8 @@ export const STARTER_TIER = {
   id: 'starter',
   name: 'Starter',
   limits: {
-    maxSignalsPerMonth: 10,
-    maxPatternHistoryDays: 7,
+    maxSignalsPerMonth: Infinity,  // Unlimited signals for all users
+    maxPatternHistoryDays: 7,      // Free users see 7 days; Pro unlocks full history
   },
 } as const;
 
