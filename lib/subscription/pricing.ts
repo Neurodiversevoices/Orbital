@@ -91,8 +91,8 @@ export const STARTER_TIER = {
   id: 'starter',
   name: 'Starter',
   limits: {
-    maxSignalsPerMonth: 10,
-    maxPatternHistoryDays: 7,
+    maxSignalsPerMonth: Infinity,
+    maxPatternHistoryDays: Infinity,
   },
 } as const;
 

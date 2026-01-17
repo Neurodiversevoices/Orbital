@@ -299,7 +299,7 @@ export default function SettingsScreen() {
               icon={FlaskConical}
               label={qaFreeModeEnabled ? 'QA Free Mode (Active)' : 'QA Free Mode'}
               sublabel={qaFreeModeEnabled
-                ? `Tier: ${tierLabel} · ${limits.maxSignalsPerMonth} signals/mo · ${limits.maxPatternHistoryDays}d history`
+                ? `Tier: ${tierLabel} · Unlimited signals · Unlimited history`
                 : 'Test as Free user (allows institutional demos)'
               }
               onPress={handleToggleQAFreeMode}
@@ -311,8 +311,8 @@ export default function SettingsScreen() {
               <Text style={styles.qaFreeModeInfoText}>
                 • No Pro entitlements{'\n'}
                 • No Circle/Family/Bundle access{'\n'}
-                • Limited signals ({limits.maxSignalsPerMonth}/month){'\n'}
-                • Limited history ({limits.maxPatternHistoryDays} days){'\n'}
+                • Unlimited signals{'\n'}
+                • Unlimited history{'\n'}
                 • CCI at Free price ($199){'\n'}
                 • Upgrade prompts visible{'\n'}
                 • NOTE: Allows institutional demos

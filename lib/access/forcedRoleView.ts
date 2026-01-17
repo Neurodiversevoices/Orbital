@@ -70,8 +70,8 @@ export const FREE_ROLE_RESTRICTIONS = {
   showDevTools: true, // Keep dev tools visible to exit
 
   // Feature limits
-  maxSignalsPerMonth: 30,
-  maxPatternHistoryDays: 7,
+  maxSignalsPerMonth: Infinity,
+  maxPatternHistoryDays: Infinity,
 } as const;
 
 // =============================================================================

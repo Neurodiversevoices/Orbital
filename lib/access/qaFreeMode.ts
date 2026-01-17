@@ -159,8 +159,8 @@ export const QA_FREE_MODE_RESTRICTIONS = {
  * QA Free Mode limits (matches Starter tier)
  */
 export const QA_FREE_MODE_LIMITS = {
-  maxSignalsPerMonth: 30,
-  maxPatternHistoryDays: 7,
+  maxSignalsPerMonth: Infinity,
+  maxPatternHistoryDays: Infinity,
 } as const;
 
 // =============================================================================
