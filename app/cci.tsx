@@ -37,10 +37,39 @@ const CCI_ACCESSIBLE = Platform.OS === 'web' || FOUNDER_DEMO_ENABLED;
 export default function CCIInstrumentScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ type?: string; seats?: string }>();
+
+  // ========== TRACE LOGGING: CCI Type Resolution ==========
+  console.log('[CCI-TRACE] ===== CCI ARTIFACT TYPE RESOLUTION =====');
+  console.log('[CCI-TRACE] Raw params object:', JSON.stringify(params));
+  console.log('[CCI-TRACE] params.type value:', params.type, '(typeof:', typeof params.type, ')');
+  console.log('[CCI-TRACE] params.seats value:', params.seats);
+  console.log('[CCI-TRACE] params.type === "circle":', params.type === 'circle');
+  console.log('[CCI-TRACE] params.type === "bundle":', params.type === 'bundle');
+  // =========================================================
+
   const cciType = params.type === 'circle' ? 'circle' : params.type === 'bundle' ? 'bundle' : 'individual';
+
+  // ========== TRACE LOGGING: Decision Result ==========
+  console.log('[CCI-TRACE] Resolved cciType:', cciType);
+  if (params.type && params.type !== cciType) {
+    console.error('[CCI-TRACE] ⚠️ TYPE MISMATCH: params.type was', params.type, 'but resolved to', cciType);
+  }
+  if (params.type === 'bundle' && cciType !== 'bundle') {
+    console.error('[CCI-TRACE] 🚨 BUNDLE→INDIVIDUAL CONVERSION DETECTED HERE');
+  }
+  // ====================================================
+
   const isCircle = cciType === 'circle';
   const isBundle = cciType === 'bundle';
   const bundleSeatCount = (parseInt(params.seats || '10') as 10 | 15 | 20) || 10;
+
+  // ========== TRACE LOGGING: Final Decision ==========
+  console.log('[CCI-TRACE] isCircle:', isCircle);
+  console.log('[CCI-TRACE] isBundle:', isBundle);
+  console.log('[CCI-TRACE] bundleSeatCount:', bundleSeatCount);
+  console.log('[CCI-TRACE] Will call:', isCircle ? 'getCircleGoldenMasterHTML()' : isBundle ? `getBundleGoldenMasterHTML(${bundleSeatCount})` : 'getGoldenMasterHTML()');
+  console.log('[CCI-TRACE] =======================================');
+  // ===================================================
 
   const [isViewing, setIsViewing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -62,11 +91,28 @@ export default function CCIInstrumentScreen() {
 
   // Get the golden master HTML (exact match to PDF)
   // Use appropriate artifact based on type: circle, bundle, or individual
-  const artifactHTML = isCircle
-    ? getCircleGoldenMasterHTML()
-    : isBundle
-    ? getBundleGoldenMasterHTML(bundleSeatCount)
-    : getGoldenMasterHTML();
+  // ========== TRACE LOGGING: Artifact Selection ==========
+  console.log('[CCI-TRACE] About to select artifact HTML...');
+  // NO SILENT FALLBACK: explicit path selection with logging
+  let artifactHTML: string;
+  if (isCircle) {
+    console.log('[CCI-TRACE] → Calling getCircleGoldenMasterHTML()');
+    artifactHTML = getCircleGoldenMasterHTML();
+  } else if (isBundle) {
+    console.log('[CCI-TRACE] → Calling getBundleGoldenMasterHTML(' + bundleSeatCount + ')');
+    artifactHTML = getBundleGoldenMasterHTML(bundleSeatCount);
+  } else {
+    console.log('[CCI-TRACE] → Calling getGoldenMasterHTML() [INDIVIDUAL]');
+    if (params.type) {
+      console.error('[CCI-TRACE] 🚨 WARNING: params.type was "' + params.type + '" but fell through to individual artifact!');
+    }
+    artifactHTML = getGoldenMasterHTML();
+  }
+  console.log('[CCI-TRACE] artifactHTML length:', artifactHTML?.length || 0);
+  console.log('[CCI-TRACE] artifactHTML contains "BUNDLE":', artifactHTML?.includes('BUNDLE') || false);
+  console.log('[CCI-TRACE] artifactHTML contains "Bundle":', artifactHTML?.includes('Bundle') || false);
+  console.log('[CCI-TRACE] artifactHTML contains "mini-chart-card":', artifactHTML?.includes('mini-chart-card') || false);
+  // ========================================================
 
   // View instrument in new window (web only)
   const handleViewInstrument = useCallback(() => {

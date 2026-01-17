@@ -434,7 +434,11 @@ function BundlesCCIBrief() {
           <Text style={styles.ctaBundlePrimaryText}>Purchase Bundle</Text>
           <Text style={styles.ctaBundlePriceText}>From $2,700/yr</Text>
         </Pressable>
-        <Pressable style={styles.ctaSecondary} onPress={() => router.push('/cci?type=bundle')}>
+        <Pressable style={styles.ctaSecondary} onPress={() => {
+          console.log('[BUNDLE-NAV-TRACE] Bundle CCI button pressed');
+          console.log('[BUNDLE-NAV-TRACE] Navigating to: /cci?type=bundle');
+          router.push('/cci?type=bundle');
+        }}>
           <Text style={styles.ctaSecondaryText}>Generate Bundle Capacity Summary (CCI)</Text>
           <Text style={styles.ctaSecondaryPrice}>$999</Text>
         </Pressable>
