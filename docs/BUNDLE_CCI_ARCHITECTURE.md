@@ -1,92 +1,121 @@
-# Bundle CCI Architecture
+# CCI Architecture: Bundle & Circle Comparison
 
 ## Single Source of Truth
 
-All Bundle CCI chart rendering flows through one file:
+All CCI chart rendering flows through one file:
 
 ```
 lib/cci/summaryChart.ts → renderSummaryChartSVG()
 ```
 
+## Compliance Matrix
+
+| CCI Type | Brief (App) | Artifact (PDF) | Uses summaryChart.ts |
+|----------|-------------|----------------|----------------------|
+| **Individual** | N/A (redirect to /cci) | `artifact.ts` | **NO** - Hardcoded SVG (golden master locked) |
+| **Circle** | `brief.tsx` → `CCISummaryChart` | `artifact.ts` → `generateCircleCCIArtifactHTML` | **YES** ✓ |
+| **Bundle** | `BundleCCIPreview` → `CCISummaryChart` | `bundleArtifact.ts` → `generateBundleCCIArtifactHTML` | **YES** ✓ |
+
 ## Architecture Diagram
 
 ```
-                    lib/cci/summaryChart.ts
+                         lib/cci/summaryChart.ts
                     ┌─────────────────────────────────────┐
                     │  SINGLE SOURCE OF TRUTH             │
                     │                                     │
-                    │  • SUMMARY_CHART dimensions         │
+                    │  • SUMMARY_CHART (320×140)          │
                     │  • CAPACITY_COLORS (H/M/L)          │
                     │  • downsampleTo6Points()            │
                     │  • renderSummaryChartSVG()          │
                     └─────────────────────────────────────┘
                                     │
-                                    │ exports
-                                    │
-          ┌─────────────────────────┼─────────────────────────┐
-          │                         │                         │
-          ▼                         ▼                         ▼
-┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────────┐
-│ CCISummaryChart.tsx │  │ bundleArtifact.ts   │  │ bundle-cci-export   │
-│ (React Native)      │  │ (HTML Generator)    │  │ -pdf.ts (Script)    │
-├─────────────────────┤  ├─────────────────────┤  ├─────────────────────┤
-│ import { render-    │  │ import { render-    │  │ import { generate-  │
-│   SummaryChartSVG } │  │   SummaryChartSVG } │  │   BundleCCIArtifact │
-│                     │  │                     │  │   HTML }            │
-│ <SvgXml xml={svg}/> │  │ Chart SVG embedded  │  │                     │
-│                     │  │ in HTML template    │  │ Playwright → PDF    │
-└─────────────────────┘  └─────────────────────┘  └─────────────────────┘
-          │                         │                         │
-          ▼                         ▼                         ▼
-┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────────┐
-│ BundleCCIPreview    │  │ Plan Mode iframe    │  │ output/bundle-cci-  │
-│ (App Brief Screen)  │  │ preview             │  │ {seats}.pdf         │
-└─────────────────────┘  └─────────────────────┘  └─────────────────────┘
+                    ┌───────────────┼───────────────┐
+                    │               │               │
+                    ▼               ▼               ▼
+            ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+            │ CIRCLE CCI  │ │ BUNDLE CCI  │ │ INDIVIDUAL  │
+            │             │ │             │ │ CCI         │
+            └─────────────┘ └─────────────┘ └─────────────┘
+                  │               │               │
+        ┌─────────┴─────────┐    │         (Golden Master
+        │                   │    │          Locked - NOT
+        ▼                   ▼    │          using SSOT)
+   ┌─────────┐         ┌─────────┐
+   │ Brief   │         │Artifact │
+   │ (App)   │         │ (PDF)   │
+   └─────────┘         └─────────┘
 ```
 
-## File Reference
+---
 
-### Core Source of Truth
-
-| File | Purpose |
-|------|---------|
-| `lib/cci/summaryChart.ts` | Chart dimensions, colors, and SVG rendering |
-
-**Key Exports:**
-```typescript
-export const SUMMARY_CHART = {
-  width: 320,
-  height: 140,
-  padding: { left: 32, right: 8, top: 8, bottom: 24 },
-  graphWidth: 280,
-  graphHeight: 108,
-  bandHeight: 36,
-};
-
-export const CAPACITY_COLORS = {
-  resourced: '#00E5FF',  // Cyan - High (≥66%)
-  stretched: '#E8A830',  // Amber - Medium (33-66%)
-  depleted: '#F44336',   // Red - Low (<33%)
-  background: '#0a0b10',
-};
-
-export function renderSummaryChartSVG(
-  values: number[],
-  options?: SummaryChartOptions
-): string;
-
-export function downsampleTo6Points(data: number[], targetPoints?: number): number[];
-export function getCapacityColor(value: number): string;
-```
+## Circle CCI
 
 ### Brief (App Screen)
 
-| File | Purpose |
-|------|---------|
-| `components/BundleCCIPreview.tsx` | Main bundle preview component |
-| `components/CCISummaryChart.tsx` | React Native chart wrapper |
+**File:** `app/(tabs)/brief.tsx` → `CirclesCCIBrief` component
 
-**Code Path (Brief):**
+```typescript
+// brief.tsx (lines 328-332)
+import { CCISummaryChart } from '../../components/CCISummaryChart';
+
+{DEMO_CIRCLE_MEMBERS.map((member) => (
+  <CCISummaryChart
+    values={member.capacityHistory}
+    width={isWideScreen ? width - 280 : width - 48}
+    chartId={member.id}
+  />
+))}
+```
+
+### Artifact (PDF)
+
+**File:** `lib/cci/artifact.ts` → `generateCircleCCIArtifactHTML()`
+
+```typescript
+// artifact.ts (lines 796-802)
+import { renderSummaryChartSVG } from './summaryChart';
+
+function generateMemberChartSVG(memberName: string, values: number[]): string {
+  return renderSummaryChartSVG(values, {
+    includeGradientDefs: true,
+    gradientId: memberName.toLowerCase(),
+  });
+}
+
+// Used in generateCircleCCIArtifactHTML:
+const miaChart = generateMemberChartSVG('Mia', FABRICATED_HISTORIES.mia);
+const zachChart = generateMemberChartSVG('Zach', FABRICATED_HISTORIES.zach);
+// ... etc
+```
+
+### Circle CCI Data Flow
+
+```
+DEMO_CIRCLE_MEMBERS (brief.tsx)     FABRICATED_HISTORIES (demoData.ts)
+         │                                    │
+         │ capacityHistory[]                  │ mia, zach, lily, tyler, emma
+         ▼                                    ▼
+┌─────────────────────┐              ┌─────────────────────┐
+│ CCISummaryChart     │              │ generateMemberChart │
+│ (React Native)      │              │ SVG() (artifact.ts) │
+├─────────────────────┤              ├─────────────────────┤
+│ renderSummaryChart  │              │ renderSummaryChart  │
+│ SVG()               │              │ SVG()               │
+└─────────────────────┘              └─────────────────────┘
+         │                                    │
+         ▼                                    ▼
+    App Screen                         Circle CCI PDF
+    (5 member cards)                   (5 member charts)
+```
+
+---
+
+## Bundle CCI
+
+### Brief (App Screen)
+
+**File:** `components/BundleCCIPreview.tsx`
+
 ```typescript
 // BundleCCIPreview.tsx
 import { CCISummaryChart } from './CCISummaryChart';
@@ -96,26 +125,12 @@ import { CCISummaryChart } from './CCISummaryChart';
   width={140}
   chartId={seat.id}
 />
-
-// CCISummaryChart.tsx
-import { renderSummaryChartSVG } from '../lib/cci/summaryChart';
-
-const svgString = renderSummaryChartSVG(values, {
-  includeGradientDefs: true,
-  gradientId: chartId,
-});
-
-<SvgXml xml={svgString} width={displayWidth} height={displayHeight} />
 ```
 
-### Artifact (PDF/Print)
+### Artifact (PDF)
 
-| File | Purpose |
-|------|---------|
-| `lib/cci/bundleArtifact.ts` | HTML artifact generator |
-| `scripts/bundle-cci-export-pdf.ts` | PDF export script |
+**File:** `lib/cci/bundleArtifact.ts`
 
-**Code Path (Artifact):**
 ```typescript
 // bundleArtifact.ts
 import { renderSummaryChartSVG, CAPACITY_COLORS } from './summaryChart';
@@ -126,65 +141,110 @@ function generateSeatChartSVG(seat: BundleSeatData): string {
     gradientId: seat.id,
   });
 }
-
-// bundle-cci-export-pdf.ts
-import { generateBundleCCIArtifactHTML } from '../lib/cci/bundleArtifact';
-
-const html = generateBundleCCIArtifactHTML(seatCount);
-// → Playwright renders to PDF
 ```
 
-### Supporting Files
+### Bundle CCI Data Flow
 
-| File | Purpose |
-|------|---------|
-| `lib/cci/bundleDemoData.ts` | Demo data generation for bundles |
-| `components/BundleSeatAvatar.tsx` | Avatar component with capacity ring |
+```
+generateBundleSeatData()
+(bundleDemoData.ts)
+         │
+         │ BundleSeatData[]
+         │ (10/15/20 seats)
+         ▼
+┌─────────────────────┐              ┌─────────────────────┐
+│ BundleCCIPreview    │              │ bundleArtifact.ts   │
+│ → CCISummaryChart   │              │ → generateSeatChart │
+├─────────────────────┤              ├─────────────────────┤
+│ renderSummaryChart  │              │ renderSummaryChart  │
+│ SVG()               │              │ SVG()               │
+└─────────────────────┘              └─────────────────────┘
+         │                                    │
+         ▼                                    ▼
+    App Screen                         Bundle CCI PDF
+    (5 per row grid)                   (5 per row grid)
+    + Aggregate chart                  + Aggregate chart
+```
 
-## Chart Rendering Guarantees
+---
 
-Because all rendering flows through `renderSummaryChartSVG()`:
+## Key Differences: Circle vs Bundle
 
-1. **Visual Parity**: Brief and Artifact charts are pixel-identical
-2. **Color Consistency**: H/M/L colors match everywhere
-3. **Dimension Lock**: 320×140px chart dimensions enforced
-4. **Downsampling**: 90-day data → 6 points (same algorithm)
-5. **Bezier Curves**: Same smooth interpolation everywhere
+| Aspect | Circle CCI | Bundle CCI |
+|--------|------------|------------|
+| **Members** | 5 named individuals (Mia, Zach, Lily, Tyler, Emma) | 10/15/20 anonymous seats |
+| **Avatars** | Photos from pravatar.cc | Colored circles with initials |
+| **Identity** | Full names + usernames | Anonymous (no PII) |
+| **Data Source** | `FABRICATED_HISTORIES` (demoData.ts) | `generateBundleSeatData()` (bundleDemoData.ts) |
+| **Layout** | Horizontal cards (info + chart) | 5-per-row grid |
+| **Aggregate** | No | Yes (combined average chart) |
+| **Stats** | Per-member notes | Resourced/Stretched/Depleted counts |
+
+---
+
+## Shared Components
+
+Both Circle and Bundle use the same underlying components:
+
+| Component | Circle CCI | Bundle CCI |
+|-----------|------------|------------|
+| `CCISummaryChart.tsx` | ✓ (brief) | ✓ (brief) |
+| `renderSummaryChartSVG()` | ✓ (artifact) | ✓ (artifact) |
+| `CAPACITY_COLORS` | ✓ | ✓ |
+| `SUMMARY_CHART` dimensions | ✓ (320×140) | ✓ (320×140) |
+
+---
+
+## Individual CCI (Exception)
+
+**Individual CCI does NOT use the single source of truth.**
+
+**File:** `lib/cci/artifact.ts` → `generateCCIArtifactHTML()`
+
+The Individual CCI artifact (lines 24-732) contains a **hardcoded SVG chart** embedded directly in the HTML template. This is marked as "GOLDEN MASTER LOCKED" and should not be modified.
+
+```typescript
+// artifact.ts (line 1-12)
+/**
+ * CCI-Q4 Artifact Generator
+ *
+ * GOLDEN MASTER LOCKED: This file reproduces the EXACT HTML/CSS/SVG
+ * from output/cci_ultra.html which generated the golden master PDF.
+ *
+ * DO NOT MODIFY VISUAL OUTPUT.
+ * DO NOT REFACTOR STYLES.
+ * DO NOT "IMPROVE" LAYOUT.
+ */
+```
+
+The hardcoded chart is at lines 551-647 in artifact.ts.
+
+---
 
 ## Commands
 
 ```bash
-# Generate Bundle CCI PDF
+# Circle CCI (no separate script - part of cci:export)
+npm run cci:export
+
+# Bundle CCI
 npm run bundle:export              # 10 seats (default)
 npm run bundle:export -- 15        # 15 seats
 npm run bundle:export -- 20        # 20 seats
 
-# Output location
-output/bundle-cci-{seats}.pdf
+# Output locations
+output/cci_ultra.pdf               # Individual CCI
+output/bundle-cci-{seats}.pdf      # Bundle CCI
 ```
 
-## Visual Elements
+---
 
-### Chart (320×140)
-- 6 downsampled data points
-- Bezier curve interpolation
-- Area fill with gradient
-- Multi-layer node markers (dark ring → colored core → white center)
-- H/M/L zone bands with dashed dividers
-- Oct/Nov/Dec x-axis labels
+## Visual Parity Guarantees
 
-### Bundle Artifact Layout
-- 5 seats per row (grid)
-- Mini chart cards with avatar + state indicator
-- Stats summary (Resourced/Stretched/Depleted counts)
-- Combined aggregate chart
-- Chain of custody metadata
-- Privacy notice (avatars only, no PII)
+For Circle and Bundle CCI (using summaryChart.ts):
 
-## Plan Mode
-
-`BundleCCIPreview` includes a toggle between:
-- **Interactive**: Tap seats to view full chart in modal
-- **Plan Mode**: iframe preview of PDF artifact HTML
-
-Both modes use the same `renderSummaryChartSVG()` source.
+1. **Brief ↔ Artifact**: Charts are pixel-identical
+2. **Color Consistency**: H/M/L colors (#00E5FF/#E8A830/#F44336)
+3. **Dimensions**: 320×140px locked
+4. **Downsampling**: 90-day → 6 points (same algorithm)
+5. **Bezier Curves**: Same interpolation everywhere
