@@ -74,6 +74,7 @@ import {
   checkBundleAllSeatsPro,
   type UserEntitlements,
 } from '../lib/entitlements';
+import { BundleCCIPreview } from '../components/BundleCCIPreview';
 
 // =============================================================================
 // PURCHASE HANDLER (Mock Checkout)
@@ -377,6 +378,8 @@ export default function UpgradeScreen() {
   // CCI eligibility state (Circle/Bundle Pro verification)
   const [circleMembersAllPro, setCircleMembersAllPro] = useState(false);
   const [bundleSeatsAllPro, setBundleSeatsAllPro] = useState(false);
+  // Bundle preview state (selected quantity for CCI preview)
+  const [previewBundleSize, setPreviewBundleSize] = useState<10 | 15 | 20 | null>(null);
 
   // Load entitlements
   useEffect(() => {
@@ -708,32 +711,70 @@ export default function UpgradeScreen() {
             <Text style={styles.planCardDescription}>
               10, 15, or 20 Pro seats · For groups & communities · Annual billing
             </Text>
+            <Text style={styles.bundleSelectHint}>
+              {bundleSize === null ? 'Select quantity to preview seats' : 'Bundle active'}
+            </Text>
             <View style={styles.bundleOptions}>
               <Pressable
-                style={[styles.bundleOptionButton, bundleSize === 10 && styles.bundleOptionButtonActive]}
-                onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_10_ANNUAL, '10-Seat Pro Bundle')}
+                style={[
+                  styles.bundleOptionButton,
+                  (bundleSize === 10 || previewBundleSize === 10) && styles.bundleOptionButtonActive,
+                ]}
+                onPress={() => bundleSize === null && setPreviewBundleSize(previewBundleSize === 10 ? null : 10)}
                 disabled={isPurchasing || bundleSize !== null}
               >
-                <Text style={[styles.bundleOptionText, bundleSize === 10 && styles.bundleOptionTextActive]}>10 seats</Text>
-                <Text style={[styles.bundleOptionPrice, bundleSize === 10 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_10.annual)}</Text>
+                <Text style={[styles.bundleOptionText, (bundleSize === 10 || previewBundleSize === 10) && styles.bundleOptionTextActive]}>10 seats</Text>
+                <Text style={[styles.bundleOptionPrice, (bundleSize === 10 || previewBundleSize === 10) && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_10.annual)}</Text>
               </Pressable>
               <Pressable
-                style={[styles.bundleOptionButton, bundleSize === 15 && styles.bundleOptionButtonActive]}
-                onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_15_ANNUAL, '15-Seat Pro Bundle')}
+                style={[
+                  styles.bundleOptionButton,
+                  (bundleSize === 15 || previewBundleSize === 15) && styles.bundleOptionButtonActive,
+                ]}
+                onPress={() => bundleSize === null && setPreviewBundleSize(previewBundleSize === 15 ? null : 15)}
                 disabled={isPurchasing || bundleSize !== null}
               >
-                <Text style={[styles.bundleOptionText, bundleSize === 15 && styles.bundleOptionTextActive]}>15 seats</Text>
-                <Text style={[styles.bundleOptionPrice, bundleSize === 15 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_15.annual)}</Text>
+                <Text style={[styles.bundleOptionText, (bundleSize === 15 || previewBundleSize === 15) && styles.bundleOptionTextActive]}>15 seats</Text>
+                <Text style={[styles.bundleOptionPrice, (bundleSize === 15 || previewBundleSize === 15) && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_15.annual)}</Text>
               </Pressable>
               <Pressable
-                style={[styles.bundleOptionButton, bundleSize === 20 && styles.bundleOptionButtonActive]}
-                onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_20_ANNUAL, '20-Seat Pro Bundle')}
+                style={[
+                  styles.bundleOptionButton,
+                  (bundleSize === 20 || previewBundleSize === 20) && styles.bundleOptionButtonActive,
+                ]}
+                onPress={() => bundleSize === null && setPreviewBundleSize(previewBundleSize === 20 ? null : 20)}
                 disabled={isPurchasing || bundleSize !== null}
               >
-                <Text style={[styles.bundleOptionText, bundleSize === 20 && styles.bundleOptionTextActive]}>20 seats</Text>
-                <Text style={[styles.bundleOptionPrice, bundleSize === 20 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_20.annual)}</Text>
+                <Text style={[styles.bundleOptionText, (bundleSize === 20 || previewBundleSize === 20) && styles.bundleOptionTextActive]}>20 seats</Text>
+                <Text style={[styles.bundleOptionPrice, (bundleSize === 20 || previewBundleSize === 20) && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_20.annual)}</Text>
               </Pressable>
             </View>
+
+            {/* Bundle CCI Preview - Shows when quantity selected */}
+            {(previewBundleSize !== null || bundleSize !== null) && (
+              <BundleCCIPreview seatCount={bundleSize ?? previewBundleSize!} />
+            )}
+
+            {/* Purchase Button - Shows when preview selected but not yet purchased */}
+            {previewBundleSize !== null && bundleSize === null && (
+              <Pressable
+                style={[styles.bundlePurchaseButton, isPurchasing && styles.bundlePurchaseButtonDisabled]}
+                onPress={() => {
+                  const productMap = {
+                    10: { id: PRODUCT_IDS.BUNDLE_10_ANNUAL, name: '10-Seat Pro Bundle' },
+                    15: { id: PRODUCT_IDS.BUNDLE_15_ANNUAL, name: '15-Seat Pro Bundle' },
+                    20: { id: PRODUCT_IDS.BUNDLE_20_ANNUAL, name: '20-Seat Pro Bundle' },
+                  };
+                  const product = productMap[previewBundleSize];
+                  handlePurchase(product.id, product.name);
+                }}
+                disabled={isPurchasing}
+              >
+                <Text style={styles.bundlePurchaseButtonText}>
+                  Purchase {previewBundleSize}-Seat Bundle · {formatPrice(BUNDLE_PRICING[`bundle_${previewBundleSize}` as keyof typeof BUNDLE_PRICING].annual)}/yr
+                </Text>
+              </Pressable>
+            )}
 
             {/* Bundle Aggregate CCI $999 - Always visible in Bundles panel */}
             <View style={styles.cciInlineSection}>
@@ -1066,6 +1107,27 @@ const styles = StyleSheet.create({
   },
   bundleOptionTextActive: {
     color: '#9C27B0',
+  },
+  bundleSelectHint: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.4)',
+    fontStyle: 'italic',
+    marginBottom: spacing.sm,
+  },
+  bundlePurchaseButton: {
+    backgroundColor: '#9C27B0',
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.md,
+    alignItems: 'center',
+    marginTop: spacing.md,
+  },
+  bundlePurchaseButtonDisabled: {
+    backgroundColor: 'rgba(156,39,176,0.4)',
+  },
+  bundlePurchaseButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#fff',
   },
 
   // Status Card
