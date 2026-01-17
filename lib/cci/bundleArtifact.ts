@@ -116,17 +116,17 @@ export function generateBundleCCIArtifactHTML(
   const stats = getBundleStats(seats);
   const aggregateChart = generateAggregateChartSVG(seats);
 
-  // Generate mini chart cards matching BundleCCIPreview style (5 per row)
-  const seatsPerRow = 5;
+  // Generate mini chart cards matching BundleCCIPreview style
+  // Use 2 per row for PDF layout (fits 612px page width properly)
+  const seatsPerRow = 2;
   const rows: string[] = [];
   for (let i = 0; i < seats.length; i += seatsPerRow) {
     const rowSeats = seats.slice(i, i + seatsPerRow);
     const rowHTML = rowSeats.map((seat, j) => {
-      const index = i + j;
       const state = getSeatCapacityState(seat);
       const stateColor = CAPACITY_COLORS[state];
       const chart = generateSeatChartSVG(seat);
-      const avatar = generateAvatarSVG(seat, 20);
+      const avatar = generateAvatarSVG(seat, 24);
 
       return `
         <div class="mini-chart-card">
@@ -219,18 +219,19 @@ export function generateBundleCCIArtifactHTML(
     .section-subtitle { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
 
     /* Mini Chart Grid - matches BundleCCIPreview MiniChartCard */
-    .grid-container { margin-bottom: 14px; }
-    .grid-row { display: flex; gap: 6px; margin-bottom: 6px; }
+    .grid-container { margin-bottom: 12px; }
+    .grid-row { display: flex; gap: 8px; margin-bottom: 8px; }
 
     .mini-chart-card {
-      flex: 1; min-width: 0;
+      flex: 1;
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 6px; padding: 6px;
+      border-radius: 8px;
+      padding: 8px;
     }
     .mini-chart-header {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
     .avatar-wrap { flex-shrink: 0; }
     .avatar-wrap svg { display: block; }
@@ -239,7 +240,7 @@ export function generateBundleCCIArtifactHTML(
       background: ${CAPACITY_COLORS.background};
       border-radius: 4px; overflow: hidden;
     }
-    .mini-chart-container svg { width: 100%; height: 60px; display: block; }
+    .mini-chart-container svg { width: 100%; height: auto; display: block; }
 
     /* Aggregate section - matches BundleCCIPreview aggregateSection */
     .aggregate-section {
