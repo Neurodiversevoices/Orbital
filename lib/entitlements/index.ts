@@ -262,6 +262,61 @@ export async function canPurchaseCCI(): Promise<{ eligible: boolean; price: numb
   };
 }
 
+/**
+ * Check if user can purchase Circle CCI
+ * REQUIREMENT: User must be a member of the specific Circle
+ */
+export async function canPurchaseCircleCCI(circleId?: string): Promise<{ eligible: boolean; reason?: string; price: number }> {
+  const hasCircle = await checkHasCircle();
+
+  if (!hasCircle) {
+    return {
+      eligible: false,
+      reason: 'You must be a member of a Circle to purchase Circle CCI',
+      price: 399
+    };
+  }
+
+  // TODO: When backend is ready, verify user is member of specific circleId
+  // For now, having any circle membership grants access
+  if (circleId) {
+    // Future: const isMember = await checkIsCircleMember(circleId);
+    // if (!isMember) return { eligible: false, reason: 'Not a member of this Circle' };
+  }
+
+  return { eligible: true, price: 399 };
+}
+
+/**
+ * Check if user can purchase Bundle CCI
+ * REQUIREMENT: User must own/be member of the specific Bundle with matching size
+ */
+export async function canPurchaseBundleCCI(bundleSize?: 10 | 15 | 20): Promise<{ eligible: boolean; reason?: string; price: number }> {
+  const hasBundle = await checkHasBundle();
+
+  if (!hasBundle) {
+    return {
+      eligible: false,
+      reason: 'You must own a Bundle to purchase Bundle CCI',
+      price: 999
+    };
+  }
+
+  // If specific bundle size requested, verify user has that bundle
+  if (bundleSize) {
+    const hasSpecificBundle = await checkHasBundle(bundleSize);
+    if (!hasSpecificBundle) {
+      return {
+        eligible: false,
+        reason: `Bundle ${bundleSize} entitlement required`,
+        price: 999
+      };
+    }
+  }
+
+  return { eligible: true, price: 999 };
+}
+
 // =============================================================================
 // CIRCLE/BUNDLE PRO VERIFICATION (for CCI eligibility)
 // =============================================================================

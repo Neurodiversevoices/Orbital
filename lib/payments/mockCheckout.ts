@@ -412,6 +412,19 @@ export async function executePurchase(
       hasPrereq = hasBundle10 || hasBundle15 || hasBundle20;
     }
 
+    // BUNDLED UPGRADE: Free users purchasing Family or Circle get Pro automatically
+    // This allows direct upgrade path without requiring separate Pro purchase first
+    if (!hasPrereq && product.requiresEntitlement === 'pro_access') {
+      const isFamilyOrCircle = product.entitlementId === 'family_access' ||
+                               product.entitlementId === 'circle_access';
+      if (isFamilyOrCircle) {
+        // Bundled upgrade: grant Pro as part of the purchase
+        await grantEntitlement('pro_access');
+        hasPrereq = true; // Continue with purchase
+        if (__DEV__) console.log('[MockCheckout] Bundled upgrade: granted pro_access with', product.entitlementId);
+      }
+    }
+
     if (!hasPrereq) {
       return {
         success: false,
