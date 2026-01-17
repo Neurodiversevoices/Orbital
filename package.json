@@ -22,7 +22,8 @@
     "citadel": "npm run ci:verify && npm run preflight && npm run stress",
     "cci:export": "node scripts/cci-export-pdf.js",
     "cci:verify": "node scripts/cci-verify-golden.js",
-    "cci:render": "cd output && node render_ultra.js"
+    "cci:render": "cd output && node render_ultra.js",
+    "bundle:export": "node scripts/bundle-cci-export-pdf.js"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
