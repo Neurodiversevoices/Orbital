@@ -6,6 +6,7 @@
  * - Mini summary charts visible by default
  * - Modal with full chart on avatar tap
  * - Combined aggregate chart for all seats
+ * - PLAN MODE: Toggle to show PDF printout preview
  *
  * All charts use lib/cci/summaryChart.ts for visual consistency.
  */
@@ -19,8 +20,9 @@ import {
   ScrollView,
   StyleSheet,
   useWindowDimensions,
+  Platform,
 } from 'react-native';
-import { X } from 'lucide-react-native';
+import { X, LayoutGrid, FileText } from 'lucide-react-native';
 import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 
 import { BundleSeatAvatar } from './BundleSeatAvatar';
@@ -33,15 +35,20 @@ import {
   type BundleSeatData,
 } from '../lib/cci/bundleDemoData';
 import { CAPACITY_COLORS } from '../lib/cci/summaryChart';
+import { generateBundleCCIArtifactHTML } from '../lib/cci/bundleArtifact';
 import { colors, spacing, borderRadius } from '../theme';
 
 // =============================================================================
 // TYPES
 // =============================================================================
 
+type ViewMode = 'interactive' | 'printout';
+
 export interface BundleCCIPreviewProps {
   /** Number of seats in bundle */
   seatCount: 10 | 15 | 20;
+  /** Initial view mode (default: interactive) */
+  initialMode?: ViewMode;
 }
 
 // =============================================================================
@@ -212,12 +219,138 @@ function AggregateChart({ seats }: AggregateChartProps) {
 }
 
 // =============================================================================
+// VIEW MODE TOGGLE
+// =============================================================================
+
+interface ViewModeToggleProps {
+  mode: ViewMode;
+  onModeChange: (mode: ViewMode) => void;
+}
+
+function ViewModeToggle({ mode, onModeChange }: ViewModeToggleProps) {
+  return (
+    <View style={styles.modeToggleContainer}>
+      <Pressable
+        style={[
+          styles.modeToggleButton,
+          mode === 'interactive' && styles.modeToggleButtonActive,
+        ]}
+        onPress={() => onModeChange('interactive')}
+      >
+        <LayoutGrid
+          size={14}
+          color={mode === 'interactive' ? '#9C27B0' : 'rgba(255,255,255,0.5)'}
+        />
+        <Text
+          style={[
+            styles.modeToggleText,
+            mode === 'interactive' && styles.modeToggleTextActive,
+          ]}
+        >
+          Interactive
+        </Text>
+      </Pressable>
+      <Pressable
+        style={[
+          styles.modeToggleButton,
+          mode === 'printout' && styles.modeToggleButtonActive,
+        ]}
+        onPress={() => onModeChange('printout')}
+      >
+        <FileText
+          size={14}
+          color={mode === 'printout' ? '#9C27B0' : 'rgba(255,255,255,0.5)'}
+        />
+        <Text
+          style={[
+            styles.modeToggleText,
+            mode === 'printout' && styles.modeToggleTextActive,
+          ]}
+        >
+          Plan Mode
+        </Text>
+      </Pressable>
+    </View>
+  );
+}
+
+// =============================================================================
+// PRINTOUT PREVIEW (Plan Mode)
+// Uses bundleArtifact.ts for exact PDF representation
+// =============================================================================
+
+interface PrintoutPreviewProps {
+  seatCount: 10 | 15 | 20;
+}
+
+function PrintoutPreview({ seatCount }: PrintoutPreviewProps) {
+  const { width } = useWindowDimensions();
+
+  // Generate the artifact HTML (same as PDF export)
+  const artifactHTML = useMemo(
+    () => generateBundleCCIArtifactHTML(seatCount),
+    [seatCount]
+  );
+
+  // Web: render iframe with artifact HTML
+  if (Platform.OS === 'web') {
+    return (
+      <Animated.View entering={FadeIn.duration(400)} style={styles.printoutContainer}>
+        <View style={styles.printoutHeader}>
+          <Text style={styles.printoutTitle}>PDF Preview</Text>
+          <Text style={styles.printoutSubtitle}>
+            This is exactly what the Bundle CCI printout will look like
+          </Text>
+        </View>
+        <View style={styles.printoutIframeContainer}>
+          <iframe
+            srcDoc={artifactHTML}
+            style={{
+              width: '100%',
+              height: 700,
+              border: 'none',
+              backgroundColor: '#fff',
+              borderRadius: 8,
+            }}
+            title="Bundle CCI Printout Preview"
+          />
+        </View>
+        <Text style={styles.printoutDisclaimer}>
+          Demo data shown. Actual issuance reflects real capacity patterns.
+        </Text>
+      </Animated.View>
+    );
+  }
+
+  // Native: show message (PDF preview not supported)
+  return (
+    <Animated.View entering={FadeIn.duration(400)} style={styles.printoutContainer}>
+      <View style={styles.printoutNativeNotice}>
+        <FileText size={32} color="#9C27B0" />
+        <Text style={styles.printoutNativeTitle}>Bundle CCI Printout</Text>
+        <Text style={styles.printoutNativeText}>
+          The PDF printout preview is available on web. The printout includes:
+        </Text>
+        <View style={styles.printoutFeatureList}>
+          <Text style={styles.printoutFeatureItem}>• Anonymous seat avatars with capacity rings</Text>
+          <Text style={styles.printoutFeatureItem}>• Individual 90-day capacity charts per seat</Text>
+          <Text style={styles.printoutFeatureItem}>• Combined aggregate capacity chart</Text>
+          <Text style={styles.printoutFeatureItem}>• Resourced/Stretched/Depleted stats summary</Text>
+          <Text style={styles.printoutFeatureItem}>• Chain of custody metadata</Text>
+        </View>
+      </View>
+    </Animated.View>
+  );
+}
+
+// =============================================================================
 // MAIN COMPONENT
 // =============================================================================
 
-export function BundleCCIPreview({ seatCount }: BundleCCIPreviewProps) {
+export function BundleCCIPreview({ seatCount, initialMode = 'interactive' }: BundleCCIPreviewProps) {
   const [selectedSeat, setSelectedSeat] = useState<BundleSeatData | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>(initialMode);
 
   // Generate seat data (memoized by seat count)
   const seats = useMemo(() => generateBundleSeatData(seatCount), [seatCount]);
@@ -240,46 +373,63 @@ export function BundleCCIPreview({ seatCount }: BundleCCIPreviewProps) {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
+      {/* Header with Mode Toggle */}
       <Animated.View entering={FadeIn.duration(300)} style={styles.header}>
-        <Text style={styles.title}>{seatCount} Seats</Text>
-        <Text style={styles.subtitle}>Tap any seat to view full chart</Text>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.title}>{seatCount} Seats</Text>
+            <Text style={styles.subtitle}>
+              {viewMode === 'interactive'
+                ? 'Tap any seat to view full chart'
+                : 'Preview of PDF printout'}
+            </Text>
+          </View>
+        </View>
+        <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
       </Animated.View>
 
-      {/* Mini Chart Grid */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.gridScrollContent}
-      >
-        <View style={styles.gridContainer}>
-          {rows.map((row, rowIndex) => (
-            <View key={`row-${rowIndex}`} style={styles.gridRow}>
-              {row.map((seat, seatIndex) => (
-                <Animated.View
-                  key={seat.id}
-                  entering={FadeInDown.delay((rowIndex * 5 + seatIndex) * 30).duration(300)}
-                >
-                  <MiniChartCard
-                    seat={seat}
-                    onPress={() => handleSeatPress(seat)}
-                  />
-                </Animated.View>
+      {/* Content based on view mode */}
+      {viewMode === 'interactive' ? (
+        <>
+          {/* Mini Chart Grid */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.gridScrollContent}
+          >
+            <View style={styles.gridContainer}>
+              {rows.map((row, rowIndex) => (
+                <View key={`row-${rowIndex}`} style={styles.gridRow}>
+                  {row.map((seat, seatIndex) => (
+                    <Animated.View
+                      key={seat.id}
+                      entering={FadeInDown.delay((rowIndex * 5 + seatIndex) * 30).duration(300)}
+                    >
+                      <MiniChartCard
+                        seat={seat}
+                        onPress={() => handleSeatPress(seat)}
+                      />
+                    </Animated.View>
+                  ))}
+                </View>
               ))}
             </View>
-          ))}
-        </View>
-      </ScrollView>
+          </ScrollView>
 
-      {/* Aggregate Chart */}
-      <AggregateChart seats={seats} />
+          {/* Aggregate Chart */}
+          <AggregateChart seats={seats} />
 
-      {/* Detail Modal */}
-      <SeatDetailModal
-        seat={selectedSeat}
-        visible={modalVisible}
-        onClose={handleCloseModal}
-      />
+          {/* Detail Modal */}
+          <SeatDetailModal
+            seat={selectedSeat}
+            visible={modalVisible}
+            onClose={handleCloseModal}
+          />
+        </>
+      ) : (
+        /* Printout Preview (Plan Mode) */
+        <PrintoutPreview seatCount={seatCount} />
+      )}
     </View>
   );
 }
@@ -482,6 +632,108 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: 'rgba(255,255,255,0.8)',
     marginTop: 2,
+  },
+
+  // Header Top
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: spacing.sm,
+  },
+
+  // Mode Toggle
+  modeToggleContainer: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    padding: 2,
+  },
+  modeToggleButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.sm,
+  },
+  modeToggleButtonActive: {
+    backgroundColor: 'rgba(156,39,176,0.15)',
+  },
+  modeToggleText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.5)',
+  },
+  modeToggleTextActive: {
+    color: '#9C27B0',
+  },
+
+  // Printout Preview
+  printoutContainer: {
+    paddingHorizontal: spacing.sm,
+    paddingTop: spacing.md,
+  },
+  printoutHeader: {
+    marginBottom: spacing.md,
+  },
+  printoutTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#9C27B0',
+  },
+  printoutSubtitle: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: 2,
+  },
+  printoutIframeContainer: {
+    borderRadius: borderRadius.md,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: '#fff',
+  },
+  printoutDisclaimer: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.4)',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: spacing.md,
+  },
+  printoutNativeNotice: {
+    backgroundColor: 'rgba(156,39,176,0.08)',
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(156,39,176,0.2)',
+    padding: spacing.lg,
+    alignItems: 'center',
+  },
+  printoutNativeTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.9)',
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  printoutNativeText: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.7)',
+    textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+  printoutFeatureList: {
+    alignSelf: 'flex-start',
+    paddingLeft: spacing.md,
+  },
+  printoutFeatureItem: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.6)',
+    marginBottom: 4,
   },
 });
 
