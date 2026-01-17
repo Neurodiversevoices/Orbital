@@ -850,24 +850,14 @@ const CIRCLE_CAPACITY_DATA: Record<string, number[]> = {
 
 /**
  * Downsample 90-day data to 6 representative points (matching app)
- * Takes averages at: Day 1, Day 18, Day 36, Day 54, Day 72, Day 90
+ * Takes raw values at: Day 1, Day 18, Day 36, Day 54, Day 72, Day 90
+ * No averaging - preserves actual peaks/valleys for volatile patterns
  */
 function downsampleTo6Points(data: number[]): number[] {
   if (data.length <= 6) return data;
 
   const indices = [0, 17, 35, 53, 71, 89]; // 6 evenly spaced points
-  return indices.map(i => {
-    // Average with neighbors for smoothing
-    const start = Math.max(0, i - 2);
-    const end = Math.min(data.length - 1, i + 2);
-    let sum = 0;
-    let count = 0;
-    for (let j = start; j <= end; j++) {
-      sum += data[j];
-      count++;
-    }
-    return sum / count;
-  });
+  return indices.map(i => data[Math.min(i, data.length - 1)]);
 }
 
 /**
