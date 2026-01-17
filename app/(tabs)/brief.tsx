@@ -33,9 +33,9 @@ import {
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../../theme';
 import { useAccess } from '../../lib/access';
-import { CCIChart } from '../../components/CCIChart';
-import { FABRICATED_HISTORIES } from '../../lib/cci/demoData';
-import { getCapacityColor } from '../../lib/cci/chartRenderer';
+import { IndividualCCIChart } from '../../components/CCI90DayChart';
+import { FABRICATED_HISTORIES, getCapacityState } from '../../lib/cci/demoData';
+import { CCI_STATE_COLORS } from '../../lib/charts';
 
 // =============================================================================
 // TYPES
@@ -67,15 +67,12 @@ interface CircleMember {
   trend: 'improving' | 'declining' | 'flat';
   participation: string;
   notes?: string;
-  capacityHistory: number[]; // 90 days of capacity data (1=depleted, 2=stretched, 3=resourced)
+  capacityHistory: number[]; // 90 days of capacity data (0-100 scale: 0-33=depleted, 33-66=stretched, 66-100=resourced)
 }
 
 // =============================================================================
-// CAPACITY COLOR SYSTEM — Imported from lib/cci/chartRenderer.ts
-// =============================================================================
-
-// =============================================================================
-// FABRICATED DEMO DATA — Imported from lib/cci/demoData.ts
+// DEMO DATA — Imported from lib/cci/demoData.ts
+// Chart colors from lib/charts (unified chart system)
 // =============================================================================
 
 const DEMO_CIRCLE_MEMBERS: CircleMember[] = [
@@ -323,15 +320,13 @@ function CirclesCCIBrief() {
               </View>
             </View>
 
-            {/* Right: Chart */}
+            {/* Right: Chart - Uses unified CCI90DayChart for pixel-identical rendering */}
             <View style={[styles.memberChartSection, isWideScreen && styles.memberChartSectionWide]}>
-              <CCIChart
-                data={member.capacityHistory}
-                timeRange="90d"
-                showLegend={false}
-                showDisclaimer={false}
+              <IndividualCCIChart
+                values={member.capacityHistory}
+                label={member.name}
                 width={isWideScreen ? width - 280 : width - 48}
-                heightRatio={0.14}
+                showDisclaimer={false}
               />
             </View>
           </View>

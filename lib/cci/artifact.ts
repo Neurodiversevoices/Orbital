@@ -12,16 +12,12 @@
  */
 
 import { CCIArtifact, CCIArtifactJSON, CCIIssuanceMetadata } from './types';
-import { FABRICATED_HISTORIES, DEMO_CIRCLE_MEMBERS } from './demoData';
+import { FABRICATED_HISTORIES, DEMO_CIRCLE_MEMBERS, getCapacityState } from './demoData';
 import {
-  getCapacityColor,
-  generateBezierPath,
-  generateAreaPath,
-  getChartNodes,
-  generateNodeMarkersSVG,
-  downsampleTo6Points,
-  ChartDimensions,
-} from './chartRenderer';
+  renderCCI90DayToSVG,
+  CCI_STATE_COLORS,
+  type CCI90DayChartData,
+} from '../charts';
 
 /**
  * Generate CCI artifact HTML
@@ -793,70 +789,50 @@ export function getGoldenMasterHTML(): string {
 
 // =============================================================================
 // CIRCLE MEMBER CAPACITY DATA — Imported from lib/cci/demoData.ts
-// Chart rendering functions imported from lib/cci/chartRenderer.ts
+// Chart rendering uses unified lib/charts system for pixel-identical output
 // =============================================================================
+
+/**
+ * Generate a single-member chart SVG using the unified chart system.
+ * This ensures the artifact charts are pixel-identical to the app.
+ */
+function generateMemberChartSVG(memberName: string, values: number[]): string {
+  const data: CCI90DayChartData = {
+    series: [{
+      id: memberName.toLowerCase(),
+      label: memberName,
+      color: CCI_STATE_COLORS.resourced, // Line color
+      values: values,
+    }],
+    showLegend: false,
+  };
+
+  // Use the unified chart renderer - this is the SAME code the app uses
+  return renderCCI90DayToSVG(data, { includeBackground: true });
+}
 
 /**
  * Generate Circle CCI artifact HTML
  *
  * Returns HTML for Circle capacity report with 5 individual member charts.
  * Matches the brief.tsx Circle view: Mia, Zach, Lily, Tyler, Emma.
+ *
+ * IMPORTANT: Uses renderCCI90DayToSVG from lib/charts for pixel-identical rendering.
  */
 export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMetadata>): string {
   const now = new Date();
   const timestamp = metadata?.generatedAt || formatUTCTimestamp(now);
   const hash = metadata?.integrityHash || generatePlaceholderHash();
 
-  // Chart dimensions matching app
-  const chartWidth = 372;
-  const chartHeight = 50;
-  const dimensions: ChartDimensions = { width: chartWidth, height: chartHeight };
+  // Generate chart SVGs using the unified chart system (same as app)
+  const miaChart = generateMemberChartSVG('Mia', FABRICATED_HISTORIES.mia);
+  const zachChart = generateMemberChartSVG('Zach', FABRICATED_HISTORIES.zach);
+  const lilyChart = generateMemberChartSVG('Lily', FABRICATED_HISTORIES.lily);
+  const tylerChart = generateMemberChartSVG('Tyler', FABRICATED_HISTORIES.tyler);
+  const emmaChart = generateMemberChartSVG('Emma', FABRICATED_HISTORIES.emma);
 
-  // Generate Bezier curve paths (smooth, 6 points) - using shared FABRICATED_HISTORIES
-  const miaPath = generateBezierPath(FABRICATED_HISTORIES.mia, dimensions);
-  const zachPath = generateBezierPath(FABRICATED_HISTORIES.zach, dimensions);
-  const lilyPath = generateBezierPath(FABRICATED_HISTORIES.lily, dimensions);
-  const tylerPath = generateBezierPath(FABRICATED_HISTORIES.tyler, dimensions);
-  const emmaPath = generateBezierPath(FABRICATED_HISTORIES.emma, dimensions);
-
-  // Generate area fill paths
-  const miaArea = generateAreaPath(FABRICATED_HISTORIES.mia, dimensions);
-  const zachArea = generateAreaPath(FABRICATED_HISTORIES.zach, dimensions);
-  const lilyArea = generateAreaPath(FABRICATED_HISTORIES.lily, dimensions);
-  const tylerArea = generateAreaPath(FABRICATED_HISTORIES.tyler, dimensions);
-  const emmaArea = generateAreaPath(FABRICATED_HISTORIES.emma, dimensions);
-
-  // Get node markers for each member (6 points with multi-layer styling)
-  const miaNodes = getChartNodes(FABRICATED_HISTORIES.mia, dimensions);
-  const zachNodes = getChartNodes(FABRICATED_HISTORIES.zach, dimensions);
-  const lilyNodes = getChartNodes(FABRICATED_HISTORIES.lily, dimensions);
-  const tylerNodes = getChartNodes(FABRICATED_HISTORIES.tyler, dimensions);
-  const emmaNodes = getChartNodes(FABRICATED_HISTORIES.emma, dimensions);
-
-  // Generate node marker SVG for each member
-  const miaMarkers = generateNodeMarkersSVG(miaNodes);
-  const zachMarkers = generateNodeMarkersSVG(zachNodes);
-  const lilyMarkers = generateNodeMarkersSVG(lilyNodes);
-  const tylerMarkers = generateNodeMarkersSVG(tylerNodes);
-  const emmaMarkers = generateNodeMarkersSVG(emmaNodes);
-
-  // Get dominant colors for gradients (based on downsampled data)
-  const miaDownsampled = downsampleTo6Points(FABRICATED_HISTORIES.mia);
-  const zachDownsampled = downsampleTo6Points(FABRICATED_HISTORIES.zach);
-  const lilyDownsampled = downsampleTo6Points(FABRICATED_HISTORIES.lily);
-  const tylerDownsampled = downsampleTo6Points(FABRICATED_HISTORIES.tyler);
-  const emmaDownsampled = downsampleTo6Points(FABRICATED_HISTORIES.emma);
-
-  const miaStartColor = getCapacityColor(miaDownsampled[0]);
-  const miaEndColor = getCapacityColor(miaDownsampled[miaDownsampled.length - 1]);
-  const zachStartColor = getCapacityColor(zachDownsampled[0]);
-  const zachEndColor = getCapacityColor(zachDownsampled[zachDownsampled.length - 1]);
-  const lilyStartColor = getCapacityColor(lilyDownsampled[0]);
-  const lilyEndColor = getCapacityColor(lilyDownsampled[lilyDownsampled.length - 1]);
-  const tylerStartColor = getCapacityColor(tylerDownsampled[0]);
-  const tylerEndColor = getCapacityColor(tylerDownsampled[tylerDownsampled.length - 1]);
-  const emmaStartColor = getCapacityColor(emmaDownsampled[0]);
-  const emmaEndColor = getCapacityColor(emmaDownsampled[emmaDownsampled.length - 1]);
+  // Get capacity states for status badges
+  const getLatestState = (values: number[]) => getCapacityState(values[values.length - 1]);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -914,7 +890,8 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
     .status-stretched { background: rgba(232,168,48,0.15); color: #b8860b; }
     .status-depleted { background: rgba(244,67,54,0.15); color: #d32f2f; }
     .member-chart { flex: 1; padding-left: 8px; }
-    .chart-card { background: #0a0b10; border-radius: 3px; padding: 4px 6px 2px 6px; height: 100%; }
+    .chart-wrapper { width: 100%; height: 70px; border-radius: 3px; overflow: hidden; }
+    .chart-wrapper svg { width: 100%; height: 100%; }
     .footer-section { border-top: 1px solid #cbd5e1; padding-top: 6px; margin-top: 6px; }
     .legal-block { background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 8px; }
     .legal-title { font-family: 'Inter', sans-serif; font-size: 6px; font-weight: 700; color: #0f172a; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -981,21 +958,7 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
         <div class="member-detail"><span class="member-detail-label">Notes:</span> Sensory sensitivity</div>
       </div>
       <div class="member-chart">
-        <div class="chart-card">
-          <svg width="100%" height="54" viewBox="0 0 ${chartWidth} ${chartHeight + 4}" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <linearGradient id="miaGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${miaStartColor}"/><stop offset="100%" stop-color="${miaEndColor}"/></linearGradient>
-              <linearGradient id="miaAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${miaEndColor}" stop-opacity="0.20"/><stop offset="100%" stop-color="${miaEndColor}" stop-opacity="0.02"/></linearGradient>
-            </defs>
-            <rect x="0" y="0" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#00E5FF" fill-opacity="0.08"/>
-            <rect x="0" y="${Math.round(chartHeight / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#E8A830" fill-opacity="0.06"/>
-            <rect x="0" y="${Math.round(chartHeight * 2 / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#F44336" fill-opacity="0.08"/>
-            <path d="${miaArea}" fill="url(#miaAreaGrad)"/>
-            <path d="${miaPath}" stroke="#0a0b10" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="${miaPath}" stroke="url(#miaGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            ${miaMarkers}
-          </svg>
-        </div>
+        <div class="chart-wrapper">${miaChart}</div>
       </div>
     </div>
 
@@ -1010,21 +973,7 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
         <div class="member-detail"><span class="member-detail-label">Notes:</span> Sleep disruption</div>
       </div>
       <div class="member-chart">
-        <div class="chart-card">
-          <svg width="100%" height="54" viewBox="0 0 ${chartWidth} ${chartHeight + 4}" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <linearGradient id="zachGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${zachStartColor}"/><stop offset="100%" stop-color="${zachEndColor}"/></linearGradient>
-              <linearGradient id="zachAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${zachStartColor}" stop-opacity="0.20"/><stop offset="100%" stop-color="${zachEndColor}" stop-opacity="0.02"/></linearGradient>
-            </defs>
-            <rect x="0" y="0" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#00E5FF" fill-opacity="0.08"/>
-            <rect x="0" y="${Math.round(chartHeight / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#E8A830" fill-opacity="0.06"/>
-            <rect x="0" y="${Math.round(chartHeight * 2 / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#F44336" fill-opacity="0.08"/>
-            <path d="${zachArea}" fill="url(#zachAreaGrad)"/>
-            <path d="${zachPath}" stroke="#0a0b10" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="${zachPath}" stroke="url(#zachGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            ${zachMarkers}
-          </svg>
-        </div>
+        <div class="chart-wrapper">${zachChart}</div>
       </div>
     </div>
 
@@ -1039,25 +988,11 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
         <div class="member-detail"><span class="member-detail-label">Notes:</span> Steady progress</div>
       </div>
       <div class="member-chart">
-        <div class="chart-card">
-          <svg width="100%" height="54" viewBox="0 0 ${chartWidth} ${chartHeight + 4}" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <linearGradient id="lilyGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${lilyStartColor}"/><stop offset="100%" stop-color="${lilyEndColor}"/></linearGradient>
-              <linearGradient id="lilyAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${lilyEndColor}" stop-opacity="0.20"/><stop offset="100%" stop-color="${lilyStartColor}" stop-opacity="0.02"/></linearGradient>
-            </defs>
-            <rect x="0" y="0" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#00E5FF" fill-opacity="0.08"/>
-            <rect x="0" y="${Math.round(chartHeight / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#E8A830" fill-opacity="0.06"/>
-            <rect x="0" y="${Math.round(chartHeight * 2 / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#F44336" fill-opacity="0.08"/>
-            <path d="${lilyArea}" fill="url(#lilyAreaGrad)"/>
-            <path d="${lilyPath}" stroke="#0a0b10" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="${lilyPath}" stroke="url(#lilyGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            ${lilyMarkers}
-          </svg>
-        </div>
+        <div class="chart-wrapper">${lilyChart}</div>
       </div>
     </div>
 
-    <!-- Member 4: Tyler - Stretched, Flat (Volatile) -->
+    <!-- Member 4: Tyler - Stretched, Volatile -->
     <div class="member-card">
       <div class="member-info">
         <div class="member-name">Tyler Ramirez</div>
@@ -1068,21 +1003,7 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
         <div class="member-detail"><span class="member-detail-label">Notes:</span> Transition support</div>
       </div>
       <div class="member-chart">
-        <div class="chart-card">
-          <svg width="100%" height="54" viewBox="0 0 ${chartWidth} ${chartHeight + 4}" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <linearGradient id="tylerGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${tylerStartColor}"/><stop offset="100%" stop-color="${tylerEndColor}"/></linearGradient>
-              <linearGradient id="tylerAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${tylerEndColor}" stop-opacity="0.20"/><stop offset="100%" stop-color="${tylerEndColor}" stop-opacity="0.02"/></linearGradient>
-            </defs>
-            <rect x="0" y="0" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#00E5FF" fill-opacity="0.08"/>
-            <rect x="0" y="${Math.round(chartHeight / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#E8A830" fill-opacity="0.06"/>
-            <rect x="0" y="${Math.round(chartHeight * 2 / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#F44336" fill-opacity="0.08"/>
-            <path d="${tylerArea}" fill="url(#tylerAreaGrad)"/>
-            <path d="${tylerPath}" stroke="#0a0b10" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="${tylerPath}" stroke="url(#tylerGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            ${tylerMarkers}
-          </svg>
-        </div>
+        <div class="chart-wrapper">${tylerChart}</div>
       </div>
     </div>
 
@@ -1097,21 +1018,7 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
         <div class="member-detail"><span class="member-detail-label">Notes:</span> Schedule changes</div>
       </div>
       <div class="member-chart">
-        <div class="chart-card">
-          <svg width="100%" height="54" viewBox="0 0 ${chartWidth} ${chartHeight + 4}" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <linearGradient id="emmaGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${emmaStartColor}"/><stop offset="100%" stop-color="${emmaEndColor}"/></linearGradient>
-              <linearGradient id="emmaAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${emmaStartColor}" stop-opacity="0.20"/><stop offset="100%" stop-color="${emmaEndColor}" stop-opacity="0.02"/></linearGradient>
-            </defs>
-            <rect x="0" y="0" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#00E5FF" fill-opacity="0.08"/>
-            <rect x="0" y="${Math.round(chartHeight / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#E8A830" fill-opacity="0.06"/>
-            <rect x="0" y="${Math.round(chartHeight * 2 / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#F44336" fill-opacity="0.08"/>
-            <path d="${emmaArea}" fill="url(#emmaAreaGrad)"/>
-            <path d="${emmaPath}" stroke="#0a0b10" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="${emmaPath}" stroke="url(#emmaGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            ${emmaMarkers}
-          </svg>
-        </div>
+        <div class="chart-wrapper">${emmaChart}</div>
       </div>
     </div>
   </div>
