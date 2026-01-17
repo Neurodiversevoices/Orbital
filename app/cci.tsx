@@ -23,7 +23,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, FileText, Download, Eye, ExternalLink, Mail, Users } from 'lucide-react-native';
 import { colors, spacing, borderRadius, commonStyles } from '../theme';
-import { generateCCIArtifactHTML, getGoldenMasterHTML } from '../lib/cci';
+import { generateCCIArtifactHTML, getGoldenMasterHTML, getCircleGoldenMasterHTML } from '../lib/cci';
 import { FOUNDER_DEMO_ENABLED } from '../lib/hooks/useDemoMode';
 import { ISSUANCE_REQUEST_URL } from '../lib/payments';
 
@@ -59,7 +59,8 @@ export default function CCIInstrumentScreen() {
   }
 
   // Get the golden master HTML (exact match to PDF)
-  const artifactHTML = getGoldenMasterHTML();
+  // Use Circle artifact for circle type, Individual artifact otherwise
+  const artifactHTML = isCircle ? getCircleGoldenMasterHTML() : getGoldenMasterHTML();
 
   // View instrument in new window (web only)
   const handleViewInstrument = useCallback(() => {
