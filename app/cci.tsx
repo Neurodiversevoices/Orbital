@@ -34,42 +34,82 @@ import { ISSUANCE_REQUEST_URL } from '../lib/payments';
  */
 const CCI_ACCESSIBLE = Platform.OS === 'web' || FOUNDER_DEMO_ENABLED;
 
+// =============================================================================
+// CCI TYPE VALIDATION — NO SILENT FALLBACKS
+// =============================================================================
+
+const VALID_CCI_TYPES = ['circle', 'bundle', 'individual'] as const;
+type CCIType = typeof VALID_CCI_TYPES[number];
+
+/**
+ * Normalize and validate CCI type from URL params.
+ *
+ * Rules:
+ * - Normalizes: trims whitespace, lowercases, handles arrays from expo-router
+ * - If empty/undefined: defaults to 'individual' (direct /cci access)
+ * - If valid type: returns that type
+ * - If INVALID type: returns 'invalid' — caller MUST hard-error, not fallback
+ */
+function normalizeCCIType(rawParam: string | string[] | undefined): CCIType | 'invalid' {
+  // Handle array (expo-router can return string[])
+  const raw = Array.isArray(rawParam) ? rawParam[0] : rawParam;
+
+  // Normalize: trim whitespace, lowercase
+  const normalized = raw?.trim().toLowerCase();
+
+  // Empty/undefined → individual (intentional direct /cci access)
+  if (!normalized || normalized === '') {
+    return 'individual';
+  }
+
+  // Valid type → use it
+  if (normalized === 'circle' || normalized === 'bundle' || normalized === 'individual') {
+    return normalized;
+  }
+
+  // INVALID: type was provided but not recognized → FAIL CLOSED
+  return 'invalid';
+}
+
 export default function CCIInstrumentScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ type?: string; seats?: string }>();
 
-  // ========== TRACE LOGGING: CCI Type Resolution ==========
-  console.log('[CCI-TRACE] ===== CCI ARTIFACT TYPE RESOLUTION =====');
-  console.log('[CCI-TRACE] Raw params object:', JSON.stringify(params));
-  console.log('[CCI-TRACE] params.type value:', params.type, '(typeof:', typeof params.type, ')');
-  console.log('[CCI-TRACE] params.seats value:', params.seats);
-  console.log('[CCI-TRACE] params.type === "circle":', params.type === 'circle');
-  console.log('[CCI-TRACE] params.type === "bundle":', params.type === 'bundle');
-  // =========================================================
+  // ========== NORMALIZE + VALIDATE CCI TYPE ==========
+  const rawType = params.type;
+  const cciType = normalizeCCIType(rawType);
 
-  const cciType = params.type === 'circle' ? 'circle' : params.type === 'bundle' ? 'bundle' : 'individual';
+  console.log('[CCI] Raw params.type:', rawType);
+  console.log('[CCI] Normalized cciType:', cciType);
 
-  // ========== TRACE LOGGING: Decision Result ==========
-  console.log('[CCI-TRACE] Resolved cciType:', cciType);
-  if (params.type && params.type !== cciType) {
-    console.error('[CCI-TRACE] ⚠️ TYPE MISMATCH: params.type was', params.type, 'but resolved to', cciType);
+  // FAIL CLOSED: Invalid type specified — hard error, no fallback
+  if (cciType === 'invalid') {
+    console.error('[CCI] HARD ERROR: Invalid CCI type "' + rawType + '" — refusing to render');
+    return (
+      <SafeAreaView style={commonStyles.screen}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorIcon}>⛔</Text>
+          <Text style={styles.errorTitle}>Invalid CCI Type</Text>
+          <Text style={styles.errorMessage}>
+            Requested type "{rawType}" is not recognized.
+          </Text>
+          <Text style={styles.errorHint}>
+            Valid types: circle, bundle, individual
+          </Text>
+          <Pressable onPress={() => router.back()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
   }
-  if (params.type === 'bundle' && cciType !== 'bundle') {
-    console.error('[CCI-TRACE] 🚨 BUNDLE→INDIVIDUAL CONVERSION DETECTED HERE');
-  }
-  // ====================================================
+  // ===================================================
 
   const isCircle = cciType === 'circle';
   const isBundle = cciType === 'bundle';
   const bundleSeatCount = (parseInt(params.seats || '10') as 10 | 15 | 20) || 10;
 
-  // ========== TRACE LOGGING: Final Decision ==========
-  console.log('[CCI-TRACE] isCircle:', isCircle);
-  console.log('[CCI-TRACE] isBundle:', isBundle);
-  console.log('[CCI-TRACE] bundleSeatCount:', bundleSeatCount);
-  console.log('[CCI-TRACE] Will call:', isCircle ? 'getCircleGoldenMasterHTML()' : isBundle ? `getBundleGoldenMasterHTML(${bundleSeatCount})` : 'getGoldenMasterHTML()');
-  console.log('[CCI-TRACE] =======================================');
-  // ===================================================
+  console.log('[CCI] isCircle:', isCircle, '| isBundle:', isBundle, '| seats:', bundleSeatCount);
 
   const [isViewing, setIsViewing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -90,29 +130,14 @@ export default function CCIInstrumentScreen() {
   }
 
   // Get the golden master HTML (exact match to PDF)
-  // Use appropriate artifact based on type: circle, bundle, or individual
-  // ========== TRACE LOGGING: Artifact Selection ==========
-  console.log('[CCI-TRACE] About to select artifact HTML...');
-  // NO SILENT FALLBACK: explicit path selection with logging
-  let artifactHTML: string;
-  if (isCircle) {
-    console.log('[CCI-TRACE] → Calling getCircleGoldenMasterHTML()');
-    artifactHTML = getCircleGoldenMasterHTML();
-  } else if (isBundle) {
-    console.log('[CCI-TRACE] → Calling getBundleGoldenMasterHTML(' + bundleSeatCount + ')');
-    artifactHTML = getBundleGoldenMasterHTML(bundleSeatCount);
-  } else {
-    console.log('[CCI-TRACE] → Calling getGoldenMasterHTML() [INDIVIDUAL]');
-    if (params.type) {
-      console.error('[CCI-TRACE] 🚨 WARNING: params.type was "' + params.type + '" but fell through to individual artifact!');
-    }
-    artifactHTML = getGoldenMasterHTML();
-  }
-  console.log('[CCI-TRACE] artifactHTML length:', artifactHTML?.length || 0);
-  console.log('[CCI-TRACE] artifactHTML contains "BUNDLE":', artifactHTML?.includes('BUNDLE') || false);
-  console.log('[CCI-TRACE] artifactHTML contains "Bundle":', artifactHTML?.includes('Bundle') || false);
-  console.log('[CCI-TRACE] artifactHTML contains "mini-chart-card":', artifactHTML?.includes('mini-chart-card') || false);
-  // ========================================================
+  // NO SILENT FALLBACK: cciType is already validated, use explicit branches
+  const artifactHTML = isCircle
+    ? getCircleGoldenMasterHTML()
+    : isBundle
+    ? getBundleGoldenMasterHTML(bundleSeatCount)
+    : getGoldenMasterHTML();
+
+  console.log('[CCI] Rendering artifact:', isCircle ? 'Circle' : isBundle ? 'Bundle' : 'Individual');
 
   // View instrument in new window (web only)
   const handleViewInstrument = useCallback(() => {
@@ -397,6 +422,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'rgba(255,255,255,0.5)',
     marginBottom: spacing.lg,
+  },
+  // Error container for invalid CCI type (fail-closed)
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xl,
+  },
+  errorIcon: {
+    fontSize: 48,
+    marginBottom: spacing.md,
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#F44336',
+    marginBottom: spacing.sm,
+  },
+  errorMessage: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.7)',
+    marginBottom: spacing.sm,
+    textAlign: 'center',
+  },
+  errorHint: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+    marginBottom: spacing.lg,
+    fontFamily: Platform.OS === 'web' ? 'monospace' : undefined,
   },
   backButton: {
     paddingVertical: spacing.sm,
