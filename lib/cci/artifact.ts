@@ -13,11 +13,7 @@
 
 import { CCIArtifact, CCIArtifactJSON, CCIIssuanceMetadata } from './types';
 import { FABRICATED_HISTORIES, DEMO_CIRCLE_MEMBERS, getCapacityState } from './demoData';
-import {
-  renderCCI90DayToSVG,
-  CCI_STATE_COLORS,
-  type CCI90DayChartData,
-} from '../charts';
+import { renderSummaryChartSVG } from './summaryChart';
 
 /**
  * Generate CCI artifact HTML
@@ -789,26 +785,20 @@ export function getGoldenMasterHTML(): string {
 
 // =============================================================================
 // CIRCLE MEMBER CAPACITY DATA — Imported from lib/cci/demoData.ts
-// Chart rendering uses unified lib/charts system for pixel-identical output
+// Chart rendering uses summaryChart.ts for Individual CCI visual style
 // =============================================================================
 
 /**
- * Generate a single-member chart SVG using the unified chart system.
- * This ensures the artifact charts are pixel-identical to the app.
+ * Generate a single-member chart SVG using the summary chart style.
+ * Matches the Individual CCI artifact visual style (6 points, Bezier curves,
+ * multi-layer nodes, H/M/L indicators).
  */
 function generateMemberChartSVG(memberName: string, values: number[]): string {
-  const data: CCI90DayChartData = {
-    series: [{
-      id: memberName.toLowerCase(),
-      label: memberName,
-      color: CCI_STATE_COLORS.resourced, // Line color
-      values: values,
-    }],
-    showLegend: false,
-  };
-
-  // Use the unified chart renderer - this is the SAME code the app uses
-  return renderCCI90DayToSVG(data, { includeBackground: true });
+  // Use unique gradient ID to avoid conflicts when multiple charts on page
+  return renderSummaryChartSVG(values, {
+    includeGradientDefs: true,
+    gradientId: memberName.toLowerCase(),
+  });
 }
 
 /**
@@ -890,7 +880,7 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
     .status-stretched { background: rgba(232,168,48,0.15); color: #b8860b; }
     .status-depleted { background: rgba(244,67,54,0.15); color: #d32f2f; }
     .member-chart { flex: 1; padding-left: 8px; }
-    .chart-wrapper { width: 100%; height: 70px; border-radius: 3px; overflow: hidden; }
+    .chart-wrapper { width: 100%; height: 80px; border-radius: 3px; overflow: hidden; background: #0a0b10; }
     .chart-wrapper svg { width: 100%; height: 100%; }
     .footer-section { border-top: 1px solid #cbd5e1; padding-top: 6px; margin-top: 6px; }
     .legal-block { background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 8px; }

@@ -33,9 +33,8 @@ import {
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../../theme';
 import { useAccess } from '../../lib/access';
-import { IndividualCCIChart } from '../../components/CCI90DayChart';
+import { CCISummaryChart } from '../../components/CCISummaryChart';
 import { FABRICATED_HISTORIES, getCapacityState } from '../../lib/cci/demoData';
-import { CCI_STATE_COLORS } from '../../lib/charts';
 
 // =============================================================================
 // TYPES
@@ -320,13 +319,12 @@ function CirclesCCIBrief() {
               </View>
             </View>
 
-            {/* Right: Chart - Uses unified CCI90DayChart for pixel-identical rendering */}
+            {/* Right: Chart - Uses CCISummaryChart for Individual CCI visual style */}
             <View style={[styles.memberChartSection, isWideScreen && styles.memberChartSectionWide]}>
-              <IndividualCCIChart
+              <CCISummaryChart
                 values={member.capacityHistory}
-                label={member.name}
                 width={isWideScreen ? width - 280 : width - 48}
-                showDisclaimer={false}
+                chartId={member.id}
               />
             </View>
           </View>
