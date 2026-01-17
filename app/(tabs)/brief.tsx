@@ -30,17 +30,19 @@ import {
   CheckCircle,
   LayoutGrid,
   Link2,
+  Package,
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../../theme';
 import { useAccess } from '../../lib/access';
 import { CCISummaryChart } from '../../components/CCISummaryChart';
+import { BundleCCIPreview } from '../../components/BundleCCIPreview';
 import { FABRICATED_HISTORIES, getCapacityState } from '../../lib/cci/demoData';
 
 // =============================================================================
 // TYPES
 // =============================================================================
 
-type BriefScope = 'personal' | 'circles';
+type BriefScope = 'personal' | 'circles' | 'bundles';
 
 interface ScopeTab {
   id: BriefScope;
@@ -51,6 +53,7 @@ interface ScopeTab {
 const SCOPE_TABS: ScopeTab[] = [
   { id: 'personal', label: 'Personal', icon: User },
   { id: 'circles', label: 'Circles', icon: Users },
+  { id: 'bundles', label: 'Bundles', icon: Package },
 ];
 
 // =============================================================================
@@ -140,6 +143,7 @@ export default function BriefingsScreen() {
       >
         {scope === 'personal' && <PersonalBrief />}
         {scope === 'circles' && <CirclesCCIBrief />}
+        {scope === 'bundles' && <BundlesCCIBrief />}
       </ScrollView>
     </SafeAreaView>
   );
@@ -345,6 +349,94 @@ function CirclesCCIBrief() {
         <Pressable style={styles.ctaSecondary} onPress={() => router.push('/cci')}>
           <Text style={styles.ctaSecondaryText}>Generate Individual Capacity Summaries</Text>
           <Text style={styles.ctaSecondaryPrice}>$149 each</Text>
+        </Pressable>
+      </View>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>Orbital – Assembled in the USA</Text>
+      </View>
+    </Animated.View>
+  );
+}
+
+// =============================================================================
+// BUNDLES TAB — Bundle CCI Demo
+// =============================================================================
+
+function BundlesCCIBrief() {
+  const router = useRouter();
+  const [selectedSize, setSelectedSize] = useState<10 | 15 | 20>(10);
+
+  return (
+    <Animated.View entering={FadeInDown.duration(400)}>
+      {/* Demo Banner */}
+      <View style={styles.demoBanner}>
+        <Text style={styles.demoBannerText}>DEMO / SAMPLE</Text>
+      </View>
+
+      {/* Bundle Header */}
+      <View style={styles.bundleHeader}>
+        <View style={styles.bundleHeaderLeft}>
+          <Text style={styles.bundleTitle}>BUNDLE CAPACITY</Text>
+          <Text style={styles.bundleSubtitle}>Anonymous seat-level capacity view</Text>
+        </View>
+        <View style={styles.bundleBadge}>
+          <Text style={styles.bundleBadgeText}>{selectedSize} SEATS</Text>
+        </View>
+      </View>
+
+      {/* Bundle Description */}
+      <View style={styles.bundleCCICard}>
+        <Text style={styles.bundleCCITitle}>BUNDLE CAPACITY INDICATOR (CCI)</Text>
+        <Text style={styles.bundleCCIDescription}>
+          A non-diagnostic, aggregate snapshot of a bundle's{' '}
+          <Text style={styles.bundleCCIHighlight}>functional regulation bandwidth</Text>
+          {' '}over time. Individual seats are represented by avatars only — no names or identifying information.
+        </Text>
+        <Text style={styles.bundleCCINote}>
+          Privacy first: avatars only, no individual attribution
+        </Text>
+      </View>
+
+      {/* Size Selector */}
+      <View style={styles.bundleSizeSelector}>
+        <Text style={styles.bundleSizeSelectorLabel}>Select Bundle Size:</Text>
+        <View style={styles.bundleSizeButtons}>
+          {([10, 15, 20] as const).map((size) => (
+            <Pressable
+              key={size}
+              style={[
+                styles.bundleSizeButton,
+                selectedSize === size && styles.bundleSizeButtonActive,
+              ]}
+              onPress={() => setSelectedSize(size)}
+            >
+              <Text
+                style={[
+                  styles.bundleSizeButtonText,
+                  selectedSize === size && styles.bundleSizeButtonTextActive,
+                ]}
+              >
+                {size} seats
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+
+      {/* Bundle CCI Preview */}
+      <BundleCCIPreview seatCount={selectedSize} />
+
+      {/* CTA Section */}
+      <View style={styles.ctaSection}>
+        <Pressable style={styles.ctaBundlePrimary} onPress={() => router.push('/upgrade')}>
+          <Text style={styles.ctaBundlePrimaryText}>Purchase Bundle</Text>
+          <Text style={styles.ctaBundlePriceText}>From $2,700/yr</Text>
+        </Pressable>
+        <Pressable style={styles.ctaSecondary} onPress={() => router.push('/cci?type=bundle')}>
+          <Text style={styles.ctaSecondaryText}>Generate Bundle Capacity Summary (CCI)</Text>
+          <Text style={styles.ctaSecondaryPrice}>$999</Text>
         </Pressable>
       </View>
 
@@ -1103,5 +1195,125 @@ const styles = StyleSheet.create({
   },
   memberChartSectionWide: {
     flex: 1,
+  },
+
+  // Bundles Tab Styles
+  bundleHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: spacing.md,
+  },
+  bundleHeaderLeft: {
+    flex: 1,
+  },
+  bundleTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.95)',
+    letterSpacing: 0.5,
+  },
+  bundleSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: 4,
+  },
+  bundleBadge: {
+    backgroundColor: 'rgba(156,39,176,0.15)',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: borderRadius.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(156,39,176,0.3)',
+  },
+  bundleBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#9C27B0',
+  },
+  bundleCCICard: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(156,39,176,0.2)',
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+  },
+  bundleCCITitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#9C27B0',
+    letterSpacing: 1,
+    marginBottom: spacing.sm,
+  },
+  bundleCCIDescription: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+    lineHeight: 22,
+    marginBottom: spacing.sm,
+  },
+  bundleCCIHighlight: {
+    color: '#9C27B0',
+    fontWeight: '600',
+  },
+  bundleCCINote: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+    fontStyle: 'italic',
+  },
+  bundleSizeSelector: {
+    marginBottom: spacing.md,
+  },
+  bundleSizeSelectorLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.7)',
+    marginBottom: spacing.sm,
+  },
+  bundleSizeButtons: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  bundleSizeButton: {
+    flex: 1,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center',
+  },
+  bundleSizeButtonActive: {
+    backgroundColor: 'rgba(156,39,176,0.15)',
+    borderColor: '#9C27B0',
+  },
+  bundleSizeButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.6)',
+  },
+  bundleSizeButtonTextActive: {
+    color: '#9C27B0',
+  },
+  ctaBundlePrimary: {
+    backgroundColor: 'rgba(156,39,176,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(156,39,176,0.3)',
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  ctaBundlePrimaryText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#9C27B0',
+  },
+  ctaBundlePriceText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#9C27B0',
   },
 });
