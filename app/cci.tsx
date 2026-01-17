@@ -20,8 +20,8 @@ import {
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { ArrowLeft, FileText, Download, Eye, ExternalLink, Mail } from 'lucide-react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { ArrowLeft, FileText, Download, Eye, ExternalLink, Mail, Users } from 'lucide-react-native';
 import { colors, spacing, borderRadius, commonStyles } from '../theme';
 import { generateCCIArtifactHTML, getGoldenMasterHTML } from '../lib/cci';
 import { FOUNDER_DEMO_ENABLED } from '../lib/hooks/useDemoMode';
@@ -36,6 +36,10 @@ const CCI_ACCESSIBLE = Platform.OS === 'web' || FOUNDER_DEMO_ENABLED;
 
 export default function CCIInstrumentScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ type?: string }>();
+  const cciType = params.type === 'circle' ? 'circle' : 'individual';
+  const isCircle = cciType === 'circle';
+
   const [isViewing, setIsViewing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -111,17 +115,35 @@ export default function CCIInstrumentScreen() {
           <ArrowLeft size={24} color={colors.textPrimary} />
         </Pressable>
         <View style={styles.headerCenter}>
-          <FileText size={18} color="#7A9AAA" />
-          <Text style={styles.headerTitle}>CCI-Q4 Issuance</Text>
+          {isCircle ? (
+            <Users size={18} color="#00E5FF" />
+          ) : (
+            <FileText size={18} color="#7A9AAA" />
+          )}
+          <Text style={styles.headerTitle}>
+            {isCircle ? 'Circle CCI-Q4' : 'CCI-Q4 Issuance'}
+          </Text>
         </View>
         <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         {/* Artifact Info Card */}
-        <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>Clinical Capacity Instrument</Text>
-          <Text style={styles.infoSubtitle}>Q4 2025 Artifact</Text>
+        <View style={[styles.infoCard, isCircle && styles.infoCardCircle]}>
+          <Text style={styles.infoTitle}>
+            {isCircle ? 'Circle Capacity Instrument' : 'Clinical Capacity Instrument'}
+          </Text>
+          <Text style={[styles.infoSubtitle, isCircle && styles.infoSubtitleCircle]}>
+            {isCircle ? 'AGGREGATE CCI-Q4' : 'Q4 2025 Artifact'}
+          </Text>
+
+          {isCircle && (
+            <View style={styles.circleNotice}>
+              <Text style={styles.circleNoticeText}>
+                This is an aggregate capacity summary for your Circle. No individual attribution — only group-level patterns.
+              </Text>
+            </View>
+          )}
 
           <View style={styles.metaRow}>
             <Text style={styles.metaLabel}>Status:</Text>
@@ -142,6 +164,13 @@ export default function CCIInstrumentScreen() {
             <Text style={styles.metaLabel}>Protocol:</Text>
             <Text style={styles.metaValue}>Structured EMA v4.2</Text>
           </View>
+
+          {isCircle && (
+            <View style={styles.metaRow}>
+              <Text style={styles.metaLabel}>Scope:</Text>
+              <Text style={styles.metaValue}>5 Circle Members (Aggregate)</Text>
+            </View>
+          )}
 
           {/* CPT 90885 Reimbursement Notice — PATCH 1 */}
           <View style={styles.cptNotice}>
@@ -319,6 +348,10 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     marginBottom: spacing.lg,
   },
+  infoCardCircle: {
+    borderColor: 'rgba(0,229,255,0.3)',
+    backgroundColor: 'rgba(0,229,255,0.03)',
+  },
   infoTitle: {
     fontSize: 18,
     fontWeight: '600',
@@ -331,6 +364,20 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     textTransform: 'uppercase',
     letterSpacing: 1,
+  },
+  infoSubtitleCircle: {
+    color: '#00E5FF',
+  },
+  circleNotice: {
+    backgroundColor: 'rgba(0,229,255,0.1)',
+    borderRadius: 6,
+    padding: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  circleNoticeText: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
+    lineHeight: 18,
   },
   metaRow: {
     flexDirection: 'row',

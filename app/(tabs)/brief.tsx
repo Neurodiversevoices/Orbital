@@ -305,7 +305,7 @@ function CirclesCCIBrief() {
           <View style={styles.circleMemberBadge}>
             <Text style={styles.circleMemberBadgeText}>5 / 5 Members</Text>
           </View>
-          <Pressable style={styles.lingsButton} onPress={() => router.push('/cci')}>
+          <Pressable style={styles.lingsButton} onPress={() => router.push('/cci?type=circle')}>
             <Link2 color="#00D7FF" size={14} />
             <Text style={styles.lingsButtonText}>LINGS</Text>
           </Pressable>
@@ -416,7 +416,7 @@ function CirclesCCIBrief() {
 
       {/* CTA Section */}
       <View style={styles.ctaSection}>
-        <Pressable style={styles.ctaPrimary} onPress={() => router.push('/cci')}>
+        <Pressable style={styles.ctaPrimary} onPress={() => router.push('/cci?type=circle')}>
           <Text style={styles.ctaPrimaryText}>Generate Circle Capacity Summary (CCI)</Text>
           <Text style={styles.ctaPriceText}>$399</Text>
         </Pressable>
