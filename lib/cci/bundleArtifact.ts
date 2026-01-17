@@ -117,8 +117,8 @@ export function generateBundleCCIArtifactHTML(
   const aggregateChart = generateAggregateChartSVG(seats);
 
   // Generate mini chart cards matching BundleCCIPreview style
-  // Use 2 per row for PDF layout (fits 612px page width properly)
-  const seatsPerRow = 2;
+  // Use 5 per row to match brief's grid layout exactly
+  const seatsPerRow = 5;
   const rows: string[] = [];
   for (let i = 0; i < seats.length; i += seatsPerRow) {
     const rowSeats = seats.slice(i, i + seatsPerRow);
@@ -126,7 +126,7 @@ export function generateBundleCCIArtifactHTML(
       const state = getSeatCapacityState(seat);
       const stateColor = CAPACITY_COLORS[state];
       const chart = generateSeatChartSVG(seat);
-      const avatar = generateAvatarSVG(seat, 24);
+      const avatar = generateAvatarSVG(seat, 18);
 
       return `
         <div class="mini-chart-card">
@@ -218,27 +218,27 @@ export function generateBundleCCIArtifactHTML(
     }
     .section-subtitle { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
 
-    /* Mini Chart Grid - matches BundleCCIPreview MiniChartCard */
-    .grid-container { margin-bottom: 12px; }
-    .grid-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    /* Mini Chart Grid - matches BundleCCIPreview MiniChartCard (5 per row) */
+    .grid-container { margin-bottom: 10px; }
+    .grid-row { display: flex; gap: 6px; margin-bottom: 6px; }
 
     .mini-chart-card {
       flex: 1;
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px;
-      padding: 8px;
+      border-radius: 6px;
+      padding: 6px;
     }
     .mini-chart-header {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .avatar-wrap { flex-shrink: 0; }
     .avatar-wrap svg { display: block; }
-    .state-indicator { width: 8px; height: 8px; border-radius: 4px; }
+    .state-indicator { width: 6px; height: 6px; border-radius: 3px; }
     .mini-chart-container {
       background: ${CAPACITY_COLORS.background};
-      border-radius: 4px; overflow: hidden;
+      border-radius: 3px; overflow: hidden;
     }
     .mini-chart-container svg { width: 100%; height: auto; display: block; }
 
