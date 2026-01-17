@@ -284,8 +284,6 @@ interface PrintoutPreviewProps {
 }
 
 function PrintoutPreview({ seatCount }: PrintoutPreviewProps) {
-  const { width } = useWindowDimensions();
-
   // Generate the artifact HTML (same as PDF export)
   const artifactHTML = useMemo(
     () => generateBundleCCIArtifactHTML(seatCount),
@@ -296,28 +294,19 @@ function PrintoutPreview({ seatCount }: PrintoutPreviewProps) {
   if (Platform.OS === 'web') {
     return (
       <Animated.View entering={FadeIn.duration(400)} style={styles.printoutContainer}>
-        <View style={styles.printoutHeader}>
-          <Text style={styles.printoutTitle}>PDF Preview</Text>
-          <Text style={styles.printoutSubtitle}>
-            This is exactly what the Bundle CCI printout will look like
-          </Text>
-        </View>
         <View style={styles.printoutIframeContainer}>
           <iframe
             srcDoc={artifactHTML}
             style={{
               width: '100%',
-              height: 700,
+              height: 800,
               border: 'none',
-              backgroundColor: '#fff',
+              backgroundColor: '#0a0b10',
               borderRadius: 8,
             }}
             title="Bundle CCI Printout Preview"
           />
         </View>
-        <Text style={styles.printoutDisclaimer}>
-          Demo data shown. Actual issuance reflects real capacity patterns.
-        </Text>
       </Animated.View>
     );
   }
@@ -696,7 +685,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
-    backgroundColor: '#fff',
+    backgroundColor: '#0a0b10',
   },
   printoutDisclaimer: {
     fontSize: 10,
