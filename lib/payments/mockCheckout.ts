@@ -233,6 +233,35 @@ export const PRODUCT_CATALOG: Record<string, ProductInfo> = {
     billingCycle: 'one_time',
     entitlementId: 'cci_bundle_purchased',
   },
+
+  // QCR Products (Quarterly Capacity Reports)
+  [PRODUCT_IDS.QCR_INDIVIDUAL]: {
+    id: PRODUCT_IDS.QCR_INDIVIDUAL,
+    name: 'Individual QCR',
+    description: 'Personal quarterly capacity analysis',
+    price: 149,
+    billingCycle: 'one_time',
+    entitlementId: 'qcr_individual',
+    requiresEntitlement: 'pro_access',
+  },
+  [PRODUCT_IDS.QCR_CIRCLE]: {
+    id: PRODUCT_IDS.QCR_CIRCLE,
+    name: 'Circle QCR',
+    description: 'Circle-wide capacity analysis with relational dynamics',
+    price: 299,
+    billingCycle: 'one_time',
+    entitlementId: 'qcr_circle',
+    requiresEntitlement: 'circle_access',
+  },
+  [PRODUCT_IDS.QCR_BUNDLE]: {
+    id: PRODUCT_IDS.QCR_BUNDLE,
+    name: 'Bundle QCR',
+    description: 'Program-level capacity analysis for administrators',
+    price: 499,
+    billingCycle: 'one_time',
+    entitlementId: 'qcr_bundle',
+    requiresEntitlement: 'admin_addon',
+  },
 };
 
 // =============================================================================

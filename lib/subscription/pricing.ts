@@ -161,12 +161,12 @@ export interface PricingTier {
 
 export const PRICING_TIERS: Record<string, PricingTier> = {
   // ===========================================================================
-  // INDIVIDUAL (Solo / Lone Wolf)
+  // INDIVIDUAL / PRO (Solo / Lone Wolf)
   // ===========================================================================
   individual: {
     id: 'individual',
-    name: 'Individual',
-    shortName: 'Solo',
+    name: 'Pro',
+    shortName: 'Pro',
     description: 'Private capacity tracking for personal use',
     pricing: {
       monthly: 29,
@@ -182,13 +182,13 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
       'Private use only',
       'No shared visibility',
     ],
-    entitlements: [ENTITLEMENTS.INDIVIDUAL],
+    entitlements: [ENTITLEMENTS.PRO],
     hasSharedVisibility: false,
     hasAdminDashboard: false,
     isBundle: false,
     productIds: {
-      monthly: PRODUCT_IDS.INDIVIDUAL_MONTHLY,
-      annual: PRODUCT_IDS.INDIVIDUAL_ANNUAL,
+      monthly: PRODUCT_IDS.PRO_MONTHLY,
+      annual: PRODUCT_IDS.PRO_ANNUAL,
     },
   },
 

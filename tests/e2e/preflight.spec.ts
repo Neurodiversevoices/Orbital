@@ -214,7 +214,7 @@ test('6. Pricing numbers match canonical values', async ({ page }) => {
   const priceChecks = [
     { value: CANONICAL_PRICES.individual.monthly, name: 'Individual monthly' },
     { value: CANONICAL_PRICES.circle.monthly, name: 'Circle monthly' },
-    { value: CANONICAL_PRICES.bundle10.monthly, name: 'Bundle 10 monthly' },
+    { value: CANONICAL_PRICES.bundle10.annual, name: 'Bundle 10 annual' }, // Bundles are annual-only
   ];
 
   let pricesFound = 0;
