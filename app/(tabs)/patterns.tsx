@@ -254,7 +254,7 @@ export default function PatternsScreen() {
   const { isDemoMode, enableDemoMode, reseedDemoData } = useDemoMode();
   const { currentMode } = useAppMode();
   const { isPro } = useSubscription();
-  const { hasUsedAppFor30Days } = useAppTenure();
+  const { hasUsedAppFor30Days, daysSinceFirstOpen } = useAppTenure();
   const router = useRouter();
   const graphWidth = width - spacing.md * 2;
   const [timeRange, setTimeRange] = useState<TimeRange>('7d');
@@ -645,6 +645,7 @@ export default function PatternsScreen() {
                     visible={true}
                     onUpgradePress={() => router.push('/upgrade')}
                     timeRange={timeRange}
+                    daysSinceInstall={daysSinceFirstOpen}
                   >
                     <EnergyGraph
                       logs={logs}

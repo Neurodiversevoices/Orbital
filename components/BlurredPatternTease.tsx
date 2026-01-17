@@ -5,12 +5,16 @@
  * Displayed to Free users who have used the app for 30+ days.
  */
 
-import React from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { Lock, Sparkles, TrendingUp } from 'lucide-react-native';
 import { colors, spacing } from '../theme';
 import type { TimeRange } from './TimeRangeTabs';
+import {
+  trackPatternTeaseViewed,
+  trackPatternTeaseUpgradeTapped,
+} from '../lib/observability';
 
 interface BlurredPatternTeaseProps {
   /** The chart content to blur */
@@ -21,6 +25,8 @@ interface BlurredPatternTeaseProps {
   onUpgradePress: () => void;
   /** The time range being previewed */
   timeRange: TimeRange;
+  /** Days since the user first opened the app (optional, for analytics) */
+  daysSinceInstall?: number;
 }
 
 const TIME_RANGE_LABELS: Record<TimeRange, string> = {
@@ -37,7 +43,24 @@ export function BlurredPatternTease({
   visible,
   onUpgradePress,
   timeRange,
+  daysSinceInstall,
 }: BlurredPatternTeaseProps) {
+  const hasTrackedView = useRef<string | null>(null);
+
+  // Track when tease becomes visible (once per time range)
+  useEffect(() => {
+    if (visible && hasTrackedView.current !== timeRange) {
+      hasTrackedView.current = timeRange;
+      trackPatternTeaseViewed(timeRange, daysSinceInstall);
+    }
+  }, [visible, timeRange, daysSinceInstall]);
+
+  // Wrap upgrade press with analytics tracking
+  const handleUpgradePress = useCallback(() => {
+    trackPatternTeaseUpgradeTapped(timeRange);
+    onUpgradePress();
+  }, [timeRange, onUpgradePress]);
+
   if (!visible) {
     return <>{children}</>;
   }
@@ -87,7 +110,7 @@ export function BlurredPatternTease({
               styles.upgradeButton,
               pressed && styles.upgradeButtonPressed,
             ]}
-            onPress={onUpgradePress}
+            onPress={handleUpgradePress}
           >
             <Sparkles size={16} color="#000" />
             <Text style={styles.upgradeButtonText}>Upgrade to Pro</Text>

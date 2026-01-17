@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Pressable, Dimensions } from 'react-native';
 import Animated, {
   FadeIn,
@@ -23,6 +23,12 @@ import { colors, spacing } from '../theme';
 import { useTutorial } from '../lib/hooks/useTutorial';
 import { useWhyOrbital } from '../lib/hooks/useWhyOrbital';
 import { ProprietaryFooter } from '../components/legal';
+import {
+  trackTutorialStarted,
+  trackTutorialStepViewed,
+  trackTutorialSkipped,
+  trackTutorialCompleted,
+} from '../lib/observability';
 
 // NOTE: Why Orbital screen marks itself as seen when dismissed.
 // We only check hasSeenWhyOrbital here, we don't pre-mark it.
@@ -81,10 +87,27 @@ export default function TutorialScreen() {
   const { hasSeenWhyOrbital } = useWhyOrbital();
   const [currentStep, setCurrentStep] = useState(0);
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
+  const hasTrackedStart = useRef(false);
 
   const step = TUTORIAL_STEPS[currentStep];
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === TUTORIAL_STEPS.length - 1;
+
+  // Track tutorial started (once)
+  useEffect(() => {
+    if (!hasTrackedStart.current) {
+      hasTrackedStart.current = true;
+      trackTutorialStarted();
+      trackTutorialStepViewed(0, TUTORIAL_STEPS[0].id);
+    }
+  }, []);
+
+  // Track step views when navigating
+  useEffect(() => {
+    if (hasTrackedStart.current && currentStep > 0) {
+      trackTutorialStepViewed(currentStep, TUTORIAL_STEPS[currentStep].id);
+    }
+  }, [currentStep]);
 
   const handleNext = useCallback(() => {
     if (isLastStep) {
@@ -103,6 +126,7 @@ export default function TutorialScreen() {
   }, [isFirstStep]);
 
   const handleSkip = useCallback(async () => {
+    trackTutorialSkipped(currentStep, TUTORIAL_STEPS.length);
     await markTutorialSeen();
     // Show "Why Orbital" on first use (it will mark itself as seen when dismissed)
     if (!hasSeenWhyOrbital) {
@@ -110,9 +134,10 @@ export default function TutorialScreen() {
     } else {
       router.replace('/');
     }
-  }, [markTutorialSeen, hasSeenWhyOrbital, router]);
+  }, [markTutorialSeen, hasSeenWhyOrbital, router, currentStep]);
 
   const handleComplete = useCallback(async () => {
+    trackTutorialCompleted(TUTORIAL_STEPS.length);
     await markTutorialSeen();
     // Show "Why Orbital" on first use (it will mark itself as seen when dismissed)
     if (!hasSeenWhyOrbital) {

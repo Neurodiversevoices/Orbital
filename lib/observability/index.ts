@@ -1,7 +1,7 @@
 /**
  * Observability Module
  *
- * Sentry integration, payment tagging, and error tracking utilities.
+ * Sentry integration, payment tagging, error tracking, and product analytics.
  */
 
 export {
@@ -21,3 +21,22 @@ export type {
   PaymentScopeOptions,
   PaymentErrorOptions,
 } from './sentryTags';
+
+// Product analytics
+export {
+  trackEvent,
+  trackScreen,
+  trackTutorialStarted,
+  trackTutorialStepViewed,
+  trackTutorialSkipped,
+  trackTutorialCompleted,
+  trackPatternTeaseViewed,
+  trackPatternTeaseUpgradeTapped,
+  trackUpgradeCtaTapped,
+  trackUpgradeScreenViewed,
+} from './analytics';
+
+export type {
+  AnalyticsEventName,
+  AnalyticsEventProperties,
+} from './analytics';
