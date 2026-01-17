@@ -12,6 +12,16 @@
  */
 
 import { CCIArtifact, CCIArtifactJSON, CCIIssuanceMetadata } from './types';
+import { FABRICATED_HISTORIES, DEMO_CIRCLE_MEMBERS } from './demoData';
+import {
+  getCapacityColor,
+  generateBezierPath,
+  generateAreaPath,
+  getChartNodes,
+  generateNodeMarkersSVG,
+  downsampleTo6Points,
+  ChartDimensions,
+} from './chartRenderer';
 
 /**
  * Generate CCI artifact HTML
@@ -782,170 +792,9 @@ export function getGoldenMasterHTML(): string {
 }
 
 // =============================================================================
-// CIRCLE MEMBER CAPACITY DATA — Matches brief.tsx exactly
+// CIRCLE MEMBER CAPACITY DATA — Imported from lib/cci/demoData.ts
+// Chart rendering functions imported from lib/cci/chartRenderer.ts
 // =============================================================================
-
-const CIRCLE_CAPACITY_DATA: Record<string, number[]> = {
-  // Mia: Stable in stretched range with some good days
-  mia: [
-    2.1, 2.0, 1.9, 2.0, 2.2, 2.3, 2.1, 2.0, 1.8, 1.9,
-    2.0, 2.1, 2.2, 2.0, 1.9, 2.0, 2.1, 2.0, 1.9, 1.8,
-    1.9, 2.0, 2.1, 2.2, 2.1, 2.0, 2.0, 1.9, 2.0, 2.1,
-    2.0, 1.9, 1.8, 1.9, 2.0, 2.1, 2.2, 2.1, 2.0, 1.9,
-    2.0, 2.1, 2.0, 1.9, 2.0, 2.1, 2.0, 1.9, 1.8, 1.9,
-    2.0, 2.1, 2.2, 2.1, 2.0, 1.9, 2.0, 2.1, 2.0, 1.9,
-    1.8, 1.9, 2.0, 2.1, 2.0, 1.9, 2.0, 2.1, 2.2, 2.1,
-    2.0, 1.9, 2.0, 2.1, 2.0, 1.9, 1.8, 1.9, 2.0, 2.1,
-    2.0, 1.9, 2.0, 2.1, 2.2, 2.1, 2.0, 1.9, 2.0, 2.0,
-  ],
-  // Zach: Clear declining pattern - started resourced, now in sentinel range
-  zach: [
-    2.8, 2.7, 2.8, 2.6, 2.7, 2.5, 2.6, 2.4, 2.5, 2.3,
-    2.4, 2.3, 2.2, 2.3, 2.1, 2.2, 2.0, 2.1, 2.0, 1.9,
-    2.0, 1.9, 1.8, 1.9, 1.8, 1.7, 1.8, 1.7, 1.6, 1.7,
-    1.6, 1.7, 1.6, 1.5, 1.6, 1.5, 1.6, 1.5, 1.4, 1.5,
-    1.4, 1.5, 1.4, 1.5, 1.4, 1.3, 1.4, 1.3, 1.4, 1.3,
-    1.4, 1.3, 1.4, 1.3, 1.2, 1.3, 1.2, 1.3, 1.4, 1.3,
-    1.2, 1.3, 1.2, 1.3, 1.2, 1.3, 1.2, 1.1, 1.2, 1.3,
-    1.2, 1.1, 1.2, 1.3, 1.2, 1.1, 1.2, 1.1, 1.2, 1.1,
-    1.2, 1.1, 1.2, 1.1, 1.0, 1.1, 1.2, 1.1, 1.0, 1.1,
-  ],
-  // Lily: Improving pattern - started low, now resourced
-  lily: [
-    1.4, 1.5, 1.4, 1.5, 1.6, 1.5, 1.6, 1.7, 1.6, 1.7,
-    1.8, 1.7, 1.8, 1.9, 1.8, 1.9, 2.0, 1.9, 2.0, 2.1,
-    2.0, 2.1, 2.2, 2.1, 2.2, 2.3, 2.2, 2.3, 2.4, 2.3,
-    2.4, 2.3, 2.4, 2.5, 2.4, 2.5, 2.4, 2.5, 2.6, 2.5,
-    2.6, 2.5, 2.6, 2.5, 2.6, 2.7, 2.6, 2.7, 2.6, 2.7,
-    2.6, 2.7, 2.8, 2.7, 2.8, 2.7, 2.8, 2.7, 2.8, 2.9,
-    2.8, 2.7, 2.8, 2.9, 2.8, 2.7, 2.8, 2.9, 2.8, 2.9,
-    2.8, 2.9, 2.8, 2.9, 2.8, 2.9, 3.0, 2.9, 2.8, 2.9,
-    3.0, 2.9, 2.8, 2.9, 3.0, 2.9, 2.8, 2.9, 3.0, 2.9,
-  ],
-  // Tyler: Volatile pattern - unpredictable swings
-  tyler: [
-    2.2, 1.8, 2.4, 1.6, 2.6, 1.9, 2.1, 1.4, 2.5, 1.7,
-    2.3, 1.5, 2.7, 1.8, 2.0, 1.3, 2.4, 1.6, 2.2, 1.9,
-    2.5, 1.4, 2.1, 1.7, 2.6, 1.5, 2.3, 1.8, 2.0, 1.4,
-    2.4, 1.6, 2.2, 1.9, 2.5, 1.3, 2.1, 1.7, 2.6, 1.5,
-    2.3, 1.8, 2.0, 1.4, 2.4, 1.6, 2.2, 1.9, 2.5, 1.3,
-    2.1, 1.7, 2.6, 1.5, 2.3, 1.8, 2.0, 1.4, 2.4, 1.6,
-    2.2, 1.9, 2.5, 1.3, 2.1, 1.7, 2.6, 1.5, 2.3, 1.8,
-    2.0, 1.4, 2.4, 1.6, 2.2, 1.9, 2.5, 1.3, 2.1, 1.7,
-    2.6, 1.5, 2.3, 1.8, 2.0, 1.4, 2.4, 1.6, 2.2, 1.8,
-  ],
-  // Emma: Gradual decline with recent dip
-  emma: [
-    2.6, 2.5, 2.6, 2.5, 2.4, 2.5, 2.4, 2.3, 2.4, 2.3,
-    2.4, 2.3, 2.2, 2.3, 2.2, 2.3, 2.2, 2.1, 2.2, 2.1,
-    2.2, 2.1, 2.0, 2.1, 2.0, 2.1, 2.0, 1.9, 2.0, 1.9,
-    2.0, 1.9, 2.0, 1.9, 1.8, 1.9, 1.8, 1.9, 1.8, 1.7,
-    1.8, 1.7, 1.8, 1.7, 1.8, 1.7, 1.6, 1.7, 1.6, 1.7,
-    1.6, 1.7, 1.6, 1.5, 1.6, 1.5, 1.6, 1.5, 1.6, 1.5,
-    1.4, 1.5, 1.4, 1.5, 1.4, 1.5, 1.4, 1.3, 1.4, 1.3,
-    1.4, 1.3, 1.4, 1.3, 1.2, 1.3, 1.2, 1.3, 1.2, 1.3,
-    1.2, 1.1, 1.2, 1.1, 1.2, 1.1, 1.2, 1.1, 1.2, 1.2,
-  ],
-};
-
-/**
- * Downsample 90-day data to 6 representative points (matching app)
- * Takes raw values at: Day 1, Day 18, Day 36, Day 54, Day 72, Day 90
- * No averaging - preserves actual peaks/valleys for volatile patterns
- */
-function downsampleTo6Points(data: number[]): number[] {
-  if (data.length <= 6) return data;
-
-  const indices = [0, 17, 35, 53, 71, 89]; // 6 evenly spaced points
-  return indices.map(i => data[Math.min(i, data.length - 1)]);
-}
-
-/**
- * Generate smooth Bezier curve path from points (monotone cubic interpolation)
- * Matches the app's CCIChart rendering style
- */
-function generateBezierPath(data: number[], width: number, height: number): string {
-  const points = downsampleTo6Points(data);
-  if (points.length < 2) return '';
-
-  const coords: { x: number; y: number }[] = points.map((value, index) => ({
-    x: Math.round((index / (points.length - 1)) * width),
-    y: Math.round(height - ((value - 1.0) / 2.0) * height)
-  }));
-
-  // Clamp Y values within bounds
-  coords.forEach(p => {
-    p.y = Math.max(2, Math.min(height - 2, p.y));
-  });
-
-  // Start path
-  let path = `M ${coords[0].x},${coords[0].y}`;
-
-  // Generate smooth cubic bezier curves between points
-  for (let i = 0; i < coords.length - 1; i++) {
-    const p0 = coords[Math.max(0, i - 1)];
-    const p1 = coords[i];
-    const p2 = coords[i + 1];
-    const p3 = coords[Math.min(coords.length - 1, i + 2)];
-
-    // Control points at 30% distance (matching app)
-    const tension = 0.3;
-    const cp1x = p1.x + (p2.x - p0.x) * tension;
-    const cp1y = p1.y + (p2.y - p0.y) * tension;
-    const cp2x = p2.x - (p3.x - p1.x) * tension;
-    const cp2y = p2.y - (p3.y - p1.y) * tension;
-
-    path += ` C ${Math.round(cp1x)},${Math.round(cp1y)} ${Math.round(cp2x)},${Math.round(cp2y)} ${coords[i + 1].x},${coords[i + 1].y}`;
-  }
-
-  return path;
-}
-
-/**
- * Generate area fill path (closes the curve to bottom)
- */
-function generateAreaPath(data: number[], width: number, height: number): string {
-  const linePath = generateBezierPath(data, width, height);
-  if (!linePath) return '';
-
-  // Close path to bottom corners for area fill
-  return `${linePath} L ${width},${height} L 0,${height} Z`;
-}
-
-/**
- * Get downsampled points with coordinates for node markers
- */
-function getChartNodes(data: number[], width: number, height: number): { x: number; y: number; value: number }[] {
-  const points = downsampleTo6Points(data);
-  return points.map((value, index) => ({
-    x: Math.round((index / (points.length - 1)) * width),
-    y: Math.max(2, Math.min(height - 2, Math.round(height - ((value - 1.0) / 2.0) * height))),
-    value
-  }));
-}
-
-/**
- * Get capacity color based on value (4-tier matching app exactly)
- */
-function getCapacityColor(value: number): string {
-  if (value >= 2.5) return '#00E5FF'; // Cyan - Resourced
-  if (value >= 2.0) return '#10B981'; // Green - Good
-  if (value >= 1.5) return '#E8A830'; // Amber - Stretched
-  return '#F44336'; // Red - Depleted
-}
-
-/**
- * Generate multi-layer node markers SVG (matching app style)
- */
-function generateNodeMarkers(nodes: { x: number; y: number; value: number }[]): string {
-  return nodes.map(node => {
-    const color = getCapacityColor(node.value);
-    return `
-      <circle cx="${node.x}" cy="${node.y}" r="5" fill="#0a0b10"/>
-      <circle cx="${node.x}" cy="${node.y}" r="3.5" fill="${color}"/>
-      <circle cx="${node.x}" cy="${node.y}" r="1.5" fill="white" fill-opacity="0.9"/>`;
-  }).join('');
-}
 
 /**
  * Generate Circle CCI artifact HTML
@@ -961,41 +810,42 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
   // Chart dimensions matching app
   const chartWidth = 372;
   const chartHeight = 50;
+  const dimensions: ChartDimensions = { width: chartWidth, height: chartHeight };
 
-  // Generate Bezier curve paths (smooth, 6 points)
-  const miaPath = generateBezierPath(CIRCLE_CAPACITY_DATA.mia, chartWidth, chartHeight);
-  const zachPath = generateBezierPath(CIRCLE_CAPACITY_DATA.zach, chartWidth, chartHeight);
-  const lilyPath = generateBezierPath(CIRCLE_CAPACITY_DATA.lily, chartWidth, chartHeight);
-  const tylerPath = generateBezierPath(CIRCLE_CAPACITY_DATA.tyler, chartWidth, chartHeight);
-  const emmaPath = generateBezierPath(CIRCLE_CAPACITY_DATA.emma, chartWidth, chartHeight);
+  // Generate Bezier curve paths (smooth, 6 points) - using shared FABRICATED_HISTORIES
+  const miaPath = generateBezierPath(FABRICATED_HISTORIES.mia, dimensions);
+  const zachPath = generateBezierPath(FABRICATED_HISTORIES.zach, dimensions);
+  const lilyPath = generateBezierPath(FABRICATED_HISTORIES.lily, dimensions);
+  const tylerPath = generateBezierPath(FABRICATED_HISTORIES.tyler, dimensions);
+  const emmaPath = generateBezierPath(FABRICATED_HISTORIES.emma, dimensions);
 
   // Generate area fill paths
-  const miaArea = generateAreaPath(CIRCLE_CAPACITY_DATA.mia, chartWidth, chartHeight);
-  const zachArea = generateAreaPath(CIRCLE_CAPACITY_DATA.zach, chartWidth, chartHeight);
-  const lilyArea = generateAreaPath(CIRCLE_CAPACITY_DATA.lily, chartWidth, chartHeight);
-  const tylerArea = generateAreaPath(CIRCLE_CAPACITY_DATA.tyler, chartWidth, chartHeight);
-  const emmaArea = generateAreaPath(CIRCLE_CAPACITY_DATA.emma, chartWidth, chartHeight);
+  const miaArea = generateAreaPath(FABRICATED_HISTORIES.mia, dimensions);
+  const zachArea = generateAreaPath(FABRICATED_HISTORIES.zach, dimensions);
+  const lilyArea = generateAreaPath(FABRICATED_HISTORIES.lily, dimensions);
+  const tylerArea = generateAreaPath(FABRICATED_HISTORIES.tyler, dimensions);
+  const emmaArea = generateAreaPath(FABRICATED_HISTORIES.emma, dimensions);
 
   // Get node markers for each member (6 points with multi-layer styling)
-  const miaNodes = getChartNodes(CIRCLE_CAPACITY_DATA.mia, chartWidth, chartHeight);
-  const zachNodes = getChartNodes(CIRCLE_CAPACITY_DATA.zach, chartWidth, chartHeight);
-  const lilyNodes = getChartNodes(CIRCLE_CAPACITY_DATA.lily, chartWidth, chartHeight);
-  const tylerNodes = getChartNodes(CIRCLE_CAPACITY_DATA.tyler, chartWidth, chartHeight);
-  const emmaNodes = getChartNodes(CIRCLE_CAPACITY_DATA.emma, chartWidth, chartHeight);
+  const miaNodes = getChartNodes(FABRICATED_HISTORIES.mia, dimensions);
+  const zachNodes = getChartNodes(FABRICATED_HISTORIES.zach, dimensions);
+  const lilyNodes = getChartNodes(FABRICATED_HISTORIES.lily, dimensions);
+  const tylerNodes = getChartNodes(FABRICATED_HISTORIES.tyler, dimensions);
+  const emmaNodes = getChartNodes(FABRICATED_HISTORIES.emma, dimensions);
 
   // Generate node marker SVG for each member
-  const miaMarkers = generateNodeMarkers(miaNodes);
-  const zachMarkers = generateNodeMarkers(zachNodes);
-  const lilyMarkers = generateNodeMarkers(lilyNodes);
-  const tylerMarkers = generateNodeMarkers(tylerNodes);
-  const emmaMarkers = generateNodeMarkers(emmaNodes);
+  const miaMarkers = generateNodeMarkersSVG(miaNodes);
+  const zachMarkers = generateNodeMarkersSVG(zachNodes);
+  const lilyMarkers = generateNodeMarkersSVG(lilyNodes);
+  const tylerMarkers = generateNodeMarkersSVG(tylerNodes);
+  const emmaMarkers = generateNodeMarkersSVG(emmaNodes);
 
   // Get dominant colors for gradients (based on downsampled data)
-  const miaDownsampled = downsampleTo6Points(CIRCLE_CAPACITY_DATA.mia);
-  const zachDownsampled = downsampleTo6Points(CIRCLE_CAPACITY_DATA.zach);
-  const lilyDownsampled = downsampleTo6Points(CIRCLE_CAPACITY_DATA.lily);
-  const tylerDownsampled = downsampleTo6Points(CIRCLE_CAPACITY_DATA.tyler);
-  const emmaDownsampled = downsampleTo6Points(CIRCLE_CAPACITY_DATA.emma);
+  const miaDownsampled = downsampleTo6Points(FABRICATED_HISTORIES.mia);
+  const zachDownsampled = downsampleTo6Points(FABRICATED_HISTORIES.zach);
+  const lilyDownsampled = downsampleTo6Points(FABRICATED_HISTORIES.lily);
+  const tylerDownsampled = downsampleTo6Points(FABRICATED_HISTORIES.tyler);
+  const emmaDownsampled = downsampleTo6Points(FABRICATED_HISTORIES.emma);
 
   const miaStartColor = getCapacityColor(miaDownsampled[0]);
   const miaEndColor = getCapacityColor(miaDownsampled[miaDownsampled.length - 1]);
