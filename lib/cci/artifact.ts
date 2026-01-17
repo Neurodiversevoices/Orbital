@@ -784,8 +784,8 @@ export function getGoldenMasterHTML(): string {
 /**
  * Generate Circle CCI artifact HTML
  *
- * Returns HTML for aggregate Circle capacity report.
- * Similar structure to Individual CCI but with Circle-specific content.
+ * Returns HTML for Circle capacity report with 5 individual member charts.
+ * Matches the brief.tsx Circle view: Mia, Zach, Lily, Tyler, Emma.
  */
 export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMetadata>): string {
   const now = new Date();
@@ -810,72 +810,57 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
       font-size: 10px; line-height: 1.5; color: #1e293b; background: #fff;
       -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     }
-    .page { width: 612px; height: 792px; padding: 36px 42px 32px 42px; background: #fff; position: relative; }
+    .page { width: 612px; height: 792px; padding: 28px 36px 24px 36px; background: #fff; position: relative; }
     .artifact-title {
-      font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #0f172a;
-      text-align: center; margin-bottom: 6px; padding-bottom: 8px;
+      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; color: #0f172a;
+      text-align: center; margin-bottom: 4px; padding-bottom: 6px;
       border-bottom: 2px solid #00E5FF; letter-spacing: 0.8px; text-transform: uppercase;
     }
     .circle-badge {
       display: inline-block; background: rgba(0,229,255,0.15); color: #00E5FF;
-      padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 600;
-      letter-spacing: 0.5px; margin-left: 8px;
+      padding: 2px 6px; border-radius: 4px; font-size: 8px; font-weight: 600;
+      letter-spacing: 0.5px; margin-left: 6px;
     }
-    .chain-of-custody { padding: 12px 0 14px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 14px; }
-    .coc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; }
-    .coc-line { font-size: 9px; line-height: 1.6; color: #1e293b; }
-    .coc-label { font-family: 'Inter', sans-serif; font-weight: 600; color: #0f172a; text-transform: uppercase; font-size: 8px; letter-spacing: 0.5px; }
+    .chain-of-custody { padding: 8px 0 10px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 10px; }
+    .coc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; }
+    .coc-line { font-size: 8px; line-height: 1.5; color: #1e293b; }
+    .coc-label { font-family: 'Inter', sans-serif; font-weight: 600; color: #0f172a; text-transform: uppercase; font-size: 7px; letter-spacing: 0.5px; }
     .coc-value { font-family: 'Inter', sans-serif; font-weight: 400; color: #334155; }
-    .coc-value-mono { font-family: 'JetBrains Mono', 'Consolas', monospace; font-size: 8.5px; color: #334155; letter-spacing: -0.2px; }
+    .coc-value-mono { font-family: 'JetBrains Mono', 'Consolas', monospace; font-size: 7.5px; color: #334155; letter-spacing: -0.2px; }
     .coc-value em { font-style: italic; color: #475569; }
     .coc-status { font-family: 'Inter', sans-serif; font-weight: 700; color: #0f172a; letter-spacing: 0.5px; }
-    .capacity-definition {
-      background: #f0fdff; border: 1px solid #b8f4ff; border-left: 3px solid #00E5FF;
-      padding: 12px 14px; margin-bottom: 14px;
-    }
-    .capacity-definition-title { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: #0f172a; margin-bottom: 8px; letter-spacing: 0.3px; }
-    .capacity-definition-body { font-family: 'Inter', sans-serif; font-size: 8px; line-height: 1.6; color: #334155; }
-    .capacity-definition-body p { margin-bottom: 6px; }
-    .capacity-definition-emphasis { font-weight: 600; color: #0f172a; font-style: italic; }
-    .capacity-definition-list { margin: 4px 0 6px 16px; padding: 0; }
-    .capacity-definition-list li { margin-bottom: 2px; color: #475569; }
-    .capacity-definition-footer { font-style: italic; color: #64748b; margin-bottom: 0 !important; }
-    .section-title { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; color: #0f172a; margin-bottom: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
-    .circle-info { margin-bottom: 14px; }
-    .info-grid { display: grid; grid-template-columns: auto 1fr auto 1fr; gap: 4px 12px; font-size: 9px; }
+    .section-title { font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 700; color: #0f172a; margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .section-subtitle { font-family: 'Inter', sans-serif; font-size: 7px; color: #64748b; margin-bottom: 8px; }
+    .circle-info { margin-bottom: 8px; }
+    .info-grid { display: grid; grid-template-columns: auto 1fr auto 1fr; gap: 3px 10px; font-size: 8px; }
     .info-label { font-family: 'Inter', sans-serif; font-weight: 600; color: #0f172a; }
     .info-value { font-family: 'Inter', sans-serif; color: #334155; }
-    .info-value-mono { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #334155; }
-    .main-content { display: flex; gap: 20px; margin-bottom: 16px; }
-    .audit-panel { width: 180px; flex-shrink: 0; border-left: 3px solid #00E5FF; padding-left: 12px; padding-top: 4px; }
-    .audit-title { font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 700; color: #0f172a; margin-bottom: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
-    .audit-row { margin-bottom: 8px; }
-    .audit-label { font-family: 'Inter', sans-serif; font-weight: 600; color: #0f172a; font-size: 8px; text-transform: uppercase; letter-spacing: 0.3px; }
-    .audit-value { font-family: 'Inter', sans-serif; color: #334155; font-size: 9px; font-weight: 500; }
-    .audit-note { display: block; font-size: 7.5px; font-style: italic; color: #64748b; margin-top: 1px; }
-    .verdict-row { margin-top: 12px; padding-top: 8px; border-top: 1px solid #e2e8f0; }
-    .audit-verdict { font-family: 'Inter', sans-serif; font-weight: 700; color: #0f172a; font-size: 8px; letter-spacing: 0.3px; }
-    .charts-panel { flex: 1; }
-    .chart-card { background: #0a0b10; border-radius: 4px; padding: 12px 14px 10px 14px; margin-bottom: 12px; }
-    .chart-header { font-family: 'Inter', sans-serif; font-size: 8px; font-weight: 600; color: rgba(255, 255, 255, 0.7); text-align: center; margin-bottom: 8px; letter-spacing: 0.8px; text-transform: uppercase; }
-    .chart-header-sub { font-weight: 400; color: rgba(255, 255, 255, 0.4); font-size: 7px; margin-left: 6px; }
-    .bar-chart-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 4px; padding: 10px 12px; }
-    .bar-chart-title { font-family: 'Inter', sans-serif; font-size: 8px; font-weight: 600; color: #0f172a; text-align: center; margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
-    .footer-section { border-top: 1px solid #cbd5e1; padding-top: 10px; margin-top: auto; }
-    .provider-title { font-family: 'Inter', sans-serif; font-size: 8px; font-weight: 700; color: #0f172a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .provider-body { font-family: 'Inter', sans-serif; font-size: 7.5px; line-height: 1.5; color: #334155; margin-bottom: 8px; }
-    .provider-body em { font-style: italic; }
-    .legal-block { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px 10px; margin-top: 6px; }
-    .legal-title { font-family: 'Inter', sans-serif; font-size: 7px; font-weight: 700; color: #0f172a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .legal-body { font-family: 'Inter', sans-serif; font-size: 6.5px; line-height: 1.55; color: #475569; }
-    .legal-rights { font-family: 'Inter', sans-serif; font-size: 6.5px; font-weight: 700; color: #0f172a; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
+    .info-value-mono { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #334155; }
+    .members-grid { display: flex; flex-direction: column; gap: 6px; }
+    .member-card { display: flex; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 6px 8px; }
+    .member-info { width: 120px; flex-shrink: 0; padding-right: 8px; border-right: 1px solid #e2e8f0; }
+    .member-name { font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 600; color: #0f172a; margin-bottom: 2px; }
+    .member-username { font-family: 'Inter', sans-serif; font-size: 7px; color: #64748b; margin-bottom: 4px; }
+    .member-detail { font-family: 'Inter', sans-serif; font-size: 7px; color: #475569; margin-bottom: 1px; }
+    .member-detail-label { font-weight: 600; color: #334155; }
+    .status-badge { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 6.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+    .status-resourced { background: rgba(0,229,255,0.15); color: #00b8d9; }
+    .status-stretched { background: rgba(232,168,48,0.15); color: #b8860b; }
+    .status-depleted { background: rgba(244,67,54,0.15); color: #d32f2f; }
+    .member-chart { flex: 1; padding-left: 8px; }
+    .chart-card { background: #0a0b10; border-radius: 3px; padding: 4px 6px 2px 6px; height: 100%; }
+    .footer-section { border-top: 1px solid #cbd5e1; padding-top: 6px; margin-top: 6px; }
+    .legal-block { background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 8px; }
+    .legal-title { font-family: 'Inter', sans-serif; font-size: 6px; font-weight: 700; color: #0f172a; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .legal-body { font-family: 'Inter', sans-serif; font-size: 6px; line-height: 1.4; color: #475569; }
+    .legal-rights { font-family: 'Inter', sans-serif; font-size: 6px; font-weight: 700; color: #0f172a; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
     @media print { .page { border: none; } .chart-card, svg rect, svg circle, svg path, svg line { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
   </style>
 </head>
 <body>
 
 <div class="page">
-  <h1 class="artifact-title">Circle Capacity Artifact [Aggregate]<span class="circle-badge">CIRCLE</span></h1>
+  <h1 class="artifact-title">Circle Capacity Instrument<span class="circle-badge">CIRCLE</span></h1>
 
   <div class="chain-of-custody">
     <div class="coc-grid">
@@ -885,7 +870,7 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
       </div>
       <div class="coc-line">
         <span class="coc-label">Protocol:</span>
-        <span class="coc-value">Structured EMA v4.2 (Aggregate)</span>
+        <span class="coc-value">Structured EMA v4.2</span>
       </div>
       <div class="coc-line">
         <span class="coc-label">Observation Window:</span>
@@ -902,166 +887,147 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
     </div>
   </div>
 
-  <div class="capacity-definition">
-    <div class="capacity-definition-title">What "Circle Capacity" Means in This Report</div>
-    <div class="capacity-definition-body">
-      <p>Circle Capacity refers to the aggregate functional bandwidth of a group — the combined emotional, cognitive, sensory, and social load the group can manage before collective regulation degrades.</p>
-      <p class="capacity-definition-emphasis">This is NOT individual attribution. No single member's data is identifiable in this report.</p>
-      <p>Circle capacity patterns may reflect:</p>
-      <ul class="capacity-definition-list">
-        <li>shared environmental stressors</li>
-        <li>collective periods of overwhelm</li>
-        <li>group resilience patterns</li>
-        <li>coordinated recovery trends</li>
-      </ul>
-      <p class="capacity-definition-footer">This report summarizes group-level patterns over time, not individual moments or members.</p>
-    </div>
-  </div>
-
-  <h2 class="section-title">Circle Aggregate Capacity Summary</h2>
-
   <div class="circle-info">
     <div class="info-grid">
       <span class="info-label">Circle ID:</span>
       <span class="info-value-mono">SSG-2025-Q4</span>
       <span class="info-label">Members:</span>
-      <span class="info-value">5 (Aggregate Only)</span>
+      <span class="info-value">5</span>
       <span class="info-label">Circle Name:</span>
       <span class="info-value">Sensory Support Group</span>
-      <span class="info-label">Observation Period:</span>
-      <span class="info-value">Oct 1, 2025 – Dec 31, 2025</span>
+      <span class="info-label">Coordinator:</span>
+      <span class="info-value">Emily Zhang</span>
     </div>
   </div>
 
-  <div class="main-content">
-    <div class="audit-panel">
-      <h3 class="audit-title">Group Reporting Quality</h3>
-      <div class="audit-row">
-        <span class="audit-label">Aggregate Continuity:</span>
-        <span class="audit-value">88% (High Reliability)</span>
-        <span class="audit-note">Reflects consistent group participation. Individual gaps do not compromise aggregate patterns.</span>
+  <div class="section-title">Member Capacity — 90 Days</div>
+  <div class="section-subtitle">Non-diagnostic. Per-member view. Observation period: Oct 1, 2025 – Dec 31, 2025</div>
+
+  <div class="members-grid">
+    <!-- Member 1: Mia - Stretched, Flat -->
+    <div class="member-card">
+      <div class="member-info">
+        <div class="member-name">Mia Anderson</div>
+        <div class="member-username">@mia</div>
+        <div class="member-detail"><span class="member-detail-label">Status:</span> <span class="status-badge status-stretched">Stretched</span></div>
+        <div class="member-detail"><span class="member-detail-label">Trend:</span> Flat</div>
+        <div class="member-detail"><span class="member-detail-label">Participation:</span> 6/7</div>
+        <div class="member-detail"><span class="member-detail-label">Notes:</span> Sensory sensitivity</div>
       </div>
-      <div class="audit-row">
-        <span class="audit-label">Member Participation:</span>
-        <span class="audit-value">5/5 Active</span>
-        <span class="audit-note">All circle members contributed signals during observation period.</span>
-      </div>
-      <div class="audit-row">
-        <span class="audit-label">Pattern Coherence:</span>
-        <span class="audit-value">91%</span>
-        <span class="audit-note">Indicates how consistent group-level capacity patterns are. High coherence suggests shared environmental factors.</span>
-      </div>
-      <div class="audit-row verdict-row">
-        <span class="audit-label">Pattern Summary:</span>
-        <span class="audit-verdict">Interpretable Group Trends</span>
+      <div class="member-chart">
+        <div class="chart-card">
+          <svg width="100%" height="54" viewBox="0 0 380 54" preserveAspectRatio="xMidYMid meet">
+            <rect x="0" y="0" width="380" height="18" fill="#00E5FF" fill-opacity="0.08"/>
+            <rect x="0" y="18" width="380" height="18" fill="#E8A830" fill-opacity="0.06"/>
+            <rect x="0" y="36" width="380" height="18" fill="#F44336" fill-opacity="0.08"/>
+            <path d="M 4,30 L 17,32 30,34 43,32 56,28 69,26 82,30 95,32 108,36 121,34 134,32 147,30 160,28 173,32 186,34 199,32 212,30 225,32 238,34 251,36 264,34 277,32 290,30 303,28 316,30 329,32 342,32 355,34 368,32 376,30" stroke="#E8A830" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="4" cy="30" r="2.5" fill="#E8A830"/><circle cx="376" cy="30" r="2.5" fill="#E8A830"/>
+          </svg>
+        </div>
       </div>
     </div>
 
-    <div class="charts-panel">
-      <div class="chart-card">
-        <div class="chart-header">
-          Aggregate Capacity Over Time<span class="chart-header-sub">— Group Average, Non-Diagnostic</span>
-        </div>
-        <svg width="100%" height="140" viewBox="0 0 320 140" preserveAspectRatio="xMidYMid meet">
-          <rect x="32" y="8" width="280" height="36" fill="#00E5FF" fill-opacity="0.06"/>
-          <rect x="32" y="44" width="280" height="36" fill="#E8A830" fill-opacity="0.04"/>
-          <rect x="32" y="80" width="280" height="36" fill="#F44336" fill-opacity="0.06"/>
-          <line x1="32" y1="44" x2="312" y2="44" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="3 3"/>
-          <line x1="32" y1="80" x2="312" y2="80" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="3 3"/>
-          <line x1="32" y1="8" x2="312" y2="8" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-          <line x1="32" y1="116" x2="312" y2="116" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-          <line x1="32" y1="8" x2="32" y2="116" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-          <circle cx="16" cy="26" r="4" fill="#00E5FF" fill-opacity="0.9"/>
-          <circle cx="16" cy="62" r="4" fill="#E8A830" fill-opacity="0.9"/>
-          <circle cx="16" cy="98" r="4" fill="#F44336" fill-opacity="0.9"/>
-          <text x="6" y="29" font-size="7" fill="#00E5FF" font-family="Inter, sans-serif" font-weight="600">H</text>
-          <text x="6" y="65" font-size="7" fill="#E8A830" font-family="Inter, sans-serif" font-weight="600">M</text>
-          <text x="6" y="101" font-size="7" fill="#F44336" font-family="Inter, sans-serif" font-weight="600">L</text>
-          <defs>
-            <linearGradient id="areaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#00E5FF" stop-opacity="0.20"/>
-              <stop offset="50%" stop-color="#E8A830" stop-opacity="0.12"/>
-              <stop offset="100%" stop-color="#F44336" stop-opacity="0.20"/>
-            </linearGradient>
-            <linearGradient id="lineGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#00E5FF"/>
-              <stop offset="50%" stop-color="#E8A830"/>
-              <stop offset="100%" stop-color="#F44336"/>
-            </linearGradient>
-          </defs>
-          <path d="M 40,85 C 52,78 64,65 80,55 C 96,45 112,38 128,42 C 148,48 168,58 188,62 C 208,66 228,58 248,48 C 268,40 288,36 300,38 L 300,116 L 40,116 Z" fill="url(#areaGrad)"/>
-          <path d="M 40,85 C 52,78 64,65 80,55 C 96,45 112,38 128,42 C 148,48 168,58 188,62 C 208,66 228,58 248,48 C 268,40 288,36 300,38" stroke="#0a0b10" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M 40,85 C 52,78 64,65 80,55 C 96,45 112,38 128,42 C 148,48 168,58 188,62 C 208,66 228,58 248,48 C 268,40 288,36 300,38" stroke="url(#lineGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-          <g class="data-nodes">
-            <circle cx="40" cy="85" r="5" fill="#0a0b10"/><circle cx="40" cy="85" r="3.5" fill="#E8A830"/><circle cx="40" cy="85" r="1.5" fill="white" fill-opacity="0.9"/>
-            <circle cx="80" cy="55" r="5" fill="#0a0b10"/><circle cx="80" cy="55" r="3.5" fill="#00E5FF"/><circle cx="80" cy="55" r="1.5" fill="white" fill-opacity="0.9"/>
-            <circle cx="128" cy="42" r="5" fill="#0a0b10"/><circle cx="128" cy="42" r="3.5" fill="#00E5FF"/><circle cx="128" cy="42" r="1.5" fill="white" fill-opacity="0.9"/>
-            <circle cx="188" cy="62" r="5" fill="#0a0b10"/><circle cx="188" cy="62" r="3.5" fill="#E8A830"/><circle cx="188" cy="62" r="1.5" fill="white" fill-opacity="0.9"/>
-            <circle cx="248" cy="48" r="5" fill="#0a0b10"/><circle cx="248" cy="48" r="3.5" fill="#00E5FF"/><circle cx="248" cy="48" r="1.5" fill="white" fill-opacity="0.9"/>
-            <circle cx="300" cy="38" r="5" fill="#0a0b10"/><circle cx="300" cy="38" r="3.5" fill="#00E5FF"/><circle cx="300" cy="38" r="1.5" fill="white" fill-opacity="0.9"/>
-          </g>
-          <text x="70" y="132" font-size="9" fill="rgba(255,255,255,0.6)" font-family="Inter, sans-serif" font-weight="500" text-anchor="middle">Oct</text>
-          <text x="170" y="132" font-size="9" fill="rgba(255,255,255,0.6)" font-family="Inter, sans-serif" font-weight="500" text-anchor="middle">Nov</text>
-          <text x="270" y="132" font-size="9" fill="rgba(255,255,255,0.6)" font-family="Inter, sans-serif" font-weight="500" text-anchor="middle">Dec</text>
-        </svg>
+    <!-- Member 2: Zach - Depleted, Declining -->
+    <div class="member-card">
+      <div class="member-info">
+        <div class="member-name">Zach Teguns</div>
+        <div class="member-username">@zach</div>
+        <div class="member-detail"><span class="member-detail-label">Status:</span> <span class="status-badge status-depleted">Depleted</span></div>
+        <div class="member-detail"><span class="member-detail-label">Trend:</span> Declining</div>
+        <div class="member-detail"><span class="member-detail-label">Participation:</span> 7/7</div>
+        <div class="member-detail"><span class="member-detail-label">Notes:</span> Sleep disruption</div>
       </div>
+      <div class="member-chart">
+        <div class="chart-card">
+          <svg width="100%" height="54" viewBox="0 0 380 54" preserveAspectRatio="xMidYMid meet">
+            <rect x="0" y="0" width="380" height="18" fill="#00E5FF" fill-opacity="0.08"/>
+            <rect x="0" y="18" width="380" height="18" fill="#E8A830" fill-opacity="0.06"/>
+            <rect x="0" y="36" width="380" height="18" fill="#F44336" fill-opacity="0.08"/>
+            <path d="M 4,10 L 30,12 56,14 82,18 108,22 134,26 160,30 186,34 212,38 238,42 264,44 290,46 316,48 342,48 368,50 376,50" stroke="url(#declineGrad)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs><linearGradient id="declineGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00E5FF"/><stop offset="50%" stop-color="#E8A830"/><stop offset="100%" stop-color="#F44336"/></linearGradient></defs>
+            <circle cx="4" cy="10" r="2.5" fill="#00E5FF"/><circle cx="376" cy="50" r="2.5" fill="#F44336"/>
+          </svg>
+        </div>
+      </div>
+    </div>
 
-      <div class="bar-chart-card">
-        <div class="bar-chart-title">Group Stability Summary</div>
-        <svg width="100%" height="100" viewBox="0 0 320 100" preserveAspectRatio="xMidYMid meet">
-          <line x1="36" y1="10" x2="36" y2="75" stroke="#cbd5e1" stroke-width="1"/>
-          <line x1="36" y1="75" x2="300" y2="75" stroke="#cbd5e1" stroke-width="1"/>
-          <line x1="36" y1="26" x2="300" y2="26" stroke="#e2e8f0" stroke-width="1"/>
-          <line x1="36" y1="42" x2="300" y2="42" stroke="#e2e8f0" stroke-width="1"/>
-          <line x1="36" y1="58" x2="300" y2="58" stroke="#e2e8f0" stroke-width="1"/>
-          <text x="30" y="14" font-size="7" fill="#64748b" font-family="Inter, sans-serif" text-anchor="end">80</text>
-          <text x="30" y="30" font-size="7" fill="#64748b" font-family="Inter, sans-serif" text-anchor="end">60</text>
-          <text x="30" y="46" font-size="7" fill="#64748b" font-family="Inter, sans-serif" text-anchor="end">40</text>
-          <text x="30" y="62" font-size="7" fill="#64748b" font-family="Inter, sans-serif" text-anchor="end">20</text>
-          <text x="30" y="78" font-size="7" fill="#64748b" font-family="Inter, sans-serif" text-anchor="end">0</text>
-          <rect x="50" y="18" width="22" height="57" fill="#00E5FF"/>
-          <rect x="76" y="58" width="22" height="17" fill="#E8A830"/>
-          <rect x="130" y="22" width="22" height="53" fill="#00E5FF"/>
-          <rect x="156" y="54" width="22" height="21" fill="#E8A830"/>
-          <rect x="210" y="20" width="22" height="55" fill="#00E5FF"/>
-          <rect x="236" y="56" width="22" height="19" fill="#E8A830"/>
-          <text x="74" y="90" font-size="8" fill="#334155" font-family="Inter, sans-serif" font-weight="500" text-anchor="middle">Oct</text>
-          <text x="154" y="90" font-size="8" fill="#334155" font-family="Inter, sans-serif" font-weight="500" text-anchor="middle">Nov</text>
-          <text x="234" y="90" font-size="8" fill="#334155" font-family="Inter, sans-serif" font-weight="500" text-anchor="middle">Dec</text>
-          <rect x="270" y="18" width="8" height="8" fill="#00E5FF"/>
-          <text x="282" y="25" font-size="6.5" fill="#334155" font-family="Inter, sans-serif">Stability</text>
-          <rect x="270" y="32" width="8" height="8" fill="#E8A830"/>
-          <text x="282" y="39" font-size="6.5" fill="#334155" font-family="Inter, sans-serif">Volatility</text>
-        </svg>
+    <!-- Member 3: Lily - Resourced, Improving -->
+    <div class="member-card">
+      <div class="member-info">
+        <div class="member-name">Lily Teguns</div>
+        <div class="member-username">@lily</div>
+        <div class="member-detail"><span class="member-detail-label">Status:</span> <span class="status-badge status-resourced">Resourced</span></div>
+        <div class="member-detail"><span class="member-detail-label">Trend:</span> Improving</div>
+        <div class="member-detail"><span class="member-detail-label">Participation:</span> 5/5</div>
+        <div class="member-detail"><span class="member-detail-label">Notes:</span> Steady progress</div>
+      </div>
+      <div class="member-chart">
+        <div class="chart-card">
+          <svg width="100%" height="54" viewBox="0 0 380 54" preserveAspectRatio="xMidYMid meet">
+            <rect x="0" y="0" width="380" height="18" fill="#00E5FF" fill-opacity="0.08"/>
+            <rect x="0" y="18" width="380" height="18" fill="#E8A830" fill-opacity="0.06"/>
+            <rect x="0" y="36" width="380" height="18" fill="#F44336" fill-opacity="0.08"/>
+            <path d="M 4,48 L 30,46 56,44 82,40 108,36 134,32 160,28 186,24 212,20 238,16 264,12 290,10 316,8 342,6 368,6 376,4" stroke="url(#improveGrad)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs><linearGradient id="improveGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#F44336"/><stop offset="50%" stop-color="#E8A830"/><stop offset="100%" stop-color="#00E5FF"/></linearGradient></defs>
+            <circle cx="4" cy="48" r="2.5" fill="#F44336"/><circle cx="376" cy="4" r="2.5" fill="#00E5FF"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Member 4: Tyler - Stretched, Flat (Volatile) -->
+    <div class="member-card">
+      <div class="member-info">
+        <div class="member-name">Tyler Ramirez</div>
+        <div class="member-username">@tyler</div>
+        <div class="member-detail"><span class="member-detail-label">Status:</span> <span class="status-badge status-stretched">Stretched</span></div>
+        <div class="member-detail"><span class="member-detail-label">Trend:</span> Volatile</div>
+        <div class="member-detail"><span class="member-detail-label">Participation:</span> 5/5</div>
+        <div class="member-detail"><span class="member-detail-label">Notes:</span> Transition support</div>
+      </div>
+      <div class="member-chart">
+        <div class="chart-card">
+          <svg width="100%" height="54" viewBox="0 0 380 54" preserveAspectRatio="xMidYMid meet">
+            <rect x="0" y="0" width="380" height="18" fill="#00E5FF" fill-opacity="0.08"/>
+            <rect x="0" y="18" width="380" height="18" fill="#E8A830" fill-opacity="0.06"/>
+            <rect x="0" y="36" width="380" height="18" fill="#F44336" fill-opacity="0.08"/>
+            <path d="M 4,26 L 30,42 56,14 82,48 108,10 134,36 160,22 186,50 212,8 238,40 264,18 290,44 316,24 342,38 368,16 376,32" stroke="#E8A830" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="4" cy="26" r="2.5" fill="#E8A830"/><circle cx="376" cy="32" r="2.5" fill="#E8A830"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Member 5: Emma - Depleted, Declining -->
+    <div class="member-card">
+      <div class="member-info">
+        <div class="member-name">Emily Zhang</div>
+        <div class="member-username">@emma</div>
+        <div class="member-detail"><span class="member-detail-label">Status:</span> <span class="status-badge status-depleted">Depleted</span></div>
+        <div class="member-detail"><span class="member-detail-label">Trend:</span> Declining</div>
+        <div class="member-detail"><span class="member-detail-label">Participation:</span> 5/5</div>
+        <div class="member-detail"><span class="member-detail-label">Notes:</span> Schedule changes</div>
+      </div>
+      <div class="member-chart">
+        <div class="chart-card">
+          <svg width="100%" height="54" viewBox="0 0 380 54" preserveAspectRatio="xMidYMid meet">
+            <rect x="0" y="0" width="380" height="18" fill="#00E5FF" fill-opacity="0.08"/>
+            <rect x="0" y="18" width="380" height="18" fill="#E8A830" fill-opacity="0.06"/>
+            <rect x="0" y="36" width="380" height="18" fill="#F44336" fill-opacity="0.08"/>
+            <path d="M 4,14 L 30,16 56,18 82,20 108,24 134,26 160,30 186,32 212,36 238,38 264,42 290,44 316,46 342,48 368,50 376,50" stroke="url(#declineGrad2)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs><linearGradient id="declineGrad2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00E5FF"/><stop offset="40%" stop-color="#E8A830"/><stop offset="100%" stop-color="#F44336"/></linearGradient></defs>
+            <circle cx="4" cy="14" r="2.5" fill="#00E5FF"/><circle cx="376" cy="50" r="2.5" fill="#F44336"/>
+          </svg>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="footer-section">
-    <div class="provider-title">Circle Coordination Statement</div>
-    <div class="provider-body">
-      This artifact is an aggregate summary of group-generated capacity signals. <em>No individual member data is identifiable in this report.</em> The Circle Capacity Instrument documents collective patterns for coordination purposes only. This does NOT constitute individual diagnosis or assessment.
-    </div>
-
-    <div class="capacity-definition" style="margin-top: 10px; margin-bottom: 10px;">
-      <div class="capacity-definition-title">How to Use This Report</div>
-      <div class="capacity-definition-body">
-        <p>This report supports group coordination, shared planning, and collective awareness.</p>
-        <p>It may be useful for:</p>
-        <ul class="capacity-definition-list">
-          <li>identifying periods of shared overwhelm</li>
-          <li>planning group activities around capacity</li>
-          <li>understanding collective resilience patterns</li>
-          <li>coordinating support during low-capacity periods</li>
-        </ul>
-        <p class="capacity-definition-footer">This report should be used for coordination, not individual evaluation.</p>
-      </div>
-    </div>
-
     <div class="legal-block">
       <div class="legal-title">Confidential &amp; Proprietary Notice</div>
       <div class="legal-body">
-        This Circle Capacity Instrument and all underlying methodologies, algorithms, data structures, and presentation formats constitute proprietary intellectual property of Orbital Health Intelligence, Inc. No individual member data is exposed in this aggregate report. Unauthorized reproduction, distribution, or derivative works are strictly prohibited.
+        This Circle Capacity Instrument and all underlying methodologies, algorithms, data structures, and presentation formats constitute proprietary intellectual property of Orbital Health Intelligence, Inc. This is NOT a diagnostic tool. Not a symptom severity scale. For coordination purposes only.
       </div>
       <div class="legal-rights">© 2026 Orbital Health Intelligence, Inc. All Rights Reserved.</div>
     </div>
