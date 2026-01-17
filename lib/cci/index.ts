@@ -8,4 +8,5 @@
  */
 
 export { generateCCIArtifactHTML, createCCIArtifact, getGoldenMasterHTML, generateCircleCCIArtifactHTML, getCircleGoldenMasterHTML } from './artifact';
+export { generateBundleCCIArtifactHTML, getBundleGoldenMasterHTML, createBundleCCIArtifact } from './bundleArtifact';
 export { CCIArtifact, CCIIssuanceMetadata, CCI_GOLDEN_MASTER_PATH } from './types';

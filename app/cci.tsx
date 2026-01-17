@@ -23,7 +23,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, FileText, Download, Eye, ExternalLink, Mail, Users } from 'lucide-react-native';
 import { colors, spacing, borderRadius, commonStyles } from '../theme';
-import { generateCCIArtifactHTML, getGoldenMasterHTML, getCircleGoldenMasterHTML } from '../lib/cci';
+import { generateCCIArtifactHTML, getGoldenMasterHTML, getCircleGoldenMasterHTML, getBundleGoldenMasterHTML } from '../lib/cci';
 import { FOUNDER_DEMO_ENABLED } from '../lib/hooks/useDemoMode';
 import { ISSUANCE_REQUEST_URL } from '../lib/payments';
 
@@ -36,9 +36,11 @@ const CCI_ACCESSIBLE = Platform.OS === 'web' || FOUNDER_DEMO_ENABLED;
 
 export default function CCIInstrumentScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ type?: string }>();
-  const cciType = params.type === 'circle' ? 'circle' : 'individual';
+  const params = useLocalSearchParams<{ type?: string; seats?: string }>();
+  const cciType = params.type === 'circle' ? 'circle' : params.type === 'bundle' ? 'bundle' : 'individual';
   const isCircle = cciType === 'circle';
+  const isBundle = cciType === 'bundle';
+  const bundleSeatCount = (parseInt(params.seats || '10') as 10 | 15 | 20) || 10;
 
   const [isViewing, setIsViewing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -59,8 +61,12 @@ export default function CCIInstrumentScreen() {
   }
 
   // Get the golden master HTML (exact match to PDF)
-  // Use Circle artifact for circle type, Individual artifact otherwise
-  const artifactHTML = isCircle ? getCircleGoldenMasterHTML() : getGoldenMasterHTML();
+  // Use appropriate artifact based on type: circle, bundle, or individual
+  const artifactHTML = isCircle
+    ? getCircleGoldenMasterHTML()
+    : isBundle
+    ? getBundleGoldenMasterHTML(bundleSeatCount)
+    : getGoldenMasterHTML();
 
   // View instrument in new window (web only)
   const handleViewInstrument = useCallback(() => {
@@ -116,13 +122,13 @@ export default function CCIInstrumentScreen() {
           <ArrowLeft size={24} color={colors.textPrimary} />
         </Pressable>
         <View style={styles.headerCenter}>
-          {isCircle ? (
+          {isCircle || isBundle ? (
             <Users size={18} color="#00E5FF" />
           ) : (
             <FileText size={18} color="#7A9AAA" />
           )}
           <Text style={styles.headerTitle}>
-            {isCircle ? 'Circle CCI-Q4' : 'CCI-Q4 Issuance'}
+            {isCircle ? 'Circle CCI-Q4' : isBundle ? `Bundle CCI (${bundleSeatCount} Seats)` : 'CCI-Q4 Issuance'}
           </Text>
         </View>
         <View style={styles.headerSpacer} />
@@ -130,18 +136,26 @@ export default function CCIInstrumentScreen() {
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         {/* Artifact Info Card */}
-        <View style={[styles.infoCard, isCircle && styles.infoCardCircle]}>
+        <View style={[styles.infoCard, (isCircle || isBundle) && styles.infoCardCircle]}>
           <Text style={styles.infoTitle}>
-            {isCircle ? 'Circle Capacity Instrument' : 'Clinical Capacity Instrument'}
+            {isCircle ? 'Circle Capacity Instrument' : isBundle ? 'Bundle Capacity Instrument' : 'Clinical Capacity Instrument'}
           </Text>
-          <Text style={[styles.infoSubtitle, isCircle && styles.infoSubtitleCircle]}>
-            {isCircle ? 'AGGREGATE CCI-Q4' : 'Q4 2025 Artifact'}
+          <Text style={[styles.infoSubtitle, (isCircle || isBundle) && styles.infoSubtitleCircle]}>
+            {isCircle ? 'AGGREGATE CCI-Q4' : isBundle ? `${bundleSeatCount}-SEAT BUNDLE` : 'Q4 2025 Artifact'}
           </Text>
 
           {isCircle && (
             <View style={styles.circleNotice}>
               <Text style={styles.circleNoticeText}>
                 This is an aggregate capacity summary for your Circle. No individual attribution — only group-level patterns.
+              </Text>
+            </View>
+          )}
+
+          {isBundle && (
+            <View style={styles.circleNotice}>
+              <Text style={styles.circleNoticeText}>
+                Anonymous capacity summary for {bundleSeatCount} seats. No PII — avatars and aggregate patterns only.
               </Text>
             </View>
           )}
@@ -170,6 +184,13 @@ export default function CCIInstrumentScreen() {
             <View style={styles.metaRow}>
               <Text style={styles.metaLabel}>Scope:</Text>
               <Text style={styles.metaValue}>5 Circle Members (Aggregate)</Text>
+            </View>
+          )}
+
+          {isBundle && (
+            <View style={styles.metaRow}>
+              <Text style={styles.metaLabel}>Scope:</Text>
+              <Text style={styles.metaValue}>{bundleSeatCount} Anonymous Seats</Text>
             </View>
           )}
 
