@@ -849,33 +849,112 @@ const CIRCLE_CAPACITY_DATA: Record<string, number[]> = {
 };
 
 /**
- * Generate SVG path string from capacity data array
- * Maps capacity values (1.0-3.0) to Y coordinates in the chart
+ * Downsample 90-day data to 6 representative points (matching app)
+ * Takes averages at: Day 1, Day 18, Day 36, Day 54, Day 72, Day 90
  */
-function generateSVGPath(data: number[], width: number, height: number): string {
-  if (data.length === 0) return '';
+function downsampleTo6Points(data: number[]): number[] {
+  if (data.length <= 6) return data;
 
-  const points: string[] = [];
-  const xStep = width / (data.length - 1);
-
-  data.forEach((value, index) => {
-    const x = Math.round(index * xStep);
-    // Map capacity 1.0-3.0 to y coordinates (inverted: high capacity = low y)
-    const y = Math.round(height - ((value - 1.0) / 2.0) * height);
-    const clampedY = Math.max(2, Math.min(height - 2, y)); // Keep within bounds
-    points.push(`${x},${clampedY}`);
+  const indices = [0, 17, 35, 53, 71, 89]; // 6 evenly spaced points
+  return indices.map(i => {
+    // Average with neighbors for smoothing
+    const start = Math.max(0, i - 2);
+    const end = Math.min(data.length - 1, i + 2);
+    let sum = 0;
+    let count = 0;
+    for (let j = start; j <= end; j++) {
+      sum += data[j];
+      count++;
+    }
+    return sum / count;
   });
-
-  return 'M ' + points.join(' L ');
 }
 
 /**
- * Get capacity color based on value (matches app exactly)
+ * Generate smooth Bezier curve path from points (monotone cubic interpolation)
+ * Matches the app's CCIChart rendering style
+ */
+function generateBezierPath(data: number[], width: number, height: number): string {
+  const points = downsampleTo6Points(data);
+  if (points.length < 2) return '';
+
+  const coords: { x: number; y: number }[] = points.map((value, index) => ({
+    x: Math.round((index / (points.length - 1)) * width),
+    y: Math.round(height - ((value - 1.0) / 2.0) * height)
+  }));
+
+  // Clamp Y values within bounds
+  coords.forEach(p => {
+    p.y = Math.max(2, Math.min(height - 2, p.y));
+  });
+
+  // Start path
+  let path = `M ${coords[0].x},${coords[0].y}`;
+
+  // Generate smooth cubic bezier curves between points
+  for (let i = 0; i < coords.length - 1; i++) {
+    const p0 = coords[Math.max(0, i - 1)];
+    const p1 = coords[i];
+    const p2 = coords[i + 1];
+    const p3 = coords[Math.min(coords.length - 1, i + 2)];
+
+    // Control points at 30% distance (matching app)
+    const tension = 0.3;
+    const cp1x = p1.x + (p2.x - p0.x) * tension;
+    const cp1y = p1.y + (p2.y - p0.y) * tension;
+    const cp2x = p2.x - (p3.x - p1.x) * tension;
+    const cp2y = p2.y - (p3.y - p1.y) * tension;
+
+    path += ` C ${Math.round(cp1x)},${Math.round(cp1y)} ${Math.round(cp2x)},${Math.round(cp2y)} ${coords[i + 1].x},${coords[i + 1].y}`;
+  }
+
+  return path;
+}
+
+/**
+ * Generate area fill path (closes the curve to bottom)
+ */
+function generateAreaPath(data: number[], width: number, height: number): string {
+  const linePath = generateBezierPath(data, width, height);
+  if (!linePath) return '';
+
+  // Close path to bottom corners for area fill
+  return `${linePath} L ${width},${height} L 0,${height} Z`;
+}
+
+/**
+ * Get downsampled points with coordinates for node markers
+ */
+function getChartNodes(data: number[], width: number, height: number): { x: number; y: number; value: number }[] {
+  const points = downsampleTo6Points(data);
+  return points.map((value, index) => ({
+    x: Math.round((index / (points.length - 1)) * width),
+    y: Math.max(2, Math.min(height - 2, Math.round(height - ((value - 1.0) / 2.0) * height))),
+    value
+  }));
+}
+
+/**
+ * Get capacity color based on value (4-tier matching app exactly)
  */
 function getCapacityColor(value: number): string {
   if (value >= 2.5) return '#00E5FF'; // Cyan - Resourced
-  if (value >= 1.5) return '#E8A830'; // Yellow - Stretched
+  if (value >= 2.0) return '#10B981'; // Green - Good
+  if (value >= 1.5) return '#E8A830'; // Amber - Stretched
   return '#F44336'; // Red - Depleted
+}
+
+/**
+ * Generate multi-layer node markers SVG (matching app style)
+ */
+function generateNodeMarkers(nodes: { x: number; y: number; value: number }[]): string {
+  return nodes.map(node => {
+    const color = getCapacityColor(node.value);
+    return `
+      <circle cx="${node.x}" cy="${node.y}" r="5" fill="#0a0b10"/>
+      <circle cx="${node.x}" cy="${node.y}" r="3.5" fill="${color}"/>
+      <circle cx="${node.x}" cy="${node.y}" r="1.5" fill="white" fill-opacity="0.9"/>`;
+  }).join('');
 }
 
 /**
@@ -889,26 +968,55 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
   const timestamp = metadata?.generatedAt || formatUTCTimestamp(now);
   const hash = metadata?.integrityHash || generatePlaceholderHash();
 
-  // Generate SVG paths from real capacity data
+  // Chart dimensions matching app
   const chartWidth = 372;
   const chartHeight = 50;
-  const miaPath = generateSVGPath(CIRCLE_CAPACITY_DATA.mia, chartWidth, chartHeight);
-  const zachPath = generateSVGPath(CIRCLE_CAPACITY_DATA.zach, chartWidth, chartHeight);
-  const lilyPath = generateSVGPath(CIRCLE_CAPACITY_DATA.lily, chartWidth, chartHeight);
-  const tylerPath = generateSVGPath(CIRCLE_CAPACITY_DATA.tyler, chartWidth, chartHeight);
-  const emmaPath = generateSVGPath(CIRCLE_CAPACITY_DATA.emma, chartWidth, chartHeight);
 
-  // Get start/end colors for each member
-  const miaStartColor = getCapacityColor(CIRCLE_CAPACITY_DATA.mia[0]);
-  const miaEndColor = getCapacityColor(CIRCLE_CAPACITY_DATA.mia[CIRCLE_CAPACITY_DATA.mia.length - 1]);
-  const zachStartColor = getCapacityColor(CIRCLE_CAPACITY_DATA.zach[0]);
-  const zachEndColor = getCapacityColor(CIRCLE_CAPACITY_DATA.zach[CIRCLE_CAPACITY_DATA.zach.length - 1]);
-  const lilyStartColor = getCapacityColor(CIRCLE_CAPACITY_DATA.lily[0]);
-  const lilyEndColor = getCapacityColor(CIRCLE_CAPACITY_DATA.lily[CIRCLE_CAPACITY_DATA.lily.length - 1]);
-  const tylerStartColor = getCapacityColor(CIRCLE_CAPACITY_DATA.tyler[0]);
-  const tylerEndColor = getCapacityColor(CIRCLE_CAPACITY_DATA.tyler[CIRCLE_CAPACITY_DATA.tyler.length - 1]);
-  const emmaStartColor = getCapacityColor(CIRCLE_CAPACITY_DATA.emma[0]);
-  const emmaEndColor = getCapacityColor(CIRCLE_CAPACITY_DATA.emma[CIRCLE_CAPACITY_DATA.emma.length - 1]);
+  // Generate Bezier curve paths (smooth, 6 points)
+  const miaPath = generateBezierPath(CIRCLE_CAPACITY_DATA.mia, chartWidth, chartHeight);
+  const zachPath = generateBezierPath(CIRCLE_CAPACITY_DATA.zach, chartWidth, chartHeight);
+  const lilyPath = generateBezierPath(CIRCLE_CAPACITY_DATA.lily, chartWidth, chartHeight);
+  const tylerPath = generateBezierPath(CIRCLE_CAPACITY_DATA.tyler, chartWidth, chartHeight);
+  const emmaPath = generateBezierPath(CIRCLE_CAPACITY_DATA.emma, chartWidth, chartHeight);
+
+  // Generate area fill paths
+  const miaArea = generateAreaPath(CIRCLE_CAPACITY_DATA.mia, chartWidth, chartHeight);
+  const zachArea = generateAreaPath(CIRCLE_CAPACITY_DATA.zach, chartWidth, chartHeight);
+  const lilyArea = generateAreaPath(CIRCLE_CAPACITY_DATA.lily, chartWidth, chartHeight);
+  const tylerArea = generateAreaPath(CIRCLE_CAPACITY_DATA.tyler, chartWidth, chartHeight);
+  const emmaArea = generateAreaPath(CIRCLE_CAPACITY_DATA.emma, chartWidth, chartHeight);
+
+  // Get node markers for each member (6 points with multi-layer styling)
+  const miaNodes = getChartNodes(CIRCLE_CAPACITY_DATA.mia, chartWidth, chartHeight);
+  const zachNodes = getChartNodes(CIRCLE_CAPACITY_DATA.zach, chartWidth, chartHeight);
+  const lilyNodes = getChartNodes(CIRCLE_CAPACITY_DATA.lily, chartWidth, chartHeight);
+  const tylerNodes = getChartNodes(CIRCLE_CAPACITY_DATA.tyler, chartWidth, chartHeight);
+  const emmaNodes = getChartNodes(CIRCLE_CAPACITY_DATA.emma, chartWidth, chartHeight);
+
+  // Generate node marker SVG for each member
+  const miaMarkers = generateNodeMarkers(miaNodes);
+  const zachMarkers = generateNodeMarkers(zachNodes);
+  const lilyMarkers = generateNodeMarkers(lilyNodes);
+  const tylerMarkers = generateNodeMarkers(tylerNodes);
+  const emmaMarkers = generateNodeMarkers(emmaNodes);
+
+  // Get dominant colors for gradients (based on downsampled data)
+  const miaDownsampled = downsampleTo6Points(CIRCLE_CAPACITY_DATA.mia);
+  const zachDownsampled = downsampleTo6Points(CIRCLE_CAPACITY_DATA.zach);
+  const lilyDownsampled = downsampleTo6Points(CIRCLE_CAPACITY_DATA.lily);
+  const tylerDownsampled = downsampleTo6Points(CIRCLE_CAPACITY_DATA.tyler);
+  const emmaDownsampled = downsampleTo6Points(CIRCLE_CAPACITY_DATA.emma);
+
+  const miaStartColor = getCapacityColor(miaDownsampled[0]);
+  const miaEndColor = getCapacityColor(miaDownsampled[miaDownsampled.length - 1]);
+  const zachStartColor = getCapacityColor(zachDownsampled[0]);
+  const zachEndColor = getCapacityColor(zachDownsampled[zachDownsampled.length - 1]);
+  const lilyStartColor = getCapacityColor(lilyDownsampled[0]);
+  const lilyEndColor = getCapacityColor(lilyDownsampled[lilyDownsampled.length - 1]);
+  const tylerStartColor = getCapacityColor(tylerDownsampled[0]);
+  const tylerEndColor = getCapacityColor(tylerDownsampled[tylerDownsampled.length - 1]);
+  const emmaStartColor = getCapacityColor(emmaDownsampled[0]);
+  const emmaEndColor = getCapacityColor(emmaDownsampled[emmaDownsampled.length - 1]);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1035,12 +1143,17 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
       <div class="member-chart">
         <div class="chart-card">
           <svg width="100%" height="54" viewBox="0 0 ${chartWidth} ${chartHeight + 4}" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="miaGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${miaStartColor}"/><stop offset="100%" stop-color="${miaEndColor}"/></linearGradient>
+              <linearGradient id="miaAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${miaEndColor}" stop-opacity="0.20"/><stop offset="100%" stop-color="${miaEndColor}" stop-opacity="0.02"/></linearGradient>
+            </defs>
             <rect x="0" y="0" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#00E5FF" fill-opacity="0.08"/>
             <rect x="0" y="${Math.round(chartHeight / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#E8A830" fill-opacity="0.06"/>
             <rect x="0" y="${Math.round(chartHeight * 2 / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#F44336" fill-opacity="0.08"/>
-            <path d="${miaPath}" stroke="${miaEndColor}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="0" cy="${Math.round(chartHeight - ((CIRCLE_CAPACITY_DATA.mia[0] - 1.0) / 2.0) * chartHeight)}" r="2.5" fill="${miaStartColor}"/>
-            <circle cx="${chartWidth}" cy="${Math.round(chartHeight - ((CIRCLE_CAPACITY_DATA.mia[CIRCLE_CAPACITY_DATA.mia.length - 1] - 1.0) / 2.0) * chartHeight)}" r="2.5" fill="${miaEndColor}"/>
+            <path d="${miaArea}" fill="url(#miaAreaGrad)"/>
+            <path d="${miaPath}" stroke="#0a0b10" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="${miaPath}" stroke="url(#miaGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            ${miaMarkers}
           </svg>
         </div>
       </div>
@@ -1059,13 +1172,17 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
       <div class="member-chart">
         <div class="chart-card">
           <svg width="100%" height="54" viewBox="0 0 ${chartWidth} ${chartHeight + 4}" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="zachGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${zachStartColor}"/><stop offset="100%" stop-color="${zachEndColor}"/></linearGradient>
+              <linearGradient id="zachAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${zachStartColor}" stop-opacity="0.20"/><stop offset="100%" stop-color="${zachEndColor}" stop-opacity="0.02"/></linearGradient>
+            </defs>
             <rect x="0" y="0" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#00E5FF" fill-opacity="0.08"/>
             <rect x="0" y="${Math.round(chartHeight / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#E8A830" fill-opacity="0.06"/>
             <rect x="0" y="${Math.round(chartHeight * 2 / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#F44336" fill-opacity="0.08"/>
-            <defs><linearGradient id="zachGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${zachStartColor}"/><stop offset="100%" stop-color="${zachEndColor}"/></linearGradient></defs>
-            <path d="${zachPath}" stroke="url(#zachGrad)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="0" cy="${Math.round(chartHeight - ((CIRCLE_CAPACITY_DATA.zach[0] - 1.0) / 2.0) * chartHeight)}" r="2.5" fill="${zachStartColor}"/>
-            <circle cx="${chartWidth}" cy="${Math.round(chartHeight - ((CIRCLE_CAPACITY_DATA.zach[CIRCLE_CAPACITY_DATA.zach.length - 1] - 1.0) / 2.0) * chartHeight)}" r="2.5" fill="${zachEndColor}"/>
+            <path d="${zachArea}" fill="url(#zachAreaGrad)"/>
+            <path d="${zachPath}" stroke="#0a0b10" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="${zachPath}" stroke="url(#zachGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            ${zachMarkers}
           </svg>
         </div>
       </div>
@@ -1084,13 +1201,17 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
       <div class="member-chart">
         <div class="chart-card">
           <svg width="100%" height="54" viewBox="0 0 ${chartWidth} ${chartHeight + 4}" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="lilyGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${lilyStartColor}"/><stop offset="100%" stop-color="${lilyEndColor}"/></linearGradient>
+              <linearGradient id="lilyAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${lilyEndColor}" stop-opacity="0.20"/><stop offset="100%" stop-color="${lilyStartColor}" stop-opacity="0.02"/></linearGradient>
+            </defs>
             <rect x="0" y="0" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#00E5FF" fill-opacity="0.08"/>
             <rect x="0" y="${Math.round(chartHeight / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#E8A830" fill-opacity="0.06"/>
             <rect x="0" y="${Math.round(chartHeight * 2 / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#F44336" fill-opacity="0.08"/>
-            <defs><linearGradient id="lilyGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${lilyStartColor}"/><stop offset="100%" stop-color="${lilyEndColor}"/></linearGradient></defs>
-            <path d="${lilyPath}" stroke="url(#lilyGrad)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="0" cy="${Math.round(chartHeight - ((CIRCLE_CAPACITY_DATA.lily[0] - 1.0) / 2.0) * chartHeight)}" r="2.5" fill="${lilyStartColor}"/>
-            <circle cx="${chartWidth}" cy="${Math.round(chartHeight - ((CIRCLE_CAPACITY_DATA.lily[CIRCLE_CAPACITY_DATA.lily.length - 1] - 1.0) / 2.0) * chartHeight)}" r="2.5" fill="${lilyEndColor}"/>
+            <path d="${lilyArea}" fill="url(#lilyAreaGrad)"/>
+            <path d="${lilyPath}" stroke="#0a0b10" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="${lilyPath}" stroke="url(#lilyGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            ${lilyMarkers}
           </svg>
         </div>
       </div>
@@ -1109,12 +1230,17 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
       <div class="member-chart">
         <div class="chart-card">
           <svg width="100%" height="54" viewBox="0 0 ${chartWidth} ${chartHeight + 4}" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="tylerGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${tylerStartColor}"/><stop offset="100%" stop-color="${tylerEndColor}"/></linearGradient>
+              <linearGradient id="tylerAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${tylerEndColor}" stop-opacity="0.20"/><stop offset="100%" stop-color="${tylerEndColor}" stop-opacity="0.02"/></linearGradient>
+            </defs>
             <rect x="0" y="0" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#00E5FF" fill-opacity="0.08"/>
             <rect x="0" y="${Math.round(chartHeight / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#E8A830" fill-opacity="0.06"/>
             <rect x="0" y="${Math.round(chartHeight * 2 / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#F44336" fill-opacity="0.08"/>
-            <path d="${tylerPath}" stroke="${tylerEndColor}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="0" cy="${Math.round(chartHeight - ((CIRCLE_CAPACITY_DATA.tyler[0] - 1.0) / 2.0) * chartHeight)}" r="2.5" fill="${tylerStartColor}"/>
-            <circle cx="${chartWidth}" cy="${Math.round(chartHeight - ((CIRCLE_CAPACITY_DATA.tyler[CIRCLE_CAPACITY_DATA.tyler.length - 1] - 1.0) / 2.0) * chartHeight)}" r="2.5" fill="${tylerEndColor}"/>
+            <path d="${tylerArea}" fill="url(#tylerAreaGrad)"/>
+            <path d="${tylerPath}" stroke="#0a0b10" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="${tylerPath}" stroke="url(#tylerGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            ${tylerMarkers}
           </svg>
         </div>
       </div>
@@ -1133,13 +1259,17 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
       <div class="member-chart">
         <div class="chart-card">
           <svg width="100%" height="54" viewBox="0 0 ${chartWidth} ${chartHeight + 4}" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="emmaGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${emmaStartColor}"/><stop offset="100%" stop-color="${emmaEndColor}"/></linearGradient>
+              <linearGradient id="emmaAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${emmaStartColor}" stop-opacity="0.20"/><stop offset="100%" stop-color="${emmaEndColor}" stop-opacity="0.02"/></linearGradient>
+            </defs>
             <rect x="0" y="0" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#00E5FF" fill-opacity="0.08"/>
             <rect x="0" y="${Math.round(chartHeight / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#E8A830" fill-opacity="0.06"/>
             <rect x="0" y="${Math.round(chartHeight * 2 / 3)}" width="${chartWidth}" height="${Math.round(chartHeight / 3)}" fill="#F44336" fill-opacity="0.08"/>
-            <defs><linearGradient id="emmaGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${emmaStartColor}"/><stop offset="100%" stop-color="${emmaEndColor}"/></linearGradient></defs>
-            <path d="${emmaPath}" stroke="url(#emmaGrad)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="0" cy="${Math.round(chartHeight - ((CIRCLE_CAPACITY_DATA.emma[0] - 1.0) / 2.0) * chartHeight)}" r="2.5" fill="${emmaStartColor}"/>
-            <circle cx="${chartWidth}" cy="${Math.round(chartHeight - ((CIRCLE_CAPACITY_DATA.emma[CIRCLE_CAPACITY_DATA.emma.length - 1] - 1.0) / 2.0) * chartHeight)}" r="2.5" fill="${emmaEndColor}"/>
+            <path d="${emmaArea}" fill="url(#emmaAreaGrad)"/>
+            <path d="${emmaPath}" stroke="#0a0b10" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="${emmaPath}" stroke="url(#emmaGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            ${emmaMarkers}
           </svg>
         </div>
       </div>
