@@ -141,6 +141,12 @@ export function generateBundleCCIArtifactHTML(
     rows.push(`<div class="grid-row">${rowHTML}</div>`);
   }
 
+  // Pagination: split rows for multi-page layout when seatCount > 10
+  const maxRowsPerPage = 2; // 2 rows × 5 seats = 10 seats per page
+  const needsPagination = seatCount > 10;
+  const firstPageRows = rows.slice(0, maxRowsPerPage);
+  const remainingRows = rows.slice(maxRowsPerPage);
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -265,8 +271,34 @@ export function generateBundleCCIArtifactHTML(
       border-radius: 4px; padding: 6px 8px; margin-bottom: 10px;
     }
 
+    /* Pagination for multi-page bundles (15/20 seats) */
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+      height: 0;
+      margin: 0;
+      padding: 0;
+    }
+    .continuation-header {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 12px;
+      padding-top: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 8px;
+    }
+    .page-two {
+      width: 612px;
+      min-height: 792px;
+      padding: 20px 24px;
+      background: ${CAPACITY_COLORS.background};
+    }
+
     @media print {
       .page { border: none; }
+      .page-two { border: none; }
+      .page-break { page-break-after: always; break-after: page; }
       .mini-chart-container, .aggregate-chart-container, svg rect, svg circle, svg path, svg line {
         print-color-adjust: exact; -webkit-print-color-adjust: exact;
       }
@@ -340,7 +372,45 @@ export function generateBundleCCIArtifactHTML(
     <div class="section-subtitle">Individual capacity · 90 days · Non-diagnostic</div>
   </div>
   <div class="grid-container">
-    ${rows.join('\n')}
+    ${needsPagination ? firstPageRows.join('\n') : rows.join('\n')}
+  </div>
+
+  ${!needsPagination ? `
+  <!-- Aggregate Chart (single page) -->
+  <div class="aggregate-section">
+    <div class="section-header">
+      <div class="section-title">Combined Aggregate</div>
+      <div class="section-subtitle">Average capacity across all ${seatCount} seats</div>
+    </div>
+    <div class="aggregate-chart-container">
+      ${aggregateChart}
+    </div>
+  </div>
+
+  <!-- Footer (single page) -->
+  <div class="footer-section">
+    <div class="legal-block">
+      <div class="legal-title">Confidential &amp; Proprietary Notice</div>
+      <div class="legal-body">
+        This Bundle Capacity Instrument contains ANONYMIZED aggregate data only. Individual seat holders are NOT identified.
+        This is NOT a diagnostic tool. Not a symptom severity scale. For coordination purposes only.
+      </div>
+      <div class="legal-rights">© 2026 Orbital Health Intelligence, Inc. All Rights Reserved.</div>
+    </div>
+  </div>
+  ` : ''}
+</div>
+
+${needsPagination ? `
+<!-- Page Break -->
+<div class="page-break"></div>
+
+<!-- Page 2: Remaining Seats + Aggregate + Footer -->
+<div class="page-two">
+  <div class="continuation-header">${seatCount} Seats — continued</div>
+
+  <div class="grid-container">
+    ${remainingRows.join('\n')}
   </div>
 
   <!-- Aggregate Chart -->
@@ -366,6 +436,7 @@ export function generateBundleCCIArtifactHTML(
     </div>
   </div>
 </div>
+` : ''}
 
 </body>
 </html>`;
