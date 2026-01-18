@@ -6,7 +6,11 @@
  * - Client NEVER grants entitlements directly
  * - Uses Stripe Checkout for PCI-compliant payment collection
  *
- * TEST MODE: Uses test API keys and test price IDs
+ * PRICE ID CONFIGURATION:
+ * - Read from env vars (preferred for production)
+ * - Fall back to placeholder values (dev convenience only)
+ * - BLOCKS checkout if placeholder IDs detected in production
+ *
  * Set EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY in environment
  */
 
@@ -30,54 +34,201 @@ export function isStripeConfigured(): boolean {
   return Platform.OS === 'web' && STRIPE_PUBLISHABLE_KEY.length > 0;
 }
 
+/**
+ * Check if we're in production (live Stripe key)
+ */
+export function isProductionStripe(): boolean {
+  return STRIPE_PUBLISHABLE_KEY.startsWith('pk_live_');
+}
+
 // =============================================================================
-// STRIPE PRICE IDS (TEST MODE)
+// STRIPE PRICE ID CONFIGURATION
 // =============================================================================
+
+/**
+ * REQUIRED ENV VARS for production deployment:
+ *
+ * Subscriptions (recurring):
+ * - STRIPE_PRICE_PRO_MONTHLY
+ * - STRIPE_PRICE_PRO_ANNUAL
+ * - STRIPE_PRICE_FAMILY_MONTHLY
+ * - STRIPE_PRICE_FAMILY_ANNUAL
+ * - STRIPE_PRICE_FAMILY_EXTRA_SEAT_MONTHLY
+ * - STRIPE_PRICE_FAMILY_EXTRA_SEAT_ANNUAL
+ * - STRIPE_PRICE_CIRCLE_MONTHLY
+ * - STRIPE_PRICE_CIRCLE_ANNUAL
+ * - STRIPE_PRICE_BUNDLE_10_ANNUAL
+ * - STRIPE_PRICE_BUNDLE_15_ANNUAL
+ * - STRIPE_PRICE_BUNDLE_20_ANNUAL
+ * - STRIPE_PRICE_ADMIN_ADDON_MONTHLY
+ * - STRIPE_PRICE_ADMIN_ADDON_ANNUAL
+ *
+ * One-time (CCI artifacts):
+ * - STRIPE_PRICE_CCI_FREE
+ * - STRIPE_PRICE_CCI_PRO
+ * - STRIPE_PRICE_CCI_CIRCLE
+ * - STRIPE_PRICE_CCI_BUNDLE
+ */
+
+// Placeholder prefix for detection
+const PLACEHOLDER_PREFIX = 'price_' as const;
+const PLACEHOLDER_SUFFIX = '_test' as const;
+
+/**
+ * Helper to get price ID from env with fallback
+ */
+function getPriceId(envVar: string, fallback: string): string {
+  return process.env[envVar] || fallback;
+}
+
+/**
+ * Check if a price ID is a placeholder (not a real Stripe ID)
+ * Real Stripe price IDs look like: price_1ABC123...
+ */
+export function isPlaceholderPriceId(priceId: string): boolean {
+  // Placeholder format: price_*_test
+  if (priceId.endsWith(PLACEHOLDER_SUFFIX)) {
+    return true;
+  }
+  // Real Stripe IDs are longer and contain alphanumeric after price_
+  // e.g., price_1OxyzABC123def456
+  if (priceId.startsWith('price_') && priceId.length < 20) {
+    return true;
+  }
+  // Legacy/disabled marker
+  if (priceId === 'LEGACY_NOT_PURCHASABLE') {
+    return true;
+  }
+  return false;
+}
 
 /**
  * Mapping from Orbital product IDs to Stripe Price IDs
  *
- * IMPORTANT: Replace these with your actual Stripe Price IDs from dashboard
- * Test mode prices start with price_test_ (or just price_ in test mode)
+ * Configuration priority:
+ * 1. Environment variable (production)
+ * 2. Fallback placeholder (development only)
  *
- * To create prices in Stripe:
+ * To configure for production:
  * 1. Go to Products in Stripe Dashboard
  * 2. Create products for each tier
  * 3. Add monthly/annual prices
- * 4. Copy the price IDs here
+ * 4. Copy the price IDs to your .env file
  */
 export const STRIPE_PRICE_IDS: Record<ProductId, string> = {
+  // =========================================================================
+  // ACTIVE PRODUCTS — Configure these env vars for production
+  // =========================================================================
+
   // Pro Subscription
-  [PRODUCT_IDS.PRO_MONTHLY]: 'price_pro_monthly_test', // Replace with actual
-  [PRODUCT_IDS.PRO_ANNUAL]: 'price_pro_annual_test',   // Replace with actual
+  [PRODUCT_IDS.PRO_MONTHLY]: getPriceId('STRIPE_PRICE_PRO_MONTHLY', 'price_pro_monthly_test'),
+  [PRODUCT_IDS.PRO_ANNUAL]: getPriceId('STRIPE_PRICE_PRO_ANNUAL', 'price_pro_annual_test'),
 
   // Family Add-on (requires Pro)
-  [PRODUCT_IDS.FAMILY_MONTHLY]: 'price_family_monthly_test',
-  [PRODUCT_IDS.FAMILY_ANNUAL]: 'price_family_annual_test',
+  [PRODUCT_IDS.FAMILY_MONTHLY]: getPriceId('STRIPE_PRICE_FAMILY_MONTHLY', 'price_family_monthly_test'),
+  [PRODUCT_IDS.FAMILY_ANNUAL]: getPriceId('STRIPE_PRICE_FAMILY_ANNUAL', 'price_family_annual_test'),
 
   // Family Extra Seat
-  [PRODUCT_IDS.FAMILY_EXTRA_SEAT_MONTHLY]: 'price_family_seat_monthly_test',
-  [PRODUCT_IDS.FAMILY_EXTRA_SEAT_ANNUAL]: 'price_family_seat_annual_test',
+  [PRODUCT_IDS.FAMILY_EXTRA_SEAT_MONTHLY]: getPriceId('STRIPE_PRICE_FAMILY_EXTRA_SEAT_MONTHLY', 'price_family_seat_monthly_test'),
+  [PRODUCT_IDS.FAMILY_EXTRA_SEAT_ANNUAL]: getPriceId('STRIPE_PRICE_FAMILY_EXTRA_SEAT_ANNUAL', 'price_family_seat_annual_test'),
 
   // Circle (requires Pro)
-  [PRODUCT_IDS.CIRCLE_MONTHLY]: 'price_circle_monthly_test',
-  [PRODUCT_IDS.CIRCLE_ANNUAL]: 'price_circle_annual_test',
+  [PRODUCT_IDS.CIRCLE_MONTHLY]: getPriceId('STRIPE_PRICE_CIRCLE_MONTHLY', 'price_circle_monthly_test'),
+  [PRODUCT_IDS.CIRCLE_ANNUAL]: getPriceId('STRIPE_PRICE_CIRCLE_ANNUAL', 'price_circle_annual_test'),
 
   // Bundle (annual only, includes Pro)
-  [PRODUCT_IDS.BUNDLE_10_ANNUAL]: 'price_bundle_10_annual_test',
-  [PRODUCT_IDS.BUNDLE_15_ANNUAL]: 'price_bundle_15_annual_test',
-  [PRODUCT_IDS.BUNDLE_20_ANNUAL]: 'price_bundle_20_annual_test',
+  [PRODUCT_IDS.BUNDLE_10_ANNUAL]: getPriceId('STRIPE_PRICE_BUNDLE_10_ANNUAL', 'price_bundle_10_annual_test'),
+  [PRODUCT_IDS.BUNDLE_15_ANNUAL]: getPriceId('STRIPE_PRICE_BUNDLE_15_ANNUAL', 'price_bundle_15_annual_test'),
+  [PRODUCT_IDS.BUNDLE_20_ANNUAL]: getPriceId('STRIPE_PRICE_BUNDLE_20_ANNUAL', 'price_bundle_20_annual_test'),
 
   // Admin Add-on (requires Circle or Bundle)
-  [PRODUCT_IDS.ADMIN_ADDON_MONTHLY]: 'price_admin_monthly_test',
-  [PRODUCT_IDS.ADMIN_ADDON_ANNUAL]: 'price_admin_annual_test',
+  [PRODUCT_IDS.ADMIN_ADDON_MONTHLY]: getPriceId('STRIPE_PRICE_ADMIN_ADDON_MONTHLY', 'price_admin_monthly_test'),
+  [PRODUCT_IDS.ADMIN_ADDON_ANNUAL]: getPriceId('STRIPE_PRICE_ADMIN_ADDON_ANNUAL', 'price_admin_annual_test'),
 
   // CCI Artifact Purchases (one-time)
-  [PRODUCT_IDS.CCI_FREE]: 'price_cci_free_test',           // $199 for free users
-  [PRODUCT_IDS.CCI_PRO]: 'price_cci_pro_test',             // $149 for Pro users
-  [PRODUCT_IDS.CCI_CIRCLE_ALL]: 'price_cci_circle_test',   // $399 for Circle
-  [PRODUCT_IDS.CCI_BUNDLE_ALL]: 'price_cci_bundle_test',   // $999 for Bundle
+  [PRODUCT_IDS.CCI_FREE]: getPriceId('STRIPE_PRICE_CCI_FREE', 'price_cci_free_test'),           // $199 for free users
+  [PRODUCT_IDS.CCI_PRO]: getPriceId('STRIPE_PRICE_CCI_PRO', 'price_cci_pro_test'),             // $149 for Pro users
+  [PRODUCT_IDS.CCI_CIRCLE_ALL]: getPriceId('STRIPE_PRICE_CCI_CIRCLE', 'price_cci_circle_test'),   // $399 for Circle
+  [PRODUCT_IDS.CCI_BUNDLE_ALL]: getPriceId('STRIPE_PRICE_CCI_BUNDLE', 'price_cci_bundle_test'),   // $999 for Bundle
+
+  // =========================================================================
+  // LEGACY PRODUCTS — Not purchasable, kept for type compatibility
+  // =========================================================================
+  [PRODUCT_IDS.INDIVIDUAL_MONTHLY]: 'LEGACY_NOT_PURCHASABLE',
+  [PRODUCT_IDS.INDIVIDUAL_ANNUAL]: 'LEGACY_NOT_PURCHASABLE',
+  [PRODUCT_IDS.BUNDLE_10_MONTHLY]: 'LEGACY_NOT_PURCHASABLE',
+  [PRODUCT_IDS.BUNDLE_25_MONTHLY]: 'LEGACY_NOT_PURCHASABLE',
+  [PRODUCT_IDS.BUNDLE_25_ANNUAL]: 'LEGACY_NOT_PURCHASABLE',
+  [PRODUCT_IDS.QCR_INDIVIDUAL]: 'LEGACY_NOT_PURCHASABLE',
+  [PRODUCT_IDS.QCR_CIRCLE]: 'LEGACY_NOT_PURCHASABLE',
+  [PRODUCT_IDS.QCR_BUNDLE]: 'LEGACY_NOT_PURCHASABLE',
 };
+
+// =============================================================================
+// PRICE VALIDATION GUARD
+// =============================================================================
+
+/**
+ * Validate that a product can be purchased with real Stripe price ID
+ *
+ * BLOCKS checkout if:
+ * - Price ID is a placeholder AND we're in production
+ * - Price ID is marked as legacy/not purchasable
+ *
+ * Returns error message if invalid, null if valid
+ */
+export function validatePriceId(productId: ProductId): string | null {
+  const priceId = STRIPE_PRICE_IDS[productId];
+
+  // Block legacy products
+  if (priceId === 'LEGACY_NOT_PURCHASABLE') {
+    return `Product "${productId}" is no longer available for purchase.`;
+  }
+
+  // Block placeholder IDs in production
+  if (isProductionStripe() && isPlaceholderPriceId(priceId)) {
+    return `Payment configuration error: Price ID for "${productId}" is not configured. Contact support.`;
+  }
+
+  return null; // Valid
+}
+
+/**
+ * Get all missing price configurations (for deployment checks)
+ */
+export function getMissingPriceConfigs(): string[] {
+  const missing: string[] = [];
+
+  // Only check active products
+  const activeProducts = [
+    PRODUCT_IDS.PRO_MONTHLY,
+    PRODUCT_IDS.PRO_ANNUAL,
+    PRODUCT_IDS.FAMILY_MONTHLY,
+    PRODUCT_IDS.FAMILY_ANNUAL,
+    PRODUCT_IDS.FAMILY_EXTRA_SEAT_MONTHLY,
+    PRODUCT_IDS.FAMILY_EXTRA_SEAT_ANNUAL,
+    PRODUCT_IDS.CIRCLE_MONTHLY,
+    PRODUCT_IDS.CIRCLE_ANNUAL,
+    PRODUCT_IDS.BUNDLE_10_ANNUAL,
+    PRODUCT_IDS.BUNDLE_15_ANNUAL,
+    PRODUCT_IDS.BUNDLE_20_ANNUAL,
+    PRODUCT_IDS.ADMIN_ADDON_MONTHLY,
+    PRODUCT_IDS.ADMIN_ADDON_ANNUAL,
+    PRODUCT_IDS.CCI_FREE,
+    PRODUCT_IDS.CCI_PRO,
+    PRODUCT_IDS.CCI_CIRCLE_ALL,
+    PRODUCT_IDS.CCI_BUNDLE_ALL,
+  ];
+
+  for (const productId of activeProducts) {
+    const priceId = STRIPE_PRICE_IDS[productId];
+    if (isPlaceholderPriceId(priceId)) {
+      missing.push(productId);
+    }
+  }
+
+  return missing;
+}
 
 // =============================================================================
 // ENTITLEMENT MAPPING
@@ -87,6 +238,7 @@ export const STRIPE_PRICE_IDS: Record<ProductId, string> = {
  * Maps product IDs to the entitlement they grant
  */
 export const PRODUCT_ENTITLEMENTS: Record<ProductId, string> = {
+  // Active products
   [PRODUCT_IDS.PRO_MONTHLY]: 'pro_access',
   [PRODUCT_IDS.PRO_ANNUAL]: 'pro_access',
   [PRODUCT_IDS.FAMILY_MONTHLY]: 'family_access',
@@ -104,6 +256,16 @@ export const PRODUCT_ENTITLEMENTS: Record<ProductId, string> = {
   [PRODUCT_IDS.CCI_PRO]: 'cci_purchased',
   [PRODUCT_IDS.CCI_CIRCLE_ALL]: 'cci_circle_purchased',
   [PRODUCT_IDS.CCI_BUNDLE_ALL]: 'cci_bundle_purchased',
+
+  // Legacy products (no entitlement)
+  [PRODUCT_IDS.INDIVIDUAL_MONTHLY]: 'legacy_not_supported',
+  [PRODUCT_IDS.INDIVIDUAL_ANNUAL]: 'legacy_not_supported',
+  [PRODUCT_IDS.BUNDLE_10_MONTHLY]: 'legacy_not_supported',
+  [PRODUCT_IDS.BUNDLE_25_MONTHLY]: 'legacy_not_supported',
+  [PRODUCT_IDS.BUNDLE_25_ANNUAL]: 'legacy_not_supported',
+  [PRODUCT_IDS.QCR_INDIVIDUAL]: 'legacy_not_supported',
+  [PRODUCT_IDS.QCR_CIRCLE]: 'legacy_not_supported',
+  [PRODUCT_IDS.QCR_BUNDLE]: 'legacy_not_supported',
 };
 
 // =============================================================================
@@ -142,13 +304,23 @@ export interface VerifySessionResponse {
  *
  * This calls our API route which creates the session server-side,
  * then redirects the user to Stripe's hosted checkout page.
+ *
+ * VALIDATION: Blocks checkout if price ID is invalid/placeholder in production
  */
 export async function initiateStripeCheckout(
   productId: ProductId,
   userId: string
 ): Promise<{ checkoutUrl: string } | { error: string }> {
+  // Check Stripe is configured
   if (!isStripeConfigured()) {
     return { error: 'Stripe is not configured. Set EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY.' };
+  }
+
+  // VALIDATION GUARD: Block invalid price IDs
+  const validationError = validatePriceId(productId);
+  if (validationError) {
+    console.error('[Stripe] Checkout blocked:', validationError);
+    return { error: validationError };
   }
 
   const successUrl = `${window.location.origin}/upgrade?session_id={CHECKOUT_SESSION_ID}&status=success`;
@@ -275,3 +447,57 @@ export function redirectToCustomerPortal(portalUrl: string): void {
     window.location.href = portalUrl;
   }
 }
+
+// =============================================================================
+// ENV VAR DOCUMENTATION (for deployment scripts)
+// =============================================================================
+
+/**
+ * Required environment variables for Stripe integration:
+ *
+ * Client-side (EXPO_PUBLIC_ prefix):
+ * - EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY: Stripe publishable key (pk_test_ or pk_live_)
+ *
+ * Server-side:
+ * - STRIPE_SECRET_KEY: Stripe secret key (sk_test_ or sk_live_)
+ *
+ * Price IDs (set these in Stripe Dashboard → Products):
+ * - STRIPE_PRICE_PRO_MONTHLY
+ * - STRIPE_PRICE_PRO_ANNUAL
+ * - STRIPE_PRICE_FAMILY_MONTHLY
+ * - STRIPE_PRICE_FAMILY_ANNUAL
+ * - STRIPE_PRICE_FAMILY_EXTRA_SEAT_MONTHLY
+ * - STRIPE_PRICE_FAMILY_EXTRA_SEAT_ANNUAL
+ * - STRIPE_PRICE_CIRCLE_MONTHLY
+ * - STRIPE_PRICE_CIRCLE_ANNUAL
+ * - STRIPE_PRICE_BUNDLE_10_ANNUAL
+ * - STRIPE_PRICE_BUNDLE_15_ANNUAL
+ * - STRIPE_PRICE_BUNDLE_20_ANNUAL
+ * - STRIPE_PRICE_ADMIN_ADDON_MONTHLY
+ * - STRIPE_PRICE_ADMIN_ADDON_ANNUAL
+ * - STRIPE_PRICE_CCI_FREE
+ * - STRIPE_PRICE_CCI_PRO
+ * - STRIPE_PRICE_CCI_CIRCLE
+ * - STRIPE_PRICE_CCI_BUNDLE
+ */
+export const REQUIRED_ENV_VARS = [
+  'EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY',
+  'STRIPE_SECRET_KEY',
+  'STRIPE_PRICE_PRO_MONTHLY',
+  'STRIPE_PRICE_PRO_ANNUAL',
+  'STRIPE_PRICE_FAMILY_MONTHLY',
+  'STRIPE_PRICE_FAMILY_ANNUAL',
+  'STRIPE_PRICE_FAMILY_EXTRA_SEAT_MONTHLY',
+  'STRIPE_PRICE_FAMILY_EXTRA_SEAT_ANNUAL',
+  'STRIPE_PRICE_CIRCLE_MONTHLY',
+  'STRIPE_PRICE_CIRCLE_ANNUAL',
+  'STRIPE_PRICE_BUNDLE_10_ANNUAL',
+  'STRIPE_PRICE_BUNDLE_15_ANNUAL',
+  'STRIPE_PRICE_BUNDLE_20_ANNUAL',
+  'STRIPE_PRICE_ADMIN_ADDON_MONTHLY',
+  'STRIPE_PRICE_ADMIN_ADDON_ANNUAL',
+  'STRIPE_PRICE_CCI_FREE',
+  'STRIPE_PRICE_CCI_PRO',
+  'STRIPE_PRICE_CCI_CIRCLE',
+  'STRIPE_PRICE_CCI_BUNDLE',
+] as const;

@@ -39,6 +39,10 @@ export {
 // Stripe Checkout (web payments)
 export {
   isStripeConfigured,
+  isProductionStripe,
+  isPlaceholderPriceId,
+  validatePriceId,
+  getMissingPriceConfigs,
   initiateStripeCheckout,
   verifyStripeSession,
   redirectToStripeCheckout,
@@ -47,6 +51,7 @@ export {
   STRIPE_PUBLISHABLE_KEY,
   STRIPE_PRICE_IDS,
   PRODUCT_ENTITLEMENTS,
+  REQUIRED_ENV_VARS,
   type CheckoutSessionRequest,
   type CheckoutSessionResponse,
   type VerifySessionRequest,
