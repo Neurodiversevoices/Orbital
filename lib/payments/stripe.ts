@@ -272,11 +272,27 @@ export const PRODUCT_ENTITLEMENTS: Record<ProductId, string> = {
 // CHECKOUT SESSION TYPES
 // =============================================================================
 
+/**
+ * CCI purchase metadata for tracking and duplicate prevention
+ */
+export interface CCIPurchaseMetadata {
+  /** Type of CCI purchase: individual (single person) or group (circle/bundle) */
+  purchase_type: 'individual' | 'group';
+  /** Scope of the CCI: individual, circle, or bundle */
+  scope: 'individual' | 'circle' | 'bundle';
+  /** Number of seats (for group CCI) */
+  seats?: number;
+  /** Group ID (for group CCI duplicate prevention) */
+  group_id?: string;
+}
+
 export interface CheckoutSessionRequest {
   productId: ProductId;
   userId: string;
   successUrl: string;
   cancelUrl: string;
+  /** Optional CCI-specific metadata */
+  cciMetadata?: CCIPurchaseMetadata;
 }
 
 export interface CheckoutSessionResponse {
@@ -309,7 +325,8 @@ export interface VerifySessionResponse {
  */
 export async function initiateStripeCheckout(
   productId: ProductId,
-  userId: string
+  userId: string,
+  cciMetadata?: CCIPurchaseMetadata
 ): Promise<{ checkoutUrl: string } | { error: string }> {
   // Check Stripe is configured
   if (!isStripeConfigured()) {
@@ -327,15 +344,18 @@ export async function initiateStripeCheckout(
   const cancelUrl = `${window.location.origin}/upgrade?status=cancelled`;
 
   try {
+    const request: CheckoutSessionRequest = {
+      productId,
+      userId,
+      successUrl,
+      cancelUrl,
+      ...(cciMetadata && { cciMetadata }),
+    };
+
     const response = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        productId,
-        userId,
-        successUrl,
-        cancelUrl,
-      } satisfies CheckoutSessionRequest),
+      body: JSON.stringify(request),
     });
 
     if (!response.ok) {

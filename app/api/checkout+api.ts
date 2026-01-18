@@ -104,7 +104,7 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     const body: CheckoutSessionRequest = await request.json();
-    const { productId, userId, successUrl, cancelUrl } = body;
+    const { productId, userId, successUrl, cancelUrl, cciMetadata } = body;
 
     // Validate product exists
     const priceId = STRIPE_PRICE_IDS[productId];
@@ -122,6 +122,47 @@ export async function POST(request: Request): Promise<Response> {
     const customerId = await getOrCreateStripeCustomer(userId);
     console.log(`[Checkout] Using customer ${customerId} for user ${userId}`);
 
+    // Build metadata including CCI-specific fields
+    const metadata: Record<string, string> = {
+      userId,
+      productId,
+      entitlementId,
+    };
+
+    // Add CCI metadata if present (for purchase tracking and duplicate prevention)
+    if (cciMetadata) {
+      metadata.cci_purchase_type = cciMetadata.purchase_type;
+      metadata.cci_scope = cciMetadata.scope;
+      if (cciMetadata.seats) {
+        metadata.cci_seats = String(cciMetadata.seats);
+      }
+      if (cciMetadata.group_id) {
+        metadata.cci_group_id = cciMetadata.group_id;
+      }
+    }
+
+    // Build request body
+    const bodyParams: Record<string, string> = {
+      'mode': mode,
+      'customer': customerId,
+      'line_items[0][price]': priceId,
+      'line_items[0][quantity]': '1',
+      'success_url': successUrl,
+      'cancel_url': cancelUrl,
+    };
+
+    // Add metadata fields
+    Object.entries(metadata).forEach(([key, value]) => {
+      bodyParams[`metadata[${key}]`] = value;
+    });
+
+    // For subscriptions, also add metadata to subscription_data
+    if (mode === 'subscription') {
+      Object.entries(metadata).forEach(([key, value]) => {
+        bodyParams[`subscription_data[metadata][${key}]`] = value;
+      });
+    }
+
     // Create Stripe Checkout Session
     const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
@@ -129,23 +170,7 @@ export async function POST(request: Request): Promise<Response> {
         'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        'mode': mode,
-        'customer': customerId,
-        'line_items[0][price]': priceId,
-        'line_items[0][quantity]': '1',
-        'success_url': successUrl,
-        'cancel_url': cancelUrl,
-        'metadata[userId]': userId,
-        'metadata[productId]': productId,
-        'metadata[entitlementId]': entitlementId,
-        // For subscriptions, allow customer to manage later
-        ...(mode === 'subscription' && {
-          'subscription_data[metadata][userId]': userId,
-          'subscription_data[metadata][productId]': productId,
-          'subscription_data[metadata][entitlementId]': entitlementId,
-        }),
-      }),
+      body: new URLSearchParams(bodyParams),
     });
 
     if (!stripeResponse.ok) {
