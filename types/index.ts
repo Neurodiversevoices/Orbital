@@ -1,3 +1,6 @@
+// Supported locales (must match locales/index.ts Locale type)
+export type SupportedLocale = 'en' | 'es' | 'fr' | 'de' | 'pt-BR' | 'it' | 'ja';
+
 // Capacity states: resourced (high capacity), stretched (moderate), depleted (low)
 export type CapacityState = 'resourced' | 'stretched' | 'depleted';
 
@@ -286,7 +289,7 @@ export interface ViewContext {
 // ============================================
 
 export interface OrbitalPreferences {
-  locale: 'en' | 'es';
+  locale: SupportedLocale;
   orbitalMode: OrbitalMode;
   sharingEnabled: boolean;
   lastExportAt?: number;
@@ -454,7 +457,7 @@ export interface PolicyDocument {
   version: string;
   effectiveDate: number;
   content: string;
-  locale: 'en' | 'es';
+  locale: SupportedLocale;
   hash: string; // SHA-256 of content for integrity verification
 }
 
@@ -739,7 +742,7 @@ export interface ContractTemplate {
   createdAt: number;
   lastModifiedAt: number;
   isActive: boolean;
-  locale: 'en' | 'es';
+  locale: SupportedLocale;
 }
 
 export interface SignedContract {

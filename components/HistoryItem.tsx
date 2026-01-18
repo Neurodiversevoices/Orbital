@@ -55,13 +55,13 @@ interface HistoryItemProps {
   onDelete?: (id: string) => void;
 }
 
-function formatTime(timestamp: number, locale: 'en' | 'es'): string {
+function formatTime(timestamp: number, locale: string): string {
   const date = new Date(timestamp);
   const localeCode = locale === 'es' ? 'es-MX' : 'en-US';
   return date.toLocaleTimeString(localeCode, { hour: 'numeric', minute: '2-digit' });
 }
 
-function formatDate(timestamp: number, t: TranslationKeys, locale: 'en' | 'es'): string {
+function formatDate(timestamp: number, t: TranslationKeys, locale: string): string {
   const date = new Date(timestamp);
   const today = new Date();
   const yesterday = new Date(today);

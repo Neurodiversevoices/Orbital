@@ -22,6 +22,9 @@ export const colors = {
   // Accents
   accent: '#00FFFF',
   accentDim: 'rgba(0, 255, 255, 0.3)',
+
+  // Primary (alias for accent, used in some UI components)
+  primary: '#00E5FF',
 } as const;
 
 export type CapacityColor = typeof colors.resourced | typeof colors.stretched | typeof colors.depleted;

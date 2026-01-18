@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { ExportFormat, ExportRange } from '../../types';
+import { ExportFormat, ExportRange, SupportedLocale } from '../../types';
 import {
   exportData,
   exportNinetyDaySummary,
@@ -17,10 +17,10 @@ interface UseExportReturn {
     format: ExportFormat,
     range: ExportRange,
     includeNotes: boolean,
-    locale: 'en' | 'es'
+    locale: SupportedLocale
   ) => Promise<boolean>;
-  exportSummary90d: (locale: 'en' | 'es') => Promise<boolean>;
-  exportSummaryAnnual: (locale: 'en' | 'es') => Promise<boolean>;
+  exportSummary90d: (locale: SupportedLocale) => Promise<boolean>;
+  exportSummaryAnnual: (locale: SupportedLocale) => Promise<boolean>;
   /** Personal export - includes demographics (user owns their data) */
   exportJson: () => Promise<boolean>;
   exportCsv: (includeNotes?: boolean) => Promise<boolean>;
@@ -41,7 +41,7 @@ export function useExport(): UseExportReturn {
       format: ExportFormat,
       range: ExportRange,
       includeNotes: boolean,
-      locale: 'en' | 'es'
+      locale: SupportedLocale
     ): Promise<boolean> => {
       setIsExporting(true);
       setError(null);
@@ -62,7 +62,7 @@ export function useExport(): UseExportReturn {
     []
   );
 
-  const exportSummary90d = useCallback(async (locale: 'en' | 'es'): Promise<boolean> => {
+  const exportSummary90d = useCallback(async (locale: SupportedLocale): Promise<boolean> => {
     setIsExporting(true);
     setError(null);
     try {
@@ -80,7 +80,7 @@ export function useExport(): UseExportReturn {
     }
   }, []);
 
-  const exportSummaryAnnual = useCallback(async (locale: 'en' | 'es'): Promise<boolean> => {
+  const exportSummaryAnnual = useCallback(async (locale: SupportedLocale): Promise<boolean> => {
     setIsExporting(true);
     setError(null);
     try {

@@ -1,4 +1,4 @@
-import { CapacityLog, CapacityState, Category, ExecutiveReportConfig, ExecutiveReportData, ExportSummary } from '../../types';
+import { CapacityLog, CapacityState, Category, ExecutiveReportConfig, ExecutiveReportData, ExportSummary, SupportedLocale } from '../../types';
 import { getLogs, getVaultedLogs, getFullHistoryRange } from '../storage';
 import { generateExportSummary } from './summaryGenerator';
 
@@ -9,7 +9,7 @@ const PERIOD_MS = {
 
 export async function generateExecutiveReport(
   config: ExecutiveReportConfig,
-  locale: 'en' | 'es' = 'en'
+  locale: SupportedLocale = 'en'
 ): Promise<ExecutiveReportData> {
   const now = Date.now();
   let periodStart: number;
@@ -107,7 +107,7 @@ function determineTrend(weeklyAverages: number[]): 'improving' | 'stable' | 'dec
   return 'stable';
 }
 
-function identifyPatterns(logs: CapacityLog[], locale: 'en' | 'es'): string[] {
+function identifyPatterns(logs: CapacityLog[], locale: SupportedLocale): string[] {
   const patterns: string[] = [];
 
   if (logs.length < 7) {
@@ -200,7 +200,7 @@ function identifyPatterns(logs: CapacityLog[], locale: 'en' | 'es'): string[] {
 
 function generateCategoryInsights(
   logs: CapacityLog[],
-  locale: 'en' | 'es'
+  locale: SupportedLocale
 ): { category: Category; impactScore: number; recommendation?: string }[] {
   const categories: Category[] = ['sensory', 'demand', 'social'];
 
@@ -214,7 +214,7 @@ function generateCategoryInsights(
     let recommendation: string | undefined;
 
     if (impactScore > 50) {
-      const recommendations = {
+      const recommendations: Record<Category, Record<string, string>> = {
         sensory: {
           en: 'Consider environmental modifications to reduce sensory load',
           es: 'Considere modificaciones ambientales para reducir la carga sensorial',
@@ -228,7 +228,7 @@ function generateCategoryInsights(
           es: 'Evalúe compromisos sociales y asignación de tiempo de recuperación',
         },
       };
-      recommendation = recommendations[category][locale];
+      recommendation = recommendations[category][locale] || recommendations[category].en;
     }
 
     return { category, impactScore, recommendation };
@@ -237,7 +237,7 @@ function generateCategoryInsights(
 
 export function formatExecutiveReportAsText(
   data: ExecutiveReportData,
-  locale: 'en' | 'es' = 'en'
+  locale: SupportedLocale = 'en'
 ): string {
   const dateFormatter = new Intl.DateTimeFormat(locale === 'es' ? 'es-MX' : 'en-US', {
     year: 'numeric',
