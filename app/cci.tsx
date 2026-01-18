@@ -9,7 +9,7 @@
  * Language: "Issuance" / "Artifact" / "Instrument" — NOT "Report"
  */
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -26,6 +26,7 @@ import { colors, spacing, borderRadius, commonStyles } from '../theme';
 import { generateCCIArtifactHTML, getGoldenMasterHTML, getCircleGoldenMasterHTML, getBundleGoldenMasterHTML } from '../lib/cci';
 import { FOUNDER_DEMO_ENABLED } from '../lib/hooks/useDemoMode';
 import { ISSUANCE_REQUEST_URL } from '../lib/payments';
+import { getUserEntitlements, type UserEntitlements } from '../lib/entitlements';
 
 /**
  * CCI-Q4 is ALWAYS demo-safe: it uses hardcoded golden master data.
@@ -107,7 +108,46 @@ export default function CCIInstrumentScreen() {
 
   const isCircle = cciType === 'circle';
   const isBundle = cciType === 'bundle';
-  const bundleSeatCount = (parseInt(params.seats || '10') as 10 | 15 | 20) || 10;
+
+  // ========== BUNDLE SEAT COUNT FROM ENTITLEMENTS ==========
+  // Source of truth: user's bundle entitlement (10/15/20)
+  // Dev override: ?seats=10|15|20 (explicit only, no default fallback)
+  const [entitlements, setEntitlements] = useState<UserEntitlements | null>(null);
+
+  useEffect(() => {
+    if (isBundle) {
+      getUserEntitlements().then(setEntitlements).catch(() => setEntitlements(null));
+    }
+  }, [isBundle]);
+
+  // Parse dev override (only if explicitly provided and valid)
+  const parseSeatsOverride = (raw: string | undefined): 10 | 15 | 20 | null => {
+    if (!raw) return null;
+    const parsed = parseInt(raw, 10);
+    if (parsed === 10 || parsed === 15 || parsed === 20) return parsed;
+    return null; // Invalid override
+  };
+
+  const seatsOverride = parseSeatsOverride(params.seats);
+  const entitlementSeats = entitlements?.bundleSize ?? null;
+
+  // Priority: explicit override > entitlement > fail closed
+  let bundleSeatCount: 10 | 15 | 20;
+  if (seatsOverride !== null) {
+    // Dev override provided explicitly
+    bundleSeatCount = seatsOverride;
+    console.log('[CCI] Bundle seats from URL override:', bundleSeatCount);
+  } else if (entitlementSeats !== null) {
+    // From user's entitlement
+    bundleSeatCount = entitlementSeats;
+    console.log('[CCI] Bundle seats from entitlement:', bundleSeatCount);
+  } else {
+    // No entitlement loaded yet or no bundle entitlement — default to 10 for demo
+    // (In production, this would show loading or error state)
+    bundleSeatCount = 10;
+    console.log('[CCI] Bundle seats defaulting to 10 (no entitlement loaded)');
+  }
+  // ==========================================================
 
   console.log('[CCI] isCircle:', isCircle, '| isBundle:', isBundle, '| seats:', bundleSeatCount);
 
