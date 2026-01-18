@@ -113,10 +113,22 @@ export default function CCIInstrumentScreen() {
   // Source of truth: user's bundle entitlement (10/15/20)
   // Dev override: ?seats=10|15|20 (explicit only, no default fallback)
   const [entitlements, setEntitlements] = useState<UserEntitlements | null>(null);
+  const [isEntitlementsLoaded, setIsEntitlementsLoaded] = useState(false);
 
   useEffect(() => {
     if (isBundle) {
-      getUserEntitlements().then(setEntitlements).catch(() => setEntitlements(null));
+      console.log('[CCI] Loading bundle entitlements...');
+      getUserEntitlements()
+        .then((ent) => {
+          console.log('[CCI] Entitlements loaded:', ent.bundleSize);
+          setEntitlements(ent);
+          setIsEntitlementsLoaded(true);
+        })
+        .catch((err) => {
+          console.error('[CCI] Failed to load entitlements:', err);
+          setEntitlements(null);
+          setIsEntitlementsLoaded(true); // Mark as loaded even on error
+        });
     }
   }, [isBundle]);
 
@@ -131,21 +143,33 @@ export default function CCIInstrumentScreen() {
   const seatsOverride = parseSeatsOverride(params.seats);
   const entitlementSeats = entitlements?.bundleSize ?? null;
 
-  // Priority: explicit override > entitlement > fail closed
+  // HARD GATE: For bundle type, must wait for entitlements (unless dev override)
+  // This prevents PDF capture from happening before entitlements resolve
+  if (isBundle && seatsOverride === null && !isEntitlementsLoaded) {
+    console.log('[CCI] GATE: Waiting for entitlements to load...');
+    return (
+      <SafeAreaView style={commonStyles.screen}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading bundle entitlement…</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Derive bundleSeatCount ONLY after entitlements are loaded
   let bundleSeatCount: 10 | 15 | 20;
   if (seatsOverride !== null) {
-    // Dev override provided explicitly
+    // Dev override provided explicitly — bypass entitlements
     bundleSeatCount = seatsOverride;
     console.log('[CCI] Bundle seats from URL override:', bundleSeatCount);
   } else if (entitlementSeats !== null) {
-    // From user's entitlement
+    // From user's entitlement (guaranteed loaded at this point)
     bundleSeatCount = entitlementSeats;
     console.log('[CCI] Bundle seats from entitlement:', bundleSeatCount);
   } else {
-    // No entitlement loaded yet or no bundle entitlement — default to 10 for demo
-    // (In production, this would show loading or error state)
+    // Entitlements loaded but user has no bundle — default to 10 for demo
     bundleSeatCount = 10;
-    console.log('[CCI] Bundle seats defaulting to 10 (no entitlement loaded)');
+    console.log('[CCI] Bundle seats defaulting to 10 (no bundle entitlement)');
   }
   // ==========================================================
 
@@ -226,7 +250,7 @@ export default function CCIInstrumentScreen() {
   }, [artifactHTML]);
 
   return (
-    <SafeAreaView style={commonStyles.screen}>
+    <SafeAreaView style={commonStyles.screen} testID="bundle-cci-ready" data-testid="bundle-cci-ready">
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.headerBack}>
@@ -462,6 +486,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'rgba(255,255,255,0.5)',
     marginBottom: spacing.lg,
+  },
+  // Loading container for bundle entitlements
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xl,
+    backgroundColor: colors.background,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.5)',
   },
   // Error container for invalid CCI type (fail-closed)
   errorContainer: {
