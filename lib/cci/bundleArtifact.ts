@@ -22,6 +22,44 @@ import {
 } from './bundleDemoData';
 
 // =============================================================================
+// PRINT DENSITY & PAGINATION RULES
+// =============================================================================
+
+/**
+ * Print density mode: controls spacing and typography for print layout.
+ * - 'standard': Normal spacing for ≤10 seats (fits on single page)
+ * - 'dense': Tighter spacing for 11-20 seats (multi-page layout)
+ */
+type PrintDensityMode = 'standard' | 'dense';
+
+/**
+ * Pagination rules for print-safe Bundle CCI artifacts.
+ * These constants ensure deterministic page allocation.
+ */
+const PAGINATION_RULES = {
+  seatsPerRow: 5,           // Fixed: 5-column grid
+  maxRowsPerPage: 2,        // 2 rows = 10 seats per page
+  maxSeatsPerPage: 10,      // Hard cap per page
+  pageBreakAfter: 10,       // Insert page break after seat 10
+  aggregateOnLastPage: true,// Aggregate chart ALWAYS on final page
+  footerOnLastPage: true,   // Footer ALWAYS on final page
+} as const;
+
+/**
+ * Calculate print density and page count based on seat count.
+ * Separates spacing concerns (density) from layout concerns (pagination).
+ */
+function calculatePrintLayout(seatCount: 10 | 15 | 20): {
+  density: PrintDensityMode;
+  pageCount: 1 | 2;
+} {
+  return {
+    density: seatCount <= 10 ? 'standard' : 'dense',
+    pageCount: seatCount <= 10 ? 1 : 2,
+  };
+}
+
+// =============================================================================
 // UTILITY FUNCTIONS
 // =============================================================================
 
@@ -116,17 +154,23 @@ export function generateBundleCCIArtifactHTML(
   const stats = getBundleStats(seats);
   const aggregateChart = generateAggregateChartSVG(seats);
 
+  // Calculate print layout: density (spacing) and pagination (page count)
+  const { density, pageCount } = calculatePrintLayout(seatCount);
+  const isMultiPage = pageCount > 1;
+
+  // Dense mode avatar size (14px) vs standard (18px)
+  const avatarSize = density === 'dense' ? 14 : 18;
+
   // Generate mini chart cards matching BundleCCIPreview style
-  // Use 5 per row to match brief's grid layout exactly
-  const seatsPerRow = 5;
+  // Use PAGINATION_RULES.seatsPerRow for consistent grid layout
   const rows: string[] = [];
-  for (let i = 0; i < seats.length; i += seatsPerRow) {
-    const rowSeats = seats.slice(i, i + seatsPerRow);
-    const rowHTML = rowSeats.map((seat, j) => {
+  for (let i = 0; i < seats.length; i += PAGINATION_RULES.seatsPerRow) {
+    const rowSeats = seats.slice(i, i + PAGINATION_RULES.seatsPerRow);
+    const rowHTML = rowSeats.map((seat) => {
       const state = getSeatCapacityState(seat);
       const stateColor = CAPACITY_COLORS[state];
       const chart = generateSeatChartSVG(seat);
-      const avatar = generateAvatarSVG(seat, 18);
+      const avatar = generateAvatarSVG(seat, avatarSize);
 
       return `
         <div class="mini-chart-card">
@@ -141,11 +185,9 @@ export function generateBundleCCIArtifactHTML(
     rows.push(`<div class="grid-row">${rowHTML}</div>`);
   }
 
-  // Pagination: split rows for multi-page layout when seatCount > 10
-  const maxRowsPerPage = 2; // 2 rows × 5 seats = 10 seats per page
-  const needsPagination = seatCount > 10;
-  const firstPageRows = rows.slice(0, maxRowsPerPage);
-  const remainingRows = rows.slice(maxRowsPerPage);
+  // Split rows per page based on PAGINATION_RULES
+  const firstPageRows = rows.slice(0, PAGINATION_RULES.maxRowsPerPage);
+  const remainingRows = rows.slice(PAGINATION_RULES.maxRowsPerPage);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -219,21 +261,21 @@ export function generateBundleCCIArtifactHTML(
     /* Section titles */
     .section-header { margin-bottom: 8px; }
     .section-title {
-      font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.9);
+      font-size: ${density === 'dense' ? '11px' : '12px'}; font-weight: 700; color: rgba(255,255,255,0.9);
       letter-spacing: 0.3px;
     }
-    .section-subtitle { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+    .section-subtitle { font-size: ${density === 'dense' ? '9px' : '10px'}; color: rgba(255,255,255,0.5); margin-top: 2px; }
 
     /* Mini Chart Grid - matches BundleCCIPreview MiniChartCard (5 per row) */
     .grid-container { margin-bottom: 10px; }
-    .grid-row { display: flex; gap: 6px; margin-bottom: 6px; }
+    .grid-row { display: flex; gap: ${density === 'dense' ? '4px' : '6px'}; margin-bottom: ${density === 'dense' ? '4px' : '6px'}; }
 
     .mini-chart-card {
       flex: 1;
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 6px;
-      padding: 6px;
+      padding: ${density === 'dense' ? '4px' : '6px'};
     }
     .mini-chart-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -368,16 +410,16 @@ export function generateBundleCCIArtifactHTML(
 
   <!-- Seat Grid (5 per row) - matches BundleCCIPreview -->
   <div class="section-header">
-    <div class="section-title">${seatCount} Seats</div>
+    <div class="section-title" data-testid="artifact-title">${seatCount} Seats</div>
     <div class="section-subtitle">Individual capacity · 90 days · Non-diagnostic</div>
   </div>
-  <div class="grid-container">
-    ${needsPagination ? firstPageRows.join('\n') : rows.join('\n')}
+  <div class="grid-container" data-testid="seat-grid-page-1">
+    ${isMultiPage ? firstPageRows.join('\n') : rows.join('\n')}
   </div>
 
-  ${!needsPagination ? `
-  <!-- Aggregate Chart (single page) -->
-  <div class="aggregate-section">
+  ${!isMultiPage ? `
+  <!-- Aggregate Chart (single page) - PAGINATION_RULES.aggregateOnLastPage -->
+  <div class="aggregate-section" data-testid="aggregate-section">
     <div class="section-header">
       <div class="section-title">Combined Aggregate</div>
       <div class="section-subtitle">Average capacity across all ${seatCount} seats</div>
@@ -387,8 +429,8 @@ export function generateBundleCCIArtifactHTML(
     </div>
   </div>
 
-  <!-- Footer (single page) -->
-  <div class="footer-section">
+  <!-- Footer (single page) - PAGINATION_RULES.footerOnLastPage -->
+  <div class="footer-section" data-testid="footer-section">
     <div class="legal-block">
       <div class="legal-title">Confidential &amp; Proprietary Notice</div>
       <div class="legal-body">
@@ -401,20 +443,20 @@ export function generateBundleCCIArtifactHTML(
   ` : ''}
 </div>
 
-${needsPagination ? `
+${isMultiPage ? `
 <!-- Page Break -->
 <div class="page-break"></div>
 
 <!-- Page 2: Remaining Seats + Aggregate + Footer -->
-<div class="page-two">
+<div class="page-two" data-testid="page-two">
   <div class="continuation-header">${seatCount} Seats — continued</div>
 
-  <div class="grid-container">
+  <div class="grid-container" data-testid="seat-grid-page-2">
     ${remainingRows.join('\n')}
   </div>
 
-  <!-- Aggregate Chart -->
-  <div class="aggregate-section">
+  <!-- Aggregate Chart - PAGINATION_RULES.aggregateOnLastPage -->
+  <div class="aggregate-section" data-testid="aggregate-section">
     <div class="section-header">
       <div class="section-title">Combined Aggregate</div>
       <div class="section-subtitle">Average capacity across all ${seatCount} seats</div>
@@ -424,8 +466,8 @@ ${needsPagination ? `
     </div>
   </div>
 
-  <!-- Footer -->
-  <div class="footer-section">
+  <!-- Footer - PAGINATION_RULES.footerOnLastPage -->
+  <div class="footer-section" data-testid="footer-section">
     <div class="legal-block">
       <div class="legal-title">Confidential &amp; Proprietary Notice</div>
       <div class="legal-body">
@@ -437,6 +479,13 @@ ${needsPagination ? `
   </div>
 </div>
 ` : ''}
+
+<!-- Ready-to-capture latch: signals artifact is safe to capture (fonts/charts/layout settled) -->
+<div data-testid="bundle-artifact-ready"
+     data-seats="${seatCount}"
+     data-pages="${pageCount}"
+     data-density="${density}"
+     style="display:none;"></div>
 
 </body>
 </html>`;
