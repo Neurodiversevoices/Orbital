@@ -67,6 +67,10 @@ import {
 import {
   PAYMENTS_ENABLED,
   executePurchase,
+  isStripeConfigured,
+  initiateStripeCheckout,
+  verifyStripeSession,
+  redirectToStripeCheckout,
 } from '../lib/payments';
 import {
   getUserEntitlements,
@@ -364,7 +368,11 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
 
 export default function UpgradeScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ demoMode?: string }>();
+  const params = useLocalSearchParams<{
+    demoMode?: string;
+    session_id?: string;
+    status?: 'success' | 'cancelled';
+  }>();
   const { isLoading: subscriptionLoading, restore } = useSubscription();
 
   // DOCTRINE: Do not surface CCI purchase options inside demo-only institutional modes
@@ -377,11 +385,68 @@ export default function UpgradeScreen() {
   // CCI eligibility state (Circle/Bundle Pro verification)
   const [circleMembersAllPro, setCircleMembersAllPro] = useState(false);
   const [bundleSeatsAllPro, setBundleSeatsAllPro] = useState(false);
+  // Stripe session verification state
+  const [verifyingSession, setVerifyingSession] = useState(false);
 
   // Load entitlements
   useEffect(() => {
     loadEntitlements();
   }, []);
+
+  // Handle Stripe Checkout return
+  useEffect(() => {
+    async function verifyCheckoutSession() {
+      const { session_id, status } = params;
+
+      // User cancelled checkout
+      if (status === 'cancelled') {
+        if (Platform.OS === 'web') {
+          window.alert('Checkout was cancelled.');
+        } else {
+          Alert.alert('Cancelled', 'Checkout was cancelled.');
+        }
+        // Clear URL params
+        router.replace('/upgrade');
+        return;
+      }
+
+      // Verify successful session
+      if (session_id && status === 'success') {
+        setVerifyingSession(true);
+        try {
+          const result = await verifyStripeSession(session_id);
+          if (result.success && result.paymentStatus === 'paid') {
+            if (Platform.OS === 'web') {
+              window.alert(`Payment successful! ${result.entitlementGranted || 'Your purchase'} has been activated.`);
+            } else {
+              Alert.alert('Success!', `${result.entitlementGranted || 'Your purchase'} has been activated.`);
+            }
+            // Reload entitlements to show new status
+            loadEntitlements();
+          } else {
+            if (Platform.OS === 'web') {
+              window.alert(`Payment verification failed: ${result.error || 'Unknown error'}`);
+            } else {
+              Alert.alert('Verification Failed', result.error || 'Could not verify payment.');
+            }
+          }
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Verification failed';
+          if (Platform.OS === 'web') {
+            window.alert(`Error: ${message}`);
+          } else {
+            Alert.alert('Error', message);
+          }
+        } finally {
+          setVerifyingSession(false);
+          // Clear URL params
+          router.replace('/upgrade');
+        }
+      }
+    }
+
+    verifyCheckoutSession();
+  }, [params.session_id, params.status]);
 
   const loadEntitlements = async () => {
     setLoadingEntitlements(true);
@@ -409,6 +474,29 @@ export default function UpgradeScreen() {
     console.log('[PURCHASE] Starting purchase:', productId, productName);
     setIsPurchasing(true);
 
+    // Use Stripe Checkout when configured (web only)
+    if (Platform.OS === 'web' && isStripeConfigured()) {
+      console.log('[PURCHASE] Using Stripe Checkout');
+      // Get userId (use anonymous ID for now, would come from auth in production)
+      const userId = 'user_' + Date.now().toString(36);
+
+      const result = await initiateStripeCheckout(productId as any, userId);
+
+      if ('checkoutUrl' in result) {
+        // Redirect to Stripe Checkout
+        redirectToStripeCheckout(result.checkoutUrl);
+        // Note: setIsPurchasing will remain true until redirect completes
+        return;
+      } else {
+        // Error creating checkout session
+        window.alert(`Checkout Failed: ${result.error}`);
+        setIsPurchasing(false);
+        return;
+      }
+    }
+
+    // Fallback to mock checkout (dev mode or non-web)
+    console.log('[PURCHASE] Using mock checkout (Stripe not configured)');
     await handleMockPurchase(
       productId,
       () => {
@@ -450,12 +538,14 @@ export default function UpgradeScreen() {
     }
   }, [restore]);
 
-  if (subscriptionLoading || loadingEntitlements) {
+  if (subscriptionLoading || loadingEntitlements || verifyingSession) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator color="#00E5FF" size="large" />
-          <Text style={styles.loadingText}>Loading...</Text>
+          <Text style={styles.loadingText}>
+            {verifyingSession ? 'Verifying payment...' : 'Loading...'}
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -807,6 +897,14 @@ export default function UpgradeScreen() {
             <View style={styles.stubNotice}>
               <Text style={styles.stubNoticeText}>
                 Payments are in demo mode. Purchases are simulated.
+              </Text>
+            </View>
+          )}
+
+          {PAYMENTS_ENABLED && Platform.OS === 'web' && isStripeConfigured() && (
+            <View style={[styles.stubNotice, { backgroundColor: 'rgba(76,175,80,0.1)' }]}>
+              <Text style={[styles.stubNoticeText, { color: '#4CAF50' }]}>
+                Stripe Checkout active (TEST MODE). Use card 4242 4242 4242 4242.
               </Text>
             </View>
           )}

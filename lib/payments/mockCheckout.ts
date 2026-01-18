@@ -316,8 +316,9 @@ async function updatePurchaseStatus(
 
 /**
  * Grant entitlement to user (mock implementation)
+ * Exported for use by Stripe verification route
  */
-async function grantEntitlement(entitlementId: string): Promise<void> {
+export async function grantEntitlement(entitlementId: string): Promise<void> {
   try {
     const existing = await AsyncStorage.getItem(STORAGE_KEYS.GRANTED_ENTITLEMENTS);
     const entitlements: string[] = existing ? JSON.parse(existing) : [];

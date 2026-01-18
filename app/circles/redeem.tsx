@@ -9,7 +9,7 @@
  * The label is NOT stored in the permanent connection record.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { CirclesAPI, CircleSecurityError, CircleSecurityEvent } from './_api';
@@ -23,6 +23,7 @@ import {
   StatusMessage,
   Label,
 } from './_ui';
+import { shouldShareNameInCircles, loadIdentity } from '../../lib/profile';
 
 /**
  * Get user-friendly error message from security error.
@@ -67,6 +68,25 @@ export default function CirclesRedeem() {
   const [msg, setMsg] = useState('');
   const [msgType, setMsgType] = useState<'info' | 'error' | 'success'>('info');
   const [loading, setLoading] = useState(false);
+
+  // Auto-populate handshake label from identity if consent is granted
+  // Fail closed: if consent check fails, leave empty (user can still enter manually)
+  useEffect(() => {
+    async function loadConsentedName() {
+      try {
+        const consentGranted = await shouldShareNameInCircles();
+        if (consentGranted) {
+          const identity = await loadIdentity();
+          if (identity.displayName) {
+            setHandshakeLabel(identity.displayName);
+          }
+        }
+      } catch {
+        // Fail closed: consent error means no auto-fill
+      }
+    }
+    loadConsentedName();
+  }, []);
 
   const canRedeemQr = qrInput.trim().length > 10;
   const canRedeemCode =

@@ -3,8 +3,15 @@
  *
  * Centralized payment configuration and utilities.
  *
- * STUB IMPLEMENTATION: Uses mockCheckout until Stripe is integrated.
- * All purchases "work" end-to-end by simulating success and granting entitlements.
+ * STRIPE INTEGRATION:
+ * - Web: Uses Stripe Checkout for real payments
+ * - Entitlements granted ONLY after Stripe confirms payment
+ * - mockCheckout still used for entitlement storage (will migrate to DB)
+ *
+ * DEV/TEST MODE:
+ * - Set STRIPE_SECRET_KEY for API routes
+ * - Set EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY for client
+ * - Use Stripe test cards (4242 4242 4242 4242)
  */
 
 export {
@@ -14,10 +21,12 @@ export {
   ISSUANCE_REQUEST_URL,
 } from './config';
 
+// Entitlement storage (mock for now, will migrate to DB)
 export {
   executePurchase,
   getGrantedEntitlements,
   hasEntitlement,
+  grantEntitlement,
   getPurchaseHistory,
   getProductInfo,
   clearMockData,
@@ -26,3 +35,18 @@ export {
   type PurchaseResult,
   type ProductInfo,
 } from './mockCheckout';
+
+// Stripe Checkout (web payments)
+export {
+  isStripeConfigured,
+  initiateStripeCheckout,
+  verifyStripeSession,
+  redirectToStripeCheckout,
+  STRIPE_PUBLISHABLE_KEY,
+  STRIPE_PRICE_IDS,
+  PRODUCT_ENTITLEMENTS,
+  type CheckoutSessionRequest,
+  type CheckoutSessionResponse,
+  type VerifySessionRequest,
+  type VerifySessionResponse,
+} from './stripe';

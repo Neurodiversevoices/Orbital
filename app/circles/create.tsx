@@ -21,6 +21,7 @@ import {
   Label,
   dangerConfirm,
 } from './_ui';
+import { shouldShareNameInCircles, loadIdentity } from '../../lib/profile';
 
 function formatTime(seconds: number): string {
   if (seconds <= 0) return 'Expired';
@@ -62,7 +63,24 @@ export default function CirclesCreateInvite() {
     try {
       setMsg('Creating invite...');
       setMsgType('info');
-      const inv = await CirclesAPI.createInvite();
+
+      // Check consent: if user has opted to share name in Circles, include displayHint
+      // Fail closed: if consent check fails, default to anonymous (no displayHint)
+      let creatorDisplayHint: string | undefined;
+      try {
+        const consentGranted = await shouldShareNameInCircles();
+        if (consentGranted) {
+          const identity = await loadIdentity();
+          if (identity.displayName) {
+            creatorDisplayHint = identity.displayName;
+          }
+        }
+      } catch {
+        // Fail closed: consent error means no name shared
+        creatorDisplayHint = undefined;
+      }
+
+      const inv = await CirclesAPI.createInvite(creatorDisplayHint);
       setInvite(inv);
       setTimeLeft(inv.expiresInSeconds);
       setMsg('');

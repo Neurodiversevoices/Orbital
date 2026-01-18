@@ -181,6 +181,7 @@ export default function CCIInstrumentScreen() {
   }, [artifactHTML]);
 
   // Export to PDF (opens print dialog)
+  // Uses readiness latch instead of fixed timeout for reliable capture
   const handleExportPDF = useCallback(() => {
     if (Platform.OS === 'web') {
       setIsExporting(true);
@@ -188,11 +189,27 @@ export default function CCIInstrumentScreen() {
       if (printWindow) {
         printWindow.document.write(artifactHTML);
         printWindow.document.close();
-        // Wait for content to load, then trigger print
-        setTimeout(() => {
-          printWindow.print();
-          setIsExporting(false);
-        }, 500);
+
+        // Wait for readiness latch instead of fixed timeout
+        // The latch (data-testid="bundle-artifact-ready") signals fonts/charts/layout settled
+        const maxWaitMs = 10000; // Max 10s wait
+        const pollIntervalMs = 100;
+        let elapsed = 0;
+
+        const checkReady = () => {
+          const latch = printWindow.document.querySelector('[data-testid="bundle-artifact-ready"]');
+          if (latch || elapsed >= maxWaitMs) {
+            // Ready or timeout - proceed with print
+            printWindow.print();
+            setIsExporting(false);
+          } else {
+            elapsed += pollIntervalMs;
+            setTimeout(checkReady, pollIntervalMs);
+          }
+        };
+
+        // Start polling after initial document write
+        setTimeout(checkReady, pollIntervalMs);
       } else {
         setIsExporting(false);
       }
