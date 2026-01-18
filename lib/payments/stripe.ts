@@ -212,3 +212,66 @@ export function redirectToStripeCheckout(checkoutUrl: string): void {
     window.location.href = checkoutUrl;
   }
 }
+
+// =============================================================================
+// CUSTOMER PORTAL TYPES AND FUNCTIONS
+// =============================================================================
+
+export interface CustomerPortalRequest {
+  userId: string;
+  returnUrl: string;
+}
+
+export interface CustomerPortalResponse {
+  success: boolean;
+  portalUrl?: string;
+  error?: string;
+}
+
+/**
+ * Create a Stripe Customer Portal session for subscription management
+ *
+ * Allows users to:
+ * - View and update payment methods
+ * - View invoice history
+ * - Cancel subscription (at period end)
+ */
+export async function createCustomerPortalSession(
+  userId: string
+): Promise<{ portalUrl: string } | { error: string }> {
+  if (!isStripeConfigured()) {
+    return { error: 'Stripe is not configured.' };
+  }
+
+  const returnUrl = `${window.location.origin}/upgrade`;
+
+  try {
+    const response = await fetch('/api/customer-portal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        returnUrl,
+      } satisfies CustomerPortalRequest),
+    });
+
+    const data: CustomerPortalResponse = await response.json();
+
+    if (!data.success || !data.portalUrl) {
+      return { error: data.error || 'Failed to create portal session' };
+    }
+
+    return { portalUrl: data.portalUrl };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : 'Network error' };
+  }
+}
+
+/**
+ * Redirect to Stripe Customer Portal
+ */
+export function redirectToCustomerPortal(portalUrl: string): void {
+  if (Platform.OS === 'web') {
+    window.location.href = portalUrl;
+  }
+}

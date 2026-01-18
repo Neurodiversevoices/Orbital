@@ -42,6 +42,8 @@ export {
   initiateStripeCheckout,
   verifyStripeSession,
   redirectToStripeCheckout,
+  createCustomerPortalSession,
+  redirectToCustomerPortal,
   STRIPE_PUBLISHABLE_KEY,
   STRIPE_PRICE_IDS,
   PRODUCT_ENTITLEMENTS,
@@ -49,4 +51,6 @@ export {
   type CheckoutSessionResponse,
   type VerifySessionRequest,
   type VerifySessionResponse,
+  type CustomerPortalRequest,
+  type CustomerPortalResponse,
 } from './stripe';

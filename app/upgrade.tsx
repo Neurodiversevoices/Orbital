@@ -48,6 +48,7 @@ import {
   Shield,
   Sparkles,
   UserPlus,
+  Settings,
 } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { colors, spacing, borderRadius } from '../theme';
@@ -71,6 +72,8 @@ import {
   initiateStripeCheckout,
   verifyStripeSession,
   redirectToStripeCheckout,
+  createCustomerPortalSession,
+  redirectToCustomerPortal,
 } from '../lib/payments';
 import {
   getUserEntitlements,
@@ -387,6 +390,8 @@ export default function UpgradeScreen() {
   const [bundleSeatsAllPro, setBundleSeatsAllPro] = useState(false);
   // Stripe session verification state
   const [verifyingSession, setVerifyingSession] = useState(false);
+  // Customer portal state
+  const [isOpeningPortal, setIsOpeningPortal] = useState(false);
 
   // Load entitlements
   useEffect(() => {
@@ -470,6 +475,20 @@ export default function UpgradeScreen() {
     setLoadingEntitlements(false);
   };
 
+  // Get or create a persistent userId (in production, this would come from auth)
+  const getUserId = useCallback((): string => {
+    if (Platform.OS === 'web') {
+      let userId = localStorage.getItem('orbital_user_id');
+      if (!userId) {
+        userId = 'user_' + Date.now().toString(36);
+        localStorage.setItem('orbital_user_id', userId);
+      }
+      return userId;
+    }
+    // For native, would use SecureStore or similar
+    return 'user_' + Date.now().toString(36);
+  }, []);
+
   const handlePurchase = useCallback(async (productId: string, productName: string) => {
     console.log('[PURCHASE] Starting purchase:', productId, productName);
     setIsPurchasing(true);
@@ -477,8 +496,8 @@ export default function UpgradeScreen() {
     // Use Stripe Checkout when configured (web only)
     if (Platform.OS === 'web' && isStripeConfigured()) {
       console.log('[PURCHASE] Using Stripe Checkout');
-      // Get userId (use anonymous ID for now, would come from auth in production)
-      const userId = 'user_' + Date.now().toString(36);
+      // Get userId (persisted in localStorage, would come from auth in production)
+      const userId = getUserId();
 
       const result = await initiateStripeCheckout(productId as any, userId);
 
@@ -523,7 +542,7 @@ export default function UpgradeScreen() {
         setIsPurchasing(false);
       }
     );
-  }, []);
+  }, [getUserId]);
 
   const handleRestore = useCallback(async () => {
     setIsRestoring(true);
@@ -537,6 +556,36 @@ export default function UpgradeScreen() {
       Alert.alert('No Purchase Found', "We couldn't find a previous purchase to restore.");
     }
   }, [restore]);
+
+  // Handle opening Stripe Customer Portal for subscription management
+  const handleManageMembership = useCallback(async () => {
+    if (Platform.OS !== 'web' || !isStripeConfigured()) {
+      if (Platform.OS === 'web') {
+        window.alert('Subscription management is not available in demo mode.');
+      } else {
+        Alert.alert('Not Available', 'Subscription management is only available on web.');
+      }
+      return;
+    }
+
+    setIsOpeningPortal(true);
+    // Use the same persistent userId as checkout
+    const userId = getUserId();
+
+    const result = await createCustomerPortalSession(userId);
+
+    if ('portalUrl' in result) {
+      redirectToCustomerPortal(result.portalUrl);
+      // Note: setIsOpeningPortal will remain true until redirect completes
+    } else {
+      if (Platform.OS === 'web') {
+        window.alert(`Error: ${result.error}`);
+      } else {
+        Alert.alert('Error', result.error);
+      }
+      setIsOpeningPortal(false);
+    }
+  }, [getUserId]);
 
   if (subscriptionLoading || loadingEntitlements || verifyingSession) {
     return (
@@ -892,6 +941,24 @@ export default function UpgradeScreen() {
               </>
             )}
           </Pressable>
+
+          {/* Manage Membership - Only visible for paid users with Stripe configured */}
+          {isPro && Platform.OS === 'web' && isStripeConfigured() && (
+            <Pressable
+              onPress={handleManageMembership}
+              disabled={isOpeningPortal}
+              style={styles.manageButton}
+            >
+              {isOpeningPortal ? (
+                <ActivityIndicator color="#00E5FF" size="small" />
+              ) : (
+                <>
+                  <Settings size={14} color="#00E5FF" />
+                  <Text style={styles.manageButtonText}>Manage Membership</Text>
+                </>
+              )}
+            </Pressable>
+          )}
 
           {!PAYMENTS_ENABLED && (
             <View style={styles.stubNotice}>
@@ -1732,6 +1799,23 @@ const styles = StyleSheet.create({
   restoreButtonText: {
     fontSize: 13,
     color: 'rgba(255,255,255,0.5)',
+  },
+  manageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    backgroundColor: 'rgba(0,229,255,0.1)',
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(0,229,255,0.3)',
+    marginBottom: spacing.md,
+  },
+  manageButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#00E5FF',
   },
   stubNotice: {
     backgroundColor: 'rgba(255,152,0,0.1)',
