@@ -56,20 +56,38 @@ export {
 export { useProfile } from './useProfile';
 export type { UseProfileReturn } from './useProfile';
 
-// Identity (display name, avatar)
+// Identity (display name, avatar, accent color)
 export {
   loadIdentity,
   saveIdentity,
   updateDisplayName,
   updateAvatar,
+  updateAccentColor,
   clearIdentity,
   getInitials,
   getAvatarColor,
   useIdentity,
   DEFAULT_IDENTITY,
+  ACCENT_COLOR_PRESETS,
 } from './identity';
 export type {
   AvatarSource,
   UserIdentity,
   UseIdentityResult,
+  AccentColorId,
 } from './identity';
+
+// Consent Defaults (privacy preferences)
+export {
+  loadConsentDefaults,
+  saveConsentDefaults,
+  clearConsentDefaults,
+  useConsentDefaults,
+  shouldShareNameInCircles,
+  shouldAllowBundleCoachVisibility,
+  DEFAULT_CONSENT,
+} from './consent';
+export type {
+  ConsentDefaults,
+  UseConsentDefaultsResult,
+} from './consent';

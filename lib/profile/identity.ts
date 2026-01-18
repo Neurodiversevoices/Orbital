@@ -18,15 +18,37 @@ export interface UserIdentity {
   displayName: string | null;
   avatarUrl: string | null;
   avatarSource: AvatarSource;
+  /** Optional accent color for initials avatar (hex, contrast-safe) */
+  accentColor: string | null;
   updatedAt: string | null;
 }
 
 export const DEFAULT_IDENTITY: UserIdentity = {
   displayName: null,
   avatarUrl: null,
-  avatarSource: 'initials',
+  avatarSource: 'initials',  // Always initials-only (no image uploads)
+  accentColor: null,         // Uses getAvatarColor() fallback if null
   updatedAt: null,
 };
+
+// =============================================================================
+// ACCENT COLOR PRESETS
+// =============================================================================
+
+/**
+ * 6 preset accent colors for initials avatars.
+ * Chosen for contrast safety on dark UI (#0D0E12) and print (white).
+ */
+export const ACCENT_COLOR_PRESETS = [
+  { id: 'cyan', hex: '#00E5FF', label: 'Cyan' },
+  { id: 'purple', hex: '#B388FF', label: 'Purple' },
+  { id: 'green', hex: '#69F0AE', label: 'Green' },
+  { id: 'orange', hex: '#FFAB40', label: 'Orange' },
+  { id: 'pink', hex: '#FF80AB', label: 'Pink' },
+  { id: 'blue', hex: '#448AFF', label: 'Blue' },
+] as const;
+
+export type AccentColorId = typeof ACCENT_COLOR_PRESETS[number]['id'];
 
 // =============================================================================
 // STORAGE
@@ -74,6 +96,14 @@ export async function updateAvatar(
     ...identity,
     avatarUrl: url,
     avatarSource: source,
+  });
+}
+
+export async function updateAccentColor(color: string | null): Promise<void> {
+  const identity = await loadIdentity();
+  await saveIdentity({
+    ...identity,
+    accentColor: color,
   });
 }
 
@@ -129,8 +159,10 @@ export interface UseIdentityResult {
   displayName: string | null;
   initials: string;
   avatarColor: string;
+  accentColor: string | null;
   updateName: (name: string | null) => Promise<void>;
   updateAvatar: (url: string | null, source?: AvatarSource) => Promise<void>;
+  updateAccentColor: (color: string | null) => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -159,14 +191,24 @@ export function useIdentity(email?: string | null): UseIdentityResult {
     await refresh();
   }, [refresh]);
 
+  const handleUpdateAccentColor = useCallback(async (color: string | null) => {
+    await updateAccentColor(color);
+    await refresh();
+  }, [refresh]);
+
+  // Use accentColor if set, otherwise fall back to generated color
+  const effectiveAvatarColor = identity.accentColor || getAvatarColor((identity.displayName || email) ?? null);
+
   return {
     identity,
     isLoading,
     displayName: identity.displayName,
     initials: getInitials(identity.displayName, email ?? null),
-    avatarColor: getAvatarColor((identity.displayName || email) ?? null),
+    avatarColor: effectiveAvatarColor,
+    accentColor: identity.accentColor,
     updateName: handleUpdateName,
     updateAvatar: handleUpdateAvatar,
+    updateAccentColor: handleUpdateAccentColor,
     refresh,
   };
 }

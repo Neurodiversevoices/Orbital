@@ -1,11 +1,19 @@
 /**
  * Profile Setup Screen
  *
- * First-time setup for B2C users after login.
- * Allows selecting an avatar and setting display name.
+ * First-time setup for users after login, before tutorial.
+ * Collects minimal profile + sets privacy/consent defaults.
+ *
+ * SCOPE (minimal):
+ * - Display Name (required)
+ * - Derived Initials (auto, read-only)
+ * - Optional Accent Color (6 presets)
+ * - Consent toggles for Circles and Bundles (defaults OFF)
+ *
+ * TARGET: 60 seconds max to complete
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,16 +23,21 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Image,
+  Switch,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { User, ArrowRight, Sparkles } from 'lucide-react-native';
+import { Sparkles, ArrowRight, Users, Shield } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../theme';
-import { AvatarPicker } from '../components/AvatarPicker';
-import { useIdentity } from '../lib/profile';
-import { type AvatarOption, getAvatarUrl } from '../lib/avatars';
+import { InitialsAvatar } from '../components/InitialsAvatar';
+import {
+  useIdentity,
+  getInitials,
+  getAvatarColor,
+  ACCENT_COLOR_PRESETS,
+} from '../lib/profile';
+import { saveConsentDefaults, DEFAULT_CONSENT } from '../lib/profile/consent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // =============================================================================
@@ -52,11 +65,24 @@ export async function markProfileSetupComplete(): Promise<void> {
 
 export default function ProfileSetupScreen() {
   const router = useRouter();
-  const { updateName, updateAvatar } = useIdentity();
+  const { updateName, updateAccentColor } = useIdentity();
 
+  // Form state
   const [displayName, setDisplayName] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState<AvatarOption | null>(null);
+  const [selectedColorHex, setSelectedColorHex] = useState<string | null>(null);
+  const [circleNameSharing, setCircleNameSharing] = useState(false);
+  const [bundleCoachVisibility, setBundleCoachVisibility] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Derived values
+  const initials = useMemo(
+    () => getInitials(displayName.trim() || null, null),
+    [displayName]
+  );
+  const avatarColor = useMemo(
+    () => selectedColorHex || getAvatarColor(displayName.trim() || null),
+    [displayName, selectedColorHex]
+  );
 
   const canContinue = displayName.trim().length >= 2;
 
@@ -68,15 +94,22 @@ export default function ProfileSetupScreen() {
       // Save display name
       await updateName(displayName.trim());
 
-      // Save avatar if selected
-      if (selectedAvatar) {
-        await updateAvatar(selectedAvatar.url, 'preset');
+      // Save accent color if selected
+      if (selectedColorHex) {
+        await updateAccentColor(selectedColorHex);
       }
+
+      // Save consent defaults
+      await saveConsentDefaults({
+        ...DEFAULT_CONSENT,
+        circleNameSharing,
+        bundleCoachVisibility,
+      });
 
       // Mark setup complete
       await markProfileSetupComplete();
 
-      // Navigate to home
+      // Navigate to home (tutorial gate will redirect if needed)
       router.replace('/(tabs)');
     } catch (error) {
       console.error('Profile setup error:', error);
@@ -86,7 +119,9 @@ export default function ProfileSetupScreen() {
   };
 
   const handleSkip = async () => {
-    // Mark setup complete even if skipped
+    // Save default consent (both OFF) even if skipped
+    await saveConsentDefaults(DEFAULT_CONSENT);
+    // Mark setup complete
     await markProfileSetupComplete();
     router.replace('/(tabs)');
   };
@@ -110,29 +145,26 @@ export default function ProfileSetupScreen() {
             </View>
             <Text style={styles.title}>Set Up Your Profile</Text>
             <Text style={styles.subtitle}>
-              Choose an avatar and display name for your Orbital experience
+              Your name and privacy preferences for Orbital
             </Text>
           </Animated.View>
 
-          {/* Selected Avatar Preview */}
+          {/* Initials Preview */}
           <Animated.View
             entering={FadeInDown.delay(100).duration(400)}
             style={styles.previewSection}
           >
-            <View style={styles.avatarPreview}>
-              {selectedAvatar ? (
-                <Image
-                  source={{ uri: selectedAvatar.url }}
-                  style={styles.previewImage}
-                />
-              ) : (
-                <View style={styles.previewPlaceholder}>
-                  <User size={40} color="rgba(255,255,255,0.3)" />
-                </View>
-              )}
-            </View>
+            <InitialsAvatar
+              initials={initials}
+              color={avatarColor}
+              size={100}
+              borderColor={colors.primary}
+            />
             <Text style={styles.previewName}>
               {displayName.trim() || 'Your Name'}
+            </Text>
+            <Text style={styles.previewInitials}>
+              Initials: {initials}
             </Text>
           </Animated.View>
 
@@ -152,22 +184,92 @@ export default function ProfileSetupScreen() {
               autoCapitalize="words"
               returnKeyType="done"
             />
-            <Text style={styles.inputHint}>
-              This is how you'll appear in Circles
-            </Text>
           </Animated.View>
 
-          {/* Avatar Picker */}
+          {/* Accent Color Picker */}
+          <Animated.View
+            entering={FadeInDown.delay(250).duration(400)}
+            style={styles.colorSection}
+          >
+            <Text style={styles.label}>Accent Color (optional)</Text>
+            <View style={styles.colorGrid}>
+              {ACCENT_COLOR_PRESETS.map((preset) => (
+                <Pressable
+                  key={preset.id}
+                  onPress={() =>
+                    setSelectedColorHex(
+                      selectedColorHex === preset.hex ? null : preset.hex
+                    )
+                  }
+                  style={[
+                    styles.colorSwatch,
+                    { backgroundColor: preset.hex },
+                    selectedColorHex === preset.hex && styles.colorSwatchSelected,
+                  ]}
+                >
+                  {selectedColorHex === preset.hex && (
+                    <View style={styles.colorSwatchCheck} />
+                  )}
+                </Pressable>
+              ))}
+            </View>
+          </Animated.View>
+
+          {/* Privacy Defaults */}
           <Animated.View
             entering={FadeInDown.delay(300).duration(400)}
-            style={styles.pickerSection}
+            style={styles.privacySection}
           >
-            <Text style={styles.label}>Choose Your Avatar</Text>
-            <AvatarPicker
-              selectedId={selectedAvatar?.id ?? null}
-              onSelect={setSelectedAvatar}
-              maxHeight={300}
-            />
+            <View style={styles.privacyHeader}>
+              <Shield size={18} color={colors.primary} />
+              <Text style={styles.privacySectionTitle}>Privacy Defaults</Text>
+            </View>
+
+            {/* Circle Name Sharing */}
+            <View style={styles.toggleRow}>
+              <View style={styles.toggleContent}>
+                <View style={styles.toggleIconWrap}>
+                  <Users size={16} color="rgba(255,255,255,0.6)" />
+                </View>
+                <View style={styles.toggleTextWrap}>
+                  <Text style={styles.toggleTitle}>Share my name in Circles</Text>
+                  <Text style={styles.toggleDesc}>
+                    Others will see your display name
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={circleNameSharing}
+                onValueChange={setCircleNameSharing}
+                trackColor={{ false: 'rgba(255,255,255,0.1)', true: colors.primary }}
+                thumbColor="#fff"
+              />
+            </View>
+
+            {/* Bundle Coach Visibility */}
+            <View style={styles.toggleRow}>
+              <View style={styles.toggleContent}>
+                <View style={styles.toggleIconWrap}>
+                  <Users size={16} color="rgba(255,255,255,0.6)" />
+                </View>
+                <View style={styles.toggleTextWrap}>
+                  <Text style={styles.toggleTitle}>Allow coach/admin to see me</Text>
+                  <Text style={styles.toggleDesc}>
+                    In Bundles you join (name + capacity)
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={bundleCoachVisibility}
+                onValueChange={setBundleCoachVisibility}
+                trackColor={{ false: 'rgba(255,255,255,0.1)', true: colors.primary }}
+                thumbColor="#fff"
+              />
+            </View>
+
+            <Text style={styles.privacyNote}>
+              Both default to OFF for privacy. You can change these later in Settings.
+            </Text>
           </Animated.View>
         </ScrollView>
 
@@ -254,36 +356,18 @@ const styles = StyleSheet.create({
   },
   previewSection: {
     alignItems: 'center',
-    marginBottom: spacing.xl,
-  },
-  avatarPreview: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-    borderWidth: 3,
-    borderColor: colors.primary,
-  },
-  previewImage: {
-    width: 94,
-    height: 94,
-    borderRadius: 47,
-  },
-  previewPlaceholder: {
-    width: 94,
-    height: 94,
-    borderRadius: 47,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginBottom: spacing.lg,
   },
   previewName: {
     fontSize: 18,
     fontWeight: '600',
     color: colors.textPrimary,
+    marginTop: spacing.sm,
+  },
+  previewInitials: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: 2,
   },
   inputSection: {
     marginBottom: spacing.lg,
@@ -304,13 +388,89 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
   },
-  inputHint: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
-    marginTop: spacing.xs,
-  },
-  pickerSection: {
+  colorSection: {
     marginBottom: spacing.lg,
+  },
+  colorGrid: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  colorSwatch: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  colorSwatchSelected: {
+    borderWidth: 3,
+    borderColor: '#fff',
+  },
+  colorSwatchCheck: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#000',
+  },
+  privacySection: {
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  privacyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  privacySectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.04)',
+  },
+  toggleContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  toggleIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.sm,
+  },
+  toggleTextWrap: {
+    flex: 1,
+  },
+  toggleTitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.textPrimary,
+  },
+  toggleDesc: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: 1,
+  },
+  privacyNote: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.4)',
+    marginTop: spacing.sm,
+    fontStyle: 'italic',
   },
   actions: {
     flexDirection: 'row',
