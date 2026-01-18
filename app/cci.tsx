@@ -9,7 +9,7 @@
  * Language: "Issuance" / "Artifact" / "Instrument" — NOT "Report"
  */
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -26,7 +26,6 @@ import { colors, spacing, borderRadius, commonStyles } from '../theme';
 import { generateCCIArtifactHTML, getGoldenMasterHTML, getCircleGoldenMasterHTML, getBundleGoldenMasterHTML } from '../lib/cci';
 import { FOUNDER_DEMO_ENABLED } from '../lib/hooks/useDemoMode';
 import { ISSUANCE_REQUEST_URL } from '../lib/payments';
-import { getUserEntitlements, type UserEntitlements } from '../lib/entitlements';
 
 /**
  * CCI-Q4 is ALWAYS demo-safe: it uses hardcoded golden master data.
@@ -109,69 +108,20 @@ export default function CCIInstrumentScreen() {
   const isCircle = cciType === 'circle';
   const isBundle = cciType === 'bundle';
 
-  // ========== BUNDLE SEAT COUNT FROM ENTITLEMENTS ==========
-  // Source of truth: user's bundle entitlement (10/15/20)
-  // Dev override: ?seats=10|15|20 (explicit only, no default fallback)
-  const [entitlements, setEntitlements] = useState<UserEntitlements | null>(null);
-  const [isEntitlementsLoaded, setIsEntitlementsLoaded] = useState(false);
-
-  useEffect(() => {
-    if (isBundle) {
-      console.log('[CCI] Loading bundle entitlements...');
-      getUserEntitlements()
-        .then((ent) => {
-          console.log('[CCI] Entitlements loaded:', ent.bundleSize);
-          setEntitlements(ent);
-          setIsEntitlementsLoaded(true);
-        })
-        .catch((err) => {
-          console.error('[CCI] Failed to load entitlements:', err);
-          setEntitlements(null);
-          setIsEntitlementsLoaded(true); // Mark as loaded even on error
-        });
-    }
-  }, [isBundle]);
-
-  // Parse dev override (only if explicitly provided and valid)
-  const parseSeatsOverride = (raw: string | undefined): 10 | 15 | 20 | null => {
-    if (!raw) return null;
+  // ========== BUNDLE SEAT COUNT FROM URL PARAM ==========
+  // Source of truth: URL param passed from navigation (brief.tsx)
+  // Navigation passes ?seats=10|15|20 based on user selection/entitlement
+  // No async loading — synchronous render for reliable PDF capture
+  const parseBundleSeats = (raw: string | undefined): 10 | 15 | 20 => {
+    if (!raw) return 10; // Default for direct /cci?type=bundle access
     const parsed = parseInt(raw, 10);
     if (parsed === 10 || parsed === 15 || parsed === 20) return parsed;
-    return null; // Invalid override
+    return 10; // Invalid value defaults to 10
   };
 
-  const seatsOverride = parseSeatsOverride(params.seats);
-  const entitlementSeats = entitlements?.bundleSize ?? null;
-
-  // HARD GATE: For bundle type, must wait for entitlements (unless dev override)
-  // This prevents PDF capture from happening before entitlements resolve
-  if (isBundle && seatsOverride === null && !isEntitlementsLoaded) {
-    console.log('[CCI] GATE: Waiting for entitlements to load...');
-    return (
-      <SafeAreaView style={commonStyles.screen}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading bundle entitlement…</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  // Derive bundleSeatCount ONLY after entitlements are loaded
-  let bundleSeatCount: 10 | 15 | 20;
-  if (seatsOverride !== null) {
-    // Dev override provided explicitly — bypass entitlements
-    bundleSeatCount = seatsOverride;
-    console.log('[CCI] Bundle seats from URL override:', bundleSeatCount);
-  } else if (entitlementSeats !== null) {
-    // From user's entitlement (guaranteed loaded at this point)
-    bundleSeatCount = entitlementSeats;
-    console.log('[CCI] Bundle seats from entitlement:', bundleSeatCount);
-  } else {
-    // Entitlements loaded but user has no bundle — default to 10 for demo
-    bundleSeatCount = 10;
-    console.log('[CCI] Bundle seats defaulting to 10 (no bundle entitlement)');
-  }
-  // ==========================================================
+  const bundleSeatCount = parseBundleSeats(params.seats);
+  console.log('[CCI] Bundle seats from URL:', bundleSeatCount, '(raw:', params.seats, ')');
+  // =======================================================
 
   console.log('[CCI] isCircle:', isCircle, '| isBundle:', isBundle, '| seats:', bundleSeatCount);
 
@@ -486,18 +436,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'rgba(255,255,255,0.5)',
     marginBottom: spacing.lg,
-  },
-  // Loading container for bundle entitlements
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
-    backgroundColor: colors.background,
-  },
-  loadingText: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
   },
   // Error container for invalid CCI type (fail-closed)
   errorContainer: {
