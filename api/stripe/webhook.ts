@@ -14,7 +14,7 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseData } from '../_lib/supabaseClient';
 import { getClientIdentifier } from '../_lib/rateLimit';
 import {
   logSecurityEvent,
@@ -23,6 +23,8 @@ import {
   logEntitlementRevoked,
   logPurchaseCompleted,
 } from '../_lib/securityAudit';
+import { invalidateEntitlements } from '../_lib/cache';
+import { startRequest, recordRequestEnd } from '../_lib/metrics';
 
 // Disable body parsing for raw webhook payload
 export const config = {
@@ -60,19 +62,10 @@ function getStripe(): Stripe {
 }
 
 // =============================================================================
-// SUPABASE CONFIGURATION
+// SUPABASE (uses shared pooled client)
 // =============================================================================
 
-function getSupabase() {
-  const url = process.env.SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url || !serviceKey) {
-    throw new Error('Supabase not configured');
-  }
-
-  return createClient(url, serviceKey);
-}
+// Use shared client from supabaseClient.ts for connection pooling
 
 // =============================================================================
 // HELPER: READ RAW BODY
@@ -96,7 +89,7 @@ async function grantEntitlement(
   entitlementId: string,
   metadata: Record<string, string>
 ): Promise<void> {
-  const supabase = getSupabase();
+  const supabase = getSupabaseData();
 
   // Get current entitlements
   const { data: existing } = await supabase
@@ -133,6 +126,9 @@ async function grantEntitlement(
       onConflict: 'user_id',
     });
 
+  // Invalidate cache so next read gets fresh data
+  invalidateEntitlements(userId);
+
   console.log(`[webhook] Granted entitlement ${entitlementId} to user ${userId}`);
 }
 
@@ -140,7 +136,7 @@ async function revokeEntitlement(
   userId: string,
   entitlementId: string
 ): Promise<void> {
-  const supabase = getSupabase();
+  const supabase = getSupabaseData();
 
   // Get current entitlements
   const { data: existing } = await supabase
@@ -165,6 +161,9 @@ async function revokeEntitlement(
     })
     .eq('user_id', userId);
 
+  // Invalidate cache so next read gets fresh data
+  invalidateEntitlements(userId);
+
   console.log(`[webhook] Revoked entitlement ${entitlementId} from user ${userId}`);
 }
 
@@ -185,7 +184,7 @@ async function handleCheckoutSessionCompleted(
     return;
   }
 
-  const supabase = getSupabase();
+  const supabase = getSupabaseData();
 
   // IDEMPOTENCY: Check if this session was already processed
   const { data: existingPurchase } = await supabase
@@ -276,12 +275,17 @@ async function handleSubscriptionUpdated(
 // REQUEST HANDLER
 // =============================================================================
 
+const ENDPOINT = '/api/stripe/webhook';
+
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ): Promise<void> {
+  const metricsCtx = startRequest(ENDPOINT);
+
   // Only allow POST
   if (req.method !== 'POST') {
+    recordRequestEnd(metricsCtx, 405);
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
@@ -289,6 +293,7 @@ export default async function handler(
   const webhookSecret = getWebhookSecret();
   if (!webhookSecret) {
     console.error('[webhook] Webhook secret not configured');
+    recordRequestEnd(metricsCtx, 500);
     res.status(500).json({ error: 'Webhook not configured' });
     return;
   }
@@ -301,7 +306,8 @@ export default async function handler(
     const ip = getClientIdentifier(req);
 
     if (!signature) {
-      await logWebhookInvalid(ip, '/api/stripe/webhook', 'Missing stripe-signature header');
+      await logWebhookInvalid(ip, ENDPOINT, 'Missing stripe-signature header');
+      recordRequestEnd(metricsCtx, 400);
       res.status(400).json({ error: 'Missing stripe-signature header' });
       return;
     }
@@ -317,20 +323,21 @@ export default async function handler(
         webhookSecret
       );
     } catch (err) {
-      await logWebhookInvalid(ip, '/api/stripe/webhook', `Signature verification failed: ${err instanceof Error ? err.message : 'unknown'}`);
+      await logWebhookInvalid(ip, ENDPOINT, `Signature verification failed: ${err instanceof Error ? err.message : 'unknown'}`);
+      recordRequestEnd(metricsCtx, 400);
       res.status(400).json({ error: 'Invalid signature' });
       return;
     }
 
-    // Log successful webhook receipt
-    await logSecurityEvent({
+    // Log successful webhook receipt (fire and forget)
+    logSecurityEvent({
       event_type: 'WEBHOOK_RECEIVED',
       ip_address: ip,
-      endpoint: '/api/stripe/webhook',
+      endpoint: ENDPOINT,
       method: 'POST',
       status_code: 200,
       details: { eventType: event.type, eventId: event.id },
-    });
+    }).catch(() => {});
 
     // Handle event types
     switch (event.type) {
@@ -356,9 +363,11 @@ export default async function handler(
         console.log(`[webhook] Unhandled event type: ${event.type}`);
     }
 
+    recordRequestEnd(metricsCtx, 200);
     res.status(200).json({ received: true });
   } catch (error) {
     console.error('[webhook] Error processing webhook:', error);
+    recordRequestEnd(metricsCtx, 500);
     res.status(500).json({ error: 'Webhook processing failed' });
   }
 }

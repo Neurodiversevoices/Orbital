@@ -13,17 +13,23 @@
  * - User ID extracted from token (users can ONLY access own entitlements)
  * - All events logged to security audit
  *
+ * SCALABILITY:
+ * - Server-side caching (30s TTL) reduces DB load
+ * - Shared Supabase client with connection pooling
+ * - Metrics tracking for capacity monitoring
+ *
  * Response:
  * {
  *   entitlements: string[];
  *   circleId?: string;
  *   bundleId?: string;
  *   updatedAt: string;
+ *   cached?: boolean;
  * }
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseData, getSupabaseAuth } from '../_lib/supabaseClient';
 import { applyRateLimit, RATE_LIMITS, getClientIdentifier } from '../_lib/rateLimit';
 import { applyCors } from '../_lib/cors';
 import {
@@ -31,24 +37,16 @@ import {
   logAuthFailure,
   logRateLimitExceeded,
 } from '../_lib/securityAudit';
+import {
+  getCachedEntitlements,
+  setCachedEntitlements,
+  getCachedAuth,
+  setCachedAuth,
+} from '../_lib/cache';
+import { startRequest, recordRequestEnd } from '../_lib/metrics';
 
 // =============================================================================
-// SUPABASE CONFIGURATION
-// =============================================================================
-
-function getSupabase() {
-  const url = process.env.SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url || !serviceKey) {
-    throw new Error('Supabase not configured');
-  }
-
-  return createClient(url, serviceKey);
-}
-
-// =============================================================================
-// AUTH VALIDATION
+// AUTH VALIDATION (with caching)
 // =============================================================================
 
 async function validateAuthToken(authHeader: string | undefined): Promise<{ userId: string } | null> {
@@ -58,15 +56,26 @@ async function validateAuthToken(authHeader: string | undefined): Promise<{ user
 
   const token = authHeader.replace('Bearer ', '');
 
+  // Check cache first (reduces DB load)
+  const cached = getCachedAuth(token);
+  if (cached) {
+    return cached;
+  }
+
   try {
-    const supabase = getSupabase();
+    const supabase = getSupabaseAuth();
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
       return null;
     }
 
-    return { userId: user.id };
+    const result = { userId: user.id };
+
+    // Cache successful auth (short TTL for security)
+    setCachedAuth(token, result);
+
+    return result;
   } catch (error) {
     return null;
   }
@@ -126,25 +135,44 @@ export default async function handler(
   // User can ONLY access their own entitlements
   const userId = authResult.userId;
 
-  try {
-    const supabase = getSupabase();
+  // Start metrics tracking
+  const metricsCtx = startRequest(ENDPOINT);
 
-    // Fetch user entitlements (using authenticated user ID from token)
+  try {
+    // Check cache first (reduces DB load under burst traffic)
+    const cachedEntitlements = getCachedEntitlements(userId);
+    if (cachedEntitlements !== undefined) {
+      recordRequestEnd(metricsCtx, 200);
+      res.status(200).json({
+        entitlements: cachedEntitlements,
+        cached: true,
+      });
+      return;
+    }
+
+    // Cache miss - fetch from database
+    const supabase = getSupabaseData();
+
     const { data, error } = await supabase
       .from('user_entitlements')
-      .select('*')
+      .select('entitlements, circle_id, bundle_id, updated_at')
       .eq('user_id', userId)
       .single();
 
     if (error && error.code !== 'PGRST116') {
       // PGRST116 = no rows found (not an error)
       console.error('[entitlements] Database error:', error);
+      recordRequestEnd(metricsCtx, 500);
       res.status(500).json({ error: 'Failed to fetch entitlements' });
       return;
     }
 
-    // Log successful fetch
-    await logSecurityEvent({
+    // Cache the result (even empty arrays)
+    const entitlements = data?.entitlements || [];
+    setCachedEntitlements(userId, entitlements);
+
+    // Log successful fetch (fire and forget - don't block response)
+    logSecurityEvent({
       event_type: 'ENTITLEMENT_FETCH_SUCCESS',
       user_id: userId,
       ip_address: ip,
@@ -152,14 +180,18 @@ export default async function handler(
       method,
       status_code: 200,
       details: {
-        entitlementCount: data?.entitlements?.length || 0,
+        entitlementCount: entitlements.length,
+        cached: false,
       },
-    });
+    }).catch(() => {}); // Don't fail request on logging error
+
+    recordRequestEnd(metricsCtx, 200);
 
     if (!data) {
       res.status(200).json({
         entitlements: [],
         updatedAt: null,
+        cached: false,
       });
       return;
     }
@@ -169,9 +201,11 @@ export default async function handler(
       circleId: data.circle_id || null,
       bundleId: data.bundle_id || null,
       updatedAt: data.updated_at,
+      cached: false,
     });
   } catch (error) {
     console.error('[entitlements] Error:', error);
+    recordRequestEnd(metricsCtx, 500);
     const message = error instanceof Error ? error.message : 'Failed to fetch entitlements';
     res.status(500).json({ error: message });
   }

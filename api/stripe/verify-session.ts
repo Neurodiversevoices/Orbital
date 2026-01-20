@@ -19,7 +19,7 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseData, getSupabaseAuth } from '../_lib/supabaseClient';
 import { applyRateLimit, RATE_LIMITS, getClientIdentifier } from '../_lib/rateLimit';
 import { applyCors } from '../_lib/cors';
 import {
@@ -30,6 +30,12 @@ import {
   logEntitlementGranted,
   logPurchaseCompleted,
 } from '../_lib/securityAudit';
+import {
+  getCachedAuth,
+  setCachedAuth,
+  invalidateEntitlements,
+} from '../_lib/cache';
+import { startRequest, recordRequestEnd } from '../_lib/metrics';
 
 // =============================================================================
 // STRIPE CONFIGURATION
@@ -52,22 +58,13 @@ function getStripe(): Stripe {
 }
 
 // =============================================================================
-// SUPABASE CONFIGURATION
+// SUPABASE (uses shared pooled client)
 // =============================================================================
 
-function getSupabase() {
-  const url = process.env.SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url || !serviceKey) {
-    throw new Error('Supabase not configured');
-  }
-
-  return createClient(url, serviceKey);
-}
+// Use shared clients from supabaseClient.ts for connection pooling
 
 // =============================================================================
-// AUTH VALIDATION
+// AUTH VALIDATION (with caching)
 // =============================================================================
 
 async function validateAuthToken(authHeader: string | undefined): Promise<{ userId: string } | null> {
@@ -77,8 +74,14 @@ async function validateAuthToken(authHeader: string | undefined): Promise<{ user
 
   const token = authHeader.replace('Bearer ', '');
 
+  // Check cache first (reduces DB load)
+  const cached = getCachedAuth(token);
+  if (cached) {
+    return cached;
+  }
+
   try {
-    const supabase = getSupabase();
+    const supabase = getSupabaseAuth();
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
@@ -86,7 +89,12 @@ async function validateAuthToken(authHeader: string | undefined): Promise<{ user
       return null;
     }
 
-    return { userId: user.id };
+    const result = { userId: user.id };
+
+    // Cache successful auth (short TTL for security)
+    setCachedAuth(token, result);
+
+    return result;
   } catch (error) {
     console.error('[verify-session] Token validation error:', error);
     return null;
@@ -102,7 +110,7 @@ async function grantEntitlement(
   entitlementId: string,
   metadata: Record<string, string>
 ): Promise<string[]> {
-  const supabase = getSupabase();
+  const supabase = getSupabaseData();
 
   // Get current entitlements
   const { data: existing } = await supabase
@@ -144,6 +152,9 @@ async function grantEntitlement(
     throw new Error('Failed to grant entitlement');
   }
 
+  // Invalidate cache so next read gets fresh data
+  invalidateEntitlements(userId);
+
   return currentEntitlements;
 }
 
@@ -159,6 +170,7 @@ export default async function handler(
 ): Promise<void> {
   const ip = getClientIdentifier(req);
   const method = req.method || 'UNKNOWN';
+  const metricsCtx = startRequest(ENDPOINT);
 
   // 1) CORS check
   const corsOk = await applyCors(req, res, {
@@ -175,6 +187,7 @@ export default async function handler(
 
   // Only allow GET
   if (req.method !== 'GET') {
+    recordRequestEnd(metricsCtx, 405);
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
@@ -182,6 +195,7 @@ export default async function handler(
   // Check payment mode
   const paymentMode = process.env.EXPO_PUBLIC_PAYMENTS_MODE;
   if (paymentMode === 'demo' || !paymentMode) {
+    recordRequestEnd(metricsCtx, 400);
     res.status(400).json({ error: 'Payments are in demo mode' });
     return;
   }
@@ -190,6 +204,7 @@ export default async function handler(
   const authResult = await validateAuthToken(req.headers.authorization);
   if (!authResult) {
     await logAuthFailure(ip, ENDPOINT, method, 'Invalid or missing auth token');
+    recordRequestEnd(metricsCtx, 401);
     res.status(401).json({ error: 'Authentication required. Please sign in.' });
     return;
   }
@@ -200,6 +215,7 @@ export default async function handler(
     const { session_id } = req.query;
 
     if (!session_id || typeof session_id !== 'string') {
+      recordRequestEnd(metricsCtx, 400);
       res.status(400).json({ error: 'Missing session_id' });
       return;
     }
@@ -212,6 +228,7 @@ export default async function handler(
 
     // Check session status
     if (session.payment_status !== 'paid') {
+      recordRequestEnd(metricsCtx, 400);
       res.status(400).json({
         success: false,
         error: 'Payment not completed',
@@ -227,6 +244,7 @@ export default async function handler(
     const productId = metadata.productId;
 
     if (!sessionUserId || !entitlementId) {
+      recordRequestEnd(metricsCtx, 400);
       res.status(400).json({
         success: false,
         error: 'Missing user or entitlement information',
@@ -237,6 +255,7 @@ export default async function handler(
     // SECURITY: Verify authenticated user matches session owner
     if (authenticatedUserId !== sessionUserId) {
       await logSessionOwnerMismatch(authenticatedUserId, sessionUserId, ip, ENDPOINT);
+      recordRequestEnd(metricsCtx, 403);
       res.status(403).json({
         success: false,
         error: 'Access denied. You can only verify your own checkout sessions.',
@@ -247,7 +266,7 @@ export default async function handler(
     // Use the verified user ID
     const userId = sessionUserId;
 
-    const supabase = getSupabase();
+    const supabase = getSupabaseData();
 
     // IDEMPOTENCY: Check if already processed by webhook
     const { data: existingPurchase } = await supabase
@@ -298,6 +317,7 @@ export default async function handler(
       await logPurchaseCompleted(userId, productId || 'unknown', session.id, 'verify-session', ip);
     }
 
+    recordRequestEnd(metricsCtx, 200);
     res.status(200).json({
       success: true,
       entitlements,
@@ -306,6 +326,7 @@ export default async function handler(
     });
   } catch (error) {
     console.error('[verify-session] Error:', error);
+    recordRequestEnd(metricsCtx, 500);
     const message = error instanceof Error ? error.message : 'Verification failed';
     res.status(500).json({ success: false, error: message });
   }

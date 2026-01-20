@@ -31,7 +31,7 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAuth } from '../_lib/supabaseClient';
 import { applyRateLimit, RATE_LIMITS, getClientIdentifier } from '../_lib/rateLimit';
 import { applyCors } from '../_lib/cors';
 import { validateProductId, getEntitlementForProduct, isOneTimeProduct } from '../_lib/skuValidation';
@@ -41,21 +41,12 @@ import {
   logRateLimitExceeded,
   logSkuValidationFailed,
 } from '../_lib/securityAudit';
+import { getCachedAuth, setCachedAuth } from '../_lib/cache';
+import { startRequest, recordRequestEnd } from '../_lib/metrics';
 
 // =============================================================================
-// SUPABASE AUTH VALIDATION
+// SUPABASE AUTH VALIDATION (with caching)
 // =============================================================================
-
-function getSupabaseClient() {
-  const url = process.env.SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url || !serviceKey) {
-    return null;
-  }
-
-  return createClient(url, serviceKey);
-}
 
 async function validateAuthToken(authHeader: string | undefined): Promise<{ userId: string } | null> {
   if (!authHeader?.startsWith('Bearer ')) {
@@ -63,21 +54,27 @@ async function validateAuthToken(authHeader: string | undefined): Promise<{ user
   }
 
   const token = authHeader.replace('Bearer ', '');
-  const supabase = getSupabaseClient();
 
-  if (!supabase) {
-    console.error('[auth] Supabase not configured');
-    return null;
+  // Check cache first (reduces DB load)
+  const cached = getCachedAuth(token);
+  if (cached) {
+    return cached;
   }
 
   try {
+    const supabase = getSupabaseAuth();
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
       return null;
     }
 
-    return { userId: user.id };
+    const result = { userId: user.id };
+
+    // Cache successful auth (short TTL for security)
+    setCachedAuth(token, result);
+
+    return result;
   } catch (error) {
     return null;
   }
@@ -157,6 +154,7 @@ export default async function handler(
 ): Promise<void> {
   const ip = getClientIdentifier(req);
   const method = req.method || 'UNKNOWN';
+  const metricsCtx = startRequest(ENDPOINT);
 
   // 1) CORS check
   const corsOk = await applyCors(req, res, {
@@ -173,6 +171,7 @@ export default async function handler(
 
   // Only allow POST
   if (req.method !== 'POST') {
+    recordRequestEnd(metricsCtx, 405);
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
@@ -180,6 +179,7 @@ export default async function handler(
   // Check payment mode
   const paymentMode = process.env.EXPO_PUBLIC_PAYMENTS_MODE;
   if (paymentMode === 'demo' || !paymentMode) {
+    recordRequestEnd(metricsCtx, 400);
     res.status(400).json({ error: 'Payments are in demo mode. No real checkout available.' });
     return;
   }
@@ -188,6 +188,7 @@ export default async function handler(
   const authResult = await validateAuthToken(req.headers.authorization);
   if (!authResult) {
     await logAuthFailure(ip, ENDPOINT, method, 'Invalid or missing auth token');
+    recordRequestEnd(metricsCtx, 401);
     res.status(401).json({ error: 'Authentication required. Please sign in.' });
     return;
   }
@@ -220,6 +221,7 @@ export default async function handler(
         status_code: 400,
         details: { reason: 'Missing productId' },
       });
+      recordRequestEnd(metricsCtx, 400);
       res.status(400).json({ error: 'Missing required field: productId' });
       return;
     }
@@ -227,6 +229,7 @@ export default async function handler(
     const validation = validateProductId(productId);
     if (!validation.valid) {
       await logSkuValidationFailed(userId, ip, ENDPOINT, productId, validation.error || 'Unknown product');
+      recordRequestEnd(metricsCtx, 400);
       res.status(400).json({ error: validation.error });
       return;
     }
@@ -235,6 +238,7 @@ export default async function handler(
     const priceId = getStripePriceId(productId);
     if (!priceId) {
       await logSkuValidationFailed(userId, ip, ENDPOINT, productId, 'No Stripe price configured');
+      recordRequestEnd(metricsCtx, 400);
       res.status(400).json({ error: `Product not configured: ${productId}` });
       return;
     }
@@ -292,8 +296,8 @@ export default async function handler(
       }),
     });
 
-    // Log successful checkout initiation
-    await logSecurityEvent({
+    // Log successful checkout initiation (fire and forget)
+    logSecurityEvent({
       event_type: 'PURCHASE_INITIATED',
       user_id: userId,
       ip_address: ip,
@@ -305,8 +309,9 @@ export default async function handler(
         sessionId: session.id,
         mode,
       },
-    });
+    }).catch(() => {});
 
+    recordRequestEnd(metricsCtx, 200);
     res.status(200).json({
       sessionId: session.id,
       url: session.url,
@@ -314,7 +319,7 @@ export default async function handler(
   } catch (error) {
     console.error('[create-checkout-session] Error:', error);
 
-    await logSecurityEvent({
+    logSecurityEvent({
       event_type: 'PURCHASE_FAILED',
       user_id: userId,
       ip_address: ip,
@@ -324,8 +329,9 @@ export default async function handler(
       details: {
         error: error instanceof Error ? error.message : 'Unknown error',
       },
-    });
+    }).catch(() => {});
 
+    recordRequestEnd(metricsCtx, 500);
     const message = error instanceof Error ? error.message : 'Failed to create checkout session';
     res.status(500).json({ error: message });
   }
