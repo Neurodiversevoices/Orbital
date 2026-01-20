@@ -20,6 +20,7 @@ import {
   addCachedEntitlement,
 } from '../entitlements/serverEntitlements';
 import { getEntitlementForProduct } from './stripePriceIds';
+import { getAccessToken } from '../auth';
 
 // =============================================================================
 // TYPES
@@ -84,7 +85,12 @@ async function executeDemoCheckout(options: CheckoutOptions): Promise<CheckoutRe
 async function executeStripeCheckout(options: CheckoutOptions): Promise<CheckoutResult> {
   const { productId, circleId, bundleId, successUrl, cancelUrl } = options;
 
-  const userId = await getUserId();
+  // Get auth token for API authentication
+  const accessToken = await getAccessToken();
+  if (!accessToken) {
+    throw new Error('Authentication required. Please sign in.');
+  }
+
   const baseUrl = getApiBaseUrl();
 
   // Call server to create checkout session
@@ -92,10 +98,10 @@ async function executeStripeCheckout(options: CheckoutOptions): Promise<Checkout
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`,
     },
     body: JSON.stringify({
       productId,
-      userId,
       circleId,
       bundleId,
       successUrl,

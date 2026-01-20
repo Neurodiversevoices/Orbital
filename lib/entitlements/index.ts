@@ -410,12 +410,15 @@ export {
 // Server-side entitlements (durable source of truth)
 export {
   getUserId,
-  setUserId,
+  getUserIdOrNull,
+  requiresAuth,
+  canMakePurchases,
   fetchServerEntitlements,
   syncEntitlements,
   getCachedEntitlements,
   addCachedEntitlement,
   clearCachedEntitlements,
+  clearDemoUserId,
   hasServerEntitlement,
   getServerEntitlements,
   restorePurchases,

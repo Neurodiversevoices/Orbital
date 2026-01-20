@@ -4,12 +4,16 @@
  * Client-side service for fetching and caching durable entitlements from the server.
  * AsyncStorage is used as a local cache, but the server is the source of truth.
  *
- * In demo mode, entitlements are ephemeral (AsyncStorage only).
- * In test/live mode, entitlements are durable (server-side + cached locally).
+ * USER ID:
+ * - In test/live mode: Uses authenticated Supabase user UUID (required)
+ * - In demo mode: Uses device-generated ID (no auth required)
+ *
+ * This enables cross-device sync when user is authenticated.
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getPaymentMode, isDemoMode, getApiBaseUrl } from '../payments/paymentMode';
+import { getAuthUserId, isAuthenticated as checkIsAuthenticated } from '../auth';
 
 // =============================================================================
 // STORAGE KEYS
@@ -17,7 +21,7 @@ import { getPaymentMode, isDemoMode, getApiBaseUrl } from '../payments/paymentMo
 
 const STORAGE_KEYS = {
   ENTITLEMENTS_CACHE: '@orbital:entitlements_cache',
-  ENTITLEMENTS_USER_ID: '@orbital:entitlements_user_id',
+  ENTITLEMENTS_USER_ID: '@orbital:entitlements_user_id', // Fallback for demo mode
   LAST_SYNC: '@orbital:entitlements_last_sync',
 } as const;
 
@@ -38,15 +42,75 @@ export interface ServerEntitlements {
 // =============================================================================
 
 /**
- * Get or create a stable user ID
- * In a real app, this would come from your auth system
+ * Get the user ID for entitlements.
+ *
+ * - In test/live mode: Returns authenticated Supabase user UUID
+ * - In demo mode: Returns device-generated ID (for demo purposes only)
+ *
+ * Throws if in test/live mode and user is not authenticated.
  */
 export async function getUserId(): Promise<string> {
+  // In demo mode, use device-generated ID (no auth required)
+  if (isDemoMode()) {
+    return getDemoUserId();
+  }
+
+  // In test/live mode, require authentication
+  const authUserId = await getAuthUserId();
+
+  if (!authUserId) {
+    throw new Error('Authentication required for purchases. Please sign in.');
+  }
+
+  return authUserId;
+}
+
+/**
+ * Get user ID if authenticated, null otherwise.
+ * Does not throw - useful for checking without requiring auth.
+ */
+export async function getUserIdOrNull(): Promise<string | null> {
+  if (isDemoMode()) {
+    return getDemoUserId();
+  }
+
+  return getAuthUserId();
+}
+
+/**
+ * Check if user is authenticated (for purchase gating)
+ */
+export async function requiresAuth(): Promise<boolean> {
+  // Auth required in test/live mode, not in demo mode
+  return !isDemoMode();
+}
+
+/**
+ * Check if current user can make purchases
+ */
+export async function canMakePurchases(): Promise<{ allowed: boolean; reason?: string }> {
+  if (isDemoMode()) {
+    return { allowed: true }; // Demo mode doesn't require auth
+  }
+
+  const isAuth = await checkIsAuthenticated();
+  if (!isAuth) {
+    return { allowed: false, reason: 'Please sign in to make purchases' };
+  }
+
+  return { allowed: true };
+}
+
+/**
+ * Get or create a demo mode user ID (device-generated)
+ * Only used when PAYMENTS_MODE=demo
+ */
+async function getDemoUserId(): Promise<string> {
   let userId = await AsyncStorage.getItem(STORAGE_KEYS.ENTITLEMENTS_USER_ID);
 
   if (!userId) {
-    // Generate a stable user ID
-    userId = `user_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+    // Generate a stable device ID for demo mode
+    userId = `demo_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
     await AsyncStorage.setItem(STORAGE_KEYS.ENTITLEMENTS_USER_ID, userId);
   }
 
@@ -54,10 +118,11 @@ export async function getUserId(): Promise<string> {
 }
 
 /**
- * Set user ID (e.g., after auth)
+ * Clear demo user ID (for testing)
+ * Does not affect authenticated user ID
  */
-export async function setUserId(userId: string): Promise<void> {
-  await AsyncStorage.setItem(STORAGE_KEYS.ENTITLEMENTS_USER_ID, userId);
+export async function clearDemoUserId(): Promise<void> {
+  await AsyncStorage.removeItem(STORAGE_KEYS.ENTITLEMENTS_USER_ID);
 }
 
 // =============================================================================

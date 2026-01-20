@@ -25,6 +25,50 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
+
+// =============================================================================
+// SUPABASE AUTH VALIDATION
+// =============================================================================
+
+function getSupabaseClient() {
+  const url = process.env.SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !serviceKey) {
+    return null;
+  }
+
+  return createClient(url, serviceKey);
+}
+
+async function validateAuthToken(authHeader: string | undefined): Promise<{ userId: string } | null> {
+  if (!authHeader?.startsWith('Bearer ')) {
+    return null;
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+  const supabase = getSupabaseClient();
+
+  if (!supabase) {
+    console.error('[auth] Supabase not configured');
+    return null;
+  }
+
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      console.error('[auth] Token validation failed:', error?.message);
+      return null;
+    }
+
+    return { userId: user.id };
+  } catch (error) {
+    console.error('[auth] Token validation error:', error);
+    return null;
+  }
+}
 
 // =============================================================================
 // STRIPE CONFIGURATION
@@ -174,17 +218,25 @@ export default async function handler(
     return;
   }
 
+  // Validate auth token (required for test/live mode)
+  const authResult = await validateAuthToken(req.headers.authorization);
+  if (!authResult) {
+    res.status(401).json({ error: 'Authentication required. Please sign in.' });
+    return;
+  }
+
+  // Use authenticated user ID (not from request body for security)
+  const userId = authResult.userId;
+
   try {
     const {
       productId,
-      userId,
       circleId,
       bundleId,
       successUrl,
       cancelUrl,
     } = req.body as {
       productId: string;
-      userId: string;
       circleId?: string;
       bundleId?: string;
       successUrl?: string;
@@ -192,8 +244,8 @@ export default async function handler(
     };
 
     // Validate required fields
-    if (!productId || !userId) {
-      res.status(400).json({ error: 'Missing required fields: productId, userId' });
+    if (!productId) {
+      res.status(400).json({ error: 'Missing required field: productId' });
       return;
     }
 

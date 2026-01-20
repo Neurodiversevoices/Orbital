@@ -75,6 +75,7 @@ import {
 import {
   syncEntitlements,
   getCachedEntitlements,
+  canMakePurchases,
 } from '../lib/entitlements/serverEntitlements';
 import {
   getUserEntitlements,
@@ -82,6 +83,7 @@ import {
   checkBundleAllSeatsPro,
   type UserEntitlements,
 } from '../lib/entitlements';
+import { useAuth } from '../lib/auth';
 
 // =============================================================================
 // PURCHASE HANDLER (Stripe Checkout or Demo)
@@ -384,8 +386,9 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
 
 export default function UpgradeScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ demoMode?: string }>();
+  const params = useLocalSearchParams<{ demoMode?: string; returnTo?: string }>();
   const { isLoading: subscriptionLoading, restore } = useSubscription();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   // DOCTRINE: Do not surface CCI purchase options inside demo-only institutional modes
   // Check for demo mode via query param (e.g., from Sentinel institutional views)
@@ -427,6 +430,30 @@ export default function UpgradeScreen() {
 
   const handlePurchase = useCallback(async (productId: string, productName: string) => {
     console.log('[PURCHASE] Starting purchase:', productId, productName);
+
+    // Check if authentication is required and user is authenticated
+    const purchaseEligibility = await canMakePurchases();
+    if (!purchaseEligibility.allowed) {
+      console.log('[PURCHASE] Auth required, redirecting to login');
+      if (Platform.OS === 'web') {
+        // Redirect to login with return URL
+        router.push({
+          pathname: '/auth/login',
+          params: { returnTo: '/upgrade' },
+        });
+      } else {
+        Alert.alert(
+          'Sign In Required',
+          purchaseEligibility.reason || 'Please sign in to make purchases',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Sign In', onPress: () => router.push('/auth/login') },
+          ]
+        );
+      }
+      return;
+    }
+
     setIsPurchasing(true);
 
     const demoIndicator = isDemoMode() ? ` (${DEMO_MODE_BANNER})` : '';
@@ -489,7 +516,7 @@ export default function UpgradeScreen() {
     }
   }, [restore]);
 
-  if (subscriptionLoading || loadingEntitlements) {
+  if (subscriptionLoading || loadingEntitlements || authLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
