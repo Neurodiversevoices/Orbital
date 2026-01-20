@@ -6,6 +6,9 @@
  * Verifies a completed Stripe Checkout Session and grants entitlements.
  * Called on return from Stripe Checkout.
  *
+ * SECURITY: Requires valid Authorization header with Supabase JWT token.
+ * Authenticated user must match the session owner (metadata.userId).
+ *
  * Response:
  * {
  *   success: boolean;
@@ -51,6 +54,33 @@ function getSupabase() {
   }
 
   return createClient(url, serviceKey);
+}
+
+// =============================================================================
+// AUTH VALIDATION
+// =============================================================================
+
+async function validateAuthToken(authHeader: string | undefined): Promise<{ userId: string } | null> {
+  if (!authHeader?.startsWith('Bearer ')) {
+    return null;
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+
+  try {
+    const supabase = getSupabase();
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      console.error('[verify-session] Token validation failed:', error?.message);
+      return null;
+    }
+
+    return { userId: user.id };
+  } catch (error) {
+    console.error('[verify-session] Token validation error:', error);
+    return null;
+  }
 }
 
 // =============================================================================
@@ -128,6 +158,15 @@ export default async function handler(
     return;
   }
 
+  // SECURITY: Validate auth token (required in test/live mode)
+  const authResult = await validateAuthToken(req.headers.authorization);
+  if (!authResult) {
+    res.status(401).json({ error: 'Authentication required. Please sign in.' });
+    return;
+  }
+
+  const authenticatedUserId = authResult.userId;
+
   try {
     const { session_id } = req.query;
 
@@ -154,17 +193,30 @@ export default async function handler(
 
     // Extract metadata
     const metadata = session.metadata || {};
-    const userId = metadata.userId || session.client_reference_id;
+    const sessionUserId = metadata.userId || session.client_reference_id;
     const entitlementId = metadata.entitlementId;
     const productId = metadata.productId;
 
-    if (!userId || !entitlementId) {
+    if (!sessionUserId || !entitlementId) {
       res.status(400).json({
         success: false,
         error: 'Missing user or entitlement information',
       });
       return;
     }
+
+    // SECURITY: Verify authenticated user matches session owner
+    if (authenticatedUserId !== sessionUserId) {
+      console.error(`[verify-session] Auth mismatch: token=${authenticatedUserId}, session=${sessionUserId}`);
+      res.status(403).json({
+        success: false,
+        error: 'Access denied. You can only verify your own checkout sessions.',
+      });
+      return;
+    }
+
+    // Use the verified user ID
+    const userId = sessionUserId;
 
     const supabase = getSupabase();
 

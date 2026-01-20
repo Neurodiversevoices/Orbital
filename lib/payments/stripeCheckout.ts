@@ -166,6 +166,7 @@ export async function executePurchase(options: CheckoutOptions): Promise<Checkou
 /**
  * Verify checkout session after return from Stripe
  * Call this on the success page to confirm payment and sync entitlements
+ * SECURITY: Requires authentication - user must match session owner
  */
 export async function verifyCheckoutSession(sessionId: string): Promise<CheckoutResult> {
   if (isDemoMode()) {
@@ -173,9 +174,20 @@ export async function verifyCheckoutSession(sessionId: string): Promise<Checkout
   }
 
   try {
+    // Get auth token for API authentication
+    const accessToken = await getAccessToken();
+    if (!accessToken) {
+      throw new Error('Authentication required. Please sign in.');
+    }
+
     const baseUrl = getApiBaseUrl();
     const response = await fetch(
-      `${baseUrl}/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`
+      `${baseUrl}/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      }
     );
 
     if (!response.ok) {

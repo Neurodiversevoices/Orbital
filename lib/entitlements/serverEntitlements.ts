@@ -13,7 +13,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getPaymentMode, isDemoMode, getApiBaseUrl } from '../payments/paymentMode';
-import { getAuthUserId, isAuthenticated as checkIsAuthenticated } from '../auth';
+import { getAuthUserId, isAuthenticated as checkIsAuthenticated, getAccessToken } from '../auth';
 
 // =============================================================================
 // STORAGE KEYS
@@ -131,6 +131,7 @@ export async function clearDemoUserId(): Promise<void> {
 
 /**
  * Fetch entitlements from server
+ * In test/live mode, requires authentication - userId is extracted from token server-side
  */
 export async function fetchServerEntitlements(userId: string): Promise<ServerEntitlements> {
   if (isDemoMode()) {
@@ -141,11 +142,22 @@ export async function fetchServerEntitlements(userId: string): Promise<ServerEnt
     };
   }
 
+  // Get auth token for API authentication
+  const accessToken = await getAccessToken();
+  if (!accessToken) {
+    throw new Error('Authentication required. Please sign in.');
+  }
+
   const baseUrl = getApiBaseUrl();
-  const response = await fetch(`${baseUrl}/api/entitlements?user_id=${encodeURIComponent(userId)}`);
+  const response = await fetch(`${baseUrl}/api/entitlements`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch entitlements: ${response.status}`);
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `Failed to fetch entitlements: ${response.status}`);
   }
 
   return response.json();
