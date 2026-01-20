@@ -67,7 +67,15 @@ import {
 import {
   PAYMENTS_ENABLED,
   executePurchase,
+  isDemoMode,
+  restorePurchases,
+  DEMO_MODE_BANNER,
+  DEMO_MODE_NOTICE,
 } from '../lib/payments';
+import {
+  syncEntitlements,
+  getCachedEntitlements,
+} from '../lib/entitlements/serverEntitlements';
 import {
   getUserEntitlements,
   checkCircleAllMembersPro,
@@ -76,18 +84,30 @@ import {
 } from '../lib/entitlements';
 
 // =============================================================================
-// PURCHASE HANDLER (Mock Checkout)
+// PURCHASE HANDLER (Stripe Checkout or Demo)
 // =============================================================================
 
-async function handleMockPurchase(
+async function handleStripePurchase(
   productId: string,
   onSuccess: () => void,
-  onError: (error: string) => void
+  onError: (error: string) => void,
+  options?: { circleId?: string; bundleId?: string }
 ): Promise<void> {
   try {
-    const result = await executePurchase(productId as any);
+    const result = await executePurchase({
+      productId: productId as any,
+      circleId: options?.circleId,
+      bundleId: options?.bundleId,
+    });
+
     if (result.success) {
-      onSuccess();
+      // If redirecting to Stripe, don't call onSuccess yet
+      // (the redirect will happen automatically)
+      if (!result.url) {
+        onSuccess();
+      }
+      // If there's a URL, we're redirecting to Stripe
+      // The success callback will be triggered after return
     } else {
       onError(result.error || 'Purchase failed');
     }
@@ -409,17 +429,19 @@ export default function UpgradeScreen() {
     console.log('[PURCHASE] Starting purchase:', productId, productName);
     setIsPurchasing(true);
 
-    await handleMockPurchase(
+    const demoIndicator = isDemoMode() ? ` (${DEMO_MODE_BANNER})` : '';
+
+    await handleStripePurchase(
       productId,
       () => {
         console.log('[PURCHASE] Success:', productName);
         if (Platform.OS === 'web') {
-          window.alert(`Success! ${productName} has been activated.`);
+          window.alert(`Success! ${productName} has been activated.${demoIndicator}`);
           loadEntitlements();
         } else {
           Alert.alert(
             'Success!',
-            `${productName} has been activated.`,
+            `${productName} has been activated.${demoIndicator}`,
             [{ text: 'Continue', onPress: () => { loadEntitlements(); } }]
           );
         }
@@ -439,14 +461,31 @@ export default function UpgradeScreen() {
 
   const handleRestore = useCallback(async () => {
     setIsRestoring(true);
-    const success = await restore();
+
+    // Try server-side restore first (for durable entitlements)
+    let success = await restorePurchases();
+
+    // Fall back to subscription provider restore
+    if (!success) {
+      success = await restore();
+    }
+
     setIsRestoring(false);
 
     if (success) {
       loadEntitlements();
-      Alert.alert('Restored!', 'Your purchases have been restored.');
+      if (Platform.OS === 'web') {
+        window.alert('Restored! Your purchases have been restored.');
+      } else {
+        Alert.alert('Restored!', 'Your purchases have been restored.');
+      }
     } else {
-      Alert.alert('No Purchase Found', "We couldn't find a previous purchase to restore.");
+      const demoNotice = isDemoMode() ? '\n\n(In demo mode, purchases are not persisted)' : '';
+      if (Platform.OS === 'web') {
+        window.alert(`No Purchase Found: We couldn't find a previous purchase to restore.${demoNotice}`);
+      } else {
+        Alert.alert('No Purchase Found', `We couldn't find a previous purchase to restore.${demoNotice}`);
+      }
     }
   }, [restore]);
 
@@ -803,10 +842,10 @@ export default function UpgradeScreen() {
             )}
           </Pressable>
 
-          {!PAYMENTS_ENABLED && (
+          {isDemoMode() && (
             <View style={styles.stubNotice}>
               <Text style={styles.stubNoticeText}>
-                Payments are in demo mode. Purchases are simulated.
+                {DEMO_MODE_NOTICE}
               </Text>
             </View>
           )}

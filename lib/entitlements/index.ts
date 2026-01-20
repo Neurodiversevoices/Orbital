@@ -406,3 +406,18 @@ export {
   getCCIPrice,
   getCCIProductId,
 } from '../subscription/pricing';
+
+// Server-side entitlements (durable source of truth)
+export {
+  getUserId,
+  setUserId,
+  fetchServerEntitlements,
+  syncEntitlements,
+  getCachedEntitlements,
+  addCachedEntitlement,
+  clearCachedEntitlements,
+  hasServerEntitlement,
+  getServerEntitlements,
+  restorePurchases,
+  type ServerEntitlements,
+} from './serverEntitlements';
