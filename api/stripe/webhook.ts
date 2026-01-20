@@ -170,10 +170,52 @@ async function handleCheckoutSessionCompleted(
   const metadata = session.metadata || {};
   const userId = metadata.userId || session.client_reference_id;
   const entitlementId = metadata.entitlementId;
+  const productId = metadata.productId;
 
   if (!userId || !entitlementId) {
     console.error('[webhook] Missing userId or entitlementId in session metadata');
     return;
+  }
+
+  const supabase = getSupabase();
+
+  // IDEMPOTENCY: Check if this session was already processed
+  const { data: existingPurchase } = await supabase
+    .from('purchase_history')
+    .select('id')
+    .eq('stripe_session_id', session.id)
+    .single();
+
+  if (existingPurchase) {
+    console.log(`[webhook] Session ${session.id} already processed, skipping`);
+    return;
+  }
+
+  // Record purchase in history (UNIQUE constraint prevents duplicates)
+  const { error: insertError } = await supabase
+    .from('purchase_history')
+    .insert({
+      user_id: userId,
+      product_id: productId || 'unknown',
+      stripe_session_id: session.id,
+      stripe_payment_intent_id: typeof session.payment_intent === 'string'
+        ? session.payment_intent
+        : session.payment_intent?.id,
+      entitlement_granted: entitlementId,
+      amount_cents: session.amount_total,
+      currency: session.currency || 'usd',
+      status: 'completed',
+      metadata: metadata,
+    });
+
+  if (insertError) {
+    // If duplicate key error, session was already processed (race condition)
+    if (insertError.code === '23505') {
+      console.log(`[webhook] Session ${session.id} already processed (race), skipping`);
+      return;
+    }
+    console.error('[webhook] Failed to record purchase:', insertError);
+    // Continue to grant entitlement even if history insert fails
   }
 
   await grantEntitlement(userId, entitlementId, metadata);

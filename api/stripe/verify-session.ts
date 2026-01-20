@@ -156,6 +156,7 @@ export default async function handler(
     const metadata = session.metadata || {};
     const userId = metadata.userId || session.client_reference_id;
     const entitlementId = metadata.entitlementId;
+    const productId = metadata.productId;
 
     if (!userId || !entitlementId) {
       res.status(400).json({
@@ -165,8 +166,52 @@ export default async function handler(
       return;
     }
 
-    // Grant entitlement
-    const entitlements = await grantEntitlement(userId, entitlementId, metadata);
+    const supabase = getSupabase();
+
+    // IDEMPOTENCY: Check if already processed by webhook
+    const { data: existingPurchase } = await supabase
+      .from('purchase_history')
+      .select('id')
+      .eq('stripe_session_id', session_id)
+      .single();
+
+    let entitlements: string[];
+
+    if (existingPurchase) {
+      // Already processed by webhook, just fetch current entitlements
+      console.log(`[verify-session] Session ${session_id} already processed by webhook`);
+      const { data: userEnt } = await supabase
+        .from('user_entitlements')
+        .select('entitlements')
+        .eq('user_id', userId)
+        .single();
+      entitlements = userEnt?.entitlements || [];
+    } else {
+      // Not yet processed, record and grant
+      // (webhook might arrive later, UNIQUE constraint will prevent duplicate)
+      const { error: insertError } = await supabase
+        .from('purchase_history')
+        .insert({
+          user_id: userId,
+          product_id: productId || 'unknown',
+          stripe_session_id: session.id,
+          stripe_payment_intent_id: typeof session.payment_intent === 'string'
+            ? session.payment_intent
+            : (session.payment_intent as any)?.id,
+          entitlement_granted: entitlementId,
+          amount_cents: session.amount_total,
+          currency: session.currency || 'usd',
+          status: 'completed',
+          metadata: metadata,
+        });
+
+      if (insertError && insertError.code !== '23505') {
+        console.error('[verify-session] Failed to record purchase:', insertError);
+      }
+
+      // Grant entitlement
+      entitlements = await grantEntitlement(userId, entitlementId, metadata);
+    }
 
     res.status(200).json({
       success: true,

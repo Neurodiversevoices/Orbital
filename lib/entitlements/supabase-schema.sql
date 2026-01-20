@@ -42,8 +42,8 @@ CREATE TABLE IF NOT EXISTS purchase_history (
 -- Create index for user purchase history
 CREATE INDEX IF NOT EXISTS idx_purchase_history_user_id ON purchase_history(user_id);
 
--- Create index for Stripe session lookups (for idempotency)
-CREATE INDEX IF NOT EXISTS idx_purchase_history_stripe_session ON purchase_history(stripe_session_id) WHERE stripe_session_id IS NOT NULL;
+-- UNIQUE constraint on stripe_session_id for idempotency (prevents double-grant)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_purchase_history_stripe_session ON purchase_history(stripe_session_id) WHERE stripe_session_id IS NOT NULL;
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE user_entitlements ENABLE ROW LEVEL SECURITY;
