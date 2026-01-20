@@ -28,6 +28,11 @@ import {
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { colors, spacing, borderRadius } from '../theme';
 import { getUserEntitlements, type UserEntitlements } from '../lib/entitlements';
+import {
+  circlesGetMyConnections,
+  circlesRevokeConnection,
+  circlesWipeAll,
+} from '../lib/circles';
 
 export default function CircleSettingsScreen() {
   const router = useRouter();
@@ -49,14 +54,52 @@ export default function CircleSettingsScreen() {
     setIsLoading(false);
   };
 
+  const [isLeaving, setIsLeaving] = useState(false);
+
+  const executeLeaveCircle = async () => {
+    setIsLeaving(true);
+    try {
+      // Get all connections and revoke each one
+      const connections = await circlesGetMyConnections();
+      for (const connection of connections) {
+        try {
+          await circlesRevokeConnection(connection.id);
+        } catch (e) {
+          // Continue even if one fails - best effort cleanup
+          if (__DEV__) console.error('[CircleSettings] Failed to revoke connection:', e);
+        }
+      }
+
+      // Wipe all local circles data (signals, invites, etc.)
+      await circlesWipeAll();
+
+      // Refresh entitlements to reflect change
+      await loadEntitlements();
+
+      if (Platform.OS === 'web') {
+        window.alert('You have left the Circle.');
+      } else {
+        Alert.alert('Done', 'You have left the Circle.');
+      }
+      router.back();
+    } catch (error) {
+      if (__DEV__) console.error('[CircleSettings] Leave circle failed:', error);
+      if (Platform.OS === 'web') {
+        window.alert('Failed to leave Circle. Please try again.');
+      } else {
+        Alert.alert('Error', 'Failed to leave Circle. Please try again.');
+      }
+    } finally {
+      setIsLeaving(false);
+    }
+  };
+
   const handleLeaveCircle = () => {
-    const message = 'Are you sure you want to leave this Circle? You will lose access to shared capacity insights.';
+    const message = 'Are you sure you want to leave this Circle? You will lose access to shared capacity insights and all connections will be revoked.';
 
     if (Platform.OS === 'web') {
       if (window.confirm(message)) {
-        // TODO: Implement actual leave circle logic
-        window.alert('You have left the Circle.');
-        router.back();
+        executeLeaveCircle();
       }
     } else {
       Alert.alert(
@@ -67,11 +110,7 @@ export default function CircleSettingsScreen() {
           {
             text: 'Leave',
             style: 'destructive',
-            onPress: () => {
-              // TODO: Implement actual leave circle logic
-              Alert.alert('Done', 'You have left the Circle.');
-              router.back();
-            },
+            onPress: executeLeaveCircle,
           },
         ]
       );
@@ -180,12 +219,18 @@ export default function CircleSettingsScreen() {
         <Animated.View entering={FadeInDown.delay(200).duration(400)}>
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>MEMBERSHIP</Text>
-            <Pressable style={styles.dangerRow} onPress={handleLeaveCircle}>
+            <Pressable
+              style={[styles.dangerRow, isLeaving && styles.dangerRowDisabled]}
+              onPress={handleLeaveCircle}
+              disabled={isLeaving}
+            >
               <View style={styles.dangerIconContainer}>
-                <LogOut color="#F44336" size={18} />
+                <LogOut color={isLeaving ? 'rgba(244,67,54,0.5)' : '#F44336'} size={18} />
               </View>
               <View style={styles.actionContent}>
-                <Text style={styles.dangerLabel}>Leave Circle</Text>
+                <Text style={[styles.dangerLabel, isLeaving && styles.dangerLabelDisabled]}>
+                  {isLeaving ? 'Leaving...' : 'Leave Circle'}
+                </Text>
                 <Text style={styles.dangerSublabel}>Remove yourself from this Circle</Text>
               </View>
             </Pressable>
@@ -385,6 +430,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'rgba(244,67,54,0.6)',
     marginTop: 2,
+  },
+  dangerRowDisabled: {
+    opacity: 0.6,
+  },
+  dangerLabelDisabled: {
+    color: 'rgba(244,67,54,0.5)',
   },
   infoBox: {
     backgroundColor: 'rgba(255,255,255,0.03)',

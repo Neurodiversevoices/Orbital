@@ -24,6 +24,71 @@ import {
   type ProductId,
 } from '../subscription/pricing';
 import type { UserEntitlements } from '../entitlements';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Storage keys for CCI purchase tracking
+const CCI_CIRCLE_PURCHASED_KEY = 'orbital:cci:circle:purchased';
+const CCI_BUNDLE_PURCHASED_KEY = 'orbital:cci:bundle:purchased';
+
+// =============================================================================
+// CCI PURCHASE STATE TRACKING
+// =============================================================================
+
+/**
+ * Check if Circle CCI has been purchased
+ */
+export async function hasCircleCCIPurchased(): Promise<boolean> {
+  try {
+    const value = await AsyncStorage.getItem(CCI_CIRCLE_PURCHASED_KEY);
+    return value === 'true';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Check if Bundle CCI has been purchased
+ */
+export async function hasBundleCCIPurchased(): Promise<boolean> {
+  try {
+    const value = await AsyncStorage.getItem(CCI_BUNDLE_PURCHASED_KEY);
+    return value === 'true';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Mark Circle CCI as purchased
+ * Call this after successful Stripe checkout for Circle CCI
+ */
+export async function markCircleCCIPurchased(): Promise<void> {
+  await AsyncStorage.setItem(CCI_CIRCLE_PURCHASED_KEY, 'true');
+}
+
+/**
+ * Mark Bundle CCI as purchased
+ * Call this after successful Stripe checkout for Bundle CCI
+ */
+export async function markBundleCCIPurchased(): Promise<void> {
+  await AsyncStorage.setItem(CCI_BUNDLE_PURCHASED_KEY, 'true');
+}
+
+/**
+ * Clear Circle CCI purchase state
+ * Call this when user leaves Circle or for testing
+ */
+export async function clearCircleCCIPurchased(): Promise<void> {
+  await AsyncStorage.removeItem(CCI_CIRCLE_PURCHASED_KEY);
+}
+
+/**
+ * Clear Bundle CCI purchase state
+ * Call this when user leaves Bundle or for testing
+ */
+export async function clearBundleCCIPurchased(): Promise<void> {
+  await AsyncStorage.removeItem(CCI_BUNDLE_PURCHASED_KEY);
+}
 
 // =============================================================================
 // TYPES
@@ -175,6 +240,14 @@ export async function resolveCCIPricing(
       ? await checkBundleAllSeatsPro(entitlements.bundleId)
       : false);
 
+  // Fetch CCI purchase states
+  const circleCCIPurchased = entitlements.hasCircle
+    ? await hasCircleCCIPurchased()
+    : false;
+  const bundleCCIPurchased = entitlements.hasBundle
+    ? await hasBundleCCIPurchased()
+    : false;
+
   // Build Individual tier
   const individualTier: CCIPricingTier = isPaid
     ? {
@@ -209,13 +282,15 @@ export async function resolveCCIPricing(
     scope: 'circle',
     productId: PRODUCT_IDS.CCI_CIRCLE_ALL,
     visible: entitlements.hasCircle && allCircleMembersPro,
-    eligible: entitlements.hasCircle && allCircleMembersPro,
+    eligible: entitlements.hasCircle && allCircleMembersPro && !circleCCIPurchased,
     reason: !entitlements.hasCircle
       ? 'Requires active Circle subscription'
       : !allCircleMembersPro
         ? 'All Circle members must have Pro'
-        : undefined,
-    purchased: false, // TODO: Track Circle CCI purchase state
+        : circleCCIPurchased
+          ? 'Already purchased'
+          : undefined,
+    purchased: circleCCIPurchased,
   };
 
   // Build Bundle tier
@@ -227,13 +302,15 @@ export async function resolveCCIPricing(
     scope: 'bundle',
     productId: PRODUCT_IDS.CCI_BUNDLE_ALL,
     visible: entitlements.hasBundle && allBundleSeatsPro,
-    eligible: entitlements.hasBundle && allBundleSeatsPro,
+    eligible: entitlements.hasBundle && allBundleSeatsPro && !bundleCCIPurchased,
     reason: !entitlements.hasBundle
       ? 'Requires active Bundle subscription'
       : !allBundleSeatsPro
         ? 'All Bundle seats must be Pro-entitled'
-        : undefined,
-    purchased: false, // TODO: Track Bundle CCI purchase state
+        : bundleCCIPurchased
+          ? 'Already purchased'
+          : undefined,
+    purchased: bundleCCIPurchased,
   };
 
   // Collect all tiers

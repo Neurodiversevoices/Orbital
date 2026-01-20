@@ -368,6 +368,10 @@ export const en = {
     title: 'Accessibility',
     subtitle: 'Customize your experience',
 
+    // Simple Mode (master toggle)
+    simpleMode: 'Simple Mode',
+    simpleModeDesc: 'Maximum accessibility with one tap',
+
     // Sections
     visualSection: 'VISUAL',
     motorSection: 'MOTOR & INPUT',

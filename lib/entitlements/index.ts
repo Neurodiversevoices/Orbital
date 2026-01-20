@@ -17,6 +17,12 @@
 
 import { getGrantedEntitlements, hasEntitlement } from '../payments/mockCheckout';
 import { ENTITLEMENTS, CCI_PRICING, getCCIPrice, getCCIProductId } from '../subscription/pricing';
+import { circlesGetMyId, circlesGetActiveConnectionCount } from '../circles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Storage keys for membership tracking
+const FAMILY_MEMBERS_KEY = 'orbital:family:memberCount';
+const BUNDLE_MEMBERS_KEY = 'orbital:bundle:memberCount';
 
 // =============================================================================
 // TYPES
@@ -159,23 +165,77 @@ export async function getUserEntitlements(): Promise<UserEntitlements> {
   else if (hasBundle15) bundleSize = 15;
   else if (hasBundle10) bundleSize = 10;
 
+  // Get actual Circle ID and member count from circles service
+  let circleId: string | null = null;
+  let circleMemberCount = 0;
+  if (hasCircle) {
+    try {
+      circleId = await circlesGetMyId();
+      // Active connections + 1 (self) = total members
+      const activeConnections = await circlesGetActiveConnectionCount();
+      circleMemberCount = activeConnections + 1;
+    } catch {
+      // Fallback if circles service unavailable
+      circleId = null;
+      circleMemberCount = 1;
+    }
+  }
+
+  // Get actual Family member count from storage
+  let familyMemberCount = 0;
+  if (hasFamily) {
+    try {
+      const stored = await AsyncStorage.getItem(FAMILY_MEMBERS_KEY);
+      familyMemberCount = stored ? parseInt(stored, 10) : 1;
+      if (isNaN(familyMemberCount) || familyMemberCount < 1) familyMemberCount = 1;
+    } catch {
+      familyMemberCount = 1;
+    }
+  }
+
+  // Get actual Bundle ID from storage
+  let bundleId: string | null = null;
+  if (bundleSize) {
+    try {
+      bundleId = await AsyncStorage.getItem('orbital:bundle:id') || `bundle_${bundleSize}`;
+    } catch {
+      bundleId = `bundle_${bundleSize}`;
+    }
+  }
+
   return {
     isFree: !isPro,
     isPro,
     hasFamily,
-    familyMemberCount: hasFamily ? 1 : 0, // TODO: Track actual family members
+    familyMemberCount,
     hasCircle,
-    circleId: hasCircle ? 'demo_circle' : null, // TODO: Track actual circle ID
-    circleMemberCount: hasCircle ? 1 : 0, // TODO: Track actual circle members
+    circleId,
+    circleMemberCount,
     maxCircleBuddies: 5,
     hasBundle: hasBundle10 || hasBundle15 || hasBundle20,
-    bundleId: bundleSize ? `demo_bundle_${bundleSize}` : null,
+    bundleId,
     bundleSize,
     hasAdminAddOn,
     hasCCIPurchased,
     cciPrice: isPro ? CCI_PRICING.proUser : CCI_PRICING.freeUser,
     rawEntitlements: entitlements,
   };
+}
+
+/**
+ * Update the family member count in storage
+ * Call this when family membership changes
+ */
+export async function setFamilyMemberCount(count: number): Promise<void> {
+  await AsyncStorage.setItem(FAMILY_MEMBERS_KEY, String(Math.max(1, count)));
+}
+
+/**
+ * Update the bundle member count in storage
+ * Call this when bundle membership changes
+ */
+export async function setBundleMemberCount(count: number): Promise<void> {
+  await AsyncStorage.setItem(BUNDLE_MEMBERS_KEY, String(Math.max(1, count)));
 }
 
 // =============================================================================

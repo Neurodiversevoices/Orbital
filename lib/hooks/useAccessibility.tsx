@@ -33,7 +33,7 @@ interface AccessibilityContextType {
   resetSettings: () => Promise<void>;
 
   // Theme helpers
-  getTheme: () => typeof ACCESSIBLE_THEMES.default;
+  getTheme: () => typeof ACCESSIBLE_THEMES[keyof typeof ACCESSIBLE_THEMES];
   getTextScale: () => number;
   getButtonScale: () => number;
 
