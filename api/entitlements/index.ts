@@ -6,8 +6,12 @@
  * Returns the current entitlements for the authenticated user from the durable server-side store.
  * This is the source of truth for entitlements - client cache should sync from here.
  *
- * SECURITY: Requires valid Authorization header with Supabase JWT token.
- * User ID is extracted from token - users can ONLY access their own entitlements.
+ * SECURITY:
+ * - Rate limited (60 req/min)
+ * - CORS restricted to allowed origins
+ * - Auth required (Supabase JWT)
+ * - User ID extracted from token (users can ONLY access own entitlements)
+ * - All events logged to security audit
  *
  * Response:
  * {
@@ -20,6 +24,13 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
+import { applyRateLimit, RATE_LIMITS, getClientIdentifier } from '../_lib/rateLimit';
+import { applyCors } from '../_lib/cors';
+import {
+  logSecurityEvent,
+  logAuthFailure,
+  logRateLimitExceeded,
+} from '../_lib/securityAudit';
 
 // =============================================================================
 // SUPABASE CONFIGURATION
@@ -52,13 +63,11 @@ async function validateAuthToken(authHeader: string | undefined): Promise<{ user
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
-      console.error('[entitlements] Token validation failed:', error?.message);
       return null;
     }
 
     return { userId: user.id };
   } catch (error) {
-    console.error('[entitlements] Token validation error:', error);
     return null;
   }
 }
@@ -67,27 +76,25 @@ async function validateAuthToken(authHeader: string | undefined): Promise<{ user
 // REQUEST HANDLER
 // =============================================================================
 
+const ENDPOINT = '/api/entitlements';
+
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ): Promise<void> {
-  // Handle CORS - restrict to known origins in production
-  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['https://orbital.health'];
-  const origin = req.headers.origin;
+  const ip = getClientIdentifier(req);
+  const method = req.method || 'UNKNOWN';
 
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else if (process.env.NODE_ENV !== 'production') {
-    // Allow any origin in development
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
-  }
+  // 1) CORS check
+  const corsOk = await applyCors(req, res, {
+    endpoint: ENDPOINT,
+    methods: ['GET', 'OPTIONS'],
+  });
+  if (!corsOk) return;
 
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
+  // 2) Rate limiting
+  if (!applyRateLimit(req, res, RATE_LIMITS.ENTITLEMENTS)) {
+    await logRateLimitExceeded(ip, ENDPOINT, method, 'entitlements');
     return;
   }
 
@@ -100,8 +107,6 @@ export default async function handler(
   // Check payment mode - in demo mode, return empty entitlements from server
   const paymentMode = process.env.EXPO_PUBLIC_PAYMENTS_MODE;
   if (paymentMode === 'demo' || !paymentMode) {
-    // In demo mode, we don't have durable entitlements
-    // Return empty array to indicate no server-side entitlements
     res.status(200).json({
       entitlements: [],
       isDemo: true,
@@ -110,9 +115,10 @@ export default async function handler(
     return;
   }
 
-  // SECURITY: Validate auth token (required in test/live mode)
+  // 3) Auth validation (required in test/live mode)
   const authResult = await validateAuthToken(req.headers.authorization);
   if (!authResult) {
+    await logAuthFailure(ip, ENDPOINT, method, 'Invalid or missing auth token');
     res.status(401).json({ error: 'Authentication required. Please sign in.' });
     return;
   }
@@ -137,8 +143,20 @@ export default async function handler(
       return;
     }
 
+    // Log successful fetch
+    await logSecurityEvent({
+      event_type: 'ENTITLEMENT_FETCH_SUCCESS',
+      user_id: userId,
+      ip_address: ip,
+      endpoint: ENDPOINT,
+      method,
+      status_code: 200,
+      details: {
+        entitlementCount: data?.entitlements?.length || 0,
+      },
+    });
+
     if (!data) {
-      // User has no entitlements yet
       res.status(200).json({
         entitlements: [],
         updatedAt: null,

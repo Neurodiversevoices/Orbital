@@ -20,6 +20,14 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { applyRateLimit, RATE_LIMITS, getClientIdentifier } from '../_lib/rateLimit';
+import { applyCors } from '../_lib/cors';
+import {
+  logSecurityEvent,
+  logAuthFailure,
+  logRateLimitExceeded,
+  logSessionOwnerMismatch,
+} from '../_lib/securityAudit';
 
 // =============================================================================
 // STRIPE CONFIGURATION
@@ -141,10 +149,28 @@ async function grantEntitlement(
 // REQUEST HANDLER
 // =============================================================================
 
+const ENDPOINT = '/api/stripe/verify-session';
+
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ): Promise<void> {
+  const ip = getClientIdentifier(req);
+  const method = req.method || 'UNKNOWN';
+
+  // 1) CORS check
+  const corsOk = await applyCors(req, res, {
+    endpoint: ENDPOINT,
+    methods: ['GET', 'OPTIONS'],
+  });
+  if (!corsOk) return;
+
+  // 2) Rate limiting
+  if (!applyRateLimit(req, res, RATE_LIMITS.VERIFY)) {
+    await logRateLimitExceeded(ip, ENDPOINT, method, 'verify');
+    return;
+  }
+
   // Only allow GET
   if (req.method !== 'GET') {
     res.status(405).json({ error: 'Method not allowed' });
@@ -158,9 +184,10 @@ export default async function handler(
     return;
   }
 
-  // SECURITY: Validate auth token (required in test/live mode)
+  // 3) Auth validation (required in test/live mode)
   const authResult = await validateAuthToken(req.headers.authorization);
   if (!authResult) {
+    await logAuthFailure(ip, ENDPOINT, method, 'Invalid or missing auth token');
     res.status(401).json({ error: 'Authentication required. Please sign in.' });
     return;
   }
@@ -207,7 +234,7 @@ export default async function handler(
 
     // SECURITY: Verify authenticated user matches session owner
     if (authenticatedUserId !== sessionUserId) {
-      console.error(`[verify-session] Auth mismatch: token=${authenticatedUserId}, session=${sessionUserId}`);
+      await logSessionOwnerMismatch(authenticatedUserId, sessionUserId, ip, ENDPOINT);
       res.status(403).json({
         success: false,
         error: 'Access denied. You can only verify your own checkout sessions.',

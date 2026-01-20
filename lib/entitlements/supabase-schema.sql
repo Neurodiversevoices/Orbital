@@ -83,3 +83,50 @@ CREATE TRIGGER update_user_entitlements_updated_at
   BEFORE UPDATE ON user_entitlements
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
+
+-- =============================================================================
+-- Security Audit Log (SECURITY HARDENING)
+-- Immutable log of all security-relevant events
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS security_audit_log (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  event_type TEXT NOT NULL,
+  user_id TEXT,
+  ip_address TEXT,
+  endpoint TEXT NOT NULL,
+  method TEXT NOT NULL,
+  status_code INTEGER,
+  details JSONB,
+  request_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Index for querying by event type (monitoring dashboards)
+CREATE INDEX IF NOT EXISTS idx_security_audit_event_type ON security_audit_log(event_type);
+
+-- Index for querying by user (user activity audit)
+CREATE INDEX IF NOT EXISTS idx_security_audit_user_id ON security_audit_log(user_id) WHERE user_id IS NOT NULL;
+
+-- Index for querying by IP (abuse detection)
+CREATE INDEX IF NOT EXISTS idx_security_audit_ip ON security_audit_log(ip_address) WHERE ip_address IS NOT NULL;
+
+-- Index for time-based queries (retention, dashboards)
+CREATE INDEX IF NOT EXISTS idx_security_audit_created_at ON security_audit_log(created_at);
+
+-- Composite index for common security queries
+CREATE INDEX IF NOT EXISTS idx_security_audit_failures ON security_audit_log(event_type, created_at)
+  WHERE event_type IN (
+    'AUTH_FAILURE', 'AUTH_TOKEN_INVALID', 'RATE_LIMIT_EXCEEDED',
+    'CORS_REJECTED', 'WEBHOOK_SIGNATURE_INVALID', 'SKU_VALIDATION_FAILED',
+    'SESSION_OWNER_MISMATCH'
+  );
+
+-- Enable RLS
+ALTER TABLE security_audit_log ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Only service role can read/write audit logs (no user access)
+CREATE POLICY "Service role only for audit logs" ON security_audit_log
+  FOR ALL
+  USING (auth.role() = 'service_role');
+

@@ -15,6 +15,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { getClientIdentifier } from '../_lib/rateLimit';
+import { logSecurityEvent, logWebhookInvalid } from '../_lib/securityAudit';
 
 // Disable body parsing for raw webhook payload
 export const config = {
@@ -281,7 +283,10 @@ export default async function handler(
     const rawBody = await getRawBody(req);
     const signature = req.headers['stripe-signature'];
 
+    const ip = getClientIdentifier(req);
+
     if (!signature) {
+      await logWebhookInvalid(ip, '/api/stripe/webhook', 'Missing stripe-signature header');
       res.status(400).json({ error: 'Missing stripe-signature header' });
       return;
     }
@@ -297,10 +302,20 @@ export default async function handler(
         webhookSecret
       );
     } catch (err) {
-      console.error('[webhook] Signature verification failed:', err);
+      await logWebhookInvalid(ip, '/api/stripe/webhook', `Signature verification failed: ${err instanceof Error ? err.message : 'unknown'}`);
       res.status(400).json({ error: 'Invalid signature' });
       return;
     }
+
+    // Log successful webhook receipt
+    await logSecurityEvent({
+      event_type: 'WEBHOOK_RECEIVED',
+      ip_address: ip,
+      endpoint: '/api/stripe/webhook',
+      method: 'POST',
+      status_code: 200,
+      details: { eventType: event.type, eventId: event.id },
+    });
 
     // Handle event types
     switch (event.type) {
