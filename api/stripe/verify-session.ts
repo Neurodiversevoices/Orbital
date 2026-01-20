@@ -27,6 +27,8 @@ import {
   logAuthFailure,
   logRateLimitExceeded,
   logSessionOwnerMismatch,
+  logEntitlementGranted,
+  logPurchaseCompleted,
 } from '../_lib/securityAudit';
 
 // =============================================================================
@@ -290,6 +292,10 @@ export default async function handler(
 
       // Grant entitlement
       entitlements = await grantEntitlement(userId, entitlementId, metadata);
+
+      // Log entitlement grant and purchase completion
+      await logEntitlementGranted(userId, entitlementId, productId || 'unknown', 'verify-session', ip);
+      await logPurchaseCompleted(userId, productId || 'unknown', session.id, 'verify-session', ip);
     }
 
     res.status(200).json({

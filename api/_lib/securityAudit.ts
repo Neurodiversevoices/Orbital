@@ -166,12 +166,20 @@ function isFailureEvent(type: SecurityEventType): boolean {
 
 /**
  * Check if event should trigger an alert
+ * Expanded for operator visibility into security-relevant patterns
  */
 function shouldAlert(type: SecurityEventType): boolean {
   const alertTypes: SecurityEventType[] = [
+    // Critical security events - always alert
     'WEBHOOK_SIGNATURE_INVALID',
     'SKU_VALIDATION_FAILED',
     'SESSION_OWNER_MISMATCH',
+    // Auth anomalies - alert for investigation
+    'AUTH_FAILURE',  // Repeated failures may indicate brute force
+    // Operational concerns
+    'RATE_LIMIT_EXCEEDED',  // May indicate abuse or misconfiguration
+    'WEBHOOK_PROCESSING_FAILED',  // Payment flow broken
+    'PURCHASE_FAILED',  // Revenue impact
   ];
   return alertTypes.includes(type);
 }
@@ -386,5 +394,67 @@ export async function logSessionOwnerMismatch(
       authenticated_user: authenticatedUserId,
       session_owner: sessionUserId,
     },
+  });
+}
+
+/**
+ * Log entitlement granted
+ */
+export async function logEntitlementGranted(
+  userId: string,
+  entitlementId: string,
+  productId: string,
+  source: 'webhook' | 'verify-session',
+  ip?: string
+): Promise<void> {
+  await logSecurityEvent({
+    event_type: 'ENTITLEMENT_GRANTED',
+    user_id: userId,
+    ip_address: ip || null,
+    endpoint: source === 'webhook' ? '/api/stripe/webhook' : '/api/stripe/verify-session',
+    method: 'POST',
+    status_code: 200,
+    details: { entitlementId, productId, source },
+  });
+}
+
+/**
+ * Log entitlement revoked (subscription cancelled)
+ */
+export async function logEntitlementRevoked(
+  userId: string,
+  entitlementId: string,
+  reason: string,
+  ip?: string
+): Promise<void> {
+  await logSecurityEvent({
+    event_type: 'ENTITLEMENT_DENIED',
+    user_id: userId,
+    ip_address: ip || null,
+    endpoint: '/api/stripe/webhook',
+    method: 'POST',
+    status_code: 200,
+    details: { entitlementId, reason, action: 'revoked' },
+  });
+}
+
+/**
+ * Log purchase completed
+ */
+export async function logPurchaseCompleted(
+  userId: string,
+  productId: string,
+  sessionId: string,
+  source: 'webhook' | 'verify-session',
+  ip?: string
+): Promise<void> {
+  await logSecurityEvent({
+    event_type: 'PURCHASE_COMPLETED',
+    user_id: userId,
+    ip_address: ip || null,
+    endpoint: source === 'webhook' ? '/api/stripe/webhook' : '/api/stripe/verify-session',
+    method: 'POST',
+    status_code: 200,
+    details: { productId, sessionId, source },
   });
 }

@@ -16,7 +16,13 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { getClientIdentifier } from '../_lib/rateLimit';
-import { logSecurityEvent, logWebhookInvalid } from '../_lib/securityAudit';
+import {
+  logSecurityEvent,
+  logWebhookInvalid,
+  logEntitlementGranted,
+  logEntitlementRevoked,
+  logPurchaseCompleted,
+} from '../_lib/securityAudit';
 
 // Disable body parsing for raw webhook payload
 export const config = {
@@ -221,6 +227,10 @@ async function handleCheckoutSessionCompleted(
   }
 
   await grantEntitlement(userId, entitlementId, metadata);
+
+  // Log entitlement grant and purchase completion
+  await logEntitlementGranted(userId, entitlementId, productId || 'unknown', 'webhook');
+  await logPurchaseCompleted(userId, productId || 'unknown', session.id, 'webhook');
 }
 
 async function handleSubscriptionDeleted(
@@ -236,6 +246,9 @@ async function handleSubscriptionDeleted(
   }
 
   await revokeEntitlement(userId, entitlementId);
+
+  // Log entitlement revocation
+  await logEntitlementRevoked(userId, entitlementId, 'subscription_deleted');
 }
 
 async function handleSubscriptionUpdated(
@@ -252,8 +265,10 @@ async function handleSubscriptionUpdated(
   // Check if subscription is still active
   if (subscription.status === 'active' || subscription.status === 'trialing') {
     await grantEntitlement(userId, entitlementId, metadata);
+    await logEntitlementGranted(userId, entitlementId, metadata.productId || 'unknown', 'webhook');
   } else if (subscription.status === 'canceled' || subscription.status === 'unpaid') {
     await revokeEntitlement(userId, entitlementId);
+    await logEntitlementRevoked(userId, entitlementId, `subscription_${subscription.status}`);
   }
 }
 
