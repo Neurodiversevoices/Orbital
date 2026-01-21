@@ -466,6 +466,127 @@ export const de = {
     demoBanner: 'DEMO',
     processing: 'Verarbeitung...',
   },
+
+  // ============================================
+  // TEAM MODE (Enterprise Capacity Pulse)
+  // ============================================
+  teamMode: {
+    title: 'Team-Modus',
+    subtitle: 'Opt-in Kapazitäts-Puls am Arbeitsplatz',
+    joinTeam: 'Team Beitreten',
+    leaveTeam: 'Team Verlassen',
+    teamCode: 'Team-Code',
+    teamCodePlaceholder: 'Team-Code eingeben',
+    teamCodeInvalid: 'Ungültiger Team-Code',
+    noTeam: 'Kein Teammitglied',
+    noTeamDesc: 'Geben Sie einen Team-Code ein, um dem Arbeitsplatz-Puls beizutreten',
+    joinSuccess: 'Team erfolgreich beigetreten',
+    leaveSuccess: 'Team erfolgreich verlassen',
+    leaveConfirmTitle: 'Team Verlassen',
+    leaveConfirmMessage: 'Sie können jederzeit mit dem Team-Code wieder beitreten.',
+
+    // Privacy banner
+    privacyBanner: 'Ihre individuellen Daten werden niemals geteilt. Nur aggregierte Teamdaten sind sichtbar.',
+
+    // Threshold warning
+    thresholdWarning: 'Das Team benötigt mindestens {min} Teilnehmer um aggregierte Daten anzuzeigen',
+    participantCount: '{count} Teilnehmer',
+
+    // Aggregate display
+    aggregateTitle: 'Team-Kapazitäts-Puls',
+    capacityDistribution: 'Kapazitätsverteilung',
+    plenty: 'Reichlich',
+    elevated: 'Erhöht',
+    nearLimit: 'Nahe am Limit',
+    topDrivers: 'Hauptfaktoren',
+    weeklyTrend: 'Wöchentlicher Trend',
+    trendImproving: 'Verbessernd',
+    trendStable: 'Stabil',
+    trendDeclining: 'Abnehmend',
+    participationConfidence: 'Datenvertrauen',
+    confidenceHigh: 'Hoch',
+    confidenceMedium: 'Mittel',
+    confidenceLow: 'Niedrig',
+    totalSignals: '{count} Signale in diesem Zeitraum',
+
+    // Action panel
+    actionPanelTitle: 'Vorgeschlagene Maßnahmen',
+    noSuggestions: 'Derzeit keine Vorschläge',
+  },
+
+  // ============================================
+  // SCHOOL ZONE (Student/Caregiver/Educator)
+  // ============================================
+  schoolZone: {
+    title: 'Schulzone',
+    subtitle: 'Kapazitätsunterstützung für Bildungseinrichtungen',
+    joinSchool: 'Schule Beitreten',
+    leaveSchool: 'Schule Verlassen',
+    schoolCode: 'Schul-Code',
+    schoolCodePlaceholder: 'Schul-Code eingeben',
+    schoolCodeInvalid: 'Ungültiger Schul-Code',
+    noSchool: 'Nicht in einer Schulzone eingeschrieben',
+    noSchoolDesc: 'Geben Sie einen Schul-Code ein, um auf Schulfunktionen zuzugreifen',
+    joinSuccess: 'Schulzone erfolgreich beigetreten',
+    leaveSuccess: 'Schulzone erfolgreich verlassen',
+    leaveConfirmTitle: 'Schulzone Verlassen',
+    leaveConfirmMessage: 'Sie können jederzeit mit dem Schul-Code wieder beitreten.',
+
+    // Role selection
+    roleLabel: 'Ich bin ein(e)',
+    roleStudent: 'Schüler/in',
+    roleCaregiver: 'Elternteil/Betreuer',
+    roleEducator: 'Pädagoge/in',
+
+    // Privacy banner
+    privacyBanner: 'Individuelle Schülerdaten werden niemals mit Pädagogen geteilt. Nur aggregierte Klassendaten sind sichtbar.',
+
+    // Threshold warning
+    thresholdWarning: 'Die Klasse benötigt mindestens {min} Schüler um aggregierte Daten anzuzeigen',
+    studentCount: '{count} Schüler',
+
+    // Student view
+    studentViewTitle: 'Ihre Kapazität',
+    studentViewDesc: 'Erfassen Sie Ihre Kapazität um sich selbst zu helfen und Unterstützung zu erhalten',
+    goToLog: 'Jetzt Erfassen',
+
+    // Caregiver view
+    caregiverViewTitle: 'Schul-Zusammenfassungskarte',
+    caregiverViewDesc: 'Erstellen Sie eine Zusammenfassung zum Teilen mit Pädagogen',
+    generateCard: 'Zusammenfassungskarte Erstellen',
+    shareCard: 'Karte Teilen',
+    cardDateRange: 'Zeitraum: {start} bis {end}',
+    cardCapacityTrend: 'Kapazitätstrend',
+    cardAverageCapacity: 'Durchschnittliche Kapazität',
+    cardCommonDrivers: 'Häufige Faktoren',
+    cardWhatHelps: 'Was Hilft',
+    cardWhatDrains: 'Was Erschöpft',
+    cardEntriesCount: '{count} Einträge im Zeitraum',
+    notesExcluded: 'Persönliche Notizen aus Datenschutzgründen ausgeschlossen',
+
+    // Educator view
+    educatorViewTitle: 'Klassen-Kapazitätsübersicht',
+    educatorViewDesc: 'Aggregierte Ansicht der Kapazitätsmuster der Klasse',
+    classCapacity: 'Klassenkapazitätsverteilung',
+    classDrivers: 'Klassenfaktoren',
+    classConfidence: 'Datenvertrauen',
+
+    // Environment factors (School Summary Card)
+    envFactors: {
+      quiet_space: 'Ruhiger Raum',
+      sensory_tools: 'Sensorische Hilfsmittel',
+      movement_breaks: 'Bewegungspausen',
+      extra_time: 'Zusätzliche Zeit',
+      small_groups: 'Kleine Gruppen',
+      check_ins: 'Rückfragen',
+      loud_environment: 'Laute Umgebung',
+      bright_lights: 'Helles Licht',
+      time_pressure: 'Zeitdruck',
+      multiple_instructions: 'Mehrfache Anweisungen',
+      crowded_spaces: 'Überfüllte Räume',
+      social_demands: 'Soziale Anforderungen',
+    },
+  },
 } as const;
 
 export type TranslationKeys = typeof de;

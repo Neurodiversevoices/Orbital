@@ -518,6 +518,127 @@ export const es = {
     demoBanner: 'DEMO',
     processing: 'Procesando...',
   },
+
+  // ============================================
+  // TEAM MODE (Enterprise Capacity Pulse)
+  // ============================================
+  teamMode: {
+    title: 'Modo Equipo',
+    subtitle: 'Pulso de capacidad laboral voluntario',
+    joinTeam: 'Unirse al Equipo',
+    leaveTeam: 'Salir del Equipo',
+    teamCode: 'Código de Equipo',
+    teamCodePlaceholder: 'Ingrese el código de equipo',
+    teamCodeInvalid: 'Código de equipo inválido',
+    noTeam: 'No forma parte de un equipo',
+    noTeamDesc: 'Ingrese un código de equipo para unirse al pulso de su lugar de trabajo',
+    joinSuccess: 'Se unió al equipo exitosamente',
+    leaveSuccess: 'Salió del equipo exitosamente',
+    leaveConfirmTitle: 'Salir del Equipo',
+    leaveConfirmMessage: 'Puede volver a unirse en cualquier momento con el código de equipo.',
+
+    // Privacy banner
+    privacyBanner: 'Sus datos individuales nunca se comparten. Solo los datos agregados del equipo son visibles.',
+
+    // Threshold warning
+    thresholdWarning: 'El equipo necesita al menos {min} participantes para mostrar datos agregados',
+    participantCount: '{count} participantes',
+
+    // Aggregate display
+    aggregateTitle: 'Pulso de Capacidad del Equipo',
+    capacityDistribution: 'Distribución de Capacidad',
+    plenty: 'Abundante',
+    elevated: 'Elevado',
+    nearLimit: 'Cerca del Límite',
+    topDrivers: 'Factores Principales',
+    weeklyTrend: 'Tendencia Semanal',
+    trendImproving: 'Mejorando',
+    trendStable: 'Estable',
+    trendDeclining: 'En Descenso',
+    participationConfidence: 'Confianza de Datos',
+    confidenceHigh: 'Alta',
+    confidenceMedium: 'Media',
+    confidenceLow: 'Baja',
+    totalSignals: '{count} señales este período',
+
+    // Action panel
+    actionPanelTitle: 'Acciones Sugeridas',
+    noSuggestions: 'Sin sugerencias en este momento',
+  },
+
+  // ============================================
+  // SCHOOL ZONE (Student/Caregiver/Educator)
+  // ============================================
+  schoolZone: {
+    title: 'Zona Escolar',
+    subtitle: 'Apoyo de capacidad para entornos educativos',
+    joinSchool: 'Unirse a la Escuela',
+    leaveSchool: 'Salir de la Escuela',
+    schoolCode: 'Código de Escuela',
+    schoolCodePlaceholder: 'Ingrese el código de escuela',
+    schoolCodeInvalid: 'Código de escuela inválido',
+    noSchool: 'No inscrito en una zona escolar',
+    noSchoolDesc: 'Ingrese un código de escuela para acceder a las funciones escolares',
+    joinSuccess: 'Se unió a la zona escolar exitosamente',
+    leaveSuccess: 'Salió de la zona escolar exitosamente',
+    leaveConfirmTitle: 'Salir de la Zona Escolar',
+    leaveConfirmMessage: 'Puede volver a unirse en cualquier momento con el código de escuela.',
+
+    // Role selection
+    roleLabel: 'Soy un/una',
+    roleStudent: 'Estudiante',
+    roleCaregiver: 'Cuidador',
+    roleEducator: 'Educador',
+
+    // Privacy banner
+    privacyBanner: 'Los datos individuales de estudiantes nunca se comparten con educadores. Solo los datos agregados de la clase son visibles.',
+
+    // Threshold warning
+    thresholdWarning: 'La clase necesita al menos {min} estudiantes para mostrar datos agregados',
+    studentCount: '{count} estudiantes',
+
+    // Student view
+    studentViewTitle: 'Tu Capacidad',
+    studentViewDesc: 'Registra tu capacidad para ayudarte y obtener apoyo',
+    goToLog: 'Registrar Ahora',
+
+    // Caregiver view
+    caregiverViewTitle: 'Tarjeta de Resumen Escolar',
+    caregiverViewDesc: 'Genere un resumen para compartir con educadores',
+    generateCard: 'Generar Tarjeta de Resumen',
+    shareCard: 'Compartir Tarjeta',
+    cardDateRange: 'Período: {start} a {end}',
+    cardCapacityTrend: 'Tendencia de Capacidad',
+    cardAverageCapacity: 'Capacidad Promedio',
+    cardCommonDrivers: 'Factores Comunes',
+    cardWhatHelps: 'Qué Ayuda',
+    cardWhatDrains: 'Qué Agota',
+    cardEntriesCount: '{count} entradas en el período',
+    notesExcluded: 'Notas personales excluidas por privacidad',
+
+    // Educator view
+    educatorViewTitle: 'Vista General de Capacidad de la Clase',
+    educatorViewDesc: 'Vista agregada de patrones de capacidad de la clase',
+    classCapacity: 'Distribución de Capacidad de la Clase',
+    classDrivers: 'Factores de la Clase',
+    classConfidence: 'Confianza de Datos',
+
+    // Environment factors (School Summary Card)
+    envFactors: {
+      quiet_space: 'Espacio tranquilo',
+      sensory_tools: 'Herramientas sensoriales',
+      movement_breaks: 'Pausas de movimiento',
+      extra_time: 'Tiempo extra',
+      small_groups: 'Grupos pequeños',
+      check_ins: 'Verificaciones',
+      loud_environment: 'Ambiente ruidoso',
+      bright_lights: 'Luces brillantes',
+      time_pressure: 'Presión de tiempo',
+      multiple_instructions: 'Instrucciones múltiples',
+      crowded_spaces: 'Espacios llenos',
+      social_demands: 'Demandas sociales',
+    },
+  },
 } as const;
 
 export type TranslationKeys = typeof es;

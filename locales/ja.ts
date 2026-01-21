@@ -466,6 +466,127 @@ export const ja = {
     demoBanner: 'デモ',
     processing: '処理中...',
   },
+
+  // ============================================
+  // TEAM MODE (Enterprise Capacity Pulse)
+  // ============================================
+  teamMode: {
+    title: 'チームモード',
+    subtitle: '職場キャパシティパルス（オプトイン）',
+    joinTeam: 'チームに参加',
+    leaveTeam: 'チームを離れる',
+    teamCode: 'チームコード',
+    teamCodePlaceholder: 'チームコードを入力',
+    teamCodeInvalid: '無効なチームコード',
+    noTeam: 'チームに所属していません',
+    noTeamDesc: 'チームコードを入力して職場パルスに参加してください',
+    joinSuccess: 'チームへの参加に成功しました',
+    leaveSuccess: 'チームから離れました',
+    leaveConfirmTitle: 'チームを離れる',
+    leaveConfirmMessage: 'チームコードでいつでも再参加できます。',
+
+    // Privacy banner
+    privacyBanner: '個人データは共有されません。チームの集計データのみが表示されます。',
+
+    // Threshold warning
+    thresholdWarning: '集計データを表示するには、チームに最低{min}人の参加者が必要です',
+    participantCount: '{count}人の参加者',
+
+    // Aggregate display
+    aggregateTitle: 'チームキャパシティパルス',
+    capacityDistribution: 'キャパシティ分布',
+    plenty: '十分',
+    elevated: '上昇',
+    nearLimit: '限界に近い',
+    topDrivers: '主要因',
+    weeklyTrend: '週間トレンド',
+    trendImproving: '改善中',
+    trendStable: '安定',
+    trendDeclining: '低下中',
+    participationConfidence: 'データ信頼度',
+    confidenceHigh: '高',
+    confidenceMedium: '中',
+    confidenceLow: '低',
+    totalSignals: 'この期間の{count}シグナル',
+
+    // Action panel
+    actionPanelTitle: '推奨アクション',
+    noSuggestions: '現時点で提案はありません',
+  },
+
+  // ============================================
+  // SCHOOL ZONE (Student/Caregiver/Educator)
+  // ============================================
+  schoolZone: {
+    title: 'スクールゾーン',
+    subtitle: '教育環境向けキャパシティサポート',
+    joinSchool: '学校に参加',
+    leaveSchool: '学校を離れる',
+    schoolCode: '学校コード',
+    schoolCodePlaceholder: '学校コードを入力',
+    schoolCodeInvalid: '無効な学校コード',
+    noSchool: 'スクールゾーンに登録されていません',
+    noSchoolDesc: '学校コードを入力して学校機能にアクセスしてください',
+    joinSuccess: 'スクールゾーンへの参加に成功しました',
+    leaveSuccess: 'スクールゾーンから離れました',
+    leaveConfirmTitle: 'スクールゾーンを離れる',
+    leaveConfirmMessage: '学校コードでいつでも再参加できます。',
+
+    // Role selection
+    roleLabel: '私は',
+    roleStudent: '生徒',
+    roleCaregiver: '保護者',
+    roleEducator: '教育者',
+
+    // Privacy banner
+    privacyBanner: '生徒の個人データは教育者と共有されません。クラスの集計データのみが表示されます。',
+
+    // Threshold warning
+    thresholdWarning: '集計データを表示するには、クラスに最低{min}人の生徒が必要です',
+    studentCount: '{count}人の生徒',
+
+    // Student view
+    studentViewTitle: 'あなたのキャパシティ',
+    studentViewDesc: 'キャパシティを記録して自分を助け、サポートを得ましょう',
+    goToLog: '今すぐ記録',
+
+    // Caregiver view
+    caregiverViewTitle: '学校サマリーカード',
+    caregiverViewDesc: '教育者と共有するサマリーを生成',
+    generateCard: 'サマリーカードを生成',
+    shareCard: 'カードを共有',
+    cardDateRange: '期間: {start} から {end}',
+    cardCapacityTrend: 'キャパシティトレンド',
+    cardAverageCapacity: '平均キャパシティ',
+    cardCommonDrivers: '一般的な要因',
+    cardWhatHelps: '助けになること',
+    cardWhatDrains: '消耗すること',
+    cardEntriesCount: '期間中の{count}エントリ',
+    notesExcluded: 'プライバシーのため個人メモは除外',
+
+    // Educator view
+    educatorViewTitle: 'クラスキャパシティ概要',
+    educatorViewDesc: 'クラスのキャパシティパターンの集計ビュー',
+    classCapacity: 'クラスキャパシティ分布',
+    classDrivers: 'クラスの要因',
+    classConfidence: 'データ信頼度',
+
+    // Environment factors (School Summary Card)
+    envFactors: {
+      quiet_space: '静かなスペース',
+      sensory_tools: '感覚ツール',
+      movement_breaks: '運動休憩',
+      extra_time: '追加時間',
+      small_groups: '小グループ',
+      check_ins: 'チェックイン',
+      loud_environment: '騒がしい環境',
+      bright_lights: '明るい照明',
+      time_pressure: '時間的プレッシャー',
+      multiple_instructions: '複数の指示',
+      crowded_spaces: '混雑したスペース',
+      social_demands: '社会的要求',
+    },
+  },
 } as const;
 
 export type TranslationKeys = typeof ja;

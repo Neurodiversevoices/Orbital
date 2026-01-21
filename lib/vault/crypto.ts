@@ -88,9 +88,10 @@ export async function deriveKeyFromMnemonic(
   salt: Uint8Array
 ): Promise<CryptoKey> {
   const mnemonicString = mnemonic.join(' ');
+  const mnemonicBytes = stringToBytes(mnemonicString);
   const keyMaterial = await crypto.subtle.importKey(
     'raw',
-    stringToBytes(mnemonicString),
+    mnemonicBytes.buffer.slice(mnemonicBytes.byteOffset, mnemonicBytes.byteOffset + mnemonicBytes.byteLength) as ArrayBuffer,
     'PBKDF2',
     false,
     ['deriveBits', 'deriveKey']
@@ -99,7 +100,7 @@ export async function deriveKeyFromMnemonic(
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt,
+      salt: salt.buffer.slice(salt.byteOffset, salt.byteOffset + salt.byteLength) as ArrayBuffer,
       iterations: 100000,
       hash: 'SHA-256',
     },
@@ -119,10 +120,12 @@ export async function encrypt(
   iv: Uint8Array
 ): Promise<ArrayBuffer> {
   const encoded = stringToBytes(plaintext);
+  const ivBuffer = iv.buffer.slice(iv.byteOffset, iv.byteOffset + iv.byteLength) as ArrayBuffer;
+  const dataBuffer = encoded.buffer.slice(encoded.byteOffset, encoded.byteOffset + encoded.byteLength) as ArrayBuffer;
   return crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
+    { name: 'AES-GCM', iv: ivBuffer },
     key,
-    encoded
+    dataBuffer
   );
 }
 
@@ -134,8 +137,9 @@ export async function decrypt(
   key: CryptoKey,
   iv: Uint8Array
 ): Promise<string> {
+  const ivBuffer = iv.buffer.slice(iv.byteOffset, iv.byteOffset + iv.byteLength) as ArrayBuffer;
   const decrypted = await crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv },
+    { name: 'AES-GCM', iv: ivBuffer },
     key,
     ciphertext
   );
@@ -177,7 +181,11 @@ export async function decryptPayload(
   const ciphertextBytes = base64ToBytes(ciphertext);
 
   const key = await deriveKeyFromMnemonic(mnemonic, saltBytes);
-  const plaintext = await decrypt(ciphertextBytes.buffer, key, ivBytes);
+  const ciphertextBuffer = ciphertextBytes.buffer.slice(
+    ciphertextBytes.byteOffset,
+    ciphertextBytes.byteOffset + ciphertextBytes.byteLength
+  ) as ArrayBuffer;
+  const plaintext = await decrypt(ciphertextBuffer, key, ivBytes);
 
   return JSON.parse(plaintext);
 }
