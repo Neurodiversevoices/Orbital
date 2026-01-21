@@ -22,6 +22,47 @@ import {
 } from './bundleDemoData';
 
 // =============================================================================
+// PRINT CONFIGURATION CONSTANTS
+// =============================================================================
+
+/**
+ * Print density mode for bundle artifacts.
+ * - 'standard': 1-10 seats, normal spacing and sizing
+ * - 'dense': 11-20 seats, tighter layout for multi-page print
+ */
+type PrintDensityMode = 'standard' | 'dense';
+
+/**
+ * Pagination rules for print-safe bundle rendering.
+ * These are LOCKED constants - do not modify without PDF validation.
+ */
+const PAGINATION_RULES = {
+  seatsPerRow: 5,           // Fixed: 5-column grid layout
+  maxRowsPerPage: 2,        // 2 rows × 5 seats = 10 seats per page
+  maxSeatsPerPage: 10,      // Hard cap per page
+  pageBreakAfter: 10,       // Insert page break after seat 10
+  aggregateOnLastPage: true, // Hero chart always on final page
+  footerOnLastPage: true,    // Legal footer always on final page
+} as const;
+
+/**
+ * Print complexity budget.
+ * Hero chart is ALWAYS rendered; member charts are capped per page.
+ */
+const PRINT_COMPLEXITY = {
+  heroChartAlways: true,     // Aggregate chart is mandatory
+  maxChartsPerPage: 10,      // Member charts capped at 10 per page
+  memberChartMode: (seatCount: number) => seatCount <= 10 ? 'full' : 'compact',
+} as const;
+
+/**
+ * Determine print density mode based on seat count.
+ */
+function getPrintDensityMode(seatCount: number): PrintDensityMode {
+  return seatCount <= 10 ? 'standard' : 'dense';
+}
+
+// =============================================================================
 // UTILITY FUNCTIONS
 // =============================================================================
 
@@ -116,9 +157,18 @@ export function generateBundleCCIArtifactHTML(
   const stats = getBundleStats(seats);
   const aggregateChart = generateAggregateChartSVG(seats);
 
+  // Determine print density mode (standard for 1-10, dense for 11-20)
+  const densityMode = getPrintDensityMode(seatCount);
+  const isDense = densityMode === 'dense';
+
+  // Dense mode sizing adjustments
+  const avatarSize = isDense ? 14 : 18;
+  const cardPadding = isDense ? 4 : 6;
+  const gridGap = isDense ? 4 : 6;
+
   // Generate mini chart cards matching BundleCCIPreview style
-  // Use 5 per row to match brief's grid layout exactly
-  const seatsPerRow = 5;
+  // Use pagination rules for consistent layout
+  const { seatsPerRow, maxRowsPerPage } = PAGINATION_RULES;
   const rows: string[] = [];
   for (let i = 0; i < seats.length; i += seatsPerRow) {
     const rowSeats = seats.slice(i, i + seatsPerRow);
@@ -126,7 +176,7 @@ export function generateBundleCCIArtifactHTML(
       const state = getSeatCapacityState(seat);
       const stateColor = CAPACITY_COLORS[state];
       const chart = generateSeatChartSVG(seat);
-      const avatar = generateAvatarSVG(seat, 18);
+      const avatar = generateAvatarSVG(seat, avatarSize);
 
       return `
         <div class="mini-chart-card">
@@ -142,8 +192,8 @@ export function generateBundleCCIArtifactHTML(
   }
 
   // Pagination: split rows for multi-page layout when seatCount > 10
-  const maxRowsPerPage = 2; // 2 rows × 5 seats = 10 seats per page
-  const needsPagination = seatCount > 10;
+  const needsPagination = seatCount > PAGINATION_RULES.maxSeatsPerPage;
+  const pageCount = needsPagination ? 2 : 1;
   const firstPageRows = rows.slice(0, maxRowsPerPage);
   const remainingRows = rows.slice(maxRowsPerPage);
 
@@ -216,24 +266,25 @@ export function generateBundleCCIArtifactHTML(
     .stat-value-avg { color: #9C27B0; }
     .stat-label { font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* Section titles */
-    .section-header { margin-bottom: 8px; }
+    /* Section titles - dense mode uses smaller fonts */
+    .section-header { margin-bottom: ${isDense ? 6 : 8}px; }
     .section-title {
-      font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.9);
+      font-size: ${isDense ? 11 : 12}px; font-weight: 700; color: rgba(255,255,255,0.9);
       letter-spacing: 0.3px;
     }
-    .section-subtitle { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+    .section-subtitle { font-size: ${isDense ? 9 : 10}px; color: rgba(255,255,255,0.5); margin-top: 2px; }
 
     /* Mini Chart Grid - matches BundleCCIPreview MiniChartCard (5 per row) */
+    /* Dense mode (11-20 seats) uses tighter spacing for multi-page print */
     .grid-container { margin-bottom: 10px; }
-    .grid-row { display: flex; gap: 6px; margin-bottom: 6px; }
+    .grid-row { display: flex; gap: ${gridGap}px; margin-bottom: ${gridGap}px; }
 
     .mini-chart-card {
       flex: 1;
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 6px;
-      padding: 6px;
+      border-radius: ${isDense ? 4 : 6}px;
+      padding: ${cardPadding}px;
     }
     .mini-chart-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -437,6 +488,14 @@ ${needsPagination ? `
   </div>
 </div>
 ` : ''}
+
+<!-- Ready-to-capture latch for Playwright/PDF generation -->
+<!-- This element signals that all content is rendered and ready for capture -->
+<div data-testid="bundle-artifact-ready"
+     data-seats="${seatCount}"
+     data-pages="${pageCount}"
+     data-density="${densityMode}"
+     style="display:none;"></div>
 
 </body>
 </html>`;
