@@ -112,6 +112,7 @@ export interface AuthActions {
   signInWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string; mfaRequired?: boolean }>;
   signUpWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signInWithMagicLink: (email: string) => Promise<{ success: boolean; error?: string }>;
+  signInWithGoogle: () => Promise<{ success: boolean; error?: string }>;
   signInWithApple: () => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
@@ -270,6 +271,51 @@ export function useAuth(): AuthContext {
       return { success: true };
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Magic link failed';
+      setState(prev => ({ ...prev, isLoading: false, error: message }));
+      return { success: false, error: message };
+    }
+  }, []);
+
+  // Sign in with Google (Web only - uses OAuth redirect)
+  const signInWithGoogle = useCallback(async () => {
+    if (!isSupabaseConfigured()) {
+      return { success: false, error: 'Cloud sync not configured' };
+    }
+
+    if (Platform.OS !== 'web') {
+      return { success: false, error: 'Google Sign-In via OAuth redirect is only available on web' };
+    }
+
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      const supabase = getSupabase();
+
+      // Get the current origin for redirect (works on Vercel production and localhost)
+      const redirectTo = typeof window !== 'undefined'
+        ? `${window.location.origin}/auth/callback`
+        : 'https://orbital-jet.vercel.app/auth/callback';
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+
+      if (error) {
+        setState(prev => ({ ...prev, isLoading: false, error: error.message }));
+        return { success: false, error: error.message };
+      }
+
+      // OAuth redirect will happen - don't update state as page will navigate
+      return { success: true };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Google Sign-In failed';
       setState(prev => ({ ...prev, isLoading: false, error: message }));
       return { success: false, error: message };
     }
@@ -582,6 +628,7 @@ export function useAuth(): AuthContext {
     signInWithEmail,
     signUpWithEmail,
     signInWithMagicLink,
+    signInWithGoogle,
     signInWithApple,
     signOut,
     resetPassword,

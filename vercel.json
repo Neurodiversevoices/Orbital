@@ -5,7 +5,7 @@
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "env": {
-    "EXPO_PUBLIC_FOUNDER_DEMO": "1"
+    "EXPO_PUBLIC_FOUNDER_DEMO": "0"
   },
   "headers": [
     {
