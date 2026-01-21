@@ -605,24 +605,24 @@ export default function UpgradeScreen() {
             <Text style={styles.planCardDescription}>
               Up to 5 family members · Household insights · Shared visibility
             </Text>
-            {!isPro && <Text style={styles.planCardRequires}>Requires Pro</Text>}
+            {!isPro && <Text style={styles.planCardRequires}>Pro included with purchase</Text>}
             <View style={styles.planCardButtonRow}>
               <Pressable
-                style={[styles.planCardCtaButton, { backgroundColor: '#FF9800' }, (hasFamily || !isPro) && styles.planCardCtaButtonDisabled]}
+                style={[styles.planCardCtaButton, { backgroundColor: '#FF9800' }, hasFamily && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_ANNUAL, 'Family (Annual)')}
-                disabled={isPurchasing || hasFamily || !isPro}
+                disabled={isPurchasing || hasFamily}
               >
-                <Text style={[styles.planCardCtaButtonText, (hasFamily || !isPro) && styles.planCardCtaButtonTextDisabled]}>
+                <Text style={[styles.planCardCtaButtonText, hasFamily && styles.planCardCtaButtonTextDisabled]}>
                   {hasFamily ? 'Active' : `${formatPrice(FAMILY_ADDON_PRICING.annual)}/yr`}
                 </Text>
-                {!hasFamily && isPro && <Text style={styles.savingsBadge}>Save 17%</Text>}
+                {!hasFamily && <Text style={styles.savingsBadge}>Save 17%</Text>}
               </Pressable>
               <Pressable
-                style={[styles.planCardCtaButtonSecondary, (hasFamily || !isPro) && styles.planCardCtaButtonDisabled]}
+                style={[styles.planCardCtaButtonSecondary, hasFamily && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_MONTHLY, 'Family (Monthly)')}
-                disabled={isPurchasing || hasFamily || !isPro}
+                disabled={isPurchasing || hasFamily}
               >
-                <Text style={[styles.planCardCtaButtonSecondaryText, (hasFamily || !isPro) && styles.planCardCtaButtonTextDisabled]}>
+                <Text style={[styles.planCardCtaButtonSecondaryText, hasFamily && styles.planCardCtaButtonTextDisabled]}>
                   {formatPrice(FAMILY_ADDON_PRICING.monthly)}/mo
                 </Text>
               </Pressable>
@@ -647,24 +647,24 @@ export default function UpgradeScreen() {
             <Text style={styles.planCardDescription}>
               Up to 5 trusted buddies · Shared capacity awareness · Circle insights
             </Text>
-            {!isPro && <Text style={styles.planCardRequires}>Requires Pro for all members</Text>}
+            {!isPro && <Text style={styles.planCardRequires}>Pro included with purchase · All members need Pro</Text>}
             <View style={styles.planCardButtonRow}>
               <Pressable
-                style={[styles.planCardCtaButton, { backgroundColor: '#00E5FF' }, (hasCircle || !isPro) && styles.planCardCtaButtonDisabled]}
+                style={[styles.planCardCtaButton, { backgroundColor: '#00E5FF' }, hasCircle && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CIRCLE_ANNUAL, 'Circle (Annual)')}
-                disabled={isPurchasing || hasCircle || !isPro}
+                disabled={isPurchasing || hasCircle}
               >
-                <Text style={[styles.planCardCtaButtonText, (hasCircle || !isPro) && styles.planCardCtaButtonTextDisabled]}>
+                <Text style={[styles.planCardCtaButtonText, hasCircle && styles.planCardCtaButtonTextDisabled]}>
                   {hasCircle ? 'Active' : `${formatPrice(CIRCLE_PRICING.annual)}/yr`}
                 </Text>
-                {!hasCircle && isPro && <Text style={styles.savingsBadge}>Save 17%</Text>}
+                {!hasCircle && <Text style={styles.savingsBadge}>Save 17%</Text>}
               </Pressable>
               <Pressable
-                style={[styles.planCardCtaButtonSecondary, (hasCircle || !isPro) && styles.planCardCtaButtonDisabled]}
+                style={[styles.planCardCtaButtonSecondary, hasCircle && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CIRCLE_MONTHLY, 'Circle (Monthly)')}
-                disabled={isPurchasing || hasCircle || !isPro}
+                disabled={isPurchasing || hasCircle}
               >
-                <Text style={[styles.planCardCtaButtonSecondaryText, (hasCircle || !isPro) && styles.planCardCtaButtonTextDisabled]}>
+                <Text style={[styles.planCardCtaButtonSecondaryText, hasCircle && styles.planCardCtaButtonTextDisabled]}>
                   {formatPrice(CIRCLE_PRICING.monthly)}/mo
                 </Text>
               </Pressable>
