@@ -346,27 +346,6 @@ export function generateCCIArtifactHTML(metadata?: Partial<CCIIssuanceMetadata>)
     }
 
     /* ============================================
-       STABILITY & VOLATILITY CHART
-       ============================================ */
-    .bar-chart-card {
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 4px;
-      padding: 10px 12px;
-    }
-
-    .bar-chart-title {
-      font-family: 'Inter', sans-serif;
-      font-size: 8px;
-      font-weight: 600;
-      color: #0f172a;
-      text-align: center;
-      margin-bottom: 6px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    /* ============================================
        PROVIDER STATEMENT + LEGAL (BOTTOM)
        Readable, strong hierarchy
        ============================================ */
@@ -642,51 +621,6 @@ export function generateCCIArtifactHTML(metadata?: Partial<CCIIssuanceMetadata>)
           <text x="70" y="132" font-size="9" fill="rgba(255,255,255,0.6)" font-family="Inter, sans-serif" font-weight="500" text-anchor="middle">Oct</text>
           <text x="170" y="132" font-size="9" fill="rgba(255,255,255,0.6)" font-family="Inter, sans-serif" font-weight="500" text-anchor="middle">Nov</text>
           <text x="270" y="132" font-size="9" fill="rgba(255,255,255,0.6)" font-family="Inter, sans-serif" font-weight="500" text-anchor="middle">Dec</text>
-        </svg>
-      </div>
-
-      <!-- STABILITY & VOLATILITY CHART -->
-      <div class="bar-chart-card">
-        <div class="bar-chart-title">Capacity Stability Summary</div>
-        <svg width="100%" height="100" viewBox="0 0 320 100" preserveAspectRatio="xMidYMid meet">
-          <!-- Y-axis -->
-          <line x1="36" y1="10" x2="36" y2="75" stroke="#cbd5e1" stroke-width="1"/>
-          <line x1="36" y1="75" x2="300" y2="75" stroke="#cbd5e1" stroke-width="1"/>
-
-          <!-- Grid lines -->
-          <line x1="36" y1="26" x2="300" y2="26" stroke="#e2e8f0" stroke-width="1"/>
-          <line x1="36" y1="42" x2="300" y2="42" stroke="#e2e8f0" stroke-width="1"/>
-          <line x1="36" y1="58" x2="300" y2="58" stroke="#e2e8f0" stroke-width="1"/>
-
-          <!-- Y-axis labels -->
-          <text x="30" y="14" font-size="7" fill="#64748b" font-family="Inter, sans-serif" text-anchor="end">80</text>
-          <text x="30" y="30" font-size="7" fill="#64748b" font-family="Inter, sans-serif" text-anchor="end">60</text>
-          <text x="30" y="46" font-size="7" fill="#64748b" font-family="Inter, sans-serif" text-anchor="end">40</text>
-          <text x="30" y="62" font-size="7" fill="#64748b" font-family="Inter, sans-serif" text-anchor="end">20</text>
-          <text x="30" y="78" font-size="7" fill="#64748b" font-family="Inter, sans-serif" text-anchor="end">0</text>
-
-          <!-- October bars -->
-          <rect x="50" y="22" width="22" height="53" fill="#00E5FF"/>
-          <rect x="76" y="55" width="22" height="20" fill="#E8A830"/>
-
-          <!-- November bars -->
-          <rect x="130" y="28" width="22" height="47" fill="#00E5FF"/>
-          <rect x="156" y="50" width="22" height="25" fill="#E8A830"/>
-
-          <!-- December bars -->
-          <rect x="210" y="25" width="22" height="50" fill="#00E5FF"/>
-          <rect x="236" y="52" width="22" height="23" fill="#E8A830"/>
-
-          <!-- X-axis labels -->
-          <text x="74" y="90" font-size="8" fill="#334155" font-family="Inter, sans-serif" font-weight="500" text-anchor="middle">Oct</text>
-          <text x="154" y="90" font-size="8" fill="#334155" font-family="Inter, sans-serif" font-weight="500" text-anchor="middle">Nov</text>
-          <text x="234" y="90" font-size="8" fill="#334155" font-family="Inter, sans-serif" font-weight="500" text-anchor="middle">Dec</text>
-
-          <!-- Legend -->
-          <rect x="270" y="18" width="8" height="8" fill="#00E5FF"/>
-          <text x="282" y="25" font-size="6.5" fill="#334155" font-family="Inter, sans-serif">Stability</text>
-          <rect x="270" y="32" width="8" height="8" fill="#E8A830"/>
-          <text x="282" y="39" font-size="6.5" fill="#334155" font-family="Inter, sans-serif">Volatility</text>
         </svg>
       </div>
     </div>
