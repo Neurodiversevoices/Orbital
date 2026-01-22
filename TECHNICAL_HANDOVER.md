@@ -428,7 +428,7 @@ CI=1 npx eas submit --platform ios --latest --profile production --non-interacti
 ### Things to Watch
 
 - **Pattern History is NEVER deleted**: Even when users "delete" logs, de-identified records persist.
-- **Free tier limits**: 50 signals/month (`FREE_TIER_LIMITS.maxSignalsPerMonth`).
+- **Free tier**: Unlimited signals and history (same as Pro).
 - **10+ participant minimum**: Institutional aggregates require 10+ to protect privacy.
 - **Sentry disabled in `__DEV__`**: Errors only report in production builds.
 - **New Architecture required**: `reanimated@4.x` requires `newArchEnabled: true` in `app.json`.
