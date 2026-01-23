@@ -18,6 +18,7 @@ import { SubscriptionProvider } from '../lib/subscription';
 import { TermsAcceptanceProvider } from '../lib/hooks/useTermsAcceptance';
 import { ErrorBoundary } from '../components';
 import { AgeGate } from '../components/legal/AgeGate';
+import { ProfileGate } from '../components/ProfileGate';
 import { useIdleTimeout, updateLastActivity } from '../lib/session';
 import { useAuth } from '../lib/supabase';
 import { logSessionExpired, createDeviceSession } from '../lib/session';
@@ -268,6 +269,7 @@ function RootLayout() {
                 {/* AGE GATE — LEGAL REQUIRED: Blocks ALL access until 13+ verified */}
                 <AgeGate>
                 <IdleTimeoutWrapper>
+                <ProfileGate>
                 <StatusBar style="light" />
                 <Stack
                   screenOptions={{
@@ -412,6 +414,14 @@ function RootLayout() {
                     }}
                   />
                   <Stack.Screen
+                    name="create-profile"
+                    options={{
+                      presentation: 'fullScreenModal',
+                      animation: 'fade',
+                      gestureEnabled: false,
+                    }}
+                  />
+                  <Stack.Screen
                     name="active-sessions"
                     options={{
                       presentation: 'modal',
@@ -419,6 +429,7 @@ function RootLayout() {
                     }}
                   />
                 </Stack>
+                </ProfileGate>
                 </IdleTimeoutWrapper>
                 </AgeGate>
               </TermsAcceptanceProvider>
