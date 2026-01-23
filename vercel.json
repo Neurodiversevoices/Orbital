@@ -6,7 +6,8 @@
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "env": {
-    "EXPO_PUBLIC_FOUNDER_DEMO": "0"
+    "EXPO_PUBLIC_FOUNDER_DEMO": "0",
+    "EXPO_PUBLIC_PAYMENTS_ENABLED": "true"
   },
   "headers": [
     {
