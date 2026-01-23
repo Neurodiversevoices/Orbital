@@ -74,6 +74,7 @@ import {
   checkBundleAllSeatsPro,
   type UserEntitlements,
 } from '../lib/entitlements';
+import { useAuth } from '../lib/supabase';
 
 // =============================================================================
 // PURCHASE HANDLER (Mock Checkout)
@@ -366,6 +367,7 @@ export default function UpgradeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ demoMode?: string }>();
   const { isLoading: subscriptionLoading, restore } = useSubscription();
+  const auth = useAuth();
 
   // DOCTRINE: Do not surface CCI purchase options inside demo-only institutional modes
   // Check for demo mode via query param (e.g., from Sentinel institutional views)
@@ -406,6 +408,12 @@ export default function UpgradeScreen() {
   };
 
   const handlePurchase = useCallback(async (productId: string, productName: string) => {
+    // Auth gate: if payments enabled and not authenticated, redirect to sign-in
+    if (PAYMENTS_ENABLED && !auth.isAuthenticated) {
+      router.push('/cloud-sync');
+      return;
+    }
+
     console.log('[PURCHASE] Starting purchase:', productId, productName);
     setIsPurchasing(true);
 
@@ -435,7 +443,7 @@ export default function UpgradeScreen() {
         setIsPurchasing(false);
       }
     );
-  }, []);
+  }, [auth.isAuthenticated, router]);
 
   const handleRestore = useCallback(async () => {
     setIsRestoring(true);
