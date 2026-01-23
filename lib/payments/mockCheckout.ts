@@ -98,24 +98,22 @@ export const PRODUCT_CATALOG: Record<string, ProductInfo> = {
     entitlementId: 'pro_access',
   },
 
-  // Family Add-on
+  // Family Add-on (includes Pro)
   [PRODUCT_IDS.FAMILY_MONTHLY]: {
     id: PRODUCT_IDS.FAMILY_MONTHLY,
     name: 'Family Add-on (Monthly)',
-    description: 'Add household members to your Pro subscription',
+    description: 'Add household members - includes Pro for all',
     price: FAMILY_ADDON_PRICING.monthly,
     billingCycle: 'monthly',
     entitlementId: 'family_access',
-    requiresEntitlement: 'pro_access',
   },
   [PRODUCT_IDS.FAMILY_ANNUAL]: {
     id: PRODUCT_IDS.FAMILY_ANNUAL,
     name: 'Family Add-on (Annual)',
-    description: 'Add household members to your Pro subscription',
+    description: 'Add household members - includes Pro for all',
     price: FAMILY_ADDON_PRICING.annual,
     billingCycle: 'annual',
     entitlementId: 'family_access',
-    requiresEntitlement: 'pro_access',
   },
 
   // Family Extra Seat (beyond base 5)
@@ -138,24 +136,22 @@ export const PRODUCT_CATALOG: Record<string, ProductInfo> = {
     requiresEntitlement: 'family_access',
   },
 
-  // Circle
+  // Circle (includes Pro)
   [PRODUCT_IDS.CIRCLE_MONTHLY]: {
     id: PRODUCT_IDS.CIRCLE_MONTHLY,
     name: 'Circle (Monthly)',
-    description: 'Create a circle with up to 5 buddies (all must be Pro)',
+    description: 'Create a circle with up to 5 buddies - includes Pro',
     price: CIRCLE_PRICING.monthly,
     billingCycle: 'monthly',
     entitlementId: 'circle_access',
-    requiresEntitlement: 'pro_access',
   },
   [PRODUCT_IDS.CIRCLE_ANNUAL]: {
     id: PRODUCT_IDS.CIRCLE_ANNUAL,
     name: 'Circle (Annual)',
-    description: 'Create a circle with up to 5 buddies (all must be Pro)',
+    description: 'Create a circle with up to 5 buddies - includes Pro',
     price: CIRCLE_PRICING.annual,
     billingCycle: 'annual',
     entitlementId: 'circle_access',
-    requiresEntitlement: 'pro_access',
   },
 
   // Bundles (Annual-only)
@@ -566,6 +562,21 @@ export async function executePurchase(
 
   // MOCK: Always succeed (in production, this would be Stripe webhook)
   try {
+    // Products that include Pro access: Family, Circles, Bundles
+    const INCLUDES_PRO = [
+      'family_access',
+      'circle_access',
+      'bundle_10_access',
+      'bundle_15_access',
+      'bundle_20_access',
+    ];
+
+    // Grant pro_access automatically if product includes it
+    if (INCLUDES_PRO.includes(product.entitlementId)) {
+      await grantEntitlement('pro_access', purchaseId);
+    }
+
+    // Grant the product's main entitlement
     await grantEntitlement(product.entitlementId, purchaseId);
     await updatePurchaseStatus(purchaseId, 'completed');
 
