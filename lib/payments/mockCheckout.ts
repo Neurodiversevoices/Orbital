@@ -4,6 +4,8 @@
  * STUB IMPLEMENTATION: No real banking yet.
  * All purchases "work" end-to-end by simulating success and granting entitlements.
  *
+ * STORAGE: Uses Supabase when authenticated, falls back to AsyncStorage.
+ *
  * When Stripe is integrated, replace the `executePurchase` implementation
  * while keeping the same interface.
  *
@@ -24,6 +26,7 @@ import {
   getCCIPrice,
   ProductId,
 } from '../subscription/pricing';
+import { getSupabase, isSupabaseConfigured } from '../supabase/client';
 
 // =============================================================================
 // TYPES
@@ -52,7 +55,7 @@ export interface PurchaseResult {
 }
 
 // =============================================================================
-// STORAGE KEYS
+// STORAGE KEYS (AsyncStorage fallback)
 // =============================================================================
 
 const STORAGE_KEYS = {
@@ -236,20 +239,185 @@ export const PRODUCT_CATALOG: Record<string, ProductInfo> = {
 };
 
 // =============================================================================
-// MOCK CHECKOUT IMPLEMENTATION
+// SUPABASE HELPERS
 // =============================================================================
 
 /**
- * Generate unique purchase ID
+ * Get current authenticated user ID from Supabase
  */
-function generatePurchaseId(): string {
-  return `purch_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+async function getCurrentUserId(): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null;
+
+  try {
+    const supabase = getSupabase();
+    const { data: { user } } = await supabase.auth.getUser();
+    return user?.id ?? null;
+  } catch {
+    return null;
+  }
 }
+
+/**
+ * Check if we should use Supabase (configured + authenticated)
+ */
+async function shouldUseSupabase(): Promise<boolean> {
+  const userId = await getCurrentUserId();
+  return userId !== null;
+}
+
+// =============================================================================
+// ENTITLEMENT STORAGE (Supabase primary, AsyncStorage fallback)
+// =============================================================================
+
+/**
+ * Grant entitlement to user
+ * Uses Supabase if authenticated, otherwise AsyncStorage
+ */
+async function grantEntitlement(entitlementId: string, purchaseId?: string): Promise<void> {
+  const userId = await getCurrentUserId();
+
+  if (userId && isSupabaseConfigured()) {
+    // Use Supabase
+    try {
+      const supabase = getSupabase();
+      const { error } = await supabase
+        .from('user_entitlements')
+        .upsert({
+          user_id: userId,
+          entitlement_id: entitlementId,
+          source: 'purchase',
+          purchase_id: purchaseId,
+        }, {
+          onConflict: 'user_id,entitlement_id',
+        });
+
+      if (error) {
+        console.error('[grantEntitlement] Supabase error:', error);
+        throw new Error('Failed to grant entitlement');
+      }
+      console.log('[grantEntitlement] Granted via Supabase:', entitlementId);
+      return;
+    } catch (e) {
+      console.error('[grantEntitlement] Supabase failed, falling back to AsyncStorage:', e);
+    }
+  }
+
+  // Fallback to AsyncStorage
+  try {
+    const existing = await AsyncStorage.getItem(STORAGE_KEYS.GRANTED_ENTITLEMENTS);
+    const entitlements: string[] = existing ? JSON.parse(existing) : [];
+    if (!entitlements.includes(entitlementId)) {
+      entitlements.push(entitlementId);
+    }
+    await AsyncStorage.setItem(STORAGE_KEYS.GRANTED_ENTITLEMENTS, JSON.stringify(entitlements));
+    console.log('[grantEntitlement] Granted via AsyncStorage:', entitlementId);
+  } catch {
+    throw new Error('Failed to grant entitlement');
+  }
+}
+
+/**
+ * Get all granted entitlements
+ * Reads from Supabase if authenticated, otherwise AsyncStorage
+ * NOTE: Respects QA Free Mode — returns empty array if enabled
+ */
+export async function getGrantedEntitlements(): Promise<string[]> {
+  // Check QA Free Mode first
+  const { isQAFreeModeEnabled, overrideGrantedEntitlements } = await import('../access/qaFreeMode');
+
+  let entitlements: string[] = [];
+  const userId = await getCurrentUserId();
+
+  if (userId && isSupabaseConfigured()) {
+    // Use Supabase
+    try {
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from('user_entitlements')
+        .select('entitlement_id')
+        .eq('user_id', userId);
+
+      if (!error && data) {
+        entitlements = data.map(row => row.entitlement_id);
+        console.log('[getGrantedEntitlements] From Supabase:', entitlements);
+      }
+    } catch (e) {
+      console.error('[getGrantedEntitlements] Supabase failed:', e);
+    }
+  }
+
+  // If no Supabase entitlements, try AsyncStorage
+  if (entitlements.length === 0) {
+    try {
+      const existing = await AsyncStorage.getItem(STORAGE_KEYS.GRANTED_ENTITLEMENTS);
+      entitlements = existing ? JSON.parse(existing) : [];
+      if (entitlements.length > 0) {
+        console.log('[getGrantedEntitlements] From AsyncStorage:', entitlements);
+      }
+    } catch {
+      entitlements = [];
+    }
+  }
+
+  // Apply QA Free Mode override
+  if (isQAFreeModeEnabled()) {
+    return overrideGrantedEntitlements(entitlements);
+  }
+
+  return entitlements;
+}
+
+/**
+ * Check if user has a specific entitlement
+ * NOTE: Respects QA Free Mode — returns false for all if enabled
+ */
+export async function hasEntitlement(entitlementId: string): Promise<boolean> {
+  // Check QA Free Mode first
+  const { isQAFreeModeEnabled } = await import('../access/qaFreeMode');
+
+  if (isQAFreeModeEnabled()) {
+    return false; // QA Free Mode blocks all entitlements
+  }
+
+  const entitlements = await getGrantedEntitlements();
+  return entitlements.includes(entitlementId);
+}
+
+// =============================================================================
+// PURCHASE HISTORY (Supabase primary, AsyncStorage fallback)
+// =============================================================================
 
 /**
  * Record purchase intent (for audit trail)
  */
 async function recordPurchaseIntent(intent: PurchaseIntent): Promise<void> {
+  const userId = await getCurrentUserId();
+
+  if (userId && isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabase();
+      const { error } = await supabase
+        .from('purchase_history')
+        .insert({
+          user_id: userId,
+          purchase_id: intent.id,
+          product_id: intent.productId,
+          product_name: intent.productName,
+          price: intent.price,
+          billing_cycle: intent.billingCycle,
+          status: intent.status,
+        });
+
+      if (!error) {
+        console.log('[recordPurchaseIntent] Recorded in Supabase');
+        return;
+      }
+    } catch (e) {
+      console.error('[recordPurchaseIntent] Supabase failed:', e);
+    }
+  }
+
+  // Fallback to AsyncStorage
   try {
     const existing = await AsyncStorage.getItem(STORAGE_KEYS.PURCHASE_INTENTS);
     const intents: PurchaseIntent[] = existing ? JSON.parse(existing) : [];
@@ -267,6 +435,31 @@ async function updatePurchaseStatus(
   purchaseId: string,
   status: PurchaseStatus
 ): Promise<void> {
+  const userId = await getCurrentUserId();
+
+  if (userId && isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabase();
+      const updateData: Record<string, unknown> = { status };
+      if (status === 'completed') {
+        updateData.completed_at = new Date().toISOString();
+      }
+
+      const { error } = await supabase
+        .from('purchase_history')
+        .update(updateData)
+        .eq('purchase_id', purchaseId)
+        .eq('user_id', userId);
+
+      if (!error) {
+        return;
+      }
+    } catch (e) {
+      console.error('[updatePurchaseStatus] Supabase failed:', e);
+    }
+  }
+
+  // Fallback to AsyncStorage
   try {
     const existing = await AsyncStorage.getItem(STORAGE_KEYS.PURCHASE_INTENTS);
     if (!existing) return;
@@ -285,59 +478,15 @@ async function updatePurchaseStatus(
   }
 }
 
-/**
- * Grant entitlement to user (mock implementation)
- */
-async function grantEntitlement(entitlementId: string): Promise<void> {
-  try {
-    const existing = await AsyncStorage.getItem(STORAGE_KEYS.GRANTED_ENTITLEMENTS);
-    const entitlements: string[] = existing ? JSON.parse(existing) : [];
-    if (!entitlements.includes(entitlementId)) {
-      entitlements.push(entitlementId);
-    }
-    await AsyncStorage.setItem(STORAGE_KEYS.GRANTED_ENTITLEMENTS, JSON.stringify(entitlements));
-  } catch {
-    throw new Error('Failed to grant entitlement');
-  }
-}
+// =============================================================================
+// MOCK CHECKOUT IMPLEMENTATION
+// =============================================================================
 
 /**
- * Get all granted entitlements
- * NOTE: Respects QA Free Mode — returns empty array if enabled
+ * Generate unique purchase ID
  */
-export async function getGrantedEntitlements(): Promise<string[]> {
-  // Check QA Free Mode first
-  const { isQAFreeModeEnabled, overrideGrantedEntitlements } = await import('../access/qaFreeMode');
-
-  try {
-    const existing = await AsyncStorage.getItem(STORAGE_KEYS.GRANTED_ENTITLEMENTS);
-    const entitlements = existing ? JSON.parse(existing) : [];
-
-    // Apply QA Free Mode override
-    if (isQAFreeModeEnabled()) {
-      return overrideGrantedEntitlements(entitlements);
-    }
-
-    return entitlements;
-  } catch {
-    return [];
-  }
-}
-
-/**
- * Check if user has a specific entitlement
- * NOTE: Respects QA Free Mode — returns false for all if enabled
- */
-export async function hasEntitlement(entitlementId: string): Promise<boolean> {
-  // Check QA Free Mode first
-  const { isQAFreeModeEnabled } = await import('../access/qaFreeMode');
-
-  if (isQAFreeModeEnabled()) {
-    return false; // QA Free Mode blocks all entitlements
-  }
-
-  const entitlements = await getGrantedEntitlements();
-  return entitlements.includes(entitlementId);
+function generatePurchaseId(): string {
+  return `purch_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
 /**
@@ -387,7 +536,7 @@ export async function executePurchase(
       return {
         success: false,
         purchaseId: '',
-        error: `Requires Circle or Bundle first`,
+        error: `Requires ${product.requiresEntitlement.replace('_', ' ')} first`,
       };
     }
   }
@@ -426,7 +575,7 @@ export async function executePurchase(
 
   // MOCK: Always succeed (in production, this would be Stripe webhook)
   try {
-    await grantEntitlement(product.entitlementId);
+    await grantEntitlement(product.entitlementId, purchaseId);
     await updatePurchaseStatus(purchaseId, 'completed');
 
     return {
@@ -448,6 +597,36 @@ export async function executePurchase(
  * Get purchase history
  */
 export async function getPurchaseHistory(): Promise<PurchaseIntent[]> {
+  const userId = await getCurrentUserId();
+
+  if (userId && isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from('purchase_history')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        return data.map(row => ({
+          id: row.purchase_id,
+          productId: row.product_id as ProductId,
+          productName: row.product_name,
+          price: row.price,
+          billingCycle: row.billing_cycle as 'monthly' | 'annual' | 'one_time',
+          userId: row.user_id,
+          createdAt: row.created_at,
+          status: row.status as PurchaseStatus,
+          completedAt: row.completed_at,
+        }));
+      }
+    } catch (e) {
+      console.error('[getPurchaseHistory] Supabase failed:', e);
+    }
+  }
+
+  // Fallback to AsyncStorage
   try {
     const existing = await AsyncStorage.getItem(STORAGE_KEYS.PURCHASE_INTENTS);
     return existing ? JSON.parse(existing) : [];
