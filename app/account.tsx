@@ -36,6 +36,7 @@ import { useIdentity, getInitials, getAvatarColor } from '../lib/profile';
 import { useAuth } from '../lib/supabase';
 import { AvatarPicker } from '../components/AvatarPicker';
 import { type AvatarOption } from '../lib/avatars';
+import { getGrantedEntitlements } from '../lib/payments/mockCheckout';
 
 export default function AccountScreen() {
   const router = useRouter();
@@ -48,6 +49,7 @@ export default function AccountScreen() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [selectedAvatarId, setSelectedAvatarId] = useState<string | null>(null);
+  const [entitlements, setEntitlements] = useState<string[]>([]);
 
   // Initialize from identity
   useEffect(() => {
@@ -55,6 +57,13 @@ export default function AccountScreen() {
       setNameInput(identity.displayName || '');
     }
   }, [isLoading, identity.displayName]);
+
+  // Fetch entitlements from Supabase
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      getGrantedEntitlements().then(setEntitlements).catch(console.error);
+    }
+  }, [auth.isAuthenticated]);
 
   // Derived display values
   const email = auth.user?.email ?? null;
@@ -168,8 +177,27 @@ export default function AccountScreen() {
           </Animated.View>
         )}
 
+        {/* Entitlements Section */}
+        {auth.isAuthenticated && (
+          <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.section}>
+            <Text style={styles.sectionLabel}>ENTITLEMENTS</Text>
+            <View style={styles.entitlementsCard}>
+              {entitlements.length > 0 ? (
+                entitlements.map((ent, idx) => (
+                  <View key={ent} style={[styles.entitlementRow, idx > 0 && styles.entitlementRowBorder]}>
+                    <Check size={14} color="#4CAF50" />
+                    <Text style={styles.entitlementText}>{ent.replace(/_/g, ' ')}</Text>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.noEntitlements}>No active entitlements</Text>
+              )}
+            </View>
+          </Animated.View>
+        )}
+
         {/* Session Management */}
-        <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.section}>
+        <Animated.View entering={FadeInDown.delay(400).duration(400)} style={styles.section}>
           <Text style={styles.sectionLabel}>SESSION MANAGEMENT</Text>
 
           <Pressable
@@ -494,5 +522,34 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 18,
     color: 'rgba(255,255,255,0.5)',
+  },
+  entitlementsCard: {
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    padding: spacing.md,
+  },
+  entitlementRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  entitlementRowBorder: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.05)',
+    marginTop: spacing.xs,
+    paddingTop: spacing.sm,
+  },
+  entitlementText: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+    textTransform: 'capitalize',
+  },
+  noEntitlements: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.4)',
+    fontStyle: 'italic',
   },
 });

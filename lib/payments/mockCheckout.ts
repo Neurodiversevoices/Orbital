@@ -4,7 +4,9 @@
  * STUB IMPLEMENTATION: No real banking yet.
  * All purchases "work" end-to-end by simulating success and granting entitlements.
  *
- * STORAGE: Uses Supabase when authenticated, falls back to AsyncStorage.
+ * STORAGE:
+ * - Authenticated users: Supabase only (no AsyncStorage fallback)
+ * - Unauthenticated users: AsyncStorage only
  *
  * When Stripe is integrated, replace the `executePurchase` implementation
  * while keeping the same interface.
@@ -271,38 +273,34 @@ async function shouldUseSupabase(): Promise<boolean> {
 
 /**
  * Grant entitlement to user
- * Uses Supabase if authenticated, otherwise AsyncStorage
+ * Uses Supabase if authenticated, AsyncStorage only for unauthenticated users
  */
 async function grantEntitlement(entitlementId: string, purchaseId?: string): Promise<void> {
   const userId = await getCurrentUserId();
 
+  // Authenticated: use Supabase only (no fallback)
   if (userId && isSupabaseConfigured()) {
-    // Use Supabase
-    try {
-      const supabase = getSupabase();
-      const { error } = await supabase
-        .from('user_entitlements')
-        .upsert({
-          user_id: userId,
-          entitlement_id: entitlementId,
-          source: 'purchase',
-          purchase_id: purchaseId,
-        }, {
-          onConflict: 'user_id,entitlement_id',
-        });
+    const supabase = getSupabase();
+    const { error } = await supabase
+      .from('user_entitlements')
+      .upsert({
+        user_id: userId,
+        entitlement_id: entitlementId,
+        source: 'purchase',
+        purchase_id: purchaseId,
+      }, {
+        onConflict: 'user_id,entitlement_id',
+      });
 
-      if (error) {
-        console.error('[grantEntitlement] Supabase error:', error);
-        throw new Error('Failed to grant entitlement');
-      }
-      console.log('[grantEntitlement] Granted via Supabase:', entitlementId);
-      return;
-    } catch (e) {
-      console.error('[grantEntitlement] Supabase failed, falling back to AsyncStorage:', e);
+    if (error) {
+      console.error('[grantEntitlement] Supabase error:', error);
+      throw new Error('Failed to grant entitlement');
     }
+    console.log('[grantEntitlement] Granted via Supabase:', entitlementId);
+    return;
   }
 
-  // Fallback to AsyncStorage
+  // Unauthenticated: use AsyncStorage
   try {
     const existing = await AsyncStorage.getItem(STORAGE_KEYS.GRANTED_ENTITLEMENTS);
     const entitlements: string[] = existing ? JSON.parse(existing) : [];
@@ -318,7 +316,7 @@ async function grantEntitlement(entitlementId: string, purchaseId?: string): Pro
 
 /**
  * Get all granted entitlements
- * Reads from Supabase if authenticated, otherwise AsyncStorage
+ * Reads from Supabase if authenticated, AsyncStorage only for unauthenticated
  * NOTE: Respects QA Free Mode — returns empty array if enabled
  */
 export async function getGrantedEntitlements(): Promise<string[]> {
@@ -328,26 +326,22 @@ export async function getGrantedEntitlements(): Promise<string[]> {
   let entitlements: string[] = [];
   const userId = await getCurrentUserId();
 
+  // Authenticated: use Supabase only (no fallback)
   if (userId && isSupabaseConfigured()) {
-    // Use Supabase
-    try {
-      const supabase = getSupabase();
-      const { data, error } = await supabase
-        .from('user_entitlements')
-        .select('entitlement_id')
-        .eq('user_id', userId);
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('user_entitlements')
+      .select('entitlement_id')
+      .eq('user_id', userId);
 
-      if (!error && data) {
-        entitlements = data.map(row => row.entitlement_id);
-        console.log('[getGrantedEntitlements] From Supabase:', entitlements);
-      }
-    } catch (e) {
-      console.error('[getGrantedEntitlements] Supabase failed:', e);
+    if (error) {
+      console.error('[getGrantedEntitlements] Supabase error:', error);
+    } else if (data) {
+      entitlements = data.map(row => row.entitlement_id);
+      console.log('[getGrantedEntitlements] From Supabase:', entitlements);
     }
-  }
-
-  // If no Supabase entitlements, try AsyncStorage
-  if (entitlements.length === 0) {
+  } else {
+    // Unauthenticated: use AsyncStorage
     try {
       const existing = await AsyncStorage.getItem(STORAGE_KEYS.GRANTED_ENTITLEMENTS);
       entitlements = existing ? JSON.parse(existing) : [];
@@ -393,31 +387,30 @@ export async function hasEntitlement(entitlementId: string): Promise<boolean> {
 async function recordPurchaseIntent(intent: PurchaseIntent): Promise<void> {
   const userId = await getCurrentUserId();
 
+  // Authenticated: use Supabase only
   if (userId && isSupabaseConfigured()) {
-    try {
-      const supabase = getSupabase();
-      const { error } = await supabase
-        .from('purchase_history')
-        .insert({
-          user_id: userId,
-          purchase_id: intent.id,
-          product_id: intent.productId,
-          product_name: intent.productName,
-          price: intent.price,
-          billing_cycle: intent.billingCycle,
-          status: intent.status,
-        });
+    const supabase = getSupabase();
+    const { error } = await supabase
+      .from('purchase_history')
+      .insert({
+        user_id: userId,
+        purchase_id: intent.id,
+        product_id: intent.productId,
+        product_name: intent.productName,
+        price: intent.price,
+        billing_cycle: intent.billingCycle,
+        status: intent.status,
+      });
 
-      if (!error) {
-        console.log('[recordPurchaseIntent] Recorded in Supabase');
-        return;
-      }
-    } catch (e) {
-      console.error('[recordPurchaseIntent] Supabase failed:', e);
+    if (error) {
+      console.error('[recordPurchaseIntent] Supabase error:', error);
+    } else {
+      console.log('[recordPurchaseIntent] Recorded in Supabase');
     }
+    return;
   }
 
-  // Fallback to AsyncStorage
+  // Unauthenticated: use AsyncStorage
   try {
     const existing = await AsyncStorage.getItem(STORAGE_KEYS.PURCHASE_INTENTS);
     const intents: PurchaseIntent[] = existing ? JSON.parse(existing) : [];
@@ -437,29 +430,27 @@ async function updatePurchaseStatus(
 ): Promise<void> {
   const userId = await getCurrentUserId();
 
+  // Authenticated: use Supabase only
   if (userId && isSupabaseConfigured()) {
-    try {
-      const supabase = getSupabase();
-      const updateData: Record<string, unknown> = { status };
-      if (status === 'completed') {
-        updateData.completed_at = new Date().toISOString();
-      }
-
-      const { error } = await supabase
-        .from('purchase_history')
-        .update(updateData)
-        .eq('purchase_id', purchaseId)
-        .eq('user_id', userId);
-
-      if (!error) {
-        return;
-      }
-    } catch (e) {
-      console.error('[updatePurchaseStatus] Supabase failed:', e);
+    const supabase = getSupabase();
+    const updateData: Record<string, unknown> = { status };
+    if (status === 'completed') {
+      updateData.completed_at = new Date().toISOString();
     }
+
+    const { error } = await supabase
+      .from('purchase_history')
+      .update(updateData)
+      .eq('purchase_id', purchaseId)
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('[updatePurchaseStatus] Supabase error:', error);
+    }
+    return;
   }
 
-  // Fallback to AsyncStorage
+  // Unauthenticated: use AsyncStorage
   try {
     const existing = await AsyncStorage.getItem(STORAGE_KEYS.PURCHASE_INTENTS);
     if (!existing) return;
@@ -599,34 +590,37 @@ export async function executePurchase(
 export async function getPurchaseHistory(): Promise<PurchaseIntent[]> {
   const userId = await getCurrentUserId();
 
+  // Authenticated: use Supabase only
   if (userId && isSupabaseConfigured()) {
-    try {
-      const supabase = getSupabase();
-      const { data, error } = await supabase
-        .from('purchase_history')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('purchase_history')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
 
-      if (!error && data) {
-        return data.map(row => ({
-          id: row.purchase_id,
-          productId: row.product_id as ProductId,
-          productName: row.product_name,
-          price: row.price,
-          billingCycle: row.billing_cycle as 'monthly' | 'annual' | 'one_time',
-          userId: row.user_id,
-          createdAt: row.created_at,
-          status: row.status as PurchaseStatus,
-          completedAt: row.completed_at,
-        }));
-      }
-    } catch (e) {
-      console.error('[getPurchaseHistory] Supabase failed:', e);
+    if (error) {
+      console.error('[getPurchaseHistory] Supabase error:', error);
+      return [];
     }
+
+    if (data) {
+      return data.map(row => ({
+        id: row.purchase_id,
+        productId: row.product_id as ProductId,
+        productName: row.product_name,
+        price: row.price,
+        billingCycle: row.billing_cycle as 'monthly' | 'annual' | 'one_time',
+        userId: row.user_id,
+        createdAt: row.created_at,
+        status: row.status as PurchaseStatus,
+        completedAt: row.completed_at,
+      }));
+    }
+    return [];
   }
 
-  // Fallback to AsyncStorage
+  // Unauthenticated: use AsyncStorage
   try {
     const existing = await AsyncStorage.getItem(STORAGE_KEYS.PURCHASE_INTENTS);
     return existing ? JSON.parse(existing) : [];
