@@ -11,13 +11,12 @@ import Animated, {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
-  Home,
-  BarChart2,
+  Circle,
+  Repeat,
   Shield,
   ChevronLeft,
   ChevronRight,
   X,
-  Sparkles,
 } from 'lucide-react-native';
 import { colors, spacing } from '../theme';
 import { useTutorial } from '../lib/hooks/useTutorial';
@@ -32,46 +31,28 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 interface TutorialStep {
   id: string;
   icon: React.ComponentType<{ color: string; size: number }>;
-  title: string;
-  description: string;
-  hint: string;
+  line1: string;
+  line2: string;
 }
 
 const TUTORIAL_STEPS: TutorialStep[] = [
   {
-    id: 'welcome',
-    icon: Sparkles,
-    title: 'Welcome to Orbital',
-    description: 'A calm space to track your capacity. No judgment, just awareness.',
-    hint: 'Designed for neurodivergent minds',
-  },
-  {
-    id: 'home',
-    icon: Home,
-    title: 'Signal Your Capacity',
-    description: 'Swipe the orb to log how you feel. Resourced, stretched, or depleted.',
-    hint: 'Tap to save your signal',
+    id: 'action',
+    icon: Circle,
+    line1: 'Check in once a day.',
+    line2: 'Tap where your capacity feels — how much you have to give right now.',
   },
   {
     id: 'patterns',
-    icon: BarChart2,
-    title: 'Discover Patterns',
-    description: 'Over time, see trends in your capacity. Find what helps and what drains.',
-    hint: 'Unlocks after 7 signals',
+    icon: Repeat,
+    line1: 'Same check-in. A few seconds. Every day.',
+    line2: 'Patterns appear over time. No analysis required.',
   },
   {
-    id: 'privacy',
+    id: 'boundaries',
     icon: Shield,
-    title: 'Your Data, Your Control',
-    description: 'Everything stays on your device. Pattern history helps you see long-term trends. Your notes never leave your phone.',
-    hint: 'Tap Settings → Your Data for details',
-  },
-  {
-    id: 'ready',
-    icon: Sparkles,
-    title: "You're Ready",
-    description: 'Start by logging your first capacity signal. There are no wrong answers.',
-    hint: 'Your patterns build over time',
+    line1: 'No advice. No scoring. No judgment.',
+    line2: 'Your data. Your conversations.',
   },
 ];
 
@@ -162,16 +143,11 @@ export default function TutorialScreen() {
             <Icon color="#00E5FF" size={48} />
           </View>
 
-          {/* Title */}
-          <Text style={styles.title}>{step.title}</Text>
+          {/* Line 1 */}
+          <Text style={styles.line1}>{step.line1}</Text>
 
-          {/* Description */}
-          <Text style={styles.description}>{step.description}</Text>
-
-          {/* Hint */}
-          <View style={styles.hintContainer}>
-            <Text style={styles.hint}>{step.hint}</Text>
-          </View>
+          {/* Line 2 */}
+          <Text style={styles.line2}>{step.line2}</Text>
         </Animated.View>
       </View>
 
@@ -191,7 +167,7 @@ export default function TutorialScreen() {
 
         <Pressable onPress={handleNext} style={styles.primaryButton}>
           <Text style={styles.primaryButtonText}>
-            {isLastStep ? 'Start Using Orbital' : 'Next'}
+            {isLastStep ? 'Get Started' : 'Next'}
           </Text>
           {!isLastStep && <ChevronRight color="#000" size={20} />}
         </Pressable>
@@ -279,31 +255,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.lg,
   },
-  title: {
-    fontSize: 24,
+  line1: {
+    fontSize: 22,
     fontWeight: '600',
     color: 'rgba(255,255,255,0.95)',
     textAlign: 'center',
     marginBottom: spacing.md,
+    lineHeight: 30,
   },
-  description: {
+  line2: {
     fontSize: 16,
     lineHeight: 24,
-    color: 'rgba(255,255,255,0.7)',
+    color: 'rgba(255,255,255,0.6)',
     textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  hintContainer: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: 12,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-  },
-  hint: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
-    textAlign: 'center',
-    fontStyle: 'italic',
   },
   navigation: {
     flexDirection: 'row',
