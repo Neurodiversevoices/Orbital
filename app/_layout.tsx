@@ -18,6 +18,7 @@ import { SubscriptionProvider } from '../lib/subscription';
 import { TermsAcceptanceProvider } from '../lib/hooks/useTermsAcceptance';
 import { ErrorBoundary } from '../components';
 import { AgeGate } from '../components/legal/AgeGate';
+import { IntroGate } from '../components/IntroGate';
 import { ProfileGate } from '../components/ProfileGate';
 import { useIdleTimeout, updateLastActivity } from '../lib/session';
 import { useAuth } from '../lib/supabase';
@@ -268,6 +269,8 @@ function RootLayout() {
               <TermsAcceptanceProvider>
                 {/* AGE GATE — LEGAL REQUIRED: Blocks ALL access until 13+ verified */}
                 <AgeGate>
+                {/* INTRO GATE — Shows explanatory intro before terms */}
+                <IntroGate>
                 <IdleTimeoutWrapper>
                 <ProfileGate>
                 <StatusBar style="light" />
@@ -279,6 +282,14 @@ function RootLayout() {
                   }}
                 >
                   <Stack.Screen name="(tabs)" />
+                  <Stack.Screen
+                    name="intro"
+                    options={{
+                      presentation: 'fullScreenModal',
+                      animation: 'fade',
+                      gestureEnabled: false,
+                    }}
+                  />
                   <Stack.Screen
                     name="tutorial"
                     options={{
@@ -431,6 +442,7 @@ function RootLayout() {
                 </Stack>
                 </ProfileGate>
                 </IdleTimeoutWrapper>
+                </IntroGate>
                 </AgeGate>
               </TermsAcceptanceProvider>
             </SubscriptionProvider>
