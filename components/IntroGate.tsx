@@ -19,6 +19,7 @@ const BYPASS_ROUTES = [
   '/legal',
   '/terms',
   '/privacy',
+  '/support',
 ];
 
 interface IntroGateProps {

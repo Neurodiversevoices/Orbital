@@ -21,6 +21,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { usePathname } from 'expo-router';
 import { Shield, AlertTriangle } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../../theme';
 import {
@@ -31,6 +32,12 @@ import {
   BLOCKED_MESSAGE,
   type AgeVerificationStatus,
 } from '../../lib/legal/ageVerification';
+
+// Routes that bypass age gate (App Store compliance pages)
+const BYPASS_ROUTES = [
+  '/privacy',
+  '/support',
+];
 
 // =============================================================================
 // TYPES
@@ -211,12 +218,21 @@ function AgeGateForm({ onVerified, onBlocked }: AgeGateFormProps) {
 // =============================================================================
 
 export function AgeGate({ children }: AgeGateProps) {
+  const pathname = usePathname();
   const [status, setStatus] = useState<AgeVerificationStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Check if current route bypasses age gate (App Store compliance pages)
+  const shouldBypass = BYPASS_ROUTES.some(route => pathname.startsWith(route));
+
   useEffect(() => {
+    // Skip check for bypass routes
+    if (shouldBypass) {
+      setIsLoading(false);
+      return;
+    }
     checkStatus();
-  }, []);
+  }, [shouldBypass]);
 
   const checkStatus = async () => {
     setIsLoading(true);
@@ -234,6 +250,11 @@ export function AgeGate({ children }: AgeGateProps) {
     await purgeUnderageLocalState();
     setStatus({ isVerified: false, isBlocked: true, record: null });
   };
+
+  // Bypass routes (App Store compliance) — allow through without verification
+  if (shouldBypass) {
+    return <>{children}</>;
+  }
 
   // Loading state
   if (isLoading) {
