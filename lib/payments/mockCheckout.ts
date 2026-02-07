@@ -316,7 +316,7 @@ async function grantEntitlement(entitlementId: string, purchaseId?: string): Pro
           entitlement_id: entitlementId,
           source: 'purchase',
           purchase_id: purchaseId,
-        } as any, {
+        }, {
           onConflict: 'user_id,entitlement_id',
         });
 
@@ -367,7 +367,7 @@ export async function getGrantedEntitlements(): Promise<string[]> {
         .eq('user_id', userId);
 
       if (!error && data) {
-        entitlements = (data as any[]).map(row => row.entitlement_id);
+        entitlements = data.map(row => row.entitlement_id);
         console.log('[getGrantedEntitlements] From Supabase:', entitlements);
       }
     } catch (e) {
@@ -435,7 +435,7 @@ async function recordPurchaseIntent(intent: PurchaseIntent): Promise<void> {
           price: intent.price,
           billing_cycle: intent.billingCycle,
           status: intent.status,
-        } as any);
+        });
 
       if (!error) {
         console.log('[recordPurchaseIntent] Recorded in Supabase');
@@ -476,7 +476,7 @@ async function updatePurchaseStatus(
 
       const { error } = await supabase
         .from('purchase_history')
-        .update(updateData as any)
+        .update(updateData)
         .eq('purchase_id', purchaseId)
         .eq('user_id', userId);
 
@@ -651,7 +651,7 @@ export async function getPurchaseHistory(): Promise<PurchaseIntent[]> {
         .order('created_at', { ascending: false });
 
       if (!error && data) {
-        return (data as any[]).map(row => ({
+        return data.map(row => ({
           id: row.purchase_id,
           productId: row.product_id as ProductId,
           productName: row.product_name,
@@ -660,7 +660,7 @@ export async function getPurchaseHistory(): Promise<PurchaseIntent[]> {
           userId: row.user_id,
           createdAt: row.created_at,
           status: row.status as PurchaseStatus,
-          completedAt: row.completed_at,
+          completedAt: row.completed_at ?? undefined,
         }));
       }
     } catch (e) {

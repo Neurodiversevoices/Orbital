@@ -428,7 +428,7 @@ export async function addRestrictedDomain(
       sales_contact_url: domain.salesContactUrl,
       added_by: adminUserId,
       is_active: true,
-    } as any);
+    });
 
     if (error) {
       if (__DEV__) console.error('[RestrictedDomains] Failed to add domain:', error);

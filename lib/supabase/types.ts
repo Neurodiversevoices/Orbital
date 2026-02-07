@@ -50,6 +50,7 @@ export interface Database {
           local_id?: string | null;
           synced_at?: string;
         };
+        Relationships: [];
       };
       user_daily_metrics: {
         Row: {
@@ -88,6 +89,7 @@ export interface Database {
           dominant_state?: CapacityState | null;
           computed_at?: string;
         };
+        Relationships: [];
       };
       org_memberships: {
         Row: {
@@ -120,6 +122,7 @@ export interface Database {
           revoked_at?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       org_aggregate_snapshots: {
         Row: {
@@ -173,6 +176,7 @@ export interface Database {
           green_bucket_high?: number | null;
           computed_at?: string;
         };
+        Relationships: [];
       };
       audit_events: {
         Row: {
@@ -200,6 +204,7 @@ export interface Database {
           user_agent?: string | null;
         };
         Update: never; // Audit log is append-only
+        Relationships: [];
       };
       user_preferences: {
         Row: {
@@ -226,8 +231,112 @@ export interface Database {
           notifications_enabled?: boolean;
           updated_at?: string;
         };
+        Relationships: [];
+      };
+      user_entitlements: {
+        Row: {
+          id: string;
+          user_id: string;
+          entitlement_id: string;
+          source: string;
+          purchase_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          entitlement_id: string;
+          source?: string;
+          purchase_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          entitlement_id?: string;
+          source?: string;
+          purchase_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      purchase_history: {
+        Row: {
+          id: string;
+          user_id: string;
+          purchase_id: string;
+          product_id: string;
+          product_name: string;
+          price: number;
+          billing_cycle: string;
+          status: string;
+          created_at: string;
+          completed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          purchase_id: string;
+          product_id: string;
+          product_name: string;
+          price: number;
+          billing_cycle: string;
+          status: string;
+          created_at?: string;
+          completed_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          purchase_id?: string;
+          product_id?: string;
+          product_name?: string;
+          price?: number;
+          billing_cycle?: string;
+          status?: string;
+          created_at?: string;
+          completed_at?: string | null;
+        };
+        Relationships: [];
+      };
+      restricted_domains: {
+        Row: {
+          id: string;
+          domain: string;
+          organization_name: string;
+          enforcement_level: string;
+          sso_endpoint: string | null;
+          sales_contact_url: string | null;
+          added_by: string;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          domain: string;
+          organization_name: string;
+          enforcement_level: string;
+          sso_endpoint?: string | null;
+          sales_contact_url?: string | null;
+          added_by: string;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          domain?: string;
+          organization_name?: string;
+          enforcement_level?: string;
+          sso_endpoint?: string | null;
+          sales_contact_url?: string | null;
+          added_by?: string;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Relationships: [];
       };
     };
+    Views: {};
     Functions: {
       compute_user_daily_metrics: {
         Args: { p_user_id: string; p_date: string };
