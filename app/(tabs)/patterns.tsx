@@ -637,10 +637,11 @@ export default function PatternsScreen() {
                   logCount={logCount}
                   isPro={isPro}
                   hasUsedAppFor30Days={hasUsedAppFor30Days}
+                  isDemoMode={isDemoMode}
                 />
 
-                {/* Show blur tease for 30d+ ranges for Free users after 30 days */}
-                {!isPro && hasUsedAppFor30Days && timeRange !== '7d' ? (
+                {/* Show blur tease for 30d+ ranges for Free users after 30 days (skip in demo mode) */}
+                {!isPro && !isDemoMode && hasUsedAppFor30Days && timeRange !== '7d' ? (
                   <BlurredPatternTease
                     visible={true}
                     onUpgradePress={() => router.push('/upgrade')}
