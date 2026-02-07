@@ -93,7 +93,9 @@ export async function generateDataRoomPackage(
     await calculateSecurityScore();
   }
 
-  pkg.metadata.generationTimeMs = Date.now() - startTime;
+  if (pkg.metadata) {
+    pkg.metadata.generationTimeMs = Date.now() - startTime;
+  }
 
   return pkg;
 }
