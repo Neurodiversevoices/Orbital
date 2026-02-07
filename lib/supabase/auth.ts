@@ -438,7 +438,6 @@ export function useAuth(): AuthContext {
       const supabase = getSupabase();
 
       // First, delete user data using our RPC function
-      // @ts-expect-error - RPC function types not generated yet
       const { error: dataError } = await supabase.rpc('delete_user_data', {
         p_user_id: state.user.id,
       });

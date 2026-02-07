@@ -454,7 +454,6 @@ export async function exportUserData(): Promise<Record<string, unknown> | null> 
   }
 
   const supabase = getSupabase();
-  // @ts-expect-error - RPC function types not generated yet
   const { data, error } = await supabase.rpc('export_user_data', {
     p_user_id: userId,
   });
@@ -477,7 +476,6 @@ export async function deleteUserData(): Promise<boolean> {
   }
 
   const supabase = getSupabase();
-  // @ts-expect-error - RPC function types not generated yet
   const { error } = await supabase.rpc('delete_user_data', {
     p_user_id: userId,
   });
