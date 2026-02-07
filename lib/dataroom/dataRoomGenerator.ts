@@ -25,6 +25,8 @@ export interface DataRoomOptions {
     auditLogs: boolean;
     orgList: boolean;
     revenueMetrics: boolean;
+    technicalArchitecture: boolean;
+    legalDocuments: boolean;
   };
   dateRange?: {
     start: number;
@@ -43,6 +45,8 @@ export const DEFAULT_DATA_ROOM_OPTIONS: DataRoomOptions = {
     auditLogs: true,
     orgList: true,
     revenueMetrics: true,
+    technicalArchitecture: true,
+    legalDocuments: true,
   },
   redactPII: true,
 };

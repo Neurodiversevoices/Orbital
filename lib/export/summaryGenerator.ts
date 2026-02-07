@@ -71,7 +71,7 @@ export function generateExportSummary(logs: CapacityLog[]): ExportSummary {
 
 export function formatSummaryAsText(
   summary: ExportSummary,
-  locale: 'en' | 'es' = 'en'
+  locale: string = 'en'
 ): string {
   const formatDate = (ts: number) =>
     new Date(ts).toLocaleDateString(locale === 'es' ? 'es-MX' : 'en-US', {

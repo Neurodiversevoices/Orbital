@@ -11,5 +11,8 @@
     "**/*.ts",
     "**/*.tsx",
     "modules/**/*.ts"
+  ],
+  "exclude": [
+    "api/**"
   ]
 }

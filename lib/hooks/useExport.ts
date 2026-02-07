@@ -17,10 +17,10 @@ interface UseExportReturn {
     format: ExportFormat,
     range: ExportRange,
     includeNotes: boolean,
-    locale: 'en' | 'es'
+    locale: string
   ) => Promise<boolean>;
-  exportSummary90d: (locale: 'en' | 'es') => Promise<boolean>;
-  exportSummaryAnnual: (locale: 'en' | 'es') => Promise<boolean>;
+  exportSummary90d: (locale: string) => Promise<boolean>;
+  exportSummaryAnnual: (locale: string) => Promise<boolean>;
   /** Personal export - includes demographics (user owns their data) */
   exportJson: () => Promise<boolean>;
   exportCsv: (includeNotes?: boolean) => Promise<boolean>;
@@ -41,7 +41,7 @@ export function useExport(): UseExportReturn {
       format: ExportFormat,
       range: ExportRange,
       includeNotes: boolean,
-      locale: 'en' | 'es'
+      locale: string
     ): Promise<boolean> => {
       setIsExporting(true);
       setError(null);
@@ -62,7 +62,7 @@ export function useExport(): UseExportReturn {
     []
   );
 
-  const exportSummary90d = useCallback(async (locale: 'en' | 'es'): Promise<boolean> => {
+  const exportSummary90d = useCallback(async (locale: string): Promise<boolean> => {
     setIsExporting(true);
     setError(null);
     try {
@@ -80,7 +80,7 @@ export function useExport(): UseExportReturn {
     }
   }, []);
 
-  const exportSummaryAnnual = useCallback(async (locale: 'en' | 'es'): Promise<boolean> => {
+  const exportSummaryAnnual = useCallback(async (locale: string): Promise<boolean> => {
     setIsExporting(true);
     setError(null);
     try {

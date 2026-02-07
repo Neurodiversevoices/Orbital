@@ -115,7 +115,7 @@ export async function createTemplate(
     type: ContractType;
     title: string;
     content: string;
-    locale?: 'en' | 'es';
+    locale?: string;
   },
   createdBy: string
 ): Promise<ContractTemplate> {

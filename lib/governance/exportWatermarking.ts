@@ -39,7 +39,7 @@ export function generateWatermark(
     recordCount: number;
     exportedBy: string;
     jurisdiction?: JurisdictionCode;
-    locale?: 'en' | 'es';
+    locale?: string;
   },
   contentForHash: string
 ): ExportWatermark {
@@ -57,7 +57,7 @@ export function generateWatermark(
   };
 }
 
-export function formatWatermarkHeader(watermark: ExportWatermark, locale: 'en' | 'es' = 'en'): string {
+export function formatWatermarkHeader(watermark: ExportWatermark, locale: string = 'en'): string {
   const date = new Date(watermark.exportDate);
   const dateStr = date.toISOString().split('T')[0];
 
@@ -108,7 +108,7 @@ export function formatWatermarkHeader(watermark: ExportWatermark, locale: 'en' |
   return header;
 }
 
-export function formatWatermarkFooter(watermark: ExportWatermark, locale: 'en' | 'es' = 'en'): string {
+export function formatWatermarkFooter(watermark: ExportWatermark, locale: string = 'en'): string {
   const labels = locale === 'es' ? {
     endOfExport: 'FIN DE LA EXPORTACIÓN',
     verifyWith: 'Verificar integridad con hash',
@@ -223,7 +223,7 @@ export async function verifyExportIntegrity(
 export function wrapContentWithWatermark(
   content: string,
   watermark: ExportWatermark,
-  locale: 'en' | 'es' = 'en'
+  locale: string = 'en'
 ): string {
   const header = formatWatermarkHeader(watermark, locale);
   const footer = formatWatermarkFooter(watermark, locale);
@@ -240,7 +240,7 @@ export async function createWatermarkedExport(
     format: 'pdf' | 'csv' | 'json';
     content: string;
     jurisdiction?: JurisdictionCode;
-    locale?: 'en' | 'es';
+    locale?: string;
     expiresInDays?: number;
   }
 ): Promise<{

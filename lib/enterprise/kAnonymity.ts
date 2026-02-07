@@ -32,6 +32,7 @@ import {
   SIGNAL_DELAY_SECONDS,
   FRESHNESS_WINDOW_HOURS,
 } from './types';
+import type { AggregatedUnitMetrics } from './types';
 
 // Re-export AggregatedUnitMetrics for external use
 export type { AggregatedUnitMetrics } from './types';

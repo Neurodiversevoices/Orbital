@@ -243,7 +243,7 @@ export async function provisionOrganization(
     createdAt: now,
     primaryContact: params.primaryContact,
     settings: {
-      retentionWindow: '3_years',
+      retentionWindow: '3y',
       ssoEnabled: false,
       mfaRequired: request.tier === 'enterprise',
       dataResidency: 'us-east-1',

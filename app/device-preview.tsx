@@ -30,7 +30,7 @@ import { useEnergyLogs } from '../lib/hooks/useEnergyLogs';
 import { useLocale } from '../lib/hooks/useLocale';
 import { CapacityState } from '../types';
 
-function formatDate(locale: 'en' | 'es'): string {
+function formatDate(locale: string): string {
   const localeCode = locale === 'es' ? 'es-MX' : 'en-US';
   return new Date().toLocaleDateString(localeCode, {
     weekday: 'long',

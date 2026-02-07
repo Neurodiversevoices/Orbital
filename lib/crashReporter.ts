@@ -5,6 +5,7 @@
 import * as Sentry from '@sentry/react-native';
 
 interface CrashContext {
+  [key: string]: unknown;
   component?: string;
   action?: string;
   extra?: Record<string, unknown>;

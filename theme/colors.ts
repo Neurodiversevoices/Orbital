@@ -20,6 +20,7 @@ export const colors = {
   textSecondary: 'rgba(255, 255, 255, 0.6)',
 
   // Accents
+  primary: '#00FFFF',
   accent: '#00FFFF',
   accentDim: 'rgba(0, 255, 255, 0.3)',
 } as const;

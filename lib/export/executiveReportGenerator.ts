@@ -9,7 +9,7 @@ const PERIOD_MS = {
 
 export async function generateExecutiveReport(
   config: ExecutiveReportConfig,
-  locale: 'en' | 'es' = 'en'
+  locale: string = 'en'
 ): Promise<ExecutiveReportData> {
   const now = Date.now();
   let periodStart: number;
@@ -107,7 +107,7 @@ function determineTrend(weeklyAverages: number[]): 'improving' | 'stable' | 'dec
   return 'stable';
 }
 
-function identifyPatterns(logs: CapacityLog[], locale: 'en' | 'es'): string[] {
+function identifyPatterns(logs: CapacityLog[], locale: string): string[] {
   const patterns: string[] = [];
 
   if (logs.length < 7) {
@@ -200,7 +200,7 @@ function identifyPatterns(logs: CapacityLog[], locale: 'en' | 'es'): string[] {
 
 function generateCategoryInsights(
   logs: CapacityLog[],
-  locale: 'en' | 'es'
+  locale: string
 ): { category: Category; impactScore: number; recommendation?: string }[] {
   const categories: Category[] = ['sensory', 'demand', 'social'];
 
@@ -237,7 +237,7 @@ function generateCategoryInsights(
 
 export function formatExecutiveReportAsText(
   data: ExecutiveReportData,
-  locale: 'en' | 'es' = 'en'
+  locale: string = 'en'
 ): string {
   const dateFormatter = new Intl.DateTimeFormat(locale === 'es' ? 'es-MX' : 'en-US', {
     year: 'numeric',
