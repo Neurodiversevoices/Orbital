@@ -228,7 +228,8 @@ function generateCategoryInsights(
           es: 'Evalúe compromisos sociales y asignación de tiempo de recuperación',
         },
       };
-      recommendation = recommendations[category][locale];
+      const l: 'en' | 'es' = locale === 'es' ? 'es' : 'en';
+      recommendation = recommendations[category][l];
     }
 
     return { category, impactScore, recommendation };

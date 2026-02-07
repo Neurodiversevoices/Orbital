@@ -50,7 +50,7 @@ export function generateWatermark(
     exportDate: Date.now(),
     scope: params.scope,
     recordCount: params.recordCount,
-    disclaimer: WATERMARK_DISCLAIMERS[locale],
+    disclaimer: WATERMARK_DISCLAIMERS[locale === 'es' ? 'es' : 'en'],
     exportedBy: params.exportedBy,
     integrityHash: generateIntegrityHash(contentForHash),
     jurisdiction: params.jurisdiction,
