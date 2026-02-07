@@ -13,6 +13,7 @@
     "modules/**/*.ts"
   ],
   "exclude": [
-    "api/**"
+    "api/**",
+    "**/__tests__/**"
   ]
 }
