@@ -24,6 +24,8 @@ import {
   ColorBlindMode,
 } from '../../types';
 
+type Theme = (typeof ACCESSIBLE_THEMES)[keyof typeof ACCESSIBLE_THEMES];
+
 interface AccessibilityContextType {
   settings: AccessibilitySettings;
   updateSetting: <K extends keyof AccessibilitySettings>(
@@ -33,7 +35,7 @@ interface AccessibilityContextType {
   resetSettings: () => Promise<void>;
 
   // Theme helpers
-  getTheme: () => typeof ACCESSIBLE_THEMES.default;
+  getTheme: () => Theme;
   getTextScale: () => number;
   getButtonScale: () => number;
 
