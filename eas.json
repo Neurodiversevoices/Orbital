@@ -1,0 +1,53 @@
+{
+  "cli": {
+    "version": ">= 5.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "production": {
+      "distribution": "store",
+      "ios": {
+        "credentialsSource": "remote",
+        "autoIncrement": "buildNumber",
+        "resourceClass": "m-medium"
+      },
+      "env": {
+        "SENTRY_ALLOW_FAILURE": "true"
+      }
+    },
+    "review": {
+      "distribution": "store",
+      "ios": {
+        "credentialsSource": "remote",
+        "autoIncrement": "buildNumber",
+        "resourceClass": "m-medium"
+      },
+      "env": {
+        "EXPO_PUBLIC_APP_STORE_REVIEW": "1",
+        "SENTRY_ALLOW_FAILURE": "true"
+      }
+    },
+    "founder-demo": {
+      "distribution": "internal",
+      "ios": {
+        "credentialsSource": "remote",
+        "resourceClass": "m-medium"
+      },
+      "env": {
+        "EXPO_PUBLIC_FOUNDER_DEMO": "1",
+        "SENTRY_ALLOW_FAILURE": "true"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascAppId": "6757295146",
+        "ascApiKeyId": "X6A8MMACDZ",
+        "ascApiKeyIssuerId": "a6c8bd6a-8f60-4aed-a0a6-d129cb2aaf7a",
+        "ascApiKeyPath": "./keys/AuthKey_X6A8MMACDZ.p8",
+        "appleTeamId": "2KM3QL4UMV"
+      }
+    }
+  }
+}

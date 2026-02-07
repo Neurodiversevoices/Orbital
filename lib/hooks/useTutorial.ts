@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { IS_REVIEW_MODE } from '../reviewMode';
 
 // Storage keys
 const TUTORIAL_SEEN_KEY = 'orbital:tutorialSeen:v1';
@@ -37,6 +38,16 @@ export function useTutorial(): TutorialState {
 
   const loadState = async () => {
     try {
+      // In review mode, auto-dismiss tutorial to prevent interrupting reviewers.
+      // This does not unlock any features — only skips the onboarding walkthrough.
+      if (IS_REVIEW_MODE) {
+        await AsyncStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
+        setHasSeenTutorial(true);
+        setHasLoggedFirstSignal(false);
+        setIsLoading(false);
+        return;
+      }
+
       const [tutorialSeen, firstSignal] = await Promise.all([
         AsyncStorage.getItem(TUTORIAL_SEEN_KEY),
         AsyncStorage.getItem(FIRST_SIGNAL_KEY),

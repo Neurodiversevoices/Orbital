@@ -2,6 +2,7 @@
   "expo": {
     "name": "Orbital",
     "slug": "orbital",
+    "owner": "orbital-health",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,7 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "38",
+      "buildNumber": "39",
       "appleTeamId": "2KM3QL4UMV",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -58,7 +59,10 @@
       ]
     ],
     "extra": {
-      "router": {}
+      "router": {},
+      "eas": {
+        "projectId": "60d17137-74cc-4a95-a1d5-bd0692cf1e2a"
+      }
     }
   }
 }

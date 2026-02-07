@@ -22,6 +22,8 @@ interface TimeRangeTabsProps {
   isPro?: boolean;
   /** Whether user has used app for 30+ days (eligible for tease) */
   hasUsedAppFor30Days?: boolean;
+  /** When true, bypasses Pro gating (for demo/screenshot mode) */
+  isDemoMode?: boolean;
 }
 
 const ranges: { key: TimeRange; label: string; requiredLogs: number }[] = [
@@ -113,6 +115,7 @@ export function TimeRangeTabs({
   logCount = 0,
   isPro = false,
   hasUsedAppFor30Days = false,
+  isDemoMode = false,
 }: TimeRangeTabsProps) {
   return (
     <View style={styles.container}>
@@ -122,8 +125,9 @@ export function TimeRangeTabs({
 
           // 7d is always available based on log count (no Pro gating)
           // 30d+ requires Pro for full access, or shows tease for eligible Free users
+          // Demo mode bypasses Pro gating entirely
           const isExtendedRange = range.key !== '7d';
-          const isProGated = isExtendedRange && !isPro;
+          const isProGated = isExtendedRange && !isPro && !isDemoMode;
 
           // Locked: not enough logs AND (not pro-gated OR not eligible for tease)
           // Tease: enough logs, pro-gated, but user has 30+ days tenure

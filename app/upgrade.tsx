@@ -75,6 +75,7 @@ import {
   type UserEntitlements,
 } from '../lib/entitlements';
 import { useAuth } from '../lib/supabase';
+import { IS_REVIEW_MODE } from '../lib/reviewMode';
 
 // =============================================================================
 // PURCHASE HANDLER (Mock Checkout)
@@ -493,6 +494,14 @@ export default function UpgradeScreen() {
         {/* CHOOSE YOUR PLAN — All options visible and equal */}
         {/* =============================================================== */}
         <Text style={styles.plansHeader}>Choose Your Plan</Text>
+
+        {IS_REVIEW_MODE && (
+          <View style={styles.reviewHint}>
+            <Text style={styles.reviewHintText}>
+              Tap a plan to test the purchase flow. Subscriptions complete instantly in the sandbox environment.
+            </Text>
+          </View>
+        )}
 
         {/* FREE */}
         <Animated.View entering={FadeInDown.delay(50).duration(400)}>
@@ -1642,6 +1651,19 @@ const styles = StyleSheet.create({
   restoreButtonText: {
     fontSize: 13,
     color: 'rgba(255,255,255,0.5)',
+  },
+  reviewHint: {
+    backgroundColor: 'rgba(0,229,255,0.06)',
+    borderRadius: borderRadius.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  reviewHintText: {
+    fontSize: 12,
+    color: 'rgba(0,229,255,0.7)',
+    textAlign: 'center',
+    lineHeight: 16,
   },
   stubNotice: {
     backgroundColor: 'rgba(255,152,0,0.1)',
