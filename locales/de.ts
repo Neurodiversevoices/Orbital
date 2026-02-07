@@ -427,6 +427,8 @@ export const de = {
     guidedSetupDesc: 'Hilfe bei der App-Einrichtung erhalten',
     guidedSetupCompleted: 'Einrichtung abgeschlossen',
     startSetup: 'Einrichtung Starten',
+    simpleMode: 'Einfacher Modus',
+    simpleModeDesc: 'Maximale Barrierefreiheit mit einem Tippen',
     simplified: {
       home: { title: 'Wie geht es Ihnen?', adjustPrompt: 'Schieberegler bewegen', spectrum: { high: 'GUT', low: 'NIEDRIG' } },
       states: { resourced: 'Gut', stretched: 'OK', depleted: 'Niedrig' },

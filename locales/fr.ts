@@ -427,6 +427,8 @@ export const fr = {
     guidedSetupDesc: "Obtenir de l'aide pour configurer l'application",
     guidedSetupCompleted: 'Configuration terminée',
     startSetup: 'Démarrer la Configuration',
+    simpleMode: 'Mode Simple',
+    simpleModeDesc: 'Accessibilité maximale en un seul geste',
     simplified: {
       home: { title: 'Comment allez-vous?', adjustPrompt: 'Déplacez le curseur', spectrum: { high: 'BIEN', low: 'BAS' } },
       states: { resourced: 'Bien', stretched: 'OK', depleted: 'Bas' },

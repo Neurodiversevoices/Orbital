@@ -427,6 +427,8 @@ export const ptBR = {
     guidedSetupDesc: 'Obter ajuda para configurar o aplicativo',
     guidedSetupCompleted: 'Configuração concluída',
     startSetup: 'Iniciar Configuração',
+    simpleMode: 'Modo Simples',
+    simpleModeDesc: 'Acessibilidade máxima com um toque',
     simplified: {
       home: { title: 'Como você está?', adjustPrompt: 'Mova o controle', spectrum: { high: 'BEM', low: 'BAIXO' } },
       states: { resourced: 'Bem', stretched: 'OK', depleted: 'Baixo' },

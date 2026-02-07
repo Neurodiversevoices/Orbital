@@ -427,6 +427,8 @@ export const ja = {
     guidedSetupDesc: 'アプリの設定をサポート',
     guidedSetupCompleted: 'セットアップ完了',
     startSetup: 'セットアップを開始',
+    simpleMode: 'シンプルモード',
+    simpleModeDesc: 'ワンタップで最大限のアクセシビリティ',
     simplified: {
       home: { title: '調子はどう？', adjustPrompt: 'スライダーを動かす', spectrum: { high: '良い', low: '低い' } },
       states: { resourced: '良い', stretched: 'まあまあ', depleted: '低い' },
