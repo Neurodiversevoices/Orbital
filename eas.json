@@ -15,6 +15,18 @@
         "SENTRY_ALLOW_FAILURE": "true"
       }
     },
+    "review": {
+      "distribution": "store",
+      "ios": {
+        "credentialsSource": "remote",
+        "autoIncrement": "buildNumber",
+        "resourceClass": "m-medium"
+      },
+      "env": {
+        "EXPO_PUBLIC_APP_STORE_REVIEW": "1",
+        "SENTRY_ALLOW_FAILURE": "true"
+      }
+    },
     "founder-demo": {
       "distribution": "internal",
       "ios": {
