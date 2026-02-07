@@ -467,6 +467,10 @@ export const es = {
     guidedSetupCompleted: 'Configuración completada',
     startSetup: 'Iniciar Configuración',
 
+    // Simple Mode
+    simpleMode: 'Modo Simple',
+    simpleModeDesc: 'Accesibilidad máxima con un solo toque',
+
     // Simplified text variants
     simplified: {
       home: {

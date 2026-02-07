@@ -462,6 +462,10 @@ export const en = {
     guidedSetupCompleted: 'Setup completed',
     startSetup: 'Start Setup',
 
+    // Simple Mode
+    simpleMode: 'Simple Mode',
+    simpleModeDesc: 'Maximum accessibility with one tap',
+
     // Simplified text variants
     simplified: {
       home: {
