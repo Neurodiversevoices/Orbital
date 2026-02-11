@@ -121,5 +121,12 @@ export async function isSupabaseReachable(): Promise<boolean> {
 // CONVENIENCE EXPORTS
 // =============================================================================
 
-export const supabase = getSupabase();
+// Lazy getter — client is only created on first property access.
+// CRITICAL: Do NOT call getSupabase() eagerly at module scope.
+// That blocks the main thread on cold start and triggers iOS watchdog kills.
+export const supabase: SupabaseClient<Database> = new Proxy({} as SupabaseClient<Database>, {
+  get(_target, prop, receiver) {
+    return Reflect.get(getSupabase(), prop, receiver);
+  },
+});
 export type { SupabaseClient };
