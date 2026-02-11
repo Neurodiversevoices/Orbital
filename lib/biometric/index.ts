@@ -8,6 +8,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
+import * as Sentry from '@sentry/react-native';
 
 // =============================================================================
 // TYPES
@@ -330,13 +331,19 @@ export function useBiometric(): UseBiometricResult {
 
   const refresh = useCallback(async () => {
     setIsLoading(true);
-    const [newStatus, newSettings] = await Promise.all([
-      getBiometricStatus(),
-      loadBiometricSettings(),
-    ]);
-    setStatus(newStatus);
-    setSettings(newSettings);
-    setIsLoading(false);
+    try {
+      const [newStatus, newSettings] = await Promise.all([
+        getBiometricStatus(),
+        loadBiometricSettings(),
+      ]);
+      setStatus(newStatus);
+      setSettings(newSettings);
+    } catch (error) {
+      Sentry.captureException(error, { tags: { hook: 'useBiometric', op: 'refresh' } });
+      if (__DEV__) console.error('[Biometric] Refresh failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
