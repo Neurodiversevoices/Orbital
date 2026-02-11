@@ -158,10 +158,14 @@ export async function exitSafeMode(): Promise<void> {
     lastCrashTime: null,
   };
 
-  await Promise.all([
-    AsyncStorage.removeItem(SAFE_MODE_KEY),
-    AsyncStorage.setItem(CRASH_COUNT_KEY, '0'),
-  ]);
+  try {
+    await Promise.all([
+      AsyncStorage.removeItem(SAFE_MODE_KEY),
+      AsyncStorage.setItem(CRASH_COUNT_KEY, '0'),
+    ]);
+  } catch (error) {
+    Sentry.captureException(error, { tags: { feature: 'safe_mode', op: 'exit' } });
+  }
 
   Sentry.captureMessage('Safe Mode manually exited', {
     level: 'info',

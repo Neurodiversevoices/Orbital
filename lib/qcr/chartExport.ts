@@ -12,6 +12,9 @@
 
 import { CapacityLog, CapacityState } from '../../types';
 
+// Hard cap for PDF/CCI SVG exports (rendering stability + memory safety)
+const MAX_PDF_CHART_POINTS = 45;
+
 // =============================================================================
 // CONSTANTS - Match EnergyGraph.tsx exactly
 // =============================================================================
@@ -162,9 +165,12 @@ export function generateChartSVG(
     }
   });
 
-  // Convert to points
+  // Convert to points — cap to MAX_PDF_CHART_POINTS for PDF rendering stability
   const numBuckets = Math.ceil(rangeMs / bucketSize);
-  const sortedIndices = Array.from(buckets.keys()).sort((a, b) => a - b);
+  const allIndices = Array.from(buckets.keys()).sort((a, b) => a - b);
+  const sortedIndices = allIndices.length > MAX_PDF_CHART_POINTS
+    ? Array.from({ length: MAX_PDF_CHART_POINTS }, (_, i) => allIndices[Math.floor(i * allIndices.length / MAX_PDF_CHART_POINTS)])
+    : allIndices;
 
   const points: ChartPoint[] = sortedIndices.map((bucketIndex) => {
     const bucket = buckets.get(bucketIndex)!;

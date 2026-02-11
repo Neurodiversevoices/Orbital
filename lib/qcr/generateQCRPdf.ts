@@ -56,11 +56,15 @@ const MULTI_PERSON_STATEMENT = `
  * 4. Sharing.shareAsync() → share dialog
  */
 export async function exportQCRToPdf(report: QuarterlyCapacityReport): Promise<boolean> {
+  const pdfStart = Date.now();
   Sentry.addBreadcrumb({
     category: 'qcr',
-    message: `PDF export started: ${report.period.quarterId}`,
+    message: 'pdf_export_started',
     level: 'info',
-    data: { dataPoints: report.chartData.dailyCapacity.length },
+    data: {
+      points_in: report.chartData.dailyCapacity.length,
+      weekly_points: report.chartData.weeklyMeans.length,
+    },
   });
 
   try {
@@ -79,6 +83,13 @@ export async function exportQCRToPdf(report: QuarterlyCapacityReport): Promise<b
     await FileSystem.moveAsync({
       from: uri,
       to: newUri,
+    });
+
+    Sentry.addBreadcrumb({
+      category: 'qcr',
+      message: 'pdf_export_complete',
+      level: 'info',
+      data: { elapsed_ms: Date.now() - pdfStart },
     });
 
     // Share the PDF
@@ -1283,6 +1294,7 @@ function generateDailyCapacitySvg(report: QuarterlyCapacityReport): string {
   const data = report.chartData.dailyCapacity;
   if (data.length === 0) return '<p class="no-data">Insufficient data</p>';
 
+  const svgStart = Date.now();
   const width = 700;
   const height = 180;
   const padding = { left: 40, right: 20, top: 20, bottom: 30 };
@@ -1293,6 +1305,18 @@ function generateDailyCapacitySvg(report: QuarterlyCapacityReport): string {
   const sorted = [...data].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   const MAX_POINTS = 45;
   const downsampled = sorted.length <= MAX_POINTS ? sorted : downsampleCapacity(sorted, MAX_POINTS);
+
+  // Dev-only assert: PDF charts must never exceed 45 points
+  if (__DEV__ && downsampled.length > MAX_POINTS) {
+    console.error(`[QCR PDF] ASSERT FAIL: daily capacity has ${downsampled.length} points (max ${MAX_POINTS})`);
+  }
+
+  Sentry.addBreadcrumb({
+    category: 'qcr.pdf',
+    message: 'daily_capacity_svg',
+    level: 'info',
+    data: { points_in: data.length, points_out: downsampled.length, elapsed_ms: Date.now() - svgStart },
+  });
 
   const xMin = new Date(downsampled[0].date).getTime();
   const xMax = new Date(downsampled[downsampled.length - 1].date).getTime();
@@ -1336,6 +1360,13 @@ function generateDailyCapacitySvg(report: QuarterlyCapacityReport): string {
 function generateWeeklyMeanSvg(report: QuarterlyCapacityReport): string {
   const data = report.chartData.weeklyMeans;
   if (data.length === 0) return '<p class="no-data">Insufficient data</p>';
+
+  Sentry.addBreadcrumb({
+    category: 'qcr.pdf',
+    message: 'weekly_mean_svg',
+    level: 'info',
+    data: { points_in: data.length, points_out: Math.min(data.length, 45) },
+  });
 
   const width = 700;
   const height = 160;

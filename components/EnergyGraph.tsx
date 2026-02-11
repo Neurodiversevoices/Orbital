@@ -11,6 +11,7 @@ import Svg, {
   Text as SvgText,
   Rect,
 } from 'react-native-svg';
+import * as Sentry from '@sentry/react-native';
 import { CapacityLog, CapacityState } from '../types';
 import { colors, spacing } from '../theme';
 import { TimeRange, getTimeRangeMs } from './TimeRangeTabs';
@@ -152,6 +153,13 @@ export function EnergyGraph({ logs, width, timeRange, startDate, endDate }: Capa
     const sortedIndices = allIndices.length > 60
       ? Array.from({ length: 60 }, (_, i) => allIndices[Math.floor(i * allIndices.length / 60)])
       : allIndices;
+
+    Sentry.addBreadcrumb({
+      category: 'chart',
+      message: 'energy_graph_render',
+      level: 'info',
+      data: { points_in: allIndices.length, points_out: sortedIndices.length },
+    });
 
     sortedIndices.forEach((bucketIndex) => {
       const bucket = buckets.get(bucketIndex)!;

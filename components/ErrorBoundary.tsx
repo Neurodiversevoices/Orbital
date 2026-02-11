@@ -1,7 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import * as Sentry from '@sentry/react-native';
 import { colors, spacing } from '../theme';
-import { reportComponentError } from '../lib/crashReporter';
 
 interface Props {
   children: ReactNode;
@@ -25,9 +25,14 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Report to crash logging
-    reportComponentError(error, this.props.name || 'Unknown', {
-      componentStack: errorInfo.componentStack || undefined,
+    const screenName = this.props.name || 'Unknown';
+    Sentry.withScope((scope) => {
+      scope.setTag('screen', screenName);
+      scope.setTag('feature', 'error_boundary');
+      if (errorInfo.componentStack) {
+        scope.setExtra('componentStack', errorInfo.componentStack);
+      }
+      Sentry.captureException(error);
     });
   }
 

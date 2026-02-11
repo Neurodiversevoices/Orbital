@@ -129,24 +129,57 @@ Sentry.init({
 Sentry.addBreadcrumb({ category: 'startup', message: 'startup:sentry_init_done', data: { ms: Date.now() - STARTUP_TS } });
 
 // =============================================================================
-// GLOBAL UNHANDLED REJECTION HANDLER
+// GLOBAL UNHANDLED REJECTION HANDLER (WITH DEDUP)
 // =============================================================================
-// Catches promise rejections that escape try/catch boundaries.
-// Sentry SDK handles some of these, but this is a safety net for Hermes engine.
+// Safety net for Hermes engine promise rejections. De-duplicates against
+// Sentry's internal handler using a 2-second fingerprint cache.
 // =============================================================================
+const _recentRejections = new Set<string>();
+
+function _rejectionFingerprint(reason: unknown): string {
+  if (reason instanceof Error) {
+    return `${reason.name}:${reason.message?.substring(0, 100)}`;
+  }
+  return String(reason).substring(0, 100);
+}
+
 if (typeof global !== 'undefined') {
   // @ts-ignore — React Native global event (Hermes engine)
   const prevHandler = global.onunhandledrejection;
   // @ts-ignore
   global.onunhandledrejection = (event: { reason: unknown }) => {
     const error = event?.reason;
+    if (error === undefined || error === null) {
+      // @ts-ignore
+      prevHandler?.(event);
+      return;
+    }
+
+    // Dedup: skip if we've seen this fingerprint in the last 2 seconds
+    const fp = _rejectionFingerprint(error);
+    if (_recentRejections.has(fp)) {
+      // @ts-ignore
+      prevHandler?.(event);
+      return;
+    }
+    _recentRejections.add(fp);
+    setTimeout(() => _recentRejections.delete(fp), 2000);
+
     if (error instanceof Error) {
-      Sentry.captureException(error, { tags: { type: 'unhandled_rejection' } });
-    } else if (error !== undefined && error !== null) {
+      Sentry.captureException(error, { tags: { type: 'unhandled_rejection', source: 'global_onunhandledrejection' } });
+    } else {
       Sentry.captureMessage(`Unhandled rejection: ${String(error).substring(0, 200)}`, 'error');
     }
     // @ts-ignore
     prevHandler?.(event);
+  };
+}
+
+// DEV-only smoke test for unhandled rejection handler
+if (__DEV__) {
+  // @ts-ignore — test function only available in development
+  global.__testUnhandledRejection = () => {
+    Promise.reject(new Error('[DEV] Smoke test: unhandled rejection'));
   };
 }
 
