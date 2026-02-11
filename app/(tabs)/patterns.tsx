@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useMemo, useEffect } from 'react';
 import { View, StyleSheet, FlatList, RefreshControl, useWindowDimensions, Text, Platform, Pressable, Modal } from 'react-native';
+import * as Sentry from '@sentry/react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Circle, Eye, ListTodo, Users, TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Calendar, Clock, Lock, Bug, RefreshCw, Award, FileText, Database } from 'lucide-react-native';
@@ -395,6 +396,13 @@ export default function PatternsScreen() {
     const currentLogs = logs.filter((log) => log.timestamp >= startTime);
     // Previous period logs (for trend comparison)
     const prevLogs = logs.filter((log) => log.timestamp >= prevStartTime && log.timestamp < startTime);
+
+    // Memory evidence breadcrumb — correlate data size with any OOM
+    Sentry.addBreadcrumb({
+      category: 'patterns.render',
+      message: `window=${timeRange} total=${logs.length} visible=${currentLogs.length}`,
+      level: 'info',
+    });
 
     if (currentLogs.length === 0) {
       return { avg: null, trend: null, timeInDepleted: null };

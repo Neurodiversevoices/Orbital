@@ -1,9 +1,9 @@
 import 'react-native-gesture-handler';
 
-import React, { useEffect, useCallback, useState } from 'react';
-import { Stack, useRouter } from 'expo-router';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
+import { Stack, useRouter, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, StyleSheet, Modal, Pressable, Platform } from 'react-native';
+import { View, Text, StyleSheet, Modal, Pressable, Platform, AppState, AppStateStatus } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Sentry from '@sentry/react-native';
 import * as Linking from 'expo-linking';
@@ -79,25 +79,72 @@ Sentry.init({
       return null; // Discard - do not send to Sentry
     }
 
-    // PII SCRUBBER: Strip emails and phone numbers from error messages
+    // ---- PII SCRUBBER (defense-in-depth: regex + structural stripping) ----
+
+    // 1. Strip emails and phone numbers from text fields
     const emailRegex = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
     const phoneRegex = /\b\d{3}[\s.\-]?\d{3}[\s.\-]?\d{4}\b/g;
+    // 2. Strip JWTs (Supabase access tokens, RevenueCat auth)
+    const jwtRegex = /eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g;
+    // 3. Strip bearer tokens
+    const bearerRegex = /Bearer\s+[A-Za-z0-9._~+/\-]+=*/gi;
+    // 4. Strip Apple/Google receipt data (base64 blobs > 40 chars)
+    const receiptRegex = /[A-Za-z0-9+/]{40,}={0,2}/g;
+
+    function scrubText(text: string): string {
+      return text
+        .replace(jwtRegex, '[jwt]')
+        .replace(bearerRegex, 'Bearer [redacted]')
+        .replace(emailRegex, '[email]')
+        .replace(phoneRegex, '[phone]');
+    }
+
     if (event.message) {
-      event.message = event.message.replace(emailRegex, '[email]').replace(phoneRegex, '[phone]');
+      event.message = scrubText(event.message);
     }
     if (event.exception?.values) {
       for (const ex of event.exception.values) {
         if (ex.value) {
-          ex.value = ex.value.replace(emailRegex, '[email]').replace(phoneRegex, '[phone]');
+          ex.value = scrubText(ex.value);
         }
       }
     }
 
-    // Never send user email/username to Sentry (only anonymous ID)
+    // 5. Never send user PII to Sentry (only anonymous ID)
     if (event.user) {
       delete event.user.email;
       delete event.user.username;
       delete event.user.ip_address;
+    }
+
+    // 6. Strip authorization headers from request context
+    if (event.request?.headers) {
+      const h = event.request.headers as Record<string, string>;
+      if (h['Authorization'] || h['authorization']) {
+        h['Authorization'] = '[redacted]';
+        delete h['authorization'];
+      }
+      if (h['apikey'] || h['Apikey']) {
+        h['apikey'] = '[redacted]';
+        delete h['Apikey'];
+      }
+    }
+
+    // 7. Strip query params from request URLs (may contain tokens/codes)
+    if (event.request?.url) {
+      const qIdx = event.request.url.indexOf('?');
+      if (qIdx > 0) {
+        event.request.url = event.request.url.substring(0, qIdx) + '?[params_redacted]';
+      }
+    }
+
+    // 8. Scrub receipt/transaction payloads from extra context
+    if (event.extra) {
+      const extraStr = JSON.stringify(event.extra);
+      if (receiptRegex.test(extraStr)) {
+        // Receipt data found — replace the entire extra with a sanitized version
+        event.extra = { note: 'receipt/transaction data redacted' };
+      }
     }
 
     // Attach additional context for payment-related errors
@@ -121,6 +168,23 @@ Sentry.init({
     if (breadcrumb.category === 'console' && breadcrumb.level !== 'error') {
       return null;
     }
+
+    // Scrub HTTP breadcrumbs: strip query params and auth headers
+    if (breadcrumb.category === 'fetch' || breadcrumb.category === 'xhr') {
+      if (breadcrumb.data?.url) {
+        const qIdx = breadcrumb.data.url.indexOf('?');
+        if (qIdx > 0) {
+          breadcrumb.data.url = breadcrumb.data.url.substring(0, qIdx) + '?[params_redacted]';
+        }
+      }
+      // Remove any authorization/apikey from breadcrumb data
+      if (breadcrumb.data) {
+        delete breadcrumb.data['Authorization'];
+        delete breadcrumb.data['authorization'];
+        delete breadcrumb.data['apikey'];
+      }
+    }
+
     return breadcrumb;
   },
 
@@ -259,6 +323,61 @@ const idleStyles = StyleSheet.create({
 });
 
 
+// =============================================================================
+// ROUTE TRACKER — Tags every Sentry event with the current screen name
+// =============================================================================
+
+function RouteTracker() {
+  const pathname = usePathname();
+  const prevPath = useRef(pathname);
+
+  useEffect(() => {
+    // Update Sentry scope tag so every future event includes current route
+    Sentry.setTag('route', pathname);
+
+    // Breadcrumb for navigation trail
+    if (prevPath.current !== pathname) {
+      Sentry.addBreadcrumb({
+        category: 'navigation',
+        message: `${prevPath.current} → ${pathname}`,
+        level: 'info',
+      });
+      prevPath.current = pathname;
+    }
+  }, [pathname]);
+
+  return null;
+}
+
+// =============================================================================
+// APP STATE TRACKER — Breadcrumbs for foreground/background transitions
+// Correlation evidence for OOM kills (iOS terminates backgrounded apps first)
+// =============================================================================
+
+function AppStateTracker() {
+  const appState = useRef<AppStateStatus>(AppState.currentState);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (next: AppStateStatus) => {
+      Sentry.addBreadcrumb({
+        category: 'app.lifecycle',
+        message: `${appState.current} → ${next}`,
+        level: 'info',
+      });
+
+      // If returning from background, tag the event as potential OOM survivor
+      if (appState.current === 'background' && next === 'active') {
+        Sentry.setTag('app.resumed_from_background', 'true');
+      }
+
+      appState.current = next;
+    });
+    return () => sub.remove();
+  }, []);
+
+  return null;
+}
+
 function RootLayout() {
   const router = useRouter();
 
@@ -300,6 +419,8 @@ function RootLayout() {
                 <AgeGate>
                 <IdleTimeoutWrapper>
                 <StatusBar style="light" />
+                <RouteTracker />
+                <AppStateTracker />
                 <Stack
                   screenOptions={{
                     headerShown: false,

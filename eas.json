@@ -11,9 +11,7 @@
         "autoIncrement": "buildNumber",
         "resourceClass": "m-medium"
       },
-      "env": {
-        "SENTRY_ALLOW_FAILURE": "true"
-      }
+      "env": {}
     },
     "review": {
       "distribution": "store",
@@ -23,8 +21,7 @@
         "resourceClass": "m-medium"
       },
       "env": {
-        "EXPO_PUBLIC_APP_STORE_REVIEW": "1",
-        "SENTRY_ALLOW_FAILURE": "true"
+        "EXPO_PUBLIC_APP_STORE_REVIEW": "1"
       }
     },
     "founder-demo": {

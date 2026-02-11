@@ -223,7 +223,37 @@ async function main() {
   );
   if (!legacyIdsPassed) allPassed = false;
 
-  // Step 5: Security Audit
+  // Step 5: Dev-Only Sentry Test Leak Check (CRITICAL — cannot ship to review/prod)
+  const sentryTestPassed = await runCommand(
+    'Sentry Smoke Test Guard',
+    'node',
+    ['-e', `
+      const { execSync } = require('child_process');
+      // Find all call-sites of __DEV_testSentryAlerts (excluding its definition/export)
+      const out = execSync(
+        'grep -rn "__DEV_testSentryAlerts" --include="*.ts" --include="*.tsx" app/ components/ ' +
+        '| grep -v "node_modules" || true',
+        { encoding: 'utf-8' }
+      ).trim();
+      if (!out) { console.log('  No call-sites found in app/components — OK'); process.exit(0); }
+      // Every call-site must be preceded by __DEV__ guard on the same or nearby line
+      const lines = out.split('\\n').filter(Boolean);
+      let unsafe = false;
+      for (const line of lines) {
+        // Accept: import lines (they just load the symbol, don't execute)
+        if (line.includes('import ')) continue;
+        // Accept: lines that also contain __DEV__
+        if (line.includes('__DEV__')) continue;
+        console.error('FAIL: __DEV_testSentryAlerts called without __DEV__ guard:');
+        console.error('  ' + line);
+        unsafe = true;
+      }
+      process.exit(unsafe ? 1 : 0);
+    `],
+  );
+  if (!sentryTestPassed) allPassed = false;
+
+  // Step 6: Security Audit
   const auditPassed = await runAudit();
   if (!auditPassed) allPassed = false;
 
