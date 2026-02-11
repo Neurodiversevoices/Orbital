@@ -32,6 +32,7 @@ import {
   TrendingUp,
   Phone,
   Activity,
+  Bug,
 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, commonStyles, spacing, borderRadius } from '../theme';
@@ -48,6 +49,7 @@ import { ProprietaryFooter } from '../components/legal';
 import { APP_MODE_CONFIGS } from '../types';
 import { ModeSelector } from '../components';
 import { getUserEntitlements, type UserEntitlements } from '../lib/entitlements';
+import { __DEV_testSentryAlerts } from '../lib/observability';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -236,6 +238,21 @@ export default function SettingsScreen() {
               onPress={() => router.push('/operator-admin')}
               disabled={isProcessing}
             />
+
+            {/* Sentry Smoke Test — DEV-ONLY */}
+            {__DEV__ && (
+              <SettingsRow
+                icon={Bug}
+                label="Sentry Smoke Test"
+                sublabel="Send test exception + payment alert to Sentry"
+                onPress={() => {
+                  __DEV_testSentryAlerts();
+                  Alert.alert('Sentry Test', 'Test events sent. Check Sentry dashboard.');
+                }}
+                disabled={isProcessing}
+                highlight
+              />
+            )}
 
             {/* FREE USER VIEW Active Banner */}
             {freeUserViewActive && (

@@ -22,14 +22,14 @@ export function PurchaseDebugPanel() {
   const { isAvailable, isPro, status, isLoading, error } = useSubscription();
   const [lastPurchaseStatus, setLastPurchaseStatus] = useState<string>('none');
 
-  // Only render in review mode
-  if (!IS_REVIEW_MODE) return null;
-
-  // Track purchase events via console (non-invasive)
+  // Track purchase events (must be BEFORE any conditional return — React hooks rule)
   useEffect(() => {
     if (isPro) setLastPurchaseStatus('subscribed');
     else if (error) setLastPurchaseStatus(`error: ${error}`);
   }, [isPro, error]);
+
+  // Only render in review mode (AFTER all hooks)
+  if (!IS_REVIEW_MODE) return null;
 
   const storeReady = !isLoading && isAvailable;
   const storeBlocked = !isLoading && !isAvailable;

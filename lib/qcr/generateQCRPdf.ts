@@ -12,6 +12,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system';
 import { Platform } from 'react-native';
+import * as Sentry from '@sentry/react-native';
 import { QuarterlyCapacityReport, getQuarterLabel } from './types';
 
 // Methodology statement (institutional compliance)
@@ -55,6 +56,13 @@ const MULTI_PERSON_STATEMENT = `
  * 4. Sharing.shareAsync() → share dialog
  */
 export async function exportQCRToPdf(report: QuarterlyCapacityReport): Promise<boolean> {
+  Sentry.addBreadcrumb({
+    category: 'qcr',
+    message: `PDF export started: ${report.period.quarterId}`,
+    level: 'info',
+    data: { dataPoints: report.chartData.dailyCapacity.length },
+  });
+
   try {
     const html = generateQCRHtml(report);
 
@@ -90,6 +98,19 @@ export async function exportQCRToPdf(report: QuarterlyCapacityReport): Promise<b
     }
   } catch (error) {
     if (__DEV__) console.error('[QCR PDF] Export failed:', error);
+
+    // Capture PDF failure to Sentry — critical for App Review diagnostics
+    Sentry.withScope((scope) => {
+      scope.setTag('feature', 'qcr_pdf');
+      scope.setTag('qcr.quarter', report.period.quarterId);
+      scope.setLevel('error');
+      scope.setExtra('report_id', report.id);
+      scope.setExtra('data_points', report.chartData.dailyCapacity.length);
+      Sentry.captureException(
+        error instanceof Error ? error : new Error(`[QCR PDF] Export failed: ${String(error)}`)
+      );
+    });
+
     return false;
   }
 }

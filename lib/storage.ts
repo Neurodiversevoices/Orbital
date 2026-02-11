@@ -26,6 +26,7 @@ import {
   onAllLogsCleared,
 } from './patternHistory';
 import { syncWidgetOnLog } from './hooks/useWidgetSync';
+import { crashReporter } from './crashReporter';
 
 // Centralized storage keys
 export const STORAGE_KEYS = {
@@ -68,6 +69,19 @@ export const STORAGE_KEYS = {
 
 const LOGS_KEY = STORAGE_KEYS.LOGS;
 
+/**
+ * Safe JSON.parse — returns fallback on corrupted data instead of crashing.
+ * AsyncStorage can return malformed strings after partial writes or storage corruption.
+ */
+function safeJsonParse<T>(raw: string, fallback: T): T {
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    if (__DEV__) console.warn('[storage] JSON.parse failed, returning fallback');
+    return fallback;
+  }
+}
+
 // Migrate old state names to new ones
 function migrateState(state: string): CapacityState {
   switch (state) {
@@ -79,6 +93,7 @@ function migrateState(state: string): CapacityState {
 }
 
 export async function savelog(log: CapacityLog): Promise<void> {
+  crashReporter.addBreadcrumb(`Log saved: ${log.state}`, 'storage');
   const logs = await getLogs();
   logs.unshift(log); // Add to beginning (newest first)
   await AsyncStorage.setItem(LOGS_KEY, JSON.stringify(logs));
@@ -93,7 +108,7 @@ export async function savelog(log: CapacityLog): Promise<void> {
 export async function getLogs(): Promise<CapacityLog[]> {
   const data = await AsyncStorage.getItem(LOGS_KEY);
   if (!data) return [];
-  const logs = JSON.parse(data) as CapacityLog[];
+  const logs = safeJsonParse<CapacityLog[]>(data, []);
   // Migrate any old state names
   return logs.map(log => ({
     ...log,
@@ -154,7 +169,7 @@ const DEFAULT_PREFERENCES: OrbitalPreferences = {
 export async function getPreferences(): Promise<OrbitalPreferences> {
   const data = await AsyncStorage.getItem(STORAGE_KEYS.PREFERENCES);
   if (!data) return DEFAULT_PREFERENCES;
-  return { ...DEFAULT_PREFERENCES, ...JSON.parse(data) };
+  return { ...DEFAULT_PREFERENCES, ...safeJsonParse(data, {}) };
 }
 
 export async function savePreferences(prefs: Partial<OrbitalPreferences>): Promise<void> {
@@ -170,7 +185,7 @@ export async function savePreferences(prefs: Partial<OrbitalPreferences>): Promi
 export async function getRecipients(): Promise<ShareRecipient[]> {
   const data = await AsyncStorage.getItem(STORAGE_KEYS.RECIPIENTS);
   if (!data) return [];
-  return JSON.parse(data);
+  return safeJsonParse<ShareRecipient[]>(data, []);
 }
 
 export async function saveRecipient(recipient: ShareRecipient): Promise<void> {
@@ -192,7 +207,7 @@ export async function deleteRecipient(id: string): Promise<void> {
 export async function getShares(): Promise<ShareConfig[]> {
   const data = await AsyncStorage.getItem(STORAGE_KEYS.SHARES);
   if (!data) return [];
-  return JSON.parse(data);
+  return safeJsonParse<ShareConfig[]>(data, []);
 }
 
 export async function getActiveShares(): Promise<ShareConfig[]> {
@@ -229,7 +244,7 @@ const MAX_AUDIT_ENTRIES = 50;
 export async function getAuditLog(): Promise<AuditEntry[]> {
   const data = await AsyncStorage.getItem(STORAGE_KEYS.AUDIT_LOG);
   if (!data) return [];
-  return JSON.parse(data);
+  return safeJsonParse<AuditEntry[]>(data, []);
 }
 
 export async function logAuditEntry(
@@ -282,7 +297,7 @@ const DEFAULT_INSTITUTIONAL_CONFIG: InstitutionalConfig = {
 export async function getInstitutionalConfig(): Promise<InstitutionalConfig> {
   const data = await AsyncStorage.getItem(STORAGE_KEYS.INSTITUTIONAL_CONFIG);
   if (!data) return DEFAULT_INSTITUTIONAL_CONFIG;
-  return { ...DEFAULT_INSTITUTIONAL_CONFIG, ...JSON.parse(data) };
+  return { ...DEFAULT_INSTITUTIONAL_CONFIG, ...safeJsonParse(data, {}) };
 }
 
 export async function saveInstitutionalConfig(config: Partial<InstitutionalConfig>): Promise<void> {
@@ -349,13 +364,13 @@ export function isEnterpriseMode(config: InstitutionalConfig): boolean {
 export async function getVaultMetadata(): Promise<HistoryVaultMetadata | null> {
   const data = await AsyncStorage.getItem(STORAGE_KEYS.VAULT_METADATA);
   if (!data) return null;
-  return JSON.parse(data);
+  return safeJsonParse<HistoryVaultMetadata | null>(data, null);
 }
 
 export async function getVaultedLogs(yearMonth?: string): Promise<VaultedCapacityLog[]> {
   const data = await AsyncStorage.getItem(STORAGE_KEYS.HISTORY_VAULT);
   if (!data) return [];
-  const logs: VaultedCapacityLog[] = JSON.parse(data);
+  const logs: VaultedCapacityLog[] = safeJsonParse<VaultedCapacityLog[]>(data, []);
   if (yearMonth) {
     return logs.filter((log) => log._yearMonth === yearMonth);
   }
@@ -453,7 +468,7 @@ const DEFAULT_SENSORY_CONFIG: SensoryAlertConfig = {
 export async function getSensoryConfig(): Promise<SensoryAlertConfig> {
   const data = await AsyncStorage.getItem(STORAGE_KEYS.SENSORY_CONFIG);
   if (!data) return DEFAULT_SENSORY_CONFIG;
-  return { ...DEFAULT_SENSORY_CONFIG, ...JSON.parse(data) };
+  return { ...DEFAULT_SENSORY_CONFIG, ...safeJsonParse(data, {}) };
 }
 
 export async function saveSensoryConfig(config: Partial<SensoryAlertConfig>): Promise<void> {
@@ -465,7 +480,7 @@ export async function saveSensoryConfig(config: Partial<SensoryAlertConfig>): Pr
 export async function getSensoryEvents(limit: number = 50): Promise<SensoryAlertEvent[]> {
   const data = await AsyncStorage.getItem(STORAGE_KEYS.SENSORY_EVENTS);
   if (!data) return [];
-  const events: SensoryAlertEvent[] = JSON.parse(data);
+  const events: SensoryAlertEvent[] = safeJsonParse<SensoryAlertEvent[]>(data, []);
   return events.slice(0, limit);
 }
 
@@ -497,7 +512,7 @@ export async function acknowledgeSensoryEvent(eventId: string): Promise<void> {
 export async function getTermsAcceptanceRecord(): Promise<TermsAcceptanceRecord | null> {
   const data = await AsyncStorage.getItem(STORAGE_KEYS.TERMS_ACCEPTANCE);
   if (!data) return null;
-  return JSON.parse(data);
+  return safeJsonParse<TermsAcceptanceRecord | null>(data, null);
 }
 
 export async function hasAcceptedCurrentTerms(): Promise<boolean> {
@@ -569,7 +584,7 @@ const DEFAULT_TEAM_MODE_SETTINGS: TeamModeSettings = {
 export async function getTeamModeSettings(): Promise<TeamModeSettings> {
   const data = await AsyncStorage.getItem(STORAGE_KEYS.TEAM_MODE_SETTINGS);
   if (!data) return DEFAULT_TEAM_MODE_SETTINGS;
-  return { ...DEFAULT_TEAM_MODE_SETTINGS, ...JSON.parse(data) };
+  return { ...DEFAULT_TEAM_MODE_SETTINGS, ...safeJsonParse(data, {}) };
 }
 
 export async function saveTeamModeSettings(settings: Partial<TeamModeSettings>): Promise<void> {
@@ -581,7 +596,7 @@ export async function saveTeamModeSettings(settings: Partial<TeamModeSettings>):
 export async function getTeamConfigs(): Promise<TeamConfig[]> {
   const data = await AsyncStorage.getItem(STORAGE_KEYS.TEAM_CONFIGS);
   if (!data) return [];
-  return JSON.parse(data);
+  return safeJsonParse<TeamConfig[]>(data, []);
 }
 
 export async function saveTeamConfig(config: TeamConfig): Promise<void> {
@@ -648,7 +663,7 @@ const DEFAULT_SCHOOL_ZONE_SETTINGS: SchoolZoneModeSettings = {
 export async function getSchoolZoneModeSettings(): Promise<SchoolZoneModeSettings> {
   const data = await AsyncStorage.getItem(STORAGE_KEYS.SCHOOL_ZONE_SETTINGS);
   if (!data) return DEFAULT_SCHOOL_ZONE_SETTINGS;
-  return { ...DEFAULT_SCHOOL_ZONE_SETTINGS, ...JSON.parse(data) };
+  return { ...DEFAULT_SCHOOL_ZONE_SETTINGS, ...safeJsonParse(data, {}) };
 }
 
 export async function saveSchoolZoneModeSettings(settings: Partial<SchoolZoneModeSettings>): Promise<void> {
@@ -660,7 +675,7 @@ export async function saveSchoolZoneModeSettings(settings: Partial<SchoolZoneMod
 export async function getSchoolZoneConfigs(): Promise<SchoolZoneConfig[]> {
   const data = await AsyncStorage.getItem(STORAGE_KEYS.SCHOOL_ZONE_CONFIGS);
   if (!data) return [];
-  return JSON.parse(data);
+  return safeJsonParse<SchoolZoneConfig[]>(data, []);
 }
 
 export async function saveSchoolZoneConfig(config: SchoolZoneConfig): Promise<void> {
@@ -742,7 +757,7 @@ export async function getAppModeSettings(): Promise<AppModeSettingsLocal> {
   };
   const data = await AsyncStorage.getItem(STORAGE_KEYS.APP_MODE_SETTINGS);
   if (!data) return defaultSettings;
-  return { ...defaultSettings, ...JSON.parse(data) };
+  return { ...defaultSettings, ...safeJsonParse(data, {}) };
 }
 
 export async function saveAppModeSettings(settings: Partial<AppModeSettingsLocal>): Promise<void> {

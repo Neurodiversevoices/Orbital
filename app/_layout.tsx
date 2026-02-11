@@ -3,7 +3,7 @@ import 'react-native-gesture-handler';
 import React, { useEffect, useCallback, useState } from 'react';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Modal, Pressable, Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Sentry from '@sentry/react-native';
 import * as Linking from 'expo-linking';
@@ -43,21 +43,33 @@ Sentry.init({
   // - App Store (__DEV__=false): 'production' (alerts WILL fire)
   environment: __DEV__ ? 'development' : 'production',
 
-  // Release tracking for regression detection
+  // Release + dist for proper symbolication of native crashes
   release: Constants.expoConfig?.version
     ? `orbital@${Constants.expoConfig.version}`
     : undefined,
+  dist: Constants.expoConfig?.ios?.buildNumber
+    ?? Constants.expoConfig?.android?.versionCode?.toString()
+    ?? undefined,
+
+  // PRIVACY: Never send PII (emails, IPs) to Sentry
+  sendDefaultPii: false,
+
+  // Breadcrumb cap — enough for diagnostics, not a memory hog
+  maxBreadcrumbs: 50,
 
   // Performance monitoring - modest sample rate (5%)
   // Does NOT affect error capture (errors always captured)
   tracesSampleRate: 0.05,
+
+  // Auto-instrument navigation transitions (Expo Router)
+  enableAutoPerformanceTracing: true,
 
   // Enable session tracking for crash-free rate alerts
   enableAutoSessionTracking: true,
   sessionTrackingIntervalMillis: 30000, // 30 seconds
 
   // ==========================================================================
-  // beforeSend: Filter noise BEFORE it reaches Sentry
+  // beforeSend: Filter noise + scrub PII BEFORE sending to Sentry
   // ==========================================================================
   beforeSend(event, hint) {
     // DROP: warning, info, debug levels (noise)
@@ -65,6 +77,27 @@ Sentry.init({
     const level = event.level;
     if (level === 'warning' || level === 'info' || level === 'debug' || level === 'log') {
       return null; // Discard - do not send to Sentry
+    }
+
+    // PII SCRUBBER: Strip emails and phone numbers from error messages
+    const emailRegex = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
+    const phoneRegex = /\b\d{3}[\s.\-]?\d{3}[\s.\-]?\d{4}\b/g;
+    if (event.message) {
+      event.message = event.message.replace(emailRegex, '[email]').replace(phoneRegex, '[phone]');
+    }
+    if (event.exception?.values) {
+      for (const ex of event.exception.values) {
+        if (ex.value) {
+          ex.value = ex.value.replace(emailRegex, '[email]').replace(phoneRegex, '[phone]');
+        }
+      }
+    }
+
+    // Never send user email/username to Sentry (only anonymous ID)
+    if (event.user) {
+      delete event.user.email;
+      delete event.user.username;
+      delete event.user.ip_address;
     }
 
     // Attach additional context for payment-related errors
@@ -106,15 +139,13 @@ Sentry.init({
     // React Native specific noise
     'Non-Error promise rejection captured',
   ],
-
-  // Integrations configuration
-  integrations: (integrations) => {
-    return integrations.filter((integration) => {
-      // Keep default integrations, filter if needed
-      return true;
-    });
-  },
 });
+
+// Set initial tags for all future events
+Sentry.setTag('app.platform', Platform.OS);
+Sentry.setTag('app.version', Constants.expoConfig?.version ?? 'unknown');
+Sentry.setTag('app.build', Constants.expoConfig?.ios?.buildNumber ?? 'unknown');
+Sentry.setTag('app.review_mode', String(process.env.EXPO_PUBLIC_APP_STORE_REVIEW === '1'));
 
 
 // =============================================================================

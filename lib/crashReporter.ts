@@ -43,6 +43,35 @@ class CrashReporter {
       // Ignore
     }
   }
+
+  /**
+   * Set persistent tags on all future Sentry events.
+   * Call this when app mode or user context changes.
+   */
+  setGlobalTags(tags: Record<string, string>) {
+    try {
+      for (const [key, value] of Object.entries(tags)) {
+        Sentry.setTag(key, value);
+      }
+    } catch {
+      // Ignore
+    }
+  }
+
+  /**
+   * Set anonymous user context (ID only — never email/name).
+   */
+  setUserScope(userId: string | null) {
+    try {
+      if (userId) {
+        Sentry.setUser({ id: userId });
+      } else {
+        Sentry.setUser(null);
+      }
+    } catch {
+      // Ignore
+    }
+  }
 }
 
 export const crashReporter = new CrashReporter();
