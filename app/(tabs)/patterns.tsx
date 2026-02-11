@@ -7,6 +7,7 @@ import { Circle, Eye, ListTodo, Users, TrendingUp, TrendingDown, AlertTriangle, 
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { HistoryItem, EnergyGraph, TimeRangeTabs, TimeRange, getTimeRangeMs, MilestonesPanel, PatternLanguagePanel, OrgRoleBanner, WeeklyCapacityRecord, BlurredPatternTease } from '../../components';
 import { QCRButton, QCRScreen, QCRPaywall } from '../../components/qcr';
+import { ErrorBoundary } from '../../components/ErrorBoundary';
 import { colors, commonStyles, spacing } from '../../theme';
 import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
 import { useLocale, interpolate } from '../../lib/hooks/useLocale';
@@ -581,6 +582,7 @@ export default function PatternsScreen() {
   }, []);
 
   return (
+    <ErrorBoundary name="PatternsScreen">
     <SafeAreaView style={commonStyles.screen}>
       {/* Debug Overlay - FOUNDER-ONLY */}
       {FOUNDER_DEMO_ENABLED && debugVisible && (
@@ -811,6 +813,7 @@ export default function PatternsScreen() {
         error={qcrError}
       />
     </SafeAreaView>
+    </ErrorBoundary>
   );
 }
 

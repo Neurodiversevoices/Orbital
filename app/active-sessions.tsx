@@ -40,6 +40,7 @@ import {
   DeviceSession,
 } from '../lib/session';
 import { getAuditLog, getActionDescription, SessionAuditEntry } from '../lib/session';
+import * as Sentry from '@sentry/react-native';
 
 export default function ActiveSessionsScreen() {
   const router = useRouter();
@@ -51,17 +52,22 @@ export default function ActiveSessionsScreen() {
 
   // Load sessions
   const loadData = useCallback(async () => {
-    const [allSessions, current, log] = await Promise.all([
-      getDeviceSessions(),
-      getCurrentSession(),
-      getAuditLog(),
-    ]);
+    try {
+      const [allSessions, current, log] = await Promise.all([
+        getDeviceSessions(),
+        getCurrentSession(),
+        getAuditLog(),
+      ]);
 
-    setSessions(allSessions);
-    setCurrentSessionId(current?.id ?? null);
-    setAuditLog(log.slice(-10).reverse()); // Last 10, newest first
-    setIsLoading(false);
-    setIsRefreshing(false);
+      setSessions(allSessions);
+      setCurrentSessionId(current?.id ?? null);
+      setAuditLog(log.slice(-10).reverse()); // Last 10, newest first
+    } catch (error) {
+      Sentry.captureException(error, { tags: { screen: 'active-sessions' } });
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
   }, []);
 
   useEffect(() => {

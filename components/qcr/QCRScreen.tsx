@@ -34,6 +34,7 @@ import { colors, spacing, borderRadius } from '../../theme';
 import { QuarterlyCapacityReport, getQuarterLabel, DAY_NAMES } from '../../lib/qcr/types';
 import { exportQCRToPdf } from '../../lib/qcr';
 import { FOUNDER_DEMO_ENABLED } from '../../lib/hooks/useDemoMode';
+import { ErrorBoundary } from '../ErrorBoundary';
 
 // Methodology statement (institutional compliance)
 const METHODOLOGY_STATEMENT =
@@ -83,6 +84,7 @@ export function QCRScreen({ report, onClose, onExport }: QCRScreenProps) {
   }, [report, onExport]);
 
   return (
+    <ErrorBoundary name="QCRScreen">
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
@@ -370,6 +372,7 @@ export function QCRScreen({ report, onClose, onExport }: QCRScreenProps) {
         </Animated.View>
       </ScrollView>
     </SafeAreaView>
+    </ErrorBoundary>
   );
 }
 

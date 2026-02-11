@@ -518,8 +518,10 @@ function computeDailyCapacityData(logs: CapacityLog[]): QCRDailyCapacityPoint[] 
     });
   });
 
-  // Sort by date
-  return points.sort((a, b) => a.date.getTime() - b.date.getTime());
+  // Sort by date, cap to 60 points for rendering stability
+  const sorted = points.sort((a, b) => a.date.getTime() - b.date.getTime());
+  if (sorted.length <= 60) return sorted;
+  return Array.from({ length: 60 }, (_, i) => sorted[Math.floor(i * sorted.length / 60)]);
 }
 
 function computeWeeklyMeanData(logs: CapacityLog[]): QCRWeeklyMeanPoint[] {

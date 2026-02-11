@@ -18,6 +18,7 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Sentry from '@sentry/react-native';
 import { STORAGE_KEYS, generateId } from './storage';
 import {
   CapacityLog,
@@ -312,7 +313,7 @@ export async function onCapacityLogSaved(
   try {
     await writePatternHistory(log, mode);
   } catch (error) {
-    // Log but don't fail the main save operation
+    Sentry.captureException(error, { tags: { module: 'patternHistory', op: 'write' } });
     if (__DEV__) console.error('[PatternHistory] Failed to write pattern history:', error);
   }
 }
@@ -326,6 +327,7 @@ export async function onCapacityLogDeleted(logId: string): Promise<void> {
     const patternHistoryId = `ph_${logId}`;
     await softDeletePatternRecord(patternHistoryId, 'user_deleted');
   } catch (error) {
+    Sentry.captureException(error, { tags: { module: 'patternHistory', op: 'soft_delete' } });
     if (__DEV__) console.error('[PatternHistory] Failed to soft-delete pattern history:', error);
   }
 }
@@ -338,6 +340,7 @@ export async function onAllLogsCleared(userId: string = DEFAULT_USER_ID): Promis
   try {
     await softDeleteUserPatternHistory(userId, 'user_deleted');
   } catch (error) {
+    Sentry.captureException(error, { tags: { module: 'patternHistory', op: 'clear_all' } });
     if (__DEV__) console.error('[PatternHistory] Failed to soft-delete all pattern history:', error);
   }
 }

@@ -128,6 +128,28 @@ Sentry.init({
 
 Sentry.addBreadcrumb({ category: 'startup', message: 'startup:sentry_init_done', data: { ms: Date.now() - STARTUP_TS } });
 
+// =============================================================================
+// GLOBAL UNHANDLED REJECTION HANDLER
+// =============================================================================
+// Catches promise rejections that escape try/catch boundaries.
+// Sentry SDK handles some of these, but this is a safety net for Hermes engine.
+// =============================================================================
+if (typeof global !== 'undefined') {
+  // @ts-ignore — React Native global event (Hermes engine)
+  const prevHandler = global.onunhandledrejection;
+  // @ts-ignore
+  global.onunhandledrejection = (event: { reason: unknown }) => {
+    const error = event?.reason;
+    if (error instanceof Error) {
+      Sentry.captureException(error, { tags: { type: 'unhandled_rejection' } });
+    } else if (error !== undefined && error !== null) {
+      Sentry.captureMessage(`Unhandled rejection: ${String(error).substring(0, 200)}`, 'error');
+    }
+    // @ts-ignore
+    prevHandler?.(event);
+  };
+}
+
 /**
  * Deferred Sentry setup — called AFTER first paint via InteractionManager.
  * Moves tag-setting off the critical startup path.

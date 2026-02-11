@@ -78,6 +78,7 @@ import {
 import { useAuth } from '../lib/supabase';
 import { IS_REVIEW_MODE } from '../lib/reviewMode';
 import { PurchaseDebugPanel } from '../components/PurchaseDebugPanel';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 // =============================================================================
 // PURCHASE HANDLER (Mock Checkout)
@@ -542,6 +543,7 @@ export default function UpgradeScreen() {
   const purchaseBlocked = isPurchasing || !!purchaseDisabledReason;
 
   return (
+    <ErrorBoundary name="UpgradeScreen">
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerSpacer} />
@@ -932,6 +934,7 @@ export default function UpgradeScreen() {
         <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>
+    </ErrorBoundary>
   );
 }
 

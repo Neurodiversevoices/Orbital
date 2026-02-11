@@ -49,6 +49,7 @@ import type {
   SchoolSummaryCard,
   Category,
 } from '../types';
+import * as Sentry from '@sentry/react-native';
 
 const categoryIcons: Record<Category, React.ComponentType<any>> = {
   sensory: Eye,
@@ -86,9 +87,13 @@ export default function SchoolZoneScreen() {
   }, []);
 
   const loadData = async () => {
-    const [s, c] = await Promise.all([getSchoolZoneModeSettings(), getSchoolZoneConfigs()]);
-    setSettings(s);
-    setConfigs(c);
+    try {
+      const [s, c] = await Promise.all([getSchoolZoneModeSettings(), getSchoolZoneConfigs()]);
+      setSettings(s);
+      setConfigs(c);
+    } catch (error) {
+      Sentry.captureException(error, { tags: { screen: 'school-zone' } });
+    }
   };
 
   const currentSchool = useMemo(() => {

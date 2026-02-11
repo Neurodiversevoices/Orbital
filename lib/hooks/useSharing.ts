@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import * as Sentry from '@sentry/react-native';
 import { ShareRecipient, ShareConfig, RecipientRole, AuditEntry } from '../../types';
 import {
   createRecipient,
@@ -47,6 +48,7 @@ export function useSharing(): UseSharingReturn {
       setActiveShares(shareData);
       setAuditLog(auditData);
     } catch (e) {
+      Sentry.captureException(e, { tags: { hook: 'useSharing' } });
       setError('Failed to load sharing data');
       if (__DEV__) console.error('[Orbital Sharing] Load failed:', e);
     } finally {

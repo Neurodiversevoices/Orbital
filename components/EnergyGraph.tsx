@@ -146,7 +146,12 @@ export function EnergyGraph({ logs, width, timeRange, startDate, endDate }: Capa
     const pts: { x: number; y: number; value: number }[] = [];
 
     // Sort bucket indices
-    const sortedIndices = Array.from(buckets.keys()).sort((a, b) => a - b);
+    const allIndices = Array.from(buckets.keys()).sort((a, b) => a - b);
+
+    // Hard cap: max 60 chart points for rendering stability
+    const sortedIndices = allIndices.length > 60
+      ? Array.from({ length: 60 }, (_, i) => allIndices[Math.floor(i * allIndices.length / 60)])
+      : allIndices;
 
     sortedIndices.forEach((bucketIndex) => {
       const bucket = buckets.get(bucketIndex)!;

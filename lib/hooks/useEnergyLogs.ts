@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import * as Sentry from '@sentry/react-native';
 import { CapacityLog, CapacityState, Tag } from '../../types';
 import { savelog, getLogs, deleteLog, clearAllLogs, generateId } from '../storage';
 import { getLocalDate } from '../baselineUtils';
@@ -40,6 +41,7 @@ export function useEnergyLogs(): UseCapacityLogsReturn {
           data = await cloudSync.pullAndMerge(data);
           hasInitialPull.current = true;
         } catch (e) {
+          Sentry.captureException(e, { tags: { hook: 'useEnergyLogs', op: 'cloud_pull' } });
           if (__DEV__) console.error('[useEnergyLogs] Cloud pull failed:', e);
           // Continue with local data
         }
@@ -47,6 +49,7 @@ export function useEnergyLogs(): UseCapacityLogsReturn {
 
       setLogs(data);
     } catch (error) {
+      Sentry.captureException(error, { tags: { hook: 'useEnergyLogs', op: 'load_logs' } });
       if (__DEV__) console.error('Failed to load logs:', error);
     } finally {
       setIsLoading(false);
@@ -85,6 +88,7 @@ export function useEnergyLogs(): UseCapacityLogsReturn {
         try {
           await cloudSync.enqueueLogForSync(newLog);
         } catch (e) {
+          Sentry.captureException(e, { tags: { hook: 'useEnergyLogs', op: 'cloud_enqueue' } });
           if (__DEV__) console.error('[useEnergyLogs] Cloud enqueue failed:', e);
           // Local save succeeded, cloud sync will retry
         }

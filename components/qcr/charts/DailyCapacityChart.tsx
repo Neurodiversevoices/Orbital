@@ -52,9 +52,11 @@ export function DailyCapacityChart({
   const chartWidth = width - paddingLeft - paddingRight;
   const chartHeight = height - paddingTop - paddingBottom;
 
-  // Sort data by date
+  // Sort data by date, cap to 60 points for rendering stability
   const sortedData = useMemo(() => {
-    return [...data].sort((a, b) => a.date.getTime() - b.date.getTime());
+    const sorted = [...data].sort((a, b) => a.date.getTime() - b.date.getTime());
+    if (sorted.length <= 60) return sorted;
+    return Array.from({ length: 60 }, (_, i) => sorted[Math.floor(i * sorted.length / 60)]);
   }, [data]);
 
   // Calculate scales

@@ -42,6 +42,7 @@ import {
   ButtonSize,
   HapticIntensity,
 } from '../types';
+import * as Sentry from '@sentry/react-native';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -66,18 +67,22 @@ export default function AccessibilityScreen() {
   const handleSimpleModeToggle = async (enabled: boolean) => {
     // When Simple Mode is enabled, set optimal accessibility settings
     if (enabled) {
-      await Promise.all([
-        updateSetting('simpleMode', true),
-        updateSetting('highContrast', true),
-        updateSetting('textSize', 'xlarge'),
-        updateSetting('reduceMotion', true),
-        updateSetting('bigButtonMode', true),
-        updateSetting('buttonSize', 'xlarge'),
-        updateSetting('simplifiedText', true),
-        updateSetting('hapticFeedback', true),
-        updateSetting('hapticIntensity', 'strong'),
-        updateSetting('confirmActions', true),
-      ]);
+      try {
+        await Promise.all([
+          updateSetting('simpleMode', true),
+          updateSetting('highContrast', true),
+          updateSetting('textSize', 'xlarge'),
+          updateSetting('reduceMotion', true),
+          updateSetting('bigButtonMode', true),
+          updateSetting('buttonSize', 'xlarge'),
+          updateSetting('simplifiedText', true),
+          updateSetting('hapticFeedback', true),
+          updateSetting('hapticIntensity', 'strong'),
+          updateSetting('confirmActions', true),
+        ]);
+      } catch (error) {
+        Sentry.captureException(error, { tags: { screen: 'accessibility' } });
+      }
       triggerHaptic('success');
     } else {
       await updateSetting('simpleMode', false);

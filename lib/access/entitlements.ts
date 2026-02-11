@@ -241,6 +241,9 @@ export function useAccess(): AccessContext {
       setQAFreeModeEnabled(qaEnabled);
       setFreeUserViewActive(forcedRole === 'free');
       setIsLoading(false);
+    }).catch((error) => {
+      if (__DEV__) console.error('[useAccess] Init failed:', error);
+      setIsLoading(false);
     });
   }, []);
 

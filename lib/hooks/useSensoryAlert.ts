@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import * as Sentry from '@sentry/react-native';
 import {
   SensoryAlertConfig,
   SensoryAlertEvent,
@@ -48,6 +49,7 @@ export function useSensoryAlert(): UseSensoryAlertReturn {
       setEvents(evts);
       setIsMonitoring(checkIsMonitoring());
     } catch (error) {
+      Sentry.captureException(error, { tags: { hook: 'useSensoryAlert' } });
       if (__DEV__) console.error('[Orbital Sensory] Failed to load data:', error);
     } finally {
       setIsLoading(false);

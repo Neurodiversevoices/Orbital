@@ -14,6 +14,7 @@ import { colors, commonStyles, spacing } from '../theme';
 import { getAuditLog, getRecipients } from '../lib/storage';
 import { AuditEntry, AuditAction, ShareRecipient } from '../types';
 import { useLocale } from '../lib/hooks/useLocale';
+import * as Sentry from '@sentry/react-native';
 
 const ACTION_ICONS: Record<AuditAction, React.ComponentType<{ color: string; size: number }>> = {
   share_created: Share2,
@@ -44,13 +45,18 @@ export default function AuditScreen() {
 
   const loadData = async () => {
     setIsLoading(true);
-    const [auditEntries, recipientList] = await Promise.all([
-      getAuditLog(),
-      getRecipients(),
-    ]);
-    setEntries(auditEntries);
-    setRecipients(new Map(recipientList.map(r => [r.id, r])));
-    setIsLoading(false);
+    try {
+      const [auditEntries, recipientList] = await Promise.all([
+        getAuditLog(),
+        getRecipients(),
+      ]);
+      setEntries(auditEntries);
+      setRecipients(new Map(recipientList.map(r => [r.id, r])));
+    } catch (error) {
+      Sentry.captureException(error, { tags: { screen: 'audit' } });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const formatTimestamp = (timestamp: number) => {
