@@ -600,7 +600,8 @@ export default function UpgradeScreen() {
               <Text style={styles.planCardCtaText}>{isPro ? 'Basic tier' : 'Your current plan'}</Text>
             </View>
 
-            {/* CCI $199 - Always visible in Free panel */}
+            {/* CCI $199 - Hidden in review mode (only Pro monthly/annual shown) */}
+            {!IS_REVIEW_MODE && (
             <View style={styles.cciInlineSection}>
               <View style={styles.cciInlineHeader}>
                 <FileText size={16} color="#7A9AAA" />
@@ -618,6 +619,7 @@ export default function UpgradeScreen() {
                 </Text>
               </Pressable>
             </View>
+            )}
           </View>
         </Animated.View>
 
@@ -660,7 +662,8 @@ export default function UpgradeScreen() {
               </Pressable>
             </View>
 
-            {/* CCI $149 - Always visible in Pro panel */}
+            {/* CCI $149 - Hidden in review mode (only Pro monthly/annual shown) */}
+            {!IS_REVIEW_MODE && (
             <View style={styles.cciInlineSection}>
               <View style={styles.cciInlineHeader}>
                 <FileText size={16} color="#FFD700" />
@@ -678,11 +681,12 @@ export default function UpgradeScreen() {
                 </Text>
               </Pressable>
             </View>
+            )}
           </View>
         </Animated.View>
 
-        {/* FAMILY */}
-        <Animated.View entering={FadeInDown.delay(150).duration(400)}>
+        {/* FAMILY — hidden in review mode (only Pro monthly/annual for 1.0 review) */}
+        {!IS_REVIEW_MODE && <Animated.View entering={FadeInDown.delay(150).duration(400)}>
           <View style={[styles.planCard, hasFamily && styles.planCardCurrent]}>
             <View style={styles.planCardHeader}>
               <View>
@@ -721,8 +725,11 @@ export default function UpgradeScreen() {
               </Pressable>
             </View>
           </View>
-        </Animated.View>
+        </Animated.View>}
 
+        {/* CIRCLES — hidden in review mode */}
+        {!IS_REVIEW_MODE && (
+        <>
         {/* CIRCLES */}
         <Animated.View entering={FadeInDown.delay(200).duration(400)}>
           <View style={[styles.planCard, hasCircle && styles.planCardCurrent]}>
@@ -848,11 +855,14 @@ export default function UpgradeScreen() {
             </View>
           </View>
         </Animated.View>
+        </>
+        )}
 
         {/* =============================================================== */}
         {/* ADMIN ADD-ON — VISIBILITY GUARD: Only shown if Pro AND (Circle OR Bundle) */}
+        {/* Hidden in review mode */}
         {/* =============================================================== */}
-        {isPro && (hasCircle || bundleSize !== null) && (
+        {!IS_REVIEW_MODE && isPro && (hasCircle || bundleSize !== null) && (
           <Animated.View entering={FadeInDown.delay(300).duration(400)}>
             <Text style={styles.sectionTitle}>ADMIN ADD-ON</Text>
             <Text style={styles.sectionSubtitle}>Admin access available after Circle or Bundle creation</Text>
