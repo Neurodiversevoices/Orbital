@@ -381,6 +381,8 @@ function RootLayout() {
       Sentry.captureMessage('Cold start exceeded 2s', { level: 'warning', extra: { elapsedMs: elapsed } });
     }
 
+    Sentry.addBreadcrumb({ category: 'startup', message: 'startup:phase1_done', level: 'info', data: { ms: Date.now() - STARTUP_TS } });
+
     // Deferred init — runs AFTER first frame is painted
     InteractionManager.runAfterInteractions(async () => {
       Sentry.addBreadcrumb({ category: 'startup', message: 'startup:deferred_begin', data: { ms: Date.now() - STARTUP_TS } });
@@ -396,6 +398,7 @@ function RootLayout() {
 
         Sentry.addBreadcrumb({ category: 'startup', message: 'startup:providers_ready', data: { ms: Date.now() - STARTUP_TS } });
         setProvidersReady(true);
+        Sentry.addBreadcrumb({ category: 'startup', message: 'startup:phase2_done', level: 'info', data: { ms: Date.now() - STARTUP_TS } });
       } catch (err) {
         Sentry.captureException(err);
         // Still show providers — fallback to synchronous import
