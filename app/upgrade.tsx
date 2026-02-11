@@ -68,6 +68,7 @@ import {
   PAYMENTS_ENABLED,
   executePurchase,
 } from '../lib/payments';
+import { syncEntitlementAfterPurchase } from '../lib/payments/purchaseSync';
 import {
   getUserEntitlements,
   checkCircleAllMembersPro,
@@ -76,6 +77,7 @@ import {
 } from '../lib/entitlements';
 import { useAuth } from '../lib/supabase';
 import { IS_REVIEW_MODE } from '../lib/reviewMode';
+import { PurchaseDebugPanel } from '../components/PurchaseDebugPanel';
 
 // =============================================================================
 // PURCHASE HANDLER (Mock Checkout)
@@ -367,7 +369,7 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
 export default function UpgradeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ demoMode?: string }>();
-  const { isLoading: subscriptionLoading, restore } = useSubscription();
+  const { isLoading: subscriptionLoading, isAvailable: rcAvailable, purchase: rcPurchase, restore } = useSubscription();
   const auth = useAuth();
 
   // DOCTRINE: Do not surface CCI purchase options inside demo-only institutional modes
@@ -409,8 +411,8 @@ export default function UpgradeScreen() {
   };
 
   const handlePurchase = useCallback(async (productId: string, productName: string) => {
-    // Auth gate: if payments enabled and not authenticated, redirect to sign-in
-    if (PAYMENTS_ENABLED && !auth.isAuthenticated) {
+    // Auth gate: require authentication for all purchase flows
+    if (!auth.isAuthenticated) {
       router.push('/cloud-sync');
       return;
     }
@@ -418,10 +420,36 @@ export default function UpgradeScreen() {
     console.log('[PURCHASE] Starting purchase:', productId, productName);
     setIsPurchasing(true);
 
+    // Native (iOS/Android) with RevenueCat available → use StoreKit
+    if (Platform.OS !== 'web' && rcAvailable) {
+      try {
+        console.log('[PURCHASE] Using RevenueCat/StoreKit for:', productId);
+        const success = await rcPurchase(productId);
+        if (success) {
+          // Sync RevenueCat entitlement → Supabase
+          await syncEntitlementAfterPurchase(productId);
+          loadEntitlements();
+          Alert.alert(
+            'Success!',
+            `${productName} has been activated.`,
+            [{ text: 'Continue' }]
+          );
+        }
+        // If !success, user cancelled — no error shown
+      } catch (error) {
+        console.error('[PURCHASE] RevenueCat error:', error);
+        Alert.alert('Purchase Failed', error instanceof Error ? error.message : 'Please try again.');
+      }
+      setIsPurchasing(false);
+      return;
+    }
+
+    // Web or RevenueCat unavailable → use mock checkout (dev/testing only)
+    console.log('[PURCHASE] RevenueCat unavailable, using mock checkout');
     await handleMockPurchase(
       productId,
       () => {
-        console.log('[PURCHASE] Success:', productName);
+        console.log('[PURCHASE] Mock success:', productName);
         if (Platform.OS === 'web') {
           window.alert(`Success! ${productName} has been activated.`);
           loadEntitlements();
@@ -435,7 +463,7 @@ export default function UpgradeScreen() {
         setIsPurchasing(false);
       },
       (error) => {
-        console.log('[PURCHASE] Failed:', error);
+        console.log('[PURCHASE] Mock failed:', error);
         if (Platform.OS === 'web') {
           window.alert(`Purchase Failed: ${error}`);
         } else {
@@ -444,19 +472,24 @@ export default function UpgradeScreen() {
         setIsPurchasing(false);
       }
     );
-  }, [auth.isAuthenticated, router]);
+  }, [auth.isAuthenticated, router, rcAvailable, rcPurchase]);
 
   const handleRestore = useCallback(async () => {
     setIsRestoring(true);
-    const success = await restore();
-    setIsRestoring(false);
-
-    if (success) {
-      loadEntitlements();
-      Alert.alert('Restored!', 'Your purchases have been restored.');
-    } else {
-      Alert.alert('No Purchase Found', "We couldn't find a previous purchase to restore.");
+    try {
+      const success = await restore();
+      if (success) {
+        // Refresh local entitlements from Supabase after RevenueCat restore
+        await loadEntitlements();
+        Alert.alert('Restored!', 'Your purchases have been restored.');
+      } else {
+        Alert.alert('No Purchase Found', "We couldn't find a previous purchase to restore.");
+      }
+    } catch (error) {
+      console.error('[RESTORE] Failed:', error);
+      Alert.alert('Restore Failed', 'Please try again.');
     }
+    setIsRestoring(false);
   }, [restore]);
 
   if (subscriptionLoading || loadingEntitlements) {
@@ -502,6 +535,9 @@ export default function UpgradeScreen() {
             </Text>
           </View>
         )}
+
+        {/* StoreKit diagnostics — review mode only */}
+        <PurchaseDebugPanel />
 
         {/* FREE */}
         <Animated.View entering={FadeInDown.delay(50).duration(400)}>
@@ -820,10 +856,10 @@ export default function UpgradeScreen() {
             )}
           </Pressable>
 
-          {!PAYMENTS_ENABLED && (
+          {!PAYMENTS_ENABLED && __DEV__ && (
             <View style={styles.stubNotice}>
               <Text style={styles.stubNoticeText}>
-                Payments are in demo mode. Purchases are simulated.
+                DEV: Mock checkout active. Set EXPO_PUBLIC_PAYMENTS_ENABLED=true for StoreKit.
               </Text>
             </View>
           )}

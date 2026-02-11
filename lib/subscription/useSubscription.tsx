@@ -37,6 +37,7 @@ import {
   capturePaymentError,
   isUserCancellation,
 } from '../observability';
+import { syncRevenueCatEntitlements } from '../payments/purchaseSync';
 
 // Dynamic import for RevenueCat to handle platform differences
 let PurchasesMobile: typeof import('react-native-purchases').default | null = null;
@@ -296,12 +297,12 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       const currentOffering = offerings.current;
 
       if (!currentOffering) {
-        if (__DEV__) console.error('[Subscription] No offerings available');
+        console.error('[Subscription] No offerings available from RevenueCat');
         clearPaymentScope();
         return false;
       }
 
-      // Find the requested package or default to monthly
+      // Find the requested package — match by product identifier
       updatePaymentStage('package_select');
       const targetPackage = currentOffering.availablePackages.find(
         pkg => pkg.product.identifier === targetProductId ||
@@ -309,17 +310,26 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       );
 
       if (!targetPackage) {
-        if (__DEV__) console.error('[Subscription] Package not found:', targetProductId);
+        console.error('[Subscription] Package not found:', targetProductId,
+          'Available:', currentOffering.availablePackages.map(p => p.product.identifier));
         clearPaymentScope();
         return false;
       }
 
-      // Make purchase
+      // Make purchase via StoreKit
       updatePaymentStage('confirm');
       const { customerInfo } = await PurchasesMobile.purchasePackage(targetPackage);
-      const isPro = !!customerInfo.entitlements.active[ENTITLEMENT_ID];
 
-      if (isPro) {
+      // Sync all active entitlements to Supabase
+      const activeIds = Object.keys(customerInfo.entitlements.active);
+      if (activeIds.length > 0) {
+        try { await syncRevenueCatEntitlements(activeIds); } catch (e) {
+          console.warn('[Subscription] Entitlement sync failed (non-fatal):', e);
+        }
+      }
+
+      const hasPro = !!customerInfo.entitlements.active[ENTITLEMENT_ID];
+      if (hasPro || activeIds.length > 0) {
         updatePaymentStage('complete');
         clearPaymentScope();
         await checkSubscriptionStatus();
@@ -389,9 +399,17 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         customerInfo = await PurchasesMobile.restorePurchases();
       }
 
+      // Sync restored entitlements to Supabase
+      const activeIds = Object.keys(customerInfo.entitlements.active);
+      if (activeIds.length > 0) {
+        try { await syncRevenueCatEntitlements(activeIds); } catch (e) {
+          console.warn('[Subscription] Restore sync failed (non-fatal):', e);
+        }
+      }
+
       const isPro = !!customerInfo.entitlements.active[ENTITLEMENT_ID];
 
-      if (isPro) {
+      if (isPro || activeIds.length > 0) {
         updatePaymentStage('complete');
         clearPaymentScope();
         await checkSubscriptionStatus();

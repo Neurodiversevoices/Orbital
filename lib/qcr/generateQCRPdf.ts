@@ -1236,6 +1236,28 @@ function getPdfStyles(): string {
 // SVG CHART GENERATORS (inline SVG for PDF)
 // =============================================================================
 
+/**
+ * Downsample daily capacity data to maxPoints using bucket averaging.
+ * Reduces memory pressure for long time ranges (90d+ → 45 points max).
+ */
+function downsampleCapacity(
+  sorted: Array<{ date: Date; capacityIndex: number }>,
+  maxPoints: number,
+): Array<{ date: Date; capacityIndex: number }> {
+  const bucketSize = Math.ceil(sorted.length / maxPoints);
+  const result: Array<{ date: Date; capacityIndex: number }> = [];
+
+  for (let i = 0; i < sorted.length; i += bucketSize) {
+    const bucket = sorted.slice(i, Math.min(i + bucketSize, sorted.length));
+    const avgCapacity = bucket.reduce((sum, d) => sum + d.capacityIndex, 0) / bucket.length;
+    // Use midpoint date of bucket
+    const midIdx = Math.floor(bucket.length / 2);
+    result.push({ date: bucket[midIdx].date, capacityIndex: Math.round(avgCapacity * 10) / 10 });
+  }
+
+  return result;
+}
+
 function generateDailyCapacitySvg(report: QuarterlyCapacityReport): string {
   const data = report.chartData.dailyCapacity;
   if (data.length === 0) return '<p class="no-data">Insufficient data</p>';
@@ -1246,23 +1268,27 @@ function generateDailyCapacitySvg(report: QuarterlyCapacityReport): string {
   const chartW = width - padding.left - padding.right;
   const chartH = height - padding.top - padding.bottom;
 
+  // Downsample to max 45 points (3-day buckets for 90d, 7-day for 365d)
   const sorted = [...data].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  const xMin = new Date(sorted[0].date).getTime();
-  const xMax = new Date(sorted[sorted.length - 1].date).getTime();
+  const MAX_POINTS = 45;
+  const downsampled = sorted.length <= MAX_POINTS ? sorted : downsampleCapacity(sorted, MAX_POINTS);
+
+  const xMin = new Date(downsampled[0].date).getTime();
+  const xMax = new Date(downsampled[downsampled.length - 1].date).getTime();
   const xRange = xMax - xMin || 1;
 
   const toX = (d: Date) => padding.left + ((new Date(d).getTime() - xMin) / xRange) * chartW;
   const toY = (v: number) => padding.top + chartH - (v / 100) * chartH;
 
   // Line path
-  const linePath = sorted.map((d, i) => {
+  const linePath = downsampled.map((d, i) => {
     const x = toX(d.date);
     const y = toY(d.capacityIndex);
     return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
   }).join(' ');
 
   // Area path
-  const areaPath = `${linePath} L ${toX(sorted[sorted.length - 1].date).toFixed(1)} ${toY(0).toFixed(1)} L ${toX(sorted[0].date).toFixed(1)} ${toY(0).toFixed(1)} Z`;
+  const areaPath = `${linePath} L ${toX(downsampled[downsampled.length - 1].date).toFixed(1)} ${toY(0).toFixed(1)} L ${toX(downsampled[0].date).toFixed(1)} ${toY(0).toFixed(1)} Z`;
 
   // Grid lines
   const gridLines = [0, 25, 50, 75, 100].map(v =>
