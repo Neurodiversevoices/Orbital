@@ -17,24 +17,25 @@ import type { ProductId } from '../subscription/pricing';
  * This bridges the StoreKit receipt → Supabase entitlement gap.
  *
  * Also grants prerequisite entitlements (e.g., Family auto-grants Pro).
+ *
+ * IMPORTANT: This function THROWS on failure so the caller can show a visible
+ * error and keep the UI locked. Silently swallowing would leave the user with
+ * a charged card but no unlocked feature.
  */
 export async function syncEntitlementAfterPurchase(productId: string): Promise<void> {
   const product = PRODUCT_CATALOG[productId] as ProductInfo | undefined;
   if (!product) {
-    console.warn('[purchaseSync] Unknown product:', productId);
-    return;
+    throw new Error(`[purchaseSync] Unknown product: ${productId}`);
   }
 
   if (!isSupabaseConfigured()) {
-    console.warn('[purchaseSync] Supabase not configured, skipping sync');
-    return;
+    throw new Error('[purchaseSync] Supabase not configured — cannot persist entitlement');
   }
 
   const supabase = getSupabase();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
-    console.warn('[purchaseSync] No authenticated user, skipping sync');
-    return;
+    throw new Error('[purchaseSync] No authenticated user — cannot persist entitlement');
   }
 
   const purchaseId = `rc_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
@@ -98,22 +99,18 @@ async function upsertEntitlement(
   entitlementId: string,
   purchaseId: string,
 ): Promise<void> {
-  try {
-    const { error } = await supabase
-      .from('user_entitlements')
-      .upsert(
-        {
-          user_id: userId,
-          entitlement_id: entitlementId,
-          source: 'purchase',
-          purchase_id: purchaseId,
-        },
-        { onConflict: 'user_id,entitlement_id' }
-      );
-    if (error) {
-      console.error('[purchaseSync] Supabase upsert error:', error);
-    }
-  } catch (e) {
-    console.error('[purchaseSync] Failed to sync entitlement:', e);
+  const { error } = await supabase
+    .from('user_entitlements')
+    .upsert(
+      {
+        user_id: userId,
+        entitlement_id: entitlementId,
+        source: 'purchase',
+        purchase_id: purchaseId,
+      },
+      { onConflict: 'user_id,entitlement_id' }
+    );
+  if (error) {
+    throw new Error(`[purchaseSync] Supabase upsert failed for ${entitlementId}: ${error.message}`);
   }
 }

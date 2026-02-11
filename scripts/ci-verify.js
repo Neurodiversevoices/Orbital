@@ -190,7 +190,40 @@ async function main() {
   // Step 3: Prettier Check (warn only)
   const prettierPassed = await runCommand('Prettier Check', 'npx', ['prettier', '--check', '.'], { warnOnly: true });
 
-  // Step 4: Security Audit
+  // Step 4: Legacy Product ID Check (CRITICAL — prevents mock purchases in production)
+  const legacyIdsPassed = await runCommand(
+    'Legacy Product ID Check',
+    'node',
+    ['-e', `
+      const { execSync } = require('child_process');
+      const LEGACY_IDS = [
+        'orbital_individual_monthly',
+        'orbital_individual_annual',
+        'orbital_bundle_10_monthly',
+        'orbital_bundle_25_monthly',
+        'orbital_bundle_25_annual',
+      ];
+      let found = false;
+      for (const id of LEGACY_IDS) {
+        try {
+          const out = execSync(
+            'grep -rn "' + id + '" --include="*.ts" --include="*.tsx" lib/ app/ components/ ' +
+            '| grep -v "pricing.ts" | grep -v node_modules || true',
+            { encoding: 'utf-8' }
+          ).trim();
+          if (out) {
+            console.error('FAIL: Legacy product ID "' + id + '" found outside pricing.ts:');
+            console.error(out);
+            found = true;
+          }
+        } catch(e) {}
+      }
+      process.exit(found ? 1 : 0);
+    `],
+  );
+  if (!legacyIdsPassed) allPassed = false;
+
+  // Step 5: Security Audit
   const auditPassed = await runAudit();
   if (!auditPassed) allPassed = false;
 

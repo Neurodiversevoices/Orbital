@@ -410,10 +410,27 @@ export default function UpgradeScreen() {
     setLoadingEntitlements(false);
   };
 
+  // Review builds on native MUST NOT fall through to mock checkout.
+  // If StoreKit/RevenueCat failed to initialise, purchases are blocked.
+  const nativeStoreBlocked = Platform.OS !== 'web' && !rcAvailable;
+  const purchaseDisabledReason: string | null =
+    IS_REVIEW_MODE && nativeStoreBlocked
+      ? 'StoreKit unavailable — products not loaded'
+      : null;
+
   const handlePurchase = useCallback(async (productId: string, productName: string) => {
     // Auth gate: require authentication for all purchase flows
     if (!auth.isAuthenticated) {
       router.push('/cloud-sync');
+      return;
+    }
+
+    // HARD BLOCK: In review builds on native, never fall back to mock.
+    if (IS_REVIEW_MODE && Platform.OS !== 'web' && !rcAvailable) {
+      Alert.alert(
+        'Store Unavailable',
+        'StoreKit products could not be loaded. Please check that IAP products are configured in App Store Connect and try again.',
+      );
       return;
     }
 
@@ -427,7 +444,18 @@ export default function UpgradeScreen() {
         const success = await rcPurchase(productId);
         if (success) {
           // Sync RevenueCat entitlement → Supabase
-          await syncEntitlementAfterPurchase(productId);
+          try {
+            await syncEntitlementAfterPurchase(productId);
+          } catch (syncErr) {
+            // Entitlement sync failure is visible — keep UI locked and warn user
+            console.error('[PURCHASE] Entitlement sync failed:', syncErr);
+            Alert.alert(
+              'Activation Pending',
+              'Your purchase succeeded but activation could not be confirmed. Please tap "Restore Purchases" to retry.',
+            );
+            setIsPurchasing(false);
+            return;
+          }
           loadEntitlements();
           Alert.alert(
             'Success!',
@@ -444,12 +472,13 @@ export default function UpgradeScreen() {
       return;
     }
 
-    // Web or RevenueCat unavailable → use mock checkout (dev/testing only)
-    console.log('[PURCHASE] RevenueCat unavailable, using mock checkout');
+    // Web or RevenueCat unavailable (non-review) → use mock checkout (dev only)
+    if (__DEV__) {
+      console.log('[PURCHASE] DEV: RevenueCat unavailable, using mock checkout');
+    }
     await handleMockPurchase(
       productId,
       () => {
-        console.log('[PURCHASE] Mock success:', productName);
         if (Platform.OS === 'web') {
           window.alert(`Success! ${productName} has been activated.`);
           loadEntitlements();
@@ -463,7 +492,6 @@ export default function UpgradeScreen() {
         setIsPurchasing(false);
       },
       (error) => {
-        console.log('[PURCHASE] Mock failed:', error);
         if (Platform.OS === 'web') {
           window.alert(`Purchase Failed: ${error}`);
         } else {
@@ -510,6 +538,9 @@ export default function UpgradeScreen() {
   const hasCCIPurchased = entitlements?.hasCCIPurchased ?? false;
   const bundleSize = entitlements?.bundleSize ?? null;
 
+  // In review builds, if StoreKit is blocked, ALL purchase buttons are disabled.
+  const purchaseBlocked = isPurchasing || !!purchaseDisabledReason;
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -528,10 +559,19 @@ export default function UpgradeScreen() {
         {/* =============================================================== */}
         <Text style={styles.plansHeader}>Choose Your Plan</Text>
 
-        {IS_REVIEW_MODE && (
+        {IS_REVIEW_MODE && !purchaseDisabledReason && (
           <View style={styles.reviewHint}>
             <Text style={styles.reviewHintText}>
               Tap a plan to test the purchase flow. Subscriptions complete instantly in the sandbox environment.
+            </Text>
+          </View>
+        )}
+
+        {/* Blocking error when StoreKit products failed to load in review build */}
+        {purchaseDisabledReason && (
+          <View style={[styles.reviewHint, { borderColor: '#FF9800' }]}>
+            <Text style={[styles.reviewHintText, { color: '#FF9800' }]}>
+              {purchaseDisabledReason}. Purchase buttons are disabled.
             </Text>
           </View>
         )}
@@ -569,9 +609,9 @@ export default function UpgradeScreen() {
               </View>
               <Text style={styles.cciInlineDescription}>Clinical capacity artifact · Issued once</Text>
               <Pressable
-                style={[styles.cciInlineButton, (isPurchasing || hasCCIPurchased) && styles.cciInlineButtonDisabled]}
+                style={[styles.cciInlineButton, (purchaseBlocked || hasCCIPurchased) && styles.cciInlineButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CCI_FREE, 'Individual CCI')}
-                disabled={isPurchasing || hasCCIPurchased}
+                disabled={purchaseBlocked || hasCCIPurchased}
               >
                 <Text style={styles.cciInlineButtonText}>
                   {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.freeUser)}`}
@@ -602,7 +642,7 @@ export default function UpgradeScreen() {
               <Pressable
                 style={[styles.planCardCtaButton, isPro && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.PRO_ANNUAL, 'Pro (Annual)')}
-                disabled={isPurchasing || isPro}
+                disabled={purchaseBlocked || isPro}
               >
                 <Text style={[styles.planCardCtaButtonText, isPro && styles.planCardCtaButtonTextDisabled]}>
                   {isPro ? 'Active' : `${formatPrice(PRO_PRICING.annual)}/yr`}
@@ -612,7 +652,7 @@ export default function UpgradeScreen() {
               <Pressable
                 style={[styles.planCardCtaButtonSecondary, isPro && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.PRO_MONTHLY, 'Pro (Monthly)')}
-                disabled={isPurchasing || isPro}
+                disabled={purchaseBlocked || isPro}
               >
                 <Text style={[styles.planCardCtaButtonSecondaryText, isPro && styles.planCardCtaButtonTextDisabled]}>
                   {formatPrice(PRO_PRICING.monthly)}/mo
@@ -629,9 +669,9 @@ export default function UpgradeScreen() {
               </View>
               <Text style={styles.cciInlineDescription}>Clinical capacity artifact · Issued once</Text>
               <Pressable
-                style={[styles.cciInlineButtonPro, (isPurchasing || hasCCIPurchased || !isPro) && styles.cciInlineButtonDisabled]}
+                style={[styles.cciInlineButtonPro, (purchaseBlocked || hasCCIPurchased || !isPro) && styles.cciInlineButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CCI_PRO, 'Individual CCI')}
-                disabled={isPurchasing || hasCCIPurchased || !isPro}
+                disabled={purchaseBlocked || hasCCIPurchased || !isPro}
               >
                 <Text style={styles.cciInlineButtonText}>
                   {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.proUser)}`}
@@ -663,7 +703,7 @@ export default function UpgradeScreen() {
               <Pressable
                 style={[styles.planCardCtaButton, { backgroundColor: '#FF9800' }, (hasFamily || !isPro) && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_ANNUAL, 'Family (Annual)')}
-                disabled={isPurchasing || hasFamily || !isPro}
+                disabled={purchaseBlocked || hasFamily || !isPro}
               >
                 <Text style={[styles.planCardCtaButtonText, (hasFamily || !isPro) && styles.planCardCtaButtonTextDisabled]}>
                   {hasFamily ? 'Active' : `${formatPrice(FAMILY_ADDON_PRICING.annual)}/yr`}
@@ -673,7 +713,7 @@ export default function UpgradeScreen() {
               <Pressable
                 style={[styles.planCardCtaButtonSecondary, (hasFamily || !isPro) && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_MONTHLY, 'Family (Monthly)')}
-                disabled={isPurchasing || hasFamily || !isPro}
+                disabled={purchaseBlocked || hasFamily || !isPro}
               >
                 <Text style={[styles.planCardCtaButtonSecondaryText, (hasFamily || !isPro) && styles.planCardCtaButtonTextDisabled]}>
                   {formatPrice(FAMILY_ADDON_PRICING.monthly)}/mo
@@ -705,7 +745,7 @@ export default function UpgradeScreen() {
               <Pressable
                 style={[styles.planCardCtaButton, { backgroundColor: '#00E5FF' }, (hasCircle || !isPro) && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CIRCLE_ANNUAL, 'Circle (Annual)')}
-                disabled={isPurchasing || hasCircle || !isPro}
+                disabled={purchaseBlocked || hasCircle || !isPro}
               >
                 <Text style={[styles.planCardCtaButtonText, (hasCircle || !isPro) && styles.planCardCtaButtonTextDisabled]}>
                   {hasCircle ? 'Active' : `${formatPrice(CIRCLE_PRICING.annual)}/yr`}
@@ -715,7 +755,7 @@ export default function UpgradeScreen() {
               <Pressable
                 style={[styles.planCardCtaButtonSecondary, (hasCircle || !isPro) && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CIRCLE_MONTHLY, 'Circle (Monthly)')}
-                disabled={isPurchasing || hasCircle || !isPro}
+                disabled={purchaseBlocked || hasCircle || !isPro}
               >
                 <Text style={[styles.planCardCtaButtonSecondaryText, (hasCircle || !isPro) && styles.planCardCtaButtonTextDisabled]}>
                   {formatPrice(CIRCLE_PRICING.monthly)}/mo
@@ -732,9 +772,9 @@ export default function UpgradeScreen() {
               </View>
               <Text style={styles.cciInlineDescription}>One CCI covering all Circle members · No individual attribution</Text>
               <Pressable
-                style={[styles.cciInlineButtonCircle, (isPurchasing || !hasCircle) && styles.cciInlineButtonDisabled]}
+                style={[styles.cciInlineButtonCircle, (purchaseBlocked || !hasCircle) && styles.cciInlineButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CCI_CIRCLE_ALL, 'Circle Aggregate CCI')}
-                disabled={isPurchasing || !hasCircle}
+                disabled={purchaseBlocked || !hasCircle}
               >
                 <Text style={styles.cciInlineButtonText}>
                   {`Get Circle CCI · ${formatPrice(CCI_GROUP_PRICING.circleAll)}`}
@@ -765,7 +805,7 @@ export default function UpgradeScreen() {
               <Pressable
                 style={[styles.bundleOptionButton, bundleSize === 10 && styles.bundleOptionButtonActive]}
                 onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_10_ANNUAL, '10-Seat Pro Bundle')}
-                disabled={isPurchasing || bundleSize !== null}
+                disabled={purchaseBlocked || bundleSize !== null}
               >
                 <Text style={[styles.bundleOptionText, bundleSize === 10 && styles.bundleOptionTextActive]}>10 seats</Text>
                 <Text style={[styles.bundleOptionPrice, bundleSize === 10 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_10.annual)}</Text>
@@ -773,7 +813,7 @@ export default function UpgradeScreen() {
               <Pressable
                 style={[styles.bundleOptionButton, bundleSize === 15 && styles.bundleOptionButtonActive]}
                 onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_15_ANNUAL, '15-Seat Pro Bundle')}
-                disabled={isPurchasing || bundleSize !== null}
+                disabled={purchaseBlocked || bundleSize !== null}
               >
                 <Text style={[styles.bundleOptionText, bundleSize === 15 && styles.bundleOptionTextActive]}>15 seats</Text>
                 <Text style={[styles.bundleOptionPrice, bundleSize === 15 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_15.annual)}</Text>
@@ -781,7 +821,7 @@ export default function UpgradeScreen() {
               <Pressable
                 style={[styles.bundleOptionButton, bundleSize === 20 && styles.bundleOptionButtonActive]}
                 onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_20_ANNUAL, '20-Seat Pro Bundle')}
-                disabled={isPurchasing || bundleSize !== null}
+                disabled={purchaseBlocked || bundleSize !== null}
               >
                 <Text style={[styles.bundleOptionText, bundleSize === 20 && styles.bundleOptionTextActive]}>20 seats</Text>
                 <Text style={[styles.bundleOptionPrice, bundleSize === 20 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_20.annual)}</Text>
@@ -797,9 +837,9 @@ export default function UpgradeScreen() {
               </View>
               <Text style={styles.cciInlineDescription}>One CCI covering all Bundle seats · No individual attribution</Text>
               <Pressable
-                style={[styles.cciInlineButtonBundle, (isPurchasing || bundleSize === null) && styles.cciInlineButtonDisabled]}
+                style={[styles.cciInlineButtonBundle, (purchaseBlocked || bundleSize === null) && styles.cciInlineButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CCI_BUNDLE_ALL, 'Bundle Aggregate CCI')}
-                disabled={isPurchasing || bundleSize === null}
+                disabled={purchaseBlocked || bundleSize === null}
               >
                 <Text style={styles.cciInlineButtonText}>
                   {`Get Bundle CCI · ${formatPrice(CCI_GROUP_PRICING.bundleAll)}`}
@@ -831,7 +871,7 @@ export default function UpgradeScreen() {
               isCurrentTier={hasAdminAddOn}
               onSelectMonthly={() => handlePurchase(PRODUCT_IDS.ADMIN_ADDON_MONTHLY, 'Admin (Monthly)')}
               onSelectAnnual={() => handlePurchase(PRODUCT_IDS.ADMIN_ADDON_ANNUAL, 'Admin (Annual)')}
-              disabled={isPurchasing}
+              disabled={purchaseBlocked}
               color="#9C27B0"
             />
           </Animated.View>
