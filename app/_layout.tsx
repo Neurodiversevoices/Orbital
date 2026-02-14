@@ -306,7 +306,12 @@ function RootLayout() {
 
   return (
     <ErrorBoundary name="RootLayout">
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureHandlerRootView style={{ flex: 1 }} onLayout={() => {
+          if (!firedPhases.has('startup:stack_visible')) {
+            firedPhases.add('startup:stack_visible');
+            startupBreadcrumb('startup:stack_visible');
+          }
+        }}>
         <StartupPhase phase="deferred_begin" />
         <LocaleProvider>
           <AccessibilityProvider>
@@ -469,7 +474,6 @@ function RootLayout() {
                     }}
                   />
                 </Stack>
-                <StartupPhase phase="startup:stack_visible" />
                 </IdleTimeoutWrapper>
                 </AgeGate>
               </TermsAcceptanceProvider>
