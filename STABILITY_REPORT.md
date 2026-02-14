@@ -1,8 +1,8 @@
 # Orbital v1.0.0 (Build 39) — Stability & Production Readiness Report
 
-**Generated**: 2026-02-11
+**Generated**: 2026-02-14
 **Branch**: `claude/patterns-by-age-cohort-9xbCx`
-**Commits**: `ebe988f` (initial hardening), `f6550e0` (final sprint), `43862b4` (biometric fix)
+**Release**: `orbital@1.0.0` **Dist**: `39`
 **Engine**: Hermes (React Native New Architecture enabled)
 **Build System**: Expo / EAS Build
 
@@ -122,7 +122,7 @@ The app uses a two-phase startup to prevent iOS watchdog termination (SIGKILL af
 | 8 | `startup:phase2_done` | startup | After setProvidersReady(true) |
 | 9 | `startup:tags_set` | startup | After setupSentryDeferred() |
 
-**Slow startup guard**: If elapsed > 2000ms at `first_layout_effect`, a `Sentry.captureMessage('Cold start exceeded 2s', 'warning')` is emitted. This is dropped by `beforeSend` (level=warning), but the breadcrumb persists for crash diagnosis.
+**Slow startup guard**: If elapsed > 2000ms at `first_layout_effect`, a `Sentry.captureMessage('Cold start exceeded 2s', 'warning')` is emitted. This warning now reaches Sentry (beforeSend only drops info/debug/log, not warning). The breadcrumb also persists for crash diagnosis.
 
 ### PROOF ARTIFACT: Startup Phase Code
 
@@ -157,20 +157,32 @@ useEffect(() => {
 }, []);
 ```
 
-**Expected cold launch breadcrumb timeline** (simulated from code analysis):
+### 2.2a Real Startup Timings
 
-| Breadcrumb | Expected ms (iPhone 14 estimate) |
-|-----------|----------------------------------|
-| `startup:sentry_init_done` | ~65-115 |
-| `startup:first_layout_effect` | ~150-250 |
-| `startup:phase1_done` | ~150-250 |
-| `startup:deferred_begin` | ~300-500 |
-| `startup:providers_loading` | ~300-500 |
-| `startup:providers_ready` | ~400-700 |
-| `startup:phase2_done` | ~400-700 |
-| `startup:tags_set` | ~400-700 |
+**Status: NOT YET AVAILABLE**
 
-> **NOTE**: Actual device timings require a TestFlight build. The above are estimates based on module-scope cost analysis. The code structure guarantees all breadcrumbs fire in order. A real cold-launch Sentry event will contain these breadcrumbs with actual `ms` values.
+This build (`orbital@1.0.0`, dist `39`) has not been deployed to TestFlight. No Sentry events exist yet for this release. Real breadcrumb timings will be available after the first TestFlight session.
+
+**Verification procedure** (must be completed before App Store submission):
+
+1. Deploy build 39 to TestFlight
+2. Cold-launch on a physical device (kill app from app switcher first)
+3. Open Sentry → Issues or Breadcrumbs → filter `release:orbital@1.0.0`
+4. Find any event and expand the breadcrumb trail
+5. Copy the `ms` values from each `startup:*` breadcrumb into this table:
+
+| Breadcrumb | ms (from Sentry) |
+|-----------|------------------|
+| `startup:sentry_init_done` | ___ |
+| `startup:first_layout_effect` | ___ |
+| `startup:phase1_done` | ___ |
+| `startup:deferred_begin` | ___ |
+| `startup:providers_loading` | ___ |
+| `startup:providers_ready` | ___ |
+| `startup:phase2_done` | ___ |
+| `startup:tags_set` | ___ |
+
+**Pass criteria**: `phase1_done` < 400ms (iOS watchdog safe), `phase2_done` < 2000ms (no slow-start warning).
 
 ### 2.3 Startup Error Handling
 
@@ -288,10 +300,104 @@ All `.map()` calls inside the ListHeaderComponent are bounded:
 | Categories row | `['sensory', 'demand', 'social']` | 3 (hardcoded) | `patterns.tsx:717` |
 | `WeeklyCapacityRecord` → `DAYS.map` | 7 days of week | 7 (hardcoded) | `WeeklyCapacityRecord.tsx:174` |
 | `WeeklyCapacityRecord` → `selectedDayLogs.map` | Logs for 1 day | Typically 1-5 | `WeeklyCapacityRecord.tsx:242` |
-| `MilestonesPanel` → `milestones.map` | Computed milestones | < 10 | `MilestonesPanel.tsx:154` |
-| `PatternLanguagePanel` → `patterns.map` | Pattern metrics | 3-4 | `PatternLanguagePanel.tsx:186` |
+| `MilestonesPanel` → `milestones.map` | Hardcoded milestone array | **exactly 3** | `MilestonesPanel.tsx:154` |
+| `PatternLanguagePanel` → `patterns.map` | Hardcoded pattern array | **exactly 3** | `PatternLanguagePanel.tsx:186` |
 
-**Verdict**: No unbounded list rendering. No `logs.map()` inside the header. `logs` are passed as props to child components (`EnergyGraph`, `WeeklyCapacityRecord`) which handle their own bounded rendering.
+### PROOF ARTIFACT: Child Component Bounded Rendering
+
+**EnergyGraph** — `components/EnergyGraph.tsx:150-170`
+
+```typescript
+// Bucket aggregation → hard cap → only capped array is rendered
+const allIndices = Array.from(buckets.keys()).sort((a, b) => a - b);
+
+// Hard cap: max 60 chart points for rendering stability
+const sortedIndices = allIndices.length > 60
+  ? Array.from({ length: 60 }, (_, i) => allIndices[Math.floor(i * allIndices.length / 60)])
+  : allIndices;
+
+// Only capped sortedIndices drives the render loop:
+sortedIndices.forEach((bucketIndex) => {
+  const bucket = buckets.get(bucketIndex)!;
+  const avgValue = bucket.sum / bucket.count;
+  pts.push({ x, y, value: avgValue });
+});
+
+// SVG circle render is additionally gated:
+{points.length <= 50 && points.map((point, index) => ( /* Circle */ ))}
+// dateLabels.map — bounded by getDateLabelCount() which returns 4-7
+```
+
+Bound: **60 points max** (downsampled). Circle render gated at **50**. Date labels **4-7** (hardcoded switch).
+
+---
+
+**WeeklyCapacityRecord** — `components/WeeklyCapacityRecord.tsx:98-121, 174, 242`
+
+```typescript
+// logsByDay is built by filtering to ONE WEEK then bucketing into 7 days:
+const weekLogs = logs.filter(log => log.timestamp >= weekStartMs && log.timestamp < weekEndMs);
+const byDay: CapacityLog[][] = [[], [], [], [], [], [], []];
+weekLogs.forEach(log => {
+  const dayIndex = new Date(log.timestamp).getDay();
+  byDay[dayIndex].push(log);
+});
+
+// .map() #1 — DAYS is a hardcoded 7-element array:
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+{DAYS.map((day, index) => { /* day tab */ })}
+
+// .map() #2 — selectedDayLogs = logs for ONE SELECTED DAY of one week:
+const selectedDayLogs = logsByDay[selectedDayIndex];
+{selectedDayLogs.map((log, index) => { /* entry row */ })}
+```
+
+Bound: DAYS.map is **exactly 7**. selectedDayLogs is logs for **one day of one week** — practically 1-5 entries. Even with aggressive logging (one per hour, 24h), max is 24.
+
+---
+
+**MilestonesPanel** — `components/MilestonesPanel.tsx:153-161`, sourced from `lib/hooks/useMilestones.ts:112-146`
+
+```typescript
+// useMilestones.ts:112-146 — milestones is a HARDCODED 3-element array literal:
+const milestones: Milestone[] = [
+  { id: 'patterns_forming',      requiredDays: 7,  /* ... */ },
+  { id: 'baseline_established',  requiredDays: 30, /* ... */ },
+  { id: 'high_confidence',       requiredDays: 90, /* ... */ },
+];
+
+// MilestonesPanel.tsx:153-161 — maps only over that array:
+{milestones.map((milestone, index) => (
+  <MilestoneItem key={milestone.id} milestone={milestone} delay={index * 100} />
+))}
+```
+
+Bound: **exactly 3 items**. Hardcoded array literal, not data-driven.
+
+---
+
+**PatternLanguagePanel** — `components/PatternLanguagePanel.tsx:185-193`, sourced from `lib/hooks/usePatternLanguage.ts:147-196`
+
+```typescript
+// usePatternLanguage.ts:147-196 — patterns is a HARDCODED 3-element array literal:
+const patterns: PatternConcept[] = [
+  { id: 'stability',    /* ... */ },
+  { id: 'volatility',   /* ... */ },
+  { id: 'recovery_lag', /* ... */ },
+];
+
+// PatternLanguagePanel.tsx:185-193 — maps only over that array:
+{patterns.map((pattern, index) => (
+  <PatternCard key={pattern.id} pattern={pattern} delay={index * 100}
+    onPress={() => setSelectedPattern(pattern)} />
+))}
+```
+
+Bound: **exactly 3 items**. Hardcoded array literal, not data-driven.
+
+---
+
+**Verdict**: All child component `.map()` calls render bounded arrays. No component iterates over raw `logs`. EnergyGraph downsamples to max 60. WeeklyCapacityRecord filters to one week then one day. MilestonesPanel and PatternLanguagePanel both map over hardcoded 3-element arrays.
 
 ### 3.2 SVG Rendering Memory
 
@@ -349,6 +455,29 @@ lib/hooks/useSensoryAlert.ts:44:      const [cfg, evts] = await Promise.all([
 | 12 | `lib/hooks/useSensoryAlert.ts` | 44-47 | `loadData` (useCallback) | Loads sensory config + events | try/catch at 43-57 + Sentry.captureException |
 | 13 | `lib/hooks/useSharing.ts` | 42-46 | `loadData` (useCallback) | Loads recipients + shares + audit | try/catch at 41-57 + Sentry.captureException; error state set |
 | 14 | `lib/access/entitlements.ts` | 235-247 | (Promise chain) | Loads entitlement configs + rules | `.then().catch()` chain; fallback state on catch |
+
+### PROOF ARTIFACT: `lib/access/entitlements.ts:234-248` catch block
+
+```typescript
+// lib/access/entitlements.ts:234-248
+useEffect(() => {
+  Promise.all([
+    loadGrants(),
+    initializeQAFreeMode(),
+    initializeForcedRoleView(),
+  ]).then(([loaded, qaEnabled, forcedRole]) => {
+    setGrants(loaded);
+    setQAFreeModeEnabled(qaEnabled);
+    setFreeUserViewActive(forcedRole === 'free');
+    setIsLoading(false);
+  }).catch((error) => {
+    if (__DEV__) console.error('[useAccess] Init failed:', error);
+    setIsLoading(false);
+  });
+}, []);
+```
+
+The `.catch()` terminates the promise chain. On failure: `setIsLoading(false)` is called (no stuck spinner), grants default to `[]` (empty — free tier), DEV console error is guarded by `__DEV__`. **Cannot produce an unhandled rejection.**
 
 **Verdict**: 14/14 Promise.all calls have error handling. Zero unprotected.
 
@@ -554,10 +683,11 @@ Production and review builds do NOT have access to mock checkout. Legacy product
 ### PROOF ARTIFACT: `beforeSend` Function (Full)
 
 ```typescript
-// app/_layout.tsx:64-108
+// app/_layout.tsx:64-109
 beforeSend(event) {
+  // Drop info/debug/log — keep warning and error/fatal
   const level = event.level;
-  if (level === 'warning' || level === 'info' || level === 'debug' || level === 'log') {
+  if (level === 'info' || level === 'debug' || level === 'log') {
     return null;
   }
 

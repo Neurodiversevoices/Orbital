@@ -62,8 +62,9 @@ Sentry.init({
   sessionTrackingIntervalMillis: 30000,
 
   beforeSend(event) {
+    // Drop info/debug/log — keep warning and error/fatal
     const level = event.level;
-    if (level === 'warning' || level === 'info' || level === 'debug' || level === 'log') {
+    if (level === 'info' || level === 'debug' || level === 'log') {
       return null;
     }
 
