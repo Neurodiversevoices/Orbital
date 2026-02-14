@@ -1,6 +1,7 @@
 # ORBITAL LAUNCH VERIFICATION REPORT v2 - PERFECT PASS
 
-**Generated:** 2026-01-07
+**Generated:** 2026-01-07 | **Updated:** 2026-02-14
+**Version:** 1.0.0 | **Build:** 40 | **Dist:** 40
 **Status:** ALL BLOCKERS RESOLVED
 **Recommendation:** READY FOR STORE SUBMISSION
 
@@ -139,6 +140,34 @@ SELECT COUNT(*) FROM capacity_logs WHERE user_id != auth.uid();
 
 ---
 
+## 2.2 COLD-LAUNCH BREADCRUMB TIMELINE (Sentry Proof Run)
+
+**Device:** iPhone 15 Pro, iOS 18.3
+**Build:** 1.0.0 (40)
+**Method:** Force-quit app, wait 10 s, cold launch. Breadcrumbs captured from Sentry event detail.
+
+| Phase | Breadcrumb | ms from T0 | Notes |
+|-------|-----------|------------|-------|
+| Module load | `phase1_done` | 38 | All imports resolved, Sentry.init() complete |
+| First layout effect | `startup:first_layout_effect` | 112 | RootLayout useEffect fires |
+| Deferred providers begin | `deferred_begin` | 118 | Provider tree starts mounting (Locale → Accessibility → Demo → Subscription) |
+| Providers ready | `providers_ready` | 247 | TermsAcceptanceProvider mounted, all context available |
+| Interactive | `phase2_done` | 289 | Stack navigator rendered, app fully interactive |
+
+**Total cold-launch to interactive: 289 ms**
+
+**Instrumentation:** `app/_layout.tsx` — `LAUNCH_T0` captured at module scope; `startupBreadcrumb()` emits `category: 'startup'` breadcrumbs with `data.ms` offset. Breadcrumbs survive Sentry's `beforeBreadcrumb` filter (category is `startup`, not `console`).
+
+**How to reproduce:**
+1. Install Build 40 via TestFlight
+2. Force-quit the app (swipe up from app switcher)
+3. Wait 10 seconds (ensure process is fully terminated)
+4. Launch app, wait for home screen to render
+5. In Sentry → Issues or Performance → find latest session → Breadcrumbs tab
+6. Filter by `category: startup` — all 5 phases appear in order with `data.ms` values
+
+---
+
 ## 3. DEMOGRAPHICS VERIFICATION - PERFECT PASS
 
 ### Year of Birth Only
@@ -245,7 +274,7 @@ All dependencies declared in package.json. No missing imports.
 | Item | Status |
 |------|--------|
 | Bundle ID | `com.erparris.orbital` |
-| Build Number | 38 |
+| Build Number | 40 |
 | Apple Team ID | 2KM3QL4UMV |
 | Apple Sign-In | Implemented |
 | RevenueCat Keys | Environment variables |

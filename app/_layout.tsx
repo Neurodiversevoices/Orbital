@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
@@ -21,6 +21,24 @@ import { AgeGate } from '../components/legal/AgeGate';
 import { useIdleTimeout, updateLastActivity } from '../lib/session';
 import { useAuth } from '../lib/supabase';
 import { logSessionExpired, createDeviceSession } from '../lib/session';
+
+// =============================================================================
+// COLD-LAUNCH TIMING — Breadcrumbs for Sentry startup trace
+// =============================================================================
+const LAUNCH_T0 = Date.now();
+
+function startupBreadcrumb(phase: string) {
+  const elapsed = Date.now() - LAUNCH_T0;
+  Sentry.addBreadcrumb({
+    message: phase,
+    category: 'startup',
+    level: 'info',
+    data: { ms: elapsed },
+  });
+}
+
+// Phase 1: module-level imports complete
+startupBreadcrumb('phase1_done');
 
 // =============================================================================
 // SENTRY CONFIGURATION - 24/7 Watchdog (Only Bark on Critical Failures)
@@ -116,6 +134,22 @@ Sentry.init({
   },
 });
 
+
+// =============================================================================
+// STARTUP PHASE MARKER — fires breadcrumb once on mount
+// =============================================================================
+
+const firedPhases = new Set<string>();
+
+function StartupPhase({ phase }: { phase: string }) {
+  useEffect(() => {
+    if (!firedPhases.has(phase)) {
+      firedPhases.add(phase);
+      startupBreadcrumb(phase);
+    }
+  }, [phase]);
+  return null;
+}
 
 // =============================================================================
 // IDLE TIMEOUT WRAPPER - Auto-logout after inactivity
@@ -230,8 +264,13 @@ const idleStyles = StyleSheet.create({
 
 function RootLayout() {
   const router = useRouter();
+  const startupTracked = useRef(false);
 
   useEffect(() => {
+    if (!startupTracked.current) {
+      startupBreadcrumb('startup:first_layout_effect');
+      startupTracked.current = true;
+    }
     Sentry.addBreadcrumb({ message: 'App mounted', category: 'lifecycle' });
   }, []);
 
@@ -259,12 +298,14 @@ function RootLayout() {
   return (
     <ErrorBoundary name="RootLayout">
       <GestureHandlerRootView style={{ flex: 1 }}>
+        <StartupPhase phase="deferred_begin" />
         <LocaleProvider>
           <AccessibilityProvider>
             <DemoModeProvider>
             <AppModeProvider>
             <SubscriptionProvider>
               <TermsAcceptanceProvider>
+                <StartupPhase phase="providers_ready" />
                 {/* AGE GATE — LEGAL REQUIRED: Blocks ALL access until 13+ verified */}
                 <AgeGate>
                 <IdleTimeoutWrapper>
@@ -419,6 +460,7 @@ function RootLayout() {
                     }}
                   />
                 </Stack>
+                <StartupPhase phase="phase2_done" />
                 </IdleTimeoutWrapper>
                 </AgeGate>
               </TermsAcceptanceProvider>
