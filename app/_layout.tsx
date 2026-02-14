@@ -37,8 +37,8 @@ function startupBreadcrumb(phase: string) {
   });
 }
 
-// Phase 1: module-level imports complete
-startupBreadcrumb('phase1_done');
+// Phase 1: module-level imports + Sentry.init() complete
+startupBreadcrumb('startup:module_ready');
 
 // =============================================================================
 // SENTRY CONFIGURATION - 24/7 Watchdog (Only Bark on Critical Failures)
@@ -141,13 +141,14 @@ Sentry.init({
 
 const firedPhases = new Set<string>();
 
-function StartupPhase({ phase }: { phase: string }) {
+function StartupPhase({ phase, onFired }: { phase: string; onFired?: () => void }) {
   useEffect(() => {
     if (!firedPhases.has(phase)) {
       firedPhases.add(phase);
       startupBreadcrumb(phase);
+      onFired?.();
     }
-  }, [phase]);
+  }, [phase, onFired]);
   return null;
 }
 
@@ -265,6 +266,7 @@ const idleStyles = StyleSheet.create({
 function RootLayout() {
   const router = useRouter();
   const startupTracked = useRef(false);
+  const [providersReady, setProvidersReady] = useState(false);
 
   useEffect(() => {
     if (!startupTracked.current) {
@@ -273,6 +275,14 @@ function RootLayout() {
     }
     Sentry.addBreadcrumb({ message: 'App mounted', category: 'lifecycle' });
   }, []);
+
+  // Phase 2 complete: fires ONLY after providersReady=true is committed to the UI
+  useEffect(() => {
+    if (providersReady && !firedPhases.has('phase2_done')) {
+      firedPhases.add('phase2_done');
+      startupBreadcrumb('phase2_done');
+    }
+  }, [providersReady]);
 
   useEffect(() => {
     const handleDeepLink = (event: { url: string }) => {
@@ -305,7 +315,7 @@ function RootLayout() {
             <AppModeProvider>
             <SubscriptionProvider>
               <TermsAcceptanceProvider>
-                <StartupPhase phase="providers_ready" />
+                <StartupPhase phase="providers_ready" onFired={() => setProvidersReady(true)} />
                 {/* AGE GATE — LEGAL REQUIRED: Blocks ALL access until 13+ verified */}
                 <AgeGate>
                 <IdleTimeoutWrapper>
@@ -460,7 +470,6 @@ function RootLayout() {
                     }}
                   />
                 </Stack>
-                <StartupPhase phase="phase2_done" />
                 </IdleTimeoutWrapper>
                 </AgeGate>
               </TermsAcceptanceProvider>

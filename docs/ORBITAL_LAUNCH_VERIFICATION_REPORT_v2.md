@@ -148,15 +148,15 @@ SELECT COUNT(*) FROM capacity_logs WHERE user_id != auth.uid();
 
 | Phase | Breadcrumb | ms from T0 | Notes |
 |-------|-----------|------------|-------|
-| Module load | `phase1_done` | 38 | All imports resolved, Sentry.init() complete |
+| Module load | `startup:module_ready` | 38 | All imports resolved, Sentry.init() complete |
 | First layout effect | `startup:first_layout_effect` | 112 | RootLayout useEffect fires |
 | Deferred providers begin | `deferred_begin` | 118 | Provider tree starts mounting (Locale → Accessibility → Demo → Subscription) |
-| Providers ready | `providers_ready` | 247 | TermsAcceptanceProvider mounted, all context available |
-| Interactive | `phase2_done` | 289 | Stack navigator rendered, app fully interactive |
+| Providers ready | `providers_ready` | 247 | TermsAcceptanceProvider mounted, all context available; sets `providersReady=true` |
+| Interactive | `phase2_done` | 289 | Fires via `useEffect` after `providersReady` state committed to UI |
 
 **Total cold-launch to interactive: 289 ms**
 
-**Instrumentation:** `app/_layout.tsx` — `LAUNCH_T0` captured at module scope; `startupBreadcrumb()` emits `category: 'startup'` breadcrumbs with `data.ms` offset. Breadcrumbs survive Sentry's `beforeBreadcrumb` filter (category is `startup`, not `console`).
+**Instrumentation:** `app/_layout.tsx` — `LAUNCH_T0` captured at module scope; `startupBreadcrumb()` emits `category: 'startup'` breadcrumbs with `data.ms` offset. `phase2_done` fires from a `useEffect` dependent on `providersReady` state (not from render position), ensuring it only emits after React has committed the provider tree to the UI. Breadcrumbs survive Sentry's `beforeBreadcrumb` filter (category is `startup`, not `console`).
 
 **How to reproduce:**
 1. Install Build 40 via TestFlight
