@@ -25,6 +25,8 @@ export interface DataRoomOptions {
     auditLogs: boolean;
     orgList: boolean;
     revenueMetrics: boolean;
+    technicalArchitecture: boolean;
+    legalDocuments: boolean;
   };
   dateRange?: {
     start: number;
@@ -43,6 +45,8 @@ export const DEFAULT_DATA_ROOM_OPTIONS: DataRoomOptions = {
     auditLogs: true,
     orgList: true,
     revenueMetrics: true,
+    technicalArchitecture: false,
+    legalDocuments: false,
   },
   redactPII: true,
 };
@@ -89,7 +93,7 @@ export async function generateDataRoomPackage(
     await calculateSecurityScore();
   }
 
-  pkg.metadata.generationTimeMs = Date.now() - startTime;
+  pkg.metadata!.generationTimeMs = Date.now() - startTime;
 
   return pkg;
 }

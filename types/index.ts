@@ -1,3 +1,5 @@
+import type { Locale } from '../locales';
+
 // Capacity states: resourced (high capacity), stretched (moderate), depleted (low)
 export type CapacityState = 'resourced' | 'stretched' | 'depleted';
 
@@ -286,7 +288,7 @@ export interface ViewContext {
 // ============================================
 
 export interface OrbitalPreferences {
-  locale: 'en' | 'es';
+  locale: Locale;
   orbitalMode: OrbitalMode;
   sharingEnabled: boolean;
   lastExportAt?: number;
@@ -454,7 +456,7 @@ export interface PolicyDocument {
   version: string;
   effectiveDate: number;
   content: string;
-  locale: 'en' | 'es';
+  locale: Locale;
   hash: string; // SHA-256 of content for integrity verification
 }
 
@@ -739,7 +741,7 @@ export interface ContractTemplate {
   createdAt: number;
   lastModifiedAt: number;
   isActive: boolean;
-  locale: 'en' | 'es';
+  locale: Locale;
 }
 
 export interface SignedContract {
@@ -1075,9 +1077,14 @@ export interface DataRoomPackage {
     technicalArchitecture: boolean;
     legalDocuments: boolean;
   };
-  accessLog: { accessedBy: string; accessedAt: number; section?: string }[];
+  metadata?: {
+    generationTimeMs: number;
+    totalItems: number;
+    redacted: boolean;
+  };
+  accessLog?: { accessedBy: string; accessedAt: number; section?: string }[];
   expiresAt?: number;
-  watermark: string;
+  watermark?: string;
 }
 
 export const JURISDICTION_CONFIGS: Record<JurisdictionCode, JurisdictionConfig> = {

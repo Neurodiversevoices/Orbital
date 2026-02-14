@@ -90,7 +90,7 @@ export async function deriveKeyFromMnemonic(
   const mnemonicString = mnemonic.join(' ');
   const keyMaterial = await crypto.subtle.importKey(
     'raw',
-    stringToBytes(mnemonicString),
+    stringToBytes(mnemonicString) as BufferSource,
     'PBKDF2',
     false,
     ['deriveBits', 'deriveKey']
@@ -99,7 +99,7 @@ export async function deriveKeyFromMnemonic(
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt,
+      salt: salt as BufferSource,
       iterations: 100000,
       hash: 'SHA-256',
     },
@@ -120,9 +120,9 @@ export async function encrypt(
 ): Promise<ArrayBuffer> {
   const encoded = stringToBytes(plaintext);
   return crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
+    { name: 'AES-GCM', iv: iv as BufferSource },
     key,
-    encoded
+    encoded as BufferSource
   );
 }
 
@@ -135,11 +135,11 @@ export async function decrypt(
   iv: Uint8Array
 ): Promise<string> {
   const decrypted = await crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv },
+    { name: 'AES-GCM', iv: iv as BufferSource },
     key,
     ciphertext
   );
-  return bytesToString(new Uint8Array(decrypted));
+  return bytesToString(new Uint8Array(decrypted as ArrayBuffer));
 }
 
 /**
@@ -177,7 +177,7 @@ export async function decryptPayload(
   const ciphertextBytes = base64ToBytes(ciphertext);
 
   const key = await deriveKeyFromMnemonic(mnemonic, saltBytes);
-  const plaintext = await decrypt(ciphertextBytes.buffer, key, ivBytes);
+  const plaintext = await decrypt(ciphertextBytes.buffer as ArrayBuffer, key, ivBytes);
 
   return JSON.parse(plaintext);
 }

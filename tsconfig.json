@@ -11,5 +11,12 @@
     "**/*.ts",
     "**/*.tsx",
     "modules/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "lib/sentinel/__tests__",
+    "tests/e2e",
+    "scripts",
+    "api"
   ]
 }

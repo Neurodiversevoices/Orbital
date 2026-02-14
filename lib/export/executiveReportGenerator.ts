@@ -1,6 +1,7 @@
 import { CapacityLog, CapacityState, Category, ExecutiveReportConfig, ExecutiveReportData, ExportSummary } from '../../types';
 import { getLogs, getVaultedLogs, getFullHistoryRange } from '../storage';
 import { generateExportSummary } from './summaryGenerator';
+import { Locale } from '../../locales';
 
 const PERIOD_MS = {
   quarterly: 90 * 24 * 60 * 60 * 1000,
@@ -9,7 +10,7 @@ const PERIOD_MS = {
 
 export async function generateExecutiveReport(
   config: ExecutiveReportConfig,
-  locale: 'en' | 'es' = 'en'
+  locale: Locale = 'en'
 ): Promise<ExecutiveReportData> {
   const now = Date.now();
   let periodStart: number;
@@ -107,7 +108,7 @@ function determineTrend(weeklyAverages: number[]): 'improving' | 'stable' | 'dec
   return 'stable';
 }
 
-function identifyPatterns(logs: CapacityLog[], locale: 'en' | 'es'): string[] {
+function identifyPatterns(logs: CapacityLog[], locale: Locale): string[] {
   const patterns: string[] = [];
 
   if (logs.length < 7) {
@@ -200,7 +201,7 @@ function identifyPatterns(logs: CapacityLog[], locale: 'en' | 'es'): string[] {
 
 function generateCategoryInsights(
   logs: CapacityLog[],
-  locale: 'en' | 'es'
+  locale: Locale
 ): { category: Category; impactScore: number; recommendation?: string }[] {
   const categories: Category[] = ['sensory', 'demand', 'social'];
 
@@ -228,7 +229,8 @@ function generateCategoryInsights(
           es: 'Evalúe compromisos sociales y asignación de tiempo de recuperación',
         },
       };
-      recommendation = recommendations[category][locale];
+      const rec = recommendations[category];
+      recommendation = locale === 'es' ? rec.es : rec.en;
     }
 
     return { category, impactScore, recommendation };
@@ -237,7 +239,7 @@ function generateCategoryInsights(
 
 export function formatExecutiveReportAsText(
   data: ExecutiveReportData,
-  locale: 'en' | 'es' = 'en'
+  locale: Locale = 'en'
 ): string {
   const dateFormatter = new Intl.DateTimeFormat(locale === 'es' ? 'es-MX' : 'en-US', {
     year: 'numeric',

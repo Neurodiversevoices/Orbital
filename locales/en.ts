@@ -456,6 +456,10 @@ export const en = {
     undoAvailable: 'Tap to undo',
     undoExpired: 'Undo expired',
 
+    // Simple mode
+    simpleMode: 'Simple Mode',
+    simpleModeDesc: 'Maximum accessibility with one tap',
+
     // Guided setup
     guidedSetup: 'Setup Wizard',
     guidedSetupDesc: 'Get help setting up the app',

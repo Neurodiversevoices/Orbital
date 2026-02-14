@@ -338,7 +338,7 @@ export default function PatternsScreen() {
     }
   }, [hasQCRAccess, generateQCR]);
 
-  const handleQCRPurchase = useCallback(async (productId: 'quarterly' | 'monthly') => {
+  const handleQCRPurchase = useCallback(async (productId: 'quarterly') => {
     const success = await purchaseQCR(productId);
     if (success) {
       await generateQCR();

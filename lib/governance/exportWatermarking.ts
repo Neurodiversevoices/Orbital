@@ -4,6 +4,7 @@ import {
   WatermarkedExport,
   JurisdictionCode,
 } from '../../types';
+import { Locale } from '../../locales';
 import { logImmutableAuditEntry } from './immutableAuditLog';
 
 const WATERMARKED_EXPORTS_KEY = '@orbital:watermarked_exports';
@@ -39,7 +40,7 @@ export function generateWatermark(
     recordCount: number;
     exportedBy: string;
     jurisdiction?: JurisdictionCode;
-    locale?: 'en' | 'es';
+    locale?: Locale;
   },
   contentForHash: string
 ): ExportWatermark {
@@ -50,14 +51,14 @@ export function generateWatermark(
     exportDate: Date.now(),
     scope: params.scope,
     recordCount: params.recordCount,
-    disclaimer: WATERMARK_DISCLAIMERS[locale],
+    disclaimer: locale === 'es' ? WATERMARK_DISCLAIMERS.es : WATERMARK_DISCLAIMERS.en,
     exportedBy: params.exportedBy,
     integrityHash: generateIntegrityHash(contentForHash),
     jurisdiction: params.jurisdiction,
   };
 }
 
-export function formatWatermarkHeader(watermark: ExportWatermark, locale: 'en' | 'es' = 'en'): string {
+export function formatWatermarkHeader(watermark: ExportWatermark, locale: Locale = 'en'): string {
   const date = new Date(watermark.exportDate);
   const dateStr = date.toISOString().split('T')[0];
 
@@ -108,7 +109,7 @@ export function formatWatermarkHeader(watermark: ExportWatermark, locale: 'en' |
   return header;
 }
 
-export function formatWatermarkFooter(watermark: ExportWatermark, locale: 'en' | 'es' = 'en'): string {
+export function formatWatermarkFooter(watermark: ExportWatermark, locale: Locale = 'en'): string {
   const labels = locale === 'es' ? {
     endOfExport: 'FIN DE LA EXPORTACIÓN',
     verifyWith: 'Verificar integridad con hash',
@@ -223,7 +224,7 @@ export async function verifyExportIntegrity(
 export function wrapContentWithWatermark(
   content: string,
   watermark: ExportWatermark,
-  locale: 'en' | 'es' = 'en'
+  locale: Locale = 'en'
 ): string {
   const header = formatWatermarkHeader(watermark, locale);
   const footer = formatWatermarkFooter(watermark, locale);
@@ -240,7 +241,7 @@ export async function createWatermarkedExport(
     format: 'pdf' | 'csv' | 'json';
     content: string;
     jurisdiction?: JurisdictionCode;
-    locale?: 'en' | 'es';
+    locale?: Locale;
     expiresInDays?: number;
   }
 ): Promise<{

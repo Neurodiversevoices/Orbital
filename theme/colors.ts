@@ -19,6 +19,9 @@ export const colors = {
   textPrimary: '#FFFFFF',
   textSecondary: 'rgba(255, 255, 255, 0.6)',
 
+  // Primary
+  primary: '#00FFFF',
+
   // Accents
   accent: '#00FFFF',
   accentDim: 'rgba(0, 255, 255, 0.3)',

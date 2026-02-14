@@ -375,7 +375,7 @@ export function guardAgainstIndividualData<T extends Record<string, unknown>>(
     for (const field of individualFields) {
       if (field in sanitized) {
         // Replace with null or remove
-        sanitized[field as string] = null;
+        (sanitized as Record<string, unknown>)[field as string] = null;
       }
     }
 
