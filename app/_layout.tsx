@@ -37,9 +37,6 @@ function startupBreadcrumb(phase: string) {
   });
 }
 
-// Phase 1: module-level imports + Sentry.init() complete
-startupBreadcrumb('startup:module_ready');
-
 // =============================================================================
 // SENTRY CONFIGURATION - 24/7 Watchdog (Only Bark on Critical Failures)
 // =============================================================================
@@ -134,6 +131,8 @@ Sentry.init({
   },
 });
 
+// Phase 1: all module-level imports resolved + Sentry.init() complete
+startupBreadcrumb('startup:module_ready');
 
 // =============================================================================
 // STARTUP PHASE MARKER — fires breadcrumb once on mount
@@ -470,6 +469,7 @@ function RootLayout() {
                     }}
                   />
                 </Stack>
+                <StartupPhase phase="startup:stack_visible" />
                 </IdleTimeoutWrapper>
                 </AgeGate>
               </TermsAcceptanceProvider>

@@ -142,29 +142,44 @@ SELECT COUNT(*) FROM capacity_logs WHERE user_id != auth.uid();
 
 ## 2.2 COLD-LAUNCH BREADCRUMB TIMELINE (Sentry Proof Run)
 
-**Device:** iPhone 15 Pro, iOS 18.3
-**Build:** 1.0.0 (40)
-**Method:** Force-quit app, wait 10 s, cold launch. Breadcrumbs captured from Sentry event detail.
+**Status:** AWAITING REAL DEVICE RUN — values below must come from a physical TestFlight cold launch, not estimates.
 
-| Phase | Breadcrumb | ms from T0 | Notes |
-|-------|-----------|------------|-------|
-| Module load | `startup:module_ready` | 38 | All imports resolved, Sentry.init() complete |
-| First layout effect | `startup:first_layout_effect` | 112 | RootLayout useEffect fires |
-| Deferred providers begin | `deferred_begin` | 118 | Provider tree starts mounting (Locale → Accessibility → Demo → Subscription) |
-| Providers ready | `providers_ready` | 247 | TermsAcceptanceProvider mounted, all context available; sets `providersReady=true` |
-| Interactive | `phase2_done` | 289 | Fires via `useEffect` after `providersReady` state committed to UI |
+**Device:** iPhone 15 Pro, iOS 18.x
+**Build:** 1.0.0 (41) _(update after EAS build)_
+**Sentry Event ID:** _(paste from Sentry after proof run)_
+**Method:** Force-quit app, wait 10 s, cold launch. Breadcrumbs captured from Sentry event detail → filter `category: startup`.
 
-**Total cold-launch to interactive: 289 ms**
+| # | Phase | Breadcrumb | ms from T0 | Notes |
+|---|-------|-----------|------------|-------|
+| 1 | Module load + Sentry.init | `startup:module_ready` | — | Fires at module scope AFTER `Sentry.init()` returns |
+| 2 | First layout effect | `startup:first_layout_effect` | — | RootLayout `useEffect` fires (React committed first render) |
+| 3 | Deferred providers begin | `deferred_begin` | — | Provider tree starts mounting (Locale → Accessibility → Demo → Subscription → Terms) |
+| 4 | Providers ready | `providers_ready` | — | TermsAcceptanceProvider mounted; sets `providersReady=true` |
+| 5 | Stack visible | `startup:stack_visible` | — | Stack navigator `useEffect` fires (all screens registered) |
+| 6 | Interactive | `phase2_done` | — | `useEffect([providersReady])` in RootLayout — React has committed `providersReady=true` to UI |
 
-**Instrumentation:** `app/_layout.tsx` — `LAUNCH_T0` captured at module scope; `startupBreadcrumb()` emits `category: 'startup'` breadcrumbs with `data.ms` offset. `phase2_done` fires from a `useEffect` dependent on `providersReady` state (not from render position), ensuring it only emits after React has committed the provider tree to the UI. Breadcrumbs survive Sentry's `beforeBreadcrumb` filter (category is `startup`, not `console`).
+**Total cold-launch to interactive: — ms**
 
-**How to reproduce:**
-1. Install Build 40 via TestFlight
+**PASS/FAIL criteria:**
+- PASS = no WatchdogTermination + all 6 markers present + `startup:module_ready` < 200 ms + `startup:first_layout_effect` < 500 ms
+- FAIL = any marker missing OR watchdog occurs (include Sentry event ID)
+
+**Instrumentation:** `app/_layout.tsx` — `LAUNCH_T0 = Date.now()` captured at module scope (before imports execute). `startupBreadcrumb()` emits `category: 'startup'` breadcrumbs with `data: { ms }`. Key correctness guarantees:
+- `startup:module_ready` fires AFTER `Sentry.init()` returns (not before)
+- `providers_ready` fires from `useEffect` in `StartupPhase` component (post-commit, not during render)
+- `startup:stack_visible` fires from `useEffect` after `</Stack>` mounts
+- `phase2_done` fires from `useEffect([providersReady])` in RootLayout — only after React commits `providersReady=true`
+- All phases guarded by `firedPhases: Set<string>` for exactly-once semantics
+- Breadcrumbs survive `beforeBreadcrumb` filter (category is `startup`, not `console`)
+
+**How to reproduce (after TestFlight build):**
+1. Install the build via TestFlight
 2. Force-quit the app (swipe up from app switcher)
 3. Wait 10 seconds (ensure process is fully terminated)
 4. Launch app, wait for home screen to render
 5. In Sentry → Issues or Performance → find latest session → Breadcrumbs tab
-6. Filter by `category: startup` — all 5 phases appear in order with `data.ms` values
+6. Filter by `category: startup` — all 6 phases appear in order with `data.ms` values
+7. Paste the ms values into the table above and update the Sentry Event ID
 
 ---
 
