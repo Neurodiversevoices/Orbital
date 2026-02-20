@@ -59,6 +59,7 @@
     "react-native-svg": "15.12.1",
     "react-native-web": "^0.21.0",
     "react-native-worklets": "0.5.1",
+    "stripe": "^20.3.1",
     "vega": "^6.2.0",
     "vega-embed": "^7.1.0",
     "vega-lite": "^6.4.1"
@@ -70,6 +71,7 @@
     "@types/react": "~19.1.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
+    "@vercel/node": "^5.6.6",
     "babel-preset-expo": "^54.0.9",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.0",
