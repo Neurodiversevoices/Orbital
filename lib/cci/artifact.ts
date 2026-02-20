@@ -14,6 +14,22 @@
 import { CCIArtifact, CCIArtifactJSON, CCIIssuanceMetadata } from './types';
 import { FABRICATED_HISTORIES, DEMO_CIRCLE_MEMBERS, getCapacityState } from './demoData';
 import { renderSummaryChartSVG } from './summaryChart';
+import { CCIFormattedStrings } from './dynamic/types';
+
+/**
+ * Golden master display constants — exact values matching locked output.
+ * When no dynamic data is provided, these reproduce the golden master byte-for-byte.
+ */
+const GOLDEN_CONSTANTS: Omit<CCIFormattedStrings, 'chartSVG' | 'chartXLabels'> = {
+  observationWindow: '2025-10-01 to 2025-12-31',
+  windowStatus: '(Closed)',
+  observationWindowDisplay: 'Oct 1, 2025 \u2013 Dec 31, 2025',
+  patientId: '34827-AFJ',
+  trackingContinuity: '85% (High Reliability)',
+  responseTiming: 'Mean 4.2s',
+  patternStability: '92%',
+  verdict: 'Interpretable Capacity Trends',
+};
 
 /**
  * Generate CCI artifact HTML
@@ -21,10 +37,16 @@ import { renderSummaryChartSVG } from './summaryChart';
  * Returns the EXACT HTML that matches the golden master PDF.
  * Only timestamp and hash fields are dynamic.
  */
-export function generateCCIArtifactHTML(metadata?: Partial<CCIIssuanceMetadata>): string {
+export function generateCCIArtifactHTML(
+  metadata?: Partial<CCIIssuanceMetadata>,
+  dynamicData?: CCIFormattedStrings | null,
+): string {
   const now = new Date();
   const timestamp = metadata?.generatedAt || formatUTCTimestamp(now);
   const hash = metadata?.integrityHash || generatePlaceholderHash();
+
+  // Single resolution point: dynamic data or golden master constants
+  const data = dynamicData ?? GOLDEN_CONSTANTS;
 
   // LOCKED HTML - matches output/cci_ultra.html EXACTLY
   return `<!DOCTYPE html>
@@ -451,7 +473,7 @@ export function generateCCIArtifactHTML(metadata?: Partial<CCIIssuanceMetadata>)
       </div>
       <div class="coc-line">
         <span class="coc-label">Observation Window:</span>
-        <span class="coc-value">2025-10-01 to 2025-12-31 <em>(Closed)</em></span>
+        <span class="coc-value">${data.observationWindow} <em>${data.windowStatus}</em></span>
       </div>
       <div class="coc-line">
         <span class="coc-label">Status:</span>
@@ -488,9 +510,9 @@ export function generateCCIArtifactHTML(metadata?: Partial<CCIIssuanceMetadata>)
   <div class="patient-info">
     <div class="info-grid">
       <span class="info-label">Patient ID:</span>
-      <span class="info-value-mono">34827-AFJ</span>
+      <span class="info-value-mono">${data.patientId}</span>
       <span class="info-label">Observation Period:</span>
-      <span class="info-value">Oct 1, 2025 – Dec 31, 2025</span>
+      <span class="info-value">${data.observationWindowDisplay}</span>
     </div>
   </div>
 
@@ -501,22 +523,22 @@ export function generateCCIArtifactHTML(metadata?: Partial<CCIIssuanceMetadata>)
       <h3 class="audit-title">Reporting Quality Overview</h3>
       <div class="audit-row">
         <span class="audit-label">Tracking Continuity:</span>
-        <span class="audit-value">85% (High Reliability)</span>
+        <span class="audit-value">${data.trackingContinuity}</span>
         <span class="audit-note">Reflects engagement with daily reflection. Gaps may correspond with overwhelm, avoidance, or periods of reduced capacity.</span>
       </div>
       <div class="audit-row">
         <span class="audit-label">Response Timing:</span>
-        <span class="audit-value">Mean 4.2s</span>
+        <span class="audit-value">${data.responseTiming}</span>
         <span class="audit-note">Reflects how quickly the individual checks in with their internal state. Slower or inconsistent timing may correlate with cognitive fatigue or overload.</span>
       </div>
       <div class="audit-row">
         <span class="audit-label">Capacity Pattern Stability:</span>
-        <span class="audit-value">92%</span>
+        <span class="audit-value">${data.patternStability}</span>
         <span class="audit-note">Indicates how consistent reported capacity is over time. Sudden shifts may reflect stressors, environmental changes, or dysregulation.</span>
       </div>
       <div class="audit-row verdict-row">
         <span class="audit-label">Pattern Summary:</span>
-        <span class="audit-verdict">Interpretable Capacity Trends</span>
+        <span class="audit-verdict">${data.verdict}</span>
       </div>
     </div>
 
@@ -688,7 +710,10 @@ function generatePlaceholderHash(): string {
 /**
  * Create a full CCI artifact object
  */
-export function createCCIArtifact(metadata?: Partial<CCIIssuanceMetadata>): CCIArtifact {
+export function createCCIArtifact(
+  metadata?: Partial<CCIIssuanceMetadata>,
+  dynamicData?: CCIFormattedStrings | null,
+): CCIArtifact {
   const now = new Date();
   const fullMetadata: CCIIssuanceMetadata = {
     generatedAt: metadata?.generatedAt || formatUTCTimestamp(now),
@@ -702,7 +727,7 @@ export function createCCIArtifact(metadata?: Partial<CCIIssuanceMetadata>): CCIA
     id: `cci-q4-${Date.now()}`,
     version: 'Q4-2025',
     metadata: fullMetadata,
-    html: generateCCIArtifactHTML(fullMetadata),
+    html: generateCCIArtifactHTML(fullMetadata, dynamicData),
   };
 }
 
