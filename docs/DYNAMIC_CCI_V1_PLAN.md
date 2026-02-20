@@ -9,6 +9,50 @@
 
 ---
 
+## PLAN LOCK (Non-Negotiable)
+
+These constraints are absolute. Any PR that violates them MUST be rejected.
+
+| # | Constraint | Enforcement | Verification |
+|---|-----------|-------------|--------------|
+| L1 | **NO BUILDS** of any kind | `eas build`, `expo prebuild`, `fastlane`, `xcodebuild`, CI pipelines — NONE invoked | Grep git log for build commands |
+| L2 | **No changes to print/PDF pipeline** | `@page`, `print-color-adjust`, page dimensions, Playwright config — FROZEN | sha256 of artifact.ts CSS block before/after |
+| L3 | **No DOM structure changes** | No new elements, no removed elements, no reordered elements, no changed class names | Diff of HTML structure (tags only) before/after |
+| L4 | **No CSS changes** | No modified styles, no new styles, no removed styles | sha256 of CSS block in artifact.ts before/after |
+| L5 | **No font changes** | Inter, JetBrains Mono imports and usage — FROZEN | Visual inspection |
+| L6 | **No SVG viewBox changes** | `viewBox="0 0 320 140"` — FROZEN | Test assertion |
+| L7 | **Golden master byte-identical** | `getGoldenMasterHTML()` output sha256 MUST match pre-implementation snapshot | Automated test (see Verification Protocol) |
+| L8 | **Dynamic path opt-in only** | Dynamic path MUST NOT affect golden-master path. `getGoldenMasterHTML()` never receives a `dynamic` argument. | Code review + test |
+
+### Verification Protocol
+
+Before any PR is merged, run the following sha256 checks:
+
+```bash
+# 1. Capture golden master HTML output hash
+node -e "const {getGoldenMasterHTML} = require('./lib/cci'); const crypto = require('crypto'); console.log(crypto.createHash('sha256').update(getGoldenMasterHTML()).digest('hex'));"
+
+# 2. This hash MUST equal the pre-implementation baseline hash.
+#    Pre-implementation baseline (captured 2026-02-20):
+```
+
+**Pre-implementation "before" snapshot hashes:**
+
+| File | SHA-256 |
+|------|---------|
+| `lib/cci/summaryChart.ts` | `e6ef5671edfaef2554cc89224530665a9cb1e06b55ede1d28fdcc943e5380a2e` |
+| `lib/cci/artifact.ts` | `fd6fbc833dbd294fe509d0243af1c123db85000551ab31921cb4fbb8d9ec3411` |
+| `lib/cci/types.ts` | `5259048a1b9e0771b6c2ccf73cce68d62361ecbe1dc82b0a062997f304d4f912` |
+| `lib/cci/index.ts` | `5b4d9592b9d2e1b105d086ebc742ee828fb4e643ae139eeaaee6750e632e1505` |
+
+**Command used to generate these hashes:**
+
+```bash
+sha256sum lib/cci/summaryChart.ts lib/cci/artifact.ts lib/cci/types.ts lib/cci/index.ts
+```
+
+---
+
 ## Absolute Constraints
 
 | Constraint | Enforcement |
@@ -258,14 +302,16 @@ Exports:
   - CCIDynamicData, CCIFormattedStrings, CCIComputeConfig (from types.ts)
 ```
 
-### 5. MODIFIED: `lib/cci/summaryChart.ts`
+### 5. MODIFIED: `lib/cci/summaryChart.ts` (PR2 ONLY — NOT in PR1)
 
-**Changes:** Minimal — make x-axis labels parameterizable.
+**Changes:** Minimal — make x-axis labels parameterizable. Default behavior preserved.
 
 | Line Range | Current | Change |
 |-----------|---------|--------|
-| 271-273 (function signature) | `renderSummaryChartSVG(values, options)` | Add optional `xLabels?: [string, string, string]` to `SummaryChartOptions` |
-| 340-342 (x-axis labels) | Hardcoded `Oct`, `Nov`, `Dec` | Use `options.xLabels?.[0] ?? 'Oct'` etc. |
+| 260-265 (`SummaryChartOptions`) | No `xLabels` field | Add `xLabels?: [string, string, string]` |
+| 340-342 (x-axis text elements) | Hardcoded `Oct`, `Nov`, `Dec` | Use `options.xLabels?.[0] ?? 'Oct'` etc. |
+
+**Default behavior guarantee:** When `xLabels` is not provided (which is the case for ALL existing callers), the `?? 'Oct'` / `?? 'Nov'` / `?? 'Dec'` fallbacks produce identical output.
 
 **What is NOT changed:**
 - SVG `viewBox`, dimensions, padding, colors, gradients, node styles
@@ -274,26 +320,61 @@ Exports:
 - All CSS classes and structural markup
 - Gradient IDs and definitions
 
-**Risk:** LOW. The x-axis labels are pure text nodes at fixed positions. Changing their content from "Oct" to "Jan" does not affect layout, paths, or coordinates.
+**Risk:** LOW. The x-axis labels are pure `<text>` nodes at fixed positions. Changing their content from "Oct" to "Jan" does not affect layout, paths, or coordinates. When called without `xLabels`, SVG output is byte-identical.
 
-### 6. MODIFIED: `lib/cci/artifact.ts`
+### 6. MODIFIED: `lib/cci/artifact.ts` (PR2 ONLY — NOT in PR1)
 
-**Changes:** Add optional `CCIFormattedStrings` parameter. Use it for text injection only.
+**Pattern:** `const data = dynamic ?? GOLDEN_CONSTANTS;`
 
-| Line | Current | Change |
-|------|---------|--------|
-| 24 (function signature) | `generateCCIArtifactHTML(metadata?: Partial<CCIIssuanceMetadata>): string` | `generateCCIArtifactHTML(metadata?: Partial<CCIIssuanceMetadata>, dynamic?: CCIFormattedStrings): string` |
-| 454 (observation window) | `2025-10-01 to 2025-12-31 <em>(Closed)</em>` | `${dynamic?.observationWindow ?? '2025-10-01 to 2025-12-31'} <em>${dynamic?.windowStatus ?? '(Closed)'}</em>` |
-| 491 (patient ID) | `34827-AFJ` | `${dynamic?.patientId ?? '34827-AFJ'}` |
-| 493 (observation period display) | `Oct 1, 2025 – Dec 31, 2025` | `${dynamic?.observationWindowDisplay ?? 'Oct 1, 2025 – Dec 31, 2025'}` |
-| 504 (tracking continuity) | `85% (High Reliability)` | `${dynamic?.trackingContinuity ?? '85% (High Reliability)'}` |
-| 509 (response timing) | `Mean 4.2s` | `${dynamic?.responseTiming ?? 'Mean 4.2s'}` |
-| 514 (pattern stability) | `92%` | `${dynamic?.patternStability ?? '92%'}` |
-| 519 (verdict) | `Interpretable Capacity Trends` | `${dynamic?.verdict ?? 'Interpretable Capacity Trends'}` |
-| 530-626 (entire SVG chart) | Inline SVG with hardcoded paths | `${dynamic?.chartSVG ?? INLINE_HARDCODED_SVG}` |
+All hardcoded values are extracted into a single `GOLDEN_CONSTANTS` object at the top of the file. The template references `data.xxx` for every dynamic field. When `dynamic` is `undefined`, `data` IS `GOLDEN_CONSTANTS` — the template produces byte-identical output.
 
-**Implementation strategy for the SVG swap (lines 530-626):**
-Extract the current hardcoded SVG into a `const GOLDEN_MASTER_CHART_SVG` at the top of the file. The template then uses `${dynamic?.chartSVG ?? GOLDEN_MASTER_CHART_SVG}`. This preserves the golden master exactly when `dynamic` is undefined, and allows the computed SVG when `dynamic` is provided.
+**Step 1 — Extract constants (no behavioral change):**
+
+```
+const GOLDEN_CONSTANTS = {
+  observationWindow: '2025-10-01 to 2025-12-31',
+  observationWindowDisplay: 'Oct 1, 2025 – Dec 31, 2025',
+  windowStatus: '(Closed)',
+  patientId: '34827-AFJ',
+  trackingContinuity: '85% (High Reliability)',
+  responseTiming: 'Mean 4.2s',
+  patternStability: '92%',
+  verdict: 'Interpretable Capacity Trends',
+  chartSVG: GOLDEN_MASTER_CHART_SVG,  // extracted from lines 530-626
+} as const;
+```
+
+**Step 2 — Single resolution line in `generateCCIArtifactHTML`:**
+
+```
+export function generateCCIArtifactHTML(
+  metadata?: Partial<CCIIssuanceMetadata>,
+  dynamic?: CCIFormattedStrings,
+): string {
+  const data = dynamic ?? GOLDEN_CONSTANTS;
+  // ... rest of template uses ${data.observationWindow}, ${data.patientId}, etc.
+}
+```
+
+**Why this pattern is safe:**
+- When `dynamic` is `undefined` (which is ALWAYS the case for `getGoldenMasterHTML()`), `data` is literally `GOLDEN_CONSTANTS` — the same hardcoded values that are inline today.
+- No `??` chains scattered throughout the template. One resolution point.
+- The sha256 of `getGoldenMasterHTML()` output MUST match the pre-implementation baseline. This is tested.
+
+**Line-by-line changes in the template:**
+
+| Line | Current Inline Value | Change To |
+|------|---------------------|-----------|
+| 454 | `2025-10-01 to 2025-12-31 <em>(Closed)</em>` | `${data.observationWindow} <em>${data.windowStatus}</em>` |
+| 491 | `34827-AFJ` | `${data.patientId}` |
+| 493 | `Oct 1, 2025 – Dec 31, 2025` | `${data.observationWindowDisplay}` |
+| 504 | `85% (High Reliability)` | `${data.trackingContinuity}` |
+| 509 | `Mean 4.2s` | `${data.responseTiming}` |
+| 514 | `92%` | `${data.patternStability}` |
+| 519 | `Interpretable Capacity Trends` | `${data.verdict}` |
+| 530-626 | Inline SVG block | `${data.chartSVG}` |
+
+**SVG extraction:** The existing hardcoded SVG (lines 530-626) is moved verbatim into `GOLDEN_MASTER_CHART_SVG` const. Not a single character changed. The template slot becomes `${data.chartSVG}`.
 
 **What is NOT changed:**
 - All CSS (lines 39-432) — FROZEN
@@ -302,7 +383,7 @@ Extract the current hardcoded SVG into a `const GOLDEN_MASTER_CHART_SVG` at the 
 - Font imports — FROZEN
 - Footer/legal/provider sections — FROZEN
 - Circle CCI template — NOT TOUCHED in v1 (separate deliverable)
-- `getGoldenMasterHTML()` — continues to call with no `dynamic` param → golden master preserved
+- `getGoldenMasterHTML()` — calls with no `dynamic` param → `data = GOLDEN_CONSTANTS` → byte-identical
 
 ### 7. MODIFIED: `lib/cci/artifact.ts` — JSON export
 
@@ -600,24 +681,113 @@ All of these can be verified **without builds** — they are pure TypeScript uni
 
 ---
 
-## Implementation Order
+## Implementation Staging
 
-| Step | Description | Dependencies |
-|------|-------------|-------------|
-| 1 | Create `lib/cci/dynamic/types.ts` | None |
-| 2 | Create `lib/cci/dynamic/compute.ts` | Step 1, existing `summaryChart.ts` and `baselineUtils.ts` imports |
-| 3 | Create `lib/cci/dynamic/format.ts` | Step 1, existing `summaryChart.ts` import |
-| 4 | Create `lib/cci/dynamic/index.ts` | Steps 1-3 |
-| 5 | Create `lib/cci/dynamic/governance.ts` | Step 1 |
-| 6 | Modify `lib/cci/summaryChart.ts` — add `xLabels` option | None (independent) |
-| 7 | Modify `lib/cci/artifact.ts` — add `dynamic` parameter | Steps 1-4 |
-| 8 | Modify `lib/cci/types.ts` — re-export dynamic types | Step 1 |
-| 9 | Modify `lib/cci/index.ts` — re-export dynamic API | Step 4 |
-| 10 | Write unit tests | Steps 1-5 |
-| 11 | Write integration tests (golden master snapshot) | Steps 6-9 |
-| 12 | Governance copy scan (manual grep + test) | Steps 5, 10 |
+Implementation is split into two PRs. PR2 MUST NOT begin until PR1 is merged and verified.
 
-Steps 1-5 can be done in parallel. Step 6 is independent. Steps 7-9 depend on 1-4. Tests (10-12) depend on all implementation steps.
+### PR1: Compute Layer + Tests Only (No Render Changes)
+
+**Scope:** Add `lib/cci/dynamic/*` — pure computation and tests. Zero changes to any existing file that produces HTML/SVG output.
+
+| Step | File | Action |
+|------|------|--------|
+| 1 | `lib/cci/dynamic/types.ts` | CREATE — type definitions |
+| 2 | `lib/cci/dynamic/compute.ts` | CREATE — pure compute functions |
+| 3 | `lib/cci/dynamic/format.ts` | CREATE — string formatters with safety rules |
+| 4 | `lib/cci/dynamic/governance.ts` | CREATE — prohibited word scanner |
+| 5 | `lib/cci/dynamic/index.ts` | CREATE — module entry point |
+| 6 | `lib/cci/dynamic/__tests__/compute.test.ts` | CREATE — unit tests for compute (tests 1-13) |
+| 7 | `lib/cci/dynamic/__tests__/format.test.ts` | CREATE — unit tests for format safety (tests 14-15) |
+| 8 | `lib/cci/dynamic/__tests__/governance.test.ts` | CREATE — governance compliance test (test 16) |
+
+**PR1 modified existing files (re-exports only — NO render/HTML/SVG changes):**
+
+| File | Change | Risk |
+|------|--------|------|
+| `lib/cci/types.ts` | Add `export type` re-exports of dynamic types | ZERO — type-only, no runtime effect |
+| `lib/cci/index.ts` | Add `export` re-exports of dynamic module API | ZERO — adds exports, changes no existing exports |
+
+**PR1 does NOT touch:**
+- `lib/cci/artifact.ts` — NOT MODIFIED
+- `lib/cci/summaryChart.ts` — NOT MODIFIED
+- Any HTML, CSS, SVG, or print/PDF pipeline file
+
+**PR1 verification:**
+
+```bash
+# Confirm artifact.ts is byte-identical (unchanged)
+sha256sum lib/cci/artifact.ts
+# Must equal: fd6fbc833dbd294fe509d0243af1c123db85000551ab31921cb4fbb8d9ec3411
+
+# Confirm summaryChart.ts is byte-identical (unchanged)
+sha256sum lib/cci/summaryChart.ts
+# Must equal: e6ef5671edfaef2554cc89224530665a9cb1e06b55ede1d28fdcc943e5380a2e
+
+# Run unit tests (no build needed)
+npx jest lib/cci/dynamic/ --no-cache
+```
+
+---
+
+### PR2: Minimal Wiring in artifact.ts (sha256-Verified)
+
+**Scope:** Wire the compute layer output into `artifact.ts` using the `const data = dynamic ?? GOLDEN_CONSTANTS` pattern. Add `xLabels` option to `summaryChart.ts`.
+
+**PR2 is gated on:** PR1 merged + all PR1 tests passing.
+
+| Step | File | Action |
+|------|------|--------|
+| 1 | `lib/cci/artifact.ts` | MODIFY — extract `GOLDEN_CONSTANTS`, add `dynamic` param, use `data.xxx` references |
+| 2 | `lib/cci/summaryChart.ts` | MODIFY — add optional `xLabels` to `SummaryChartOptions` |
+| 3 | `lib/cci/dynamic/__tests__/golden-master.test.ts` | CREATE — golden master sha256 equality test |
+| 4 | `lib/cci/dynamic/__tests__/integration.test.ts` | CREATE — integration tests (tests 17-20) |
+
+**PR2 verification (MANDATORY before merge):**
+
+```bash
+# Step 1: Capture golden master HTML hash BEFORE changes
+node -e "
+  const {getGoldenMasterHTML} = require('./lib/cci');
+  const crypto = require('crypto');
+  console.log('BEFORE:', crypto.createHash('sha256').update(getGoldenMasterHTML()).digest('hex'));
+"
+# Save this hash.
+
+# Step 2: Apply PR2 changes.
+
+# Step 3: Capture golden master HTML hash AFTER changes
+node -e "
+  const {getGoldenMasterHTML} = require('./lib/cci');
+  const crypto = require('crypto');
+  console.log('AFTER:', crypto.createHash('sha256').update(getGoldenMasterHTML()).digest('hex'));
+"
+
+# Step 4: BEFORE hash must EQUAL AFTER hash. If not, PR2 is REJECTED.
+
+# Step 5: Capture summaryChart SVG hash with demo inputs (same as golden master)
+# The golden master chart uses values that produce the hardcoded Bezier paths.
+# After PR2, calling renderSummaryChartSVG() with NO xLabels arg must produce
+# identical output to before (default 'Oct','Nov','Dec' labels preserved).
+
+# Step 6: File-level sha256 checks
+sha256sum lib/cci/summaryChart.ts
+# WILL differ from baseline (xLabels added) — but SVG output with default args must match.
+
+sha256sum lib/cci/artifact.ts
+# WILL differ from baseline (GOLDEN_CONSTANTS extracted) — but getGoldenMasterHTML() output must match.
+```
+
+**PR2 automated golden master test (added in step 3):**
+
+```
+test('golden master HTML is byte-identical after refactor', () => {
+  const html = getGoldenMasterHTML();
+  const hash = crypto.createHash('sha256').update(html).digest('hex');
+  expect(hash).toBe(GOLDEN_MASTER_SHA256);  // captured pre-implementation
+});
+```
+
+This test runs in CI and on every subsequent commit. If anyone modifies artifact.ts in a way that changes the golden master output, the test fails.
 
 ---
 
@@ -636,20 +806,38 @@ Steps 1-5 can be done in parallel. Step 6 is independent. Steps 7-9 depend on 1-
 
 ## Summary
 
-**4 new files** created in `lib/cci/dynamic/`:
+### PR1 — Compute Layer (Zero Render Changes)
+
+**5 new files** created in `lib/cci/dynamic/`:
 - `types.ts` — Type definitions
 - `compute.ts` — Pure computation (8 functions)
 - `format.ts` — String formatting with safety (7 functions)
+- `governance.ts` — Prohibited word scanner
 - `index.ts` — Module entry point
 
-**1 new file** for governance:
-- `governance.ts` — Prohibited word scanner
+**3 new test files** in `lib/cci/dynamic/__tests__/`:
+- `compute.test.ts` — Compute unit tests
+- `format.test.ts` — Format safety tests
+- `governance.test.ts` — Governance compliance tests
 
-**3 existing files** modified (minimal, backwards-compatible):
-- `lib/cci/summaryChart.ts` — Add optional `xLabels` to options
-- `lib/cci/artifact.ts` — Add optional `dynamic` parameter with `??` fallbacks
-- `lib/cci/index.ts` + `lib/cci/types.ts` — Re-exports only
+**2 existing files** modified (re-exports only):
+- `lib/cci/index.ts` — Add export of dynamic module API
+- `lib/cci/types.ts` — Add type re-exports
 
-**Zero layout changes.** Zero CSS changes. Zero HTML structure changes. Zero build requirements.
+**PR1 touches ZERO render/HTML/SVG files.** `artifact.ts` and `summaryChart.ts` are unchanged. sha256 verification required.
 
-The golden master is preserved by the `??` fallback pattern: when `dynamic` is `undefined` (which it is for `getGoldenMasterHTML()`), every value falls back to the current hardcoded string. The output is byte-identical.
+### PR2 — Minimal Wiring (sha256-Verified)
+
+**2 existing files** modified:
+- `lib/cci/artifact.ts` — Extract `GOLDEN_CONSTANTS`, add `dynamic` param, use `const data = dynamic ?? GOLDEN_CONSTANTS`
+- `lib/cci/summaryChart.ts` — Add optional `xLabels` to `SummaryChartOptions`
+
+**2 new test files:**
+- `golden-master.test.ts` — sha256 equality assertion
+- `integration.test.ts` — Dynamic HTML structure tests
+
+**PR2 GATE:** `getGoldenMasterHTML()` output sha256 MUST match pre-implementation baseline. If hashes differ, PR2 is rejected. No exceptions.
+
+### Invariant
+
+The golden master is preserved by the `const data = dynamic ?? GOLDEN_CONSTANTS` pattern: when `dynamic` is `undefined` (which is ALWAYS the case for `getGoldenMasterHTML()`), `data` IS `GOLDEN_CONSTANTS` — the identical hardcoded values that exist inline today. The template output is byte-identical. This is enforced by an automated sha256 test that runs on every commit.
