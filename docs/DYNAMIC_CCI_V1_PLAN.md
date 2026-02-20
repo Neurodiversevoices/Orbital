@@ -26,29 +26,104 @@ These constraints are absolute. Any PR that violates them MUST be rejected.
 
 ### Verification Protocol
 
-Before any PR is merged, run the following sha256 checks:
+The **binding gate** is OUTPUT hashes (the generated HTML/SVG strings), not file hashes.
+File hashes are secondary — they confirm source didn't change, but the output hash is what
+proves the golden master is byte-identical.
+
+#### Binding Gate: Output Hashes
+
+**Before ANY PR is merged**, capture and compare these output hashes:
+
+**Linux / macOS:**
 
 ```bash
-# 1. Capture golden master HTML output hash
-node -e "const {getGoldenMasterHTML} = require('./lib/cci'); const crypto = require('crypto'); console.log(crypto.createHash('sha256').update(getGoldenMasterHTML()).digest('hex'));"
+# GATE 1: Golden master HTML output hash (BINDING — must match pre/post)
+node -e "
+  const {getGoldenMasterHTML} = require('./lib/cci');
+  const crypto = require('crypto');
+  console.log(crypto.createHash('sha256').update(getGoldenMasterHTML()).digest('hex'));
+"
 
-# 2. This hash MUST equal the pre-implementation baseline hash.
-#    Pre-implementation baseline (captured 2026-02-20):
+# GATE 2: summaryChart SVG output hash with default args (BINDING — must match pre/post)
+# Uses the same demo values the golden master chart is built from.
+node -e "
+  const {renderSummaryChartSVG} = require('./lib/cci/summaryChart');
+  const crypto = require('crypto');
+  const svg = renderSummaryChartSVG([80, 55, 70, 40, 60, 85]);
+  console.log(crypto.createHash('sha256').update(svg).digest('hex'));
+"
 ```
 
-**Pre-implementation "before" snapshot hashes:**
+**Windows (PowerShell):**
 
-| File | SHA-256 |
-|------|---------|
-| `lib/cci/summaryChart.ts` | `e6ef5671edfaef2554cc89224530665a9cb1e06b55ede1d28fdcc943e5380a2e` |
-| `lib/cci/artifact.ts` | `fd6fbc833dbd294fe509d0243af1c123db85000551ab31921cb4fbb8d9ec3411` |
-| `lib/cci/types.ts` | `5259048a1b9e0771b6c2ccf73cce68d62361ecbe1dc82b0a062997f304d4f912` |
-| `lib/cci/index.ts` | `5b4d9592b9d2e1b105d086ebc742ee828fb4e643ae139eeaaee6750e632e1505` |
+```powershell
+# GATE 1: Golden master HTML output hash (BINDING)
+node -e "const {getGoldenMasterHTML} = require('./lib/cci'); const crypto = require('crypto'); console.log(crypto.createHash('sha256').update(getGoldenMasterHTML()).digest('hex'));"
 
-**Command used to generate these hashes:**
+# GATE 2: summaryChart SVG output hash with default args (BINDING)
+node -e "const {renderSummaryChartSVG} = require('./lib/cci/summaryChart'); const crypto = require('crypto'); const svg = renderSummaryChartSVG([80, 55, 70, 40, 60, 85]); console.log(crypto.createHash('sha256').update(svg).digest('hex'));"
+```
+
+These two hashes are captured BEFORE implementation and AFTER implementation.
+**If either hash differs, the PR is REJECTED. No exceptions.**
+
+#### Secondary: File Hashes
+
+File hashes confirm that source files haven't been modified when they shouldn't be (e.g. PR1 must not touch `artifact.ts`).
+
+**Pre-implementation "before" snapshot — Source Files:**
+
+| File | SHA-256 | Role |
+|------|---------|------|
+| `lib/cci/artifact.ts` | `fd6fbc833dbd294fe509d0243af1c123db85000551ab31921cb4fbb8d9ec3411` | Golden master HTML generator |
+| `lib/cci/summaryChart.ts` | `e6ef5671edfaef2554cc89224530665a9cb1e06b55ede1d28fdcc943e5380a2e` | Chart SVG renderer (SSOT) |
+| `lib/cci/types.ts` | `5259048a1b9e0771b6c2ccf73cce68d62361ecbe1dc82b0a062997f304d4f912` | CCI type definitions |
+| `lib/cci/index.ts` | `5b4d9592b9d2e1b105d086ebc742ee828fb4e643ae139eeaaee6750e632e1505` | CCI module entry point |
+
+**Pre-implementation "before" snapshot — Entrypoint & Pipeline Files (MUST NOT be modified):**
+
+| File | SHA-256 | Role |
+|------|---------|------|
+| `app/cci.tsx` | `1eaef11478292ad0adece443243711f36ebdf5fb4984fe8c7fcbff2e2df4270f` | CCI viewer screen (calls `getGoldenMasterHTML()`) |
+| `scripts/cci-export-pdf.js` | `039539153ac324ebe006b68a0947d73d5672366d61977502837a64456dc317bc` | Playwright PDF export script |
+| `scripts/cci-verify-golden.js` | `677739a6e886a1626df5dfcc75c7b83943e6182088b4279150ea235280eda369` | Golden master visual verification |
+| `scripts/bundle-cci-export-pdf.ts` | `0eba18a5a077c7a83bf95e0b002296baf83105802a2ad5e0dbec1bd7e1846be9` | Bundle CCI PDF export |
+| `lib/cci/bundleArtifact.ts` | `a0f7124b5281b5e44f9cea934dca9c6cd65e490f30e905fe5df29c135f5ccc2c` | Bundle CCI HTML generator |
+
+**Note:** `components/CCI90DayChart.tsx` and `lib/charts/capacityOverTime90d.ts` exist but are NOT used by the CCI artifact pipeline. They are app-screen chart components. No CCI artifact code imports them.
+
+**Linux / macOS — Generate all file hashes:**
 
 ```bash
-sha256sum lib/cci/summaryChart.ts lib/cci/artifact.ts lib/cci/types.ts lib/cci/index.ts
+sha256sum \
+  lib/cci/artifact.ts \
+  lib/cci/summaryChart.ts \
+  lib/cci/types.ts \
+  lib/cci/index.ts \
+  app/cci.tsx \
+  scripts/cci-export-pdf.js \
+  scripts/cci-verify-golden.js \
+  scripts/bundle-cci-export-pdf.ts \
+  lib/cci/bundleArtifact.ts
+```
+
+**Windows (PowerShell) — Generate all file hashes:**
+
+```powershell
+@(
+  "lib/cci/artifact.ts",
+  "lib/cci/summaryChart.ts",
+  "lib/cci/types.ts",
+  "lib/cci/index.ts",
+  "app/cci.tsx",
+  "scripts/cci-export-pdf.js",
+  "scripts/cci-verify-golden.js",
+  "scripts/bundle-cci-export-pdf.ts",
+  "lib/cci/bundleArtifact.ts"
+) | ForEach-Object {
+  $hash = (Get-FileHash -Algorithm SHA256 -Path $_).Hash
+  Write-Output "$hash  $_"
+}
 ```
 
 ---
@@ -710,26 +785,79 @@ Implementation is split into two PRs. PR2 MUST NOT begin until PR1 is merged and
 **PR1 does NOT touch:**
 - `lib/cci/artifact.ts` — NOT MODIFIED
 - `lib/cci/summaryChart.ts` — NOT MODIFIED
+- `app/cci.tsx` — NOT MODIFIED
+- `scripts/cci-export-pdf.js` — NOT MODIFIED
+- `scripts/cci-verify-golden.js` — NOT MODIFIED
+- `scripts/bundle-cci-export-pdf.ts` — NOT MODIFIED
+- `lib/cci/bundleArtifact.ts` — NOT MODIFIED
 - Any HTML, CSS, SVG, or print/PDF pipeline file
 
-**PR1 verification:**
+**PR1 verification — Linux / macOS:**
 
 ```bash
-# Confirm artifact.ts is byte-identical (unchanged)
-sha256sum lib/cci/artifact.ts
-# Must equal: fd6fbc833dbd294fe509d0243af1c123db85000551ab31921cb4fbb8d9ec3411
+# OUTPUT GATE 1: Golden master HTML output hash must be unchanged
+node -e "
+  const {getGoldenMasterHTML} = require('./lib/cci');
+  const crypto = require('crypto');
+  console.log('HTML OUTPUT:', crypto.createHash('sha256').update(getGoldenMasterHTML()).digest('hex'));
+"
+# Must match pre-implementation baseline.
 
-# Confirm summaryChart.ts is byte-identical (unchanged)
-sha256sum lib/cci/summaryChart.ts
-# Must equal: e6ef5671edfaef2554cc89224530665a9cb1e06b55ede1d28fdcc943e5380a2e
+# OUTPUT GATE 2: SVG output hash must be unchanged
+node -e "
+  const {renderSummaryChartSVG} = require('./lib/cci/summaryChart');
+  const crypto = require('crypto');
+  const svg = renderSummaryChartSVG([80, 55, 70, 40, 60, 85]);
+  console.log('SVG OUTPUT:', crypto.createHash('sha256').update(svg).digest('hex'));
+"
+# Must match pre-implementation baseline.
 
-# Run unit tests (no build needed)
+# FILE CHECKS: Confirm render files are byte-identical (unchanged)
+sha256sum lib/cci/artifact.ts lib/cci/summaryChart.ts app/cci.tsx \
+  scripts/cci-export-pdf.js scripts/cci-verify-golden.js \
+  scripts/bundle-cci-export-pdf.ts lib/cci/bundleArtifact.ts
+# artifact.ts must equal:       fd6fbc833dbd294fe509d0243af1c123db85000551ab31921cb4fbb8d9ec3411
+# summaryChart.ts must equal:   e6ef5671edfaef2554cc89224530665a9cb1e06b55ede1d28fdcc943e5380a2e
+# app/cci.tsx must equal:        1eaef11478292ad0adece443243711f36ebdf5fb4984fe8c7fcbff2e2df4270f
+# cci-export-pdf.js must equal:  039539153ac324ebe006b68a0947d73d5672366d61977502837a64456dc317bc
+# cci-verify-golden.js must:     677739a6e886a1626df5dfcc75c7b83943e6182088b4279150ea235280eda369
+# bundle-cci-export-pdf.ts must: 0eba18a5a077c7a83bf95e0b002296baf83105802a2ad5e0dbec1bd7e1846be9
+# bundleArtifact.ts must equal:  a0f7124b5281b5e44f9cea934dca9c6cd65e490f30e905fe5df29c135f5ccc2c
+
+# RUN TESTS (no build needed)
+npx jest lib/cci/dynamic/ --no-cache
+```
+
+**PR1 verification — Windows (PowerShell):**
+
+```powershell
+# OUTPUT GATE 1: Golden master HTML output hash
+node -e "const {getGoldenMasterHTML} = require('./lib/cci'); const crypto = require('crypto'); console.log('HTML OUTPUT:', crypto.createHash('sha256').update(getGoldenMasterHTML()).digest('hex'));"
+
+# OUTPUT GATE 2: SVG output hash
+node -e "const {renderSummaryChartSVG} = require('./lib/cci/summaryChart'); const crypto = require('crypto'); const svg = renderSummaryChartSVG([80, 55, 70, 40, 60, 85]); console.log('SVG OUTPUT:', crypto.createHash('sha256').update(svg).digest('hex'));"
+
+# FILE CHECKS: Confirm render files are byte-identical
+@(
+  "lib/cci/artifact.ts",
+  "lib/cci/summaryChart.ts",
+  "app/cci.tsx",
+  "scripts/cci-export-pdf.js",
+  "scripts/cci-verify-golden.js",
+  "scripts/bundle-cci-export-pdf.ts",
+  "lib/cci/bundleArtifact.ts"
+) | ForEach-Object {
+  $hash = (Get-FileHash -Algorithm SHA256 -Path $_).Hash
+  Write-Output "$hash  $_"
+}
+
+# RUN TESTS
 npx jest lib/cci/dynamic/ --no-cache
 ```
 
 ---
 
-### PR2: Minimal Wiring in artifact.ts (sha256-Verified)
+### PR2: Minimal Wiring in artifact.ts (Output-Hash-Verified)
 
 **Scope:** Wire the compute layer output into `artifact.ts` using the `const data = dynamic ?? GOLDEN_CONSTANTS` pattern. Add `xLabels` option to `summaryChart.ts`.
 
@@ -742,39 +870,113 @@ npx jest lib/cci/dynamic/ --no-cache
 | 3 | `lib/cci/dynamic/__tests__/golden-master.test.ts` | CREATE — golden master sha256 equality test |
 | 4 | `lib/cci/dynamic/__tests__/integration.test.ts` | CREATE — integration tests (tests 17-20) |
 
-**PR2 verification (MANDATORY before merge):**
+**PR2 does NOT touch:**
+- `app/cci.tsx` — NOT MODIFIED (wiring to screen is a separate step)
+- `scripts/cci-export-pdf.js` — NOT MODIFIED
+- `scripts/cci-verify-golden.js` — NOT MODIFIED
+- `scripts/bundle-cci-export-pdf.ts` — NOT MODIFIED
+- `lib/cci/bundleArtifact.ts` — NOT MODIFIED
+
+**PR2 verification (MANDATORY before merge) — Linux / macOS:**
 
 ```bash
-# Step 1: Capture golden master HTML hash BEFORE changes
+# ===========================================================
+# STEP 1: Capture BEFORE output hashes (run BEFORE applying PR2 changes)
+# ===========================================================
+
+# BEFORE — Golden master HTML output
 node -e "
   const {getGoldenMasterHTML} = require('./lib/cci');
   const crypto = require('crypto');
-  console.log('BEFORE:', crypto.createHash('sha256').update(getGoldenMasterHTML()).digest('hex'));
+  console.log('BEFORE HTML:', crypto.createHash('sha256').update(getGoldenMasterHTML()).digest('hex'));
 "
-# Save this hash.
 
-# Step 2: Apply PR2 changes.
+# BEFORE — SVG output with default args (no xLabels)
+node -e "
+  const {renderSummaryChartSVG} = require('./lib/cci/summaryChart');
+  const crypto = require('crypto');
+  const svg = renderSummaryChartSVG([80, 55, 70, 40, 60, 85]);
+  console.log('BEFORE SVG:', crypto.createHash('sha256').update(svg).digest('hex'));
+"
 
-# Step 3: Capture golden master HTML hash AFTER changes
+# Save both hashes.
+
+# ===========================================================
+# STEP 2: Apply PR2 changes.
+# ===========================================================
+
+# ===========================================================
+# STEP 3: Capture AFTER output hashes (run AFTER applying PR2 changes)
+# ===========================================================
+
+# AFTER — Golden master HTML output
 node -e "
   const {getGoldenMasterHTML} = require('./lib/cci');
   const crypto = require('crypto');
-  console.log('AFTER:', crypto.createHash('sha256').update(getGoldenMasterHTML()).digest('hex'));
+  console.log('AFTER HTML:', crypto.createHash('sha256').update(getGoldenMasterHTML()).digest('hex'));
 "
 
-# Step 4: BEFORE hash must EQUAL AFTER hash. If not, PR2 is REJECTED.
+# AFTER — SVG output with default args (no xLabels)
+node -e "
+  const {renderSummaryChartSVG} = require('./lib/cci/summaryChart');
+  const crypto = require('crypto');
+  const svg = renderSummaryChartSVG([80, 55, 70, 40, 60, 85]);
+  console.log('AFTER SVG:', crypto.createHash('sha256').update(svg).digest('hex'));
+"
 
-# Step 5: Capture summaryChart SVG hash with demo inputs (same as golden master)
-# The golden master chart uses values that produce the hardcoded Bezier paths.
-# After PR2, calling renderSummaryChartSVG() with NO xLabels arg must produce
-# identical output to before (default 'Oct','Nov','Dec' labels preserved).
+# ===========================================================
+# STEP 4: COMPARE
+# ===========================================================
+# BEFORE HTML hash MUST EQUAL AFTER HTML hash. If not → PR2 REJECTED.
+# BEFORE SVG hash MUST EQUAL AFTER SVG hash.  If not → PR2 REJECTED.
 
-# Step 6: File-level sha256 checks
-sha256sum lib/cci/summaryChart.ts
-# WILL differ from baseline (xLabels added) — but SVG output with default args must match.
+# ===========================================================
+# STEP 5: File-level checks (secondary — files WILL differ, output must not)
+# ===========================================================
+sha256sum lib/cci/artifact.ts lib/cci/summaryChart.ts
+# These WILL differ from baseline (code was refactored).
+# That is EXPECTED. The OUTPUT hashes above are what matters.
 
-sha256sum lib/cci/artifact.ts
-# WILL differ from baseline (GOLDEN_CONSTANTS extracted) — but getGoldenMasterHTML() output must match.
+# Confirm pipeline/entrypoint files are STILL untouched:
+sha256sum app/cci.tsx scripts/cci-export-pdf.js scripts/cci-verify-golden.js \
+  scripts/bundle-cci-export-pdf.ts lib/cci/bundleArtifact.ts
+# All must match pre-implementation baseline hashes.
+
+# ===========================================================
+# STEP 6: Run all tests
+# ===========================================================
+npx jest lib/cci/dynamic/ --no-cache
+```
+
+**PR2 verification — Windows (PowerShell):**
+
+```powershell
+# STEP 1: BEFORE output hashes (run BEFORE applying PR2 changes)
+node -e "const {getGoldenMasterHTML} = require('./lib/cci'); const crypto = require('crypto'); console.log('BEFORE HTML:', crypto.createHash('sha256').update(getGoldenMasterHTML()).digest('hex'));"
+node -e "const {renderSummaryChartSVG} = require('./lib/cci/summaryChart'); const crypto = require('crypto'); const svg = renderSummaryChartSVG([80, 55, 70, 40, 60, 85]); console.log('BEFORE SVG:', crypto.createHash('sha256').update(svg).digest('hex'));"
+
+# STEP 2: Apply PR2 changes.
+
+# STEP 3: AFTER output hashes (run AFTER applying PR2 changes)
+node -e "const {getGoldenMasterHTML} = require('./lib/cci'); const crypto = require('crypto'); console.log('AFTER HTML:', crypto.createHash('sha256').update(getGoldenMasterHTML()).digest('hex'));"
+node -e "const {renderSummaryChartSVG} = require('./lib/cci/summaryChart'); const crypto = require('crypto'); const svg = renderSummaryChartSVG([80, 55, 70, 40, 60, 85]); console.log('AFTER SVG:', crypto.createHash('sha256').update(svg).digest('hex'));"
+
+# STEP 4: BEFORE HTML == AFTER HTML. BEFORE SVG == AFTER SVG. Else REJECT.
+
+# STEP 5: Pipeline/entrypoint files must be untouched
+@(
+  "app/cci.tsx",
+  "scripts/cci-export-pdf.js",
+  "scripts/cci-verify-golden.js",
+  "scripts/bundle-cci-export-pdf.ts",
+  "lib/cci/bundleArtifact.ts"
+) | ForEach-Object {
+  $hash = (Get-FileHash -Algorithm SHA256 -Path $_).Hash
+  Write-Output "$hash  $_"
+}
+
+# STEP 6: Run tests
+npx jest lib/cci/dynamic/ --no-cache
 ```
 
 **PR2 automated golden master test (added in step 3):**
@@ -785,9 +987,15 @@ test('golden master HTML is byte-identical after refactor', () => {
   const hash = crypto.createHash('sha256').update(html).digest('hex');
   expect(hash).toBe(GOLDEN_MASTER_SHA256);  // captured pre-implementation
 });
+
+test('summaryChart SVG is byte-identical with default args', () => {
+  const svg = renderSummaryChartSVG([80, 55, 70, 40, 60, 85]);
+  const hash = crypto.createHash('sha256').update(svg).digest('hex');
+  expect(hash).toBe(GOLDEN_MASTER_SVG_SHA256);  // captured pre-implementation
+});
 ```
 
-This test runs in CI and on every subsequent commit. If anyone modifies artifact.ts in a way that changes the golden master output, the test fails.
+These tests run on every commit. If anyone modifies `artifact.ts` or `summaryChart.ts` in a way that changes the golden master output, the test fails immediately.
 
 ---
 
