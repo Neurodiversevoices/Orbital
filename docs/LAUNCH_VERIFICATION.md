@@ -202,8 +202,8 @@ SELECT COUNT(*) FROM capacity_logs WHERE user_id != auth.uid();
 | Item | Status | Notes |
 |------|--------|-------|
 | App Name | Orbital | |
-| Bundle ID (iOS) | com.orbital.app | Verify in App Store Connect |
-| Package (Android) | com.orbital.app | Verify in Play Console |
+| Bundle ID (iOS) | com.erparris.orbital | Verify in App Store Connect |
+| Package (Android) | com.erparris.orbital | Verify in Play Console |
 | Age Rating | 4+ / Everyone | No user-generated content visible to others |
 | Privacy Policy | Required | Must link to privacy policy |
 | Data Safety | Required | Declare: account info, usage data, encrypted in transit |

@@ -37,6 +37,7 @@ import {
   capturePaymentError,
   isUserCancellation,
 } from '../observability';
+import { initAttribution, trackPurchaseAttribution } from '../attribution';
 
 // Dynamic import for RevenueCat to handle platform differences
 let PurchasesMobile: typeof import('react-native-purchases').default | null = null;
@@ -152,6 +153,9 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       }
 
       await PurchasesMobile.configure({ apiKey });
+
+      // Enable Apple Search Ads attribution (iOS only, no-op elsewhere)
+      await initAttribution();
 
       // Check current subscription status
       await checkSubscriptionStatus();
@@ -275,6 +279,11 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
 
         if (isPro) {
           updatePaymentStage('complete');
+          trackPurchaseAttribution({
+            type: targetProductId.includes('cci') ? 'cci_purchase' : 'pro_subscription',
+            productId: targetProductId,
+            isProUser: true,
+          });
           clearPaymentScope();
           await checkSubscriptionStatus();
           return true;
@@ -321,6 +330,11 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
 
       if (isPro) {
         updatePaymentStage('complete');
+        trackPurchaseAttribution({
+          type: targetProductId.includes('cci') ? 'cci_purchase' : 'pro_subscription',
+          productId: targetProductId,
+          isProUser: true,
+        });
         clearPaymentScope();
         await checkSubscriptionStatus();
         return true;
