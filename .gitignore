@@ -52,6 +52,7 @@ config-snapshot.json
 .env.local
 
 keys/*.p8
+keys/*.json
 
 .vercel
 

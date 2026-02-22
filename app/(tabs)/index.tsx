@@ -33,8 +33,9 @@ import { useDemoMode, FOUNDER_DEMO_ENABLED } from '../../lib/hooks/useDemoMode';
 import { useAppMode } from '../../lib/hooks/useAppMode';
 import { useTutorial } from '../../lib/hooks/useTutorial';
 import { useSubscription, shouldBypassSubscription, FREE_TIER_LIMITS } from '../../lib/subscription';
+import { Locale } from '../../locales';
 
-function formatDate(locale: 'en' | 'es'): string {
+function formatDate(locale: Locale): string {
   const localeCode = locale === 'es' ? 'es-MX' : 'en-US';
   return new Date().toLocaleDateString(localeCode, {
     weekday: 'long',

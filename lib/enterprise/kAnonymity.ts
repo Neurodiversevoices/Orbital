@@ -27,6 +27,7 @@
 import {
   K_ANONYMITY_THRESHOLD,
   AggregatedValue,
+  AggregatedUnitMetrics,
   TrendDirection,
   FreshnessLevel,
   SIGNAL_DELAY_SECONDS,

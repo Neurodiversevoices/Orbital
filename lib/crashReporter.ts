@@ -21,7 +21,7 @@ class CrashReporter {
 
   captureException(error: Error, context?: CrashContext) {
     try {
-      Sentry.captureException(error, { extra: context });
+      Sentry.captureException(error, { extra: context as Record<string, unknown> });
     } catch {
       // Silently fail if Sentry isn't ready
       console.error('[CrashReporter]', error.message);
@@ -30,7 +30,7 @@ class CrashReporter {
 
   captureMessage(message: string, context?: CrashContext) {
     try {
-      Sentry.captureMessage(message, { extra: context });
+      Sentry.captureMessage(message, { extra: context as Record<string, unknown> });
     } catch {
       console.warn('[CrashReporter]', message);
     }

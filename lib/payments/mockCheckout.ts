@@ -660,7 +660,7 @@ export async function getPurchaseHistory(): Promise<PurchaseIntent[]> {
           userId: row.user_id,
           createdAt: row.created_at,
           status: row.status as PurchaseStatus,
-          completedAt: row.completed_at,
+          completedAt: row.completed_at ?? undefined,
         }));
       }
     } catch (e) {

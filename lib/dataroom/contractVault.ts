@@ -5,6 +5,7 @@ import {
   ContractType,
   ContractStatus,
 } from '../../types';
+import { Locale } from '../../locales';
 
 const TEMPLATES_KEY = '@orbital:contract_templates';
 const CONTRACTS_KEY = '@orbital:signed_contracts';
@@ -115,7 +116,7 @@ export async function createTemplate(
     type: ContractType;
     title: string;
     content: string;
-    locale?: 'en' | 'es';
+    locale?: Locale;
   },
   createdBy: string
 ): Promise<ContractTemplate> {

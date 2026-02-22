@@ -124,7 +124,7 @@ export async function pushToCloud(): Promise<{ synced: number; failed: number }>
         const { error } = await supabase
           .from('capacity_logs')
           .update({ deleted_at: new Date().toISOString() })
-          .eq('client_log_id', entry.client_log_id)
+          .eq('local_id', entry.client_log_id)
           .eq('user_id', userId);
 
         if (error) {

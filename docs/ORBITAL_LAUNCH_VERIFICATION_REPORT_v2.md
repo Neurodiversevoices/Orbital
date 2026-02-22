@@ -1,6 +1,7 @@
 # ORBITAL LAUNCH VERIFICATION REPORT v2 - PERFECT PASS
 
-**Generated:** 2026-01-07
+**Generated:** 2026-01-07 | **Updated:** 2026-02-14
+**Version:** 1.0.0 | **Build:** 40 | **Dist:** 40
 **Status:** ALL BLOCKERS RESOLVED
 **Recommendation:** READY FOR STORE SUBMISSION
 
@@ -139,6 +140,49 @@ SELECT COUNT(*) FROM capacity_logs WHERE user_id != auth.uid();
 
 ---
 
+## 2.2 COLD-LAUNCH BREADCRUMB TIMELINE (Sentry Proof Run)
+
+**Status:** AWAITING REAL DEVICE RUN — values below must come from a physical TestFlight cold launch, not estimates.
+
+**Device:** iPhone 15 Pro, iOS 18.x
+**Build:** 1.0.0 (41) _(update after EAS build)_
+**Sentry Event ID:** _(paste from Sentry after proof run)_
+**Method:** Force-quit app, wait 10 s, cold launch. Breadcrumbs captured from Sentry event detail → filter `category: startup`.
+
+| # | Phase | Breadcrumb | ms from T0 | Notes |
+|---|-------|-----------|------------|-------|
+| 1 | Module load + Sentry.init | `startup:module_ready` | — | Fires at module scope AFTER `Sentry.init()` returns |
+| 2 | First layout effect | `startup:first_layout_effect` | — | RootLayout `useEffect` fires (React committed first render) |
+| 3 | Deferred providers begin | `deferred_begin` | — | Provider tree starts mounting (Locale → Accessibility → Demo → Subscription → Terms) |
+| 4 | Providers ready | `providers_ready` | — | TermsAcceptanceProvider mounted; sets `providersReady=true` |
+| 5 | Stack visible | `startup:stack_visible` | — | Stack navigator `useEffect` fires (all screens registered) |
+| 6 | Interactive | `phase2_done` | — | `useEffect([providersReady])` in RootLayout — React has committed `providersReady=true` to UI |
+
+**Total cold-launch to interactive: — ms**
+
+**PASS/FAIL criteria:**
+- PASS = no WatchdogTermination + all 6 markers present + `startup:module_ready` < 200 ms + `startup:first_layout_effect` < 500 ms
+- FAIL = any marker missing OR watchdog occurs (include Sentry event ID)
+
+**Instrumentation:** `app/_layout.tsx` — `LAUNCH_T0 = Date.now()` captured at module scope (before imports execute). `startupBreadcrumb()` emits `category: 'startup'` breadcrumbs with `data: { ms }`. Key correctness guarantees:
+- `startup:module_ready` fires AFTER `Sentry.init()` returns (not before)
+- `providers_ready` fires from `useEffect` in `StartupPhase` component (post-commit, not during render)
+- `startup:stack_visible` fires from `useEffect` after `</Stack>` mounts
+- `phase2_done` fires from `useEffect([providersReady])` in RootLayout — only after React commits `providersReady=true`
+- All phases guarded by `firedPhases: Set<string>` for exactly-once semantics
+- Breadcrumbs survive `beforeBreadcrumb` filter (category is `startup`, not `console`)
+
+**How to reproduce (after TestFlight build):**
+1. Install the build via TestFlight
+2. Force-quit the app (swipe up from app switcher)
+3. Wait 10 seconds (ensure process is fully terminated)
+4. Launch app, wait for home screen to render
+5. In Sentry → Issues or Performance → find latest session → Breadcrumbs tab
+6. Filter by `category: startup` — all 6 phases appear in order with `data.ms` values
+7. Paste the ms values into the table above and update the Sentry Event ID
+
+---
+
 ## 3. DEMOGRAPHICS VERIFICATION - PERFECT PASS
 
 ### Year of Birth Only
@@ -245,7 +289,7 @@ All dependencies declared in package.json. No missing imports.
 | Item | Status |
 |------|--------|
 | Bundle ID | `com.erparris.orbital` |
-| Build Number | 38 |
+| Build Number | 40 |
 | Apple Team ID | 2KM3QL4UMV |
 | Apple Sign-In | Implemented |
 | RevenueCat Keys | Environment variables |

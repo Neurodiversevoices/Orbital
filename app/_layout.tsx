@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
@@ -21,6 +21,21 @@ import { AgeGate } from '../components/legal/AgeGate';
 import { useIdleTimeout, updateLastActivity } from '../lib/session';
 import { useAuth } from '../lib/supabase';
 import { logSessionExpired, createDeviceSession } from '../lib/session';
+
+// =============================================================================
+// COLD-LAUNCH TIMING — Breadcrumbs for Sentry startup trace
+// =============================================================================
+const LAUNCH_T0 = Date.now();
+
+function startupBreadcrumb(phase: string) {
+  const elapsed = Date.now() - LAUNCH_T0;
+  Sentry.addBreadcrumb({
+    message: phase,
+    category: 'startup',
+    level: 'info',
+    data: { ms: elapsed },
+  });
+}
 
 // =============================================================================
 // SENTRY CONFIGURATION - 24/7 Watchdog (Only Bark on Critical Failures)
@@ -116,6 +131,25 @@ Sentry.init({
   },
 });
 
+// Phase 1: all module-level imports resolved + Sentry.init() complete
+startupBreadcrumb('startup:module_ready');
+
+// =============================================================================
+// STARTUP PHASE MARKER — fires breadcrumb once on mount
+// =============================================================================
+
+const firedPhases = new Set<string>();
+
+function StartupPhase({ phase, onFired }: { phase: string; onFired?: () => void }) {
+  useEffect(() => {
+    if (!firedPhases.has(phase)) {
+      firedPhases.add(phase);
+      startupBreadcrumb(phase);
+      onFired?.();
+    }
+  }, [phase, onFired]);
+  return null;
+}
 
 // =============================================================================
 // IDLE TIMEOUT WRAPPER - Auto-logout after inactivity
@@ -230,10 +264,24 @@ const idleStyles = StyleSheet.create({
 
 function RootLayout() {
   const router = useRouter();
+  const startupTracked = useRef(false);
+  const [providersReady, setProvidersReady] = useState(false);
 
   useEffect(() => {
+    if (!startupTracked.current) {
+      startupBreadcrumb('startup:first_layout_effect');
+      startupTracked.current = true;
+    }
     Sentry.addBreadcrumb({ message: 'App mounted', category: 'lifecycle' });
   }, []);
+
+  // Phase 2 complete: fires ONLY after providersReady=true is committed to the UI
+  useEffect(() => {
+    if (providersReady && !firedPhases.has('phase2_done')) {
+      firedPhases.add('phase2_done');
+      startupBreadcrumb('phase2_done');
+    }
+  }, [providersReady]);
 
   useEffect(() => {
     const handleDeepLink = (event: { url: string }) => {
@@ -258,13 +306,20 @@ function RootLayout() {
 
   return (
     <ErrorBoundary name="RootLayout">
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureHandlerRootView style={{ flex: 1 }} onLayout={() => {
+          if (!firedPhases.has('startup:stack_visible')) {
+            firedPhases.add('startup:stack_visible');
+            startupBreadcrumb('startup:stack_visible');
+          }
+        }}>
+        <StartupPhase phase="deferred_begin" />
         <LocaleProvider>
           <AccessibilityProvider>
             <DemoModeProvider>
             <AppModeProvider>
             <SubscriptionProvider>
               <TermsAcceptanceProvider>
+                <StartupPhase phase="providers_ready" onFired={() => setProvidersReady(true)} />
                 {/* AGE GATE — LEGAL REQUIRED: Blocks ALL access until 13+ verified */}
                 <AgeGate>
                 <IdleTimeoutWrapper>

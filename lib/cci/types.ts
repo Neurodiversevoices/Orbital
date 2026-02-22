@@ -111,3 +111,14 @@ export type {
   CCIPricingTier,
   CCIPricingResult,
 } from './pricing';
+
+// =============================================================================
+// DYNAMIC CCI TYPES (re-exported from dynamic module)
+// =============================================================================
+
+export type {
+  CCIDynamicData,
+  CCIFormattedStrings,
+  CCIComputeConfig,
+  CCIMonthlyBreakdown,
+} from './dynamic/types';

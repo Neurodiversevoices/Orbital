@@ -30,7 +30,7 @@ export default function NewExperimentScreen() {
   const [suggestion, setSuggestion] = useState<ExperimentSuggestion | null>(null);
   const [selectedHypothesis, setSelectedHypothesis] = useState<string | null>(null);
   const [customHypothesis, setCustomHypothesis] = useState('');
-  const [durationWeeks, setDurationWeeks] = useState(EXPERIMENT_CONSTANTS.DEFAULT_DURATION_WEEKS);
+  const [durationWeeks, setDurationWeeks] = useState<number>(EXPERIMENT_CONSTANTS.DEFAULT_DURATION_WEEKS);
   const [isStarting, setIsStarting] = useState(false);
 
   useEffect(() => {
