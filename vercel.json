@@ -5,6 +5,7 @@
     { "source": "/api/:path*", "destination": "/api/:path*" },
     { "source": "/support", "destination": "/support.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/", "destination": "/landing.html" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "env": {
