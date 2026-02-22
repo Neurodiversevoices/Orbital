@@ -14,8 +14,8 @@ export interface CCIComputeConfig {
   windowStart: string;
   /** Observation window end (YYYY-MM-DD) */
   windowEnd: string;
-  /** Minimum signals required to produce output (Phase 3 gate). Default: 90. */
-  minimumSignals: number;
+  /** Minimum unique days with at least one entry required (Phase 3 gate). Default: 90. */
+  minimumDays: number;
   /** Seed for deterministic anonymized patient ID generation */
   patientIdSeed?: string;
 }

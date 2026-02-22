@@ -56,7 +56,7 @@ function makeLogs(
 const DEFAULT_CONFIG: CCIComputeConfig = {
   windowStart: '2025-10-01',
   windowEnd: '2025-12-31',
-  minimumSignals: 90,
+  minimumDays: 90,
   patientIdSeed: 'test-user-123',
 };
 
