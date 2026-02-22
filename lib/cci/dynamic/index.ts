@@ -10,6 +10,17 @@ export {
   PROHIBITED_IN_CCI,
   ALL_VERDICT_STRINGS,
 } from './governance';
+export { computeProjection } from './projection';
+export type { CCIProjectionResult } from './projection';
+export { generateNarrative } from './narrative';
+export type { CCINarrativeInput, CCINarrativeResult } from './narrative';
+export { mapFunctionalImpact, SEVERITY_COLORS } from './impact';
+export type {
+  SeverityLevel,
+  FunctionalImpactItem,
+  CCIFunctionalImpact,
+  InterventionTarget,
+} from './impact';
 export type {
   CCIDynamicData,
   CCIFormattedStrings,
