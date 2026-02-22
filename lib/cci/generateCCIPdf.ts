@@ -48,8 +48,8 @@ export interface CCIPdfOptions {
   windowStart?: string;
   /** Override observation window end */
   windowEnd?: string;
-  /** Minimum signals required (default: 90) */
-  minimumSignals?: number;
+  /** Minimum unique days with at least one entry (default: 90) */
+  minimumDays?: number;
   /** Seed for patient ID generation */
   patientIdSeed?: string;
   /** Skip sharing dialog (useful for testing) */
@@ -140,7 +140,7 @@ export async function generateCCIPdf(
     const config: CCIComputeConfig = {
       windowStart,
       windowEnd,
-      minimumSignals: options.minimumSignals ?? 90,
+      minimumDays: options.minimumDays ?? 90,
       patientIdSeed: options.patientIdSeed,
     };
 
@@ -151,7 +151,7 @@ export async function generateCCIPdf(
     if (!dynamicData) {
       return {
         success: false,
-        error: `Insufficient signals. Need at least ${config.minimumSignals} capacity logs within the observation window.`,
+        error: `Insufficient logging days. Need at least ${config.minimumDays} unique days with entries within the observation window.`,
       };
     }
 

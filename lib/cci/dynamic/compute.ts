@@ -317,7 +317,7 @@ function computeChartXLabels(start: string, end: string): [string, string, strin
 
 /**
  * Compute all dynamic CCI data from CapacityLog entries.
- * Returns null if insufficient signals (Phase 3 gate).
+ * Returns null if insufficient unique logging days (Phase 3 gate).
  */
 export function computeCCIDynamicData(
   logs: CapacityLog[],
@@ -329,8 +329,9 @@ export function computeCCIDynamicData(
     return d >= config.windowStart && d <= config.windowEnd;
   });
 
-  // Phase 3 gate
-  if (windowLogs.length < config.minimumSignals) {
+  // Phase 3 gate: require minimumDays unique days with ≥1 entry
+  const uniqueLoggingDays = getUniqueDates(windowLogs);
+  if (uniqueLoggingDays.size < config.minimumDays) {
     return null;
   }
 

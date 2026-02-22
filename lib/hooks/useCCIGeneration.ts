@@ -35,7 +35,7 @@ export interface UseCCIGenerationReturn {
 // CONSTANTS
 // =============================================================================
 
-const MIN_SIGNALS = 90;
+const MIN_DAYS = 90;
 
 // =============================================================================
 // HOOK
@@ -73,11 +73,14 @@ export function useCCIGeneration(): UseCCIGenerationReturn {
         }
 
         // =====================================================================
-        // Gate 3: Load logs and check signal count
+        // Gate 3: Load logs and check unique logging days
         // =====================================================================
         const logs = await getLogs();
-        if (logs.length < MIN_SIGNALS) {
-          const msg = `Insufficient data. You have ${logs.length} capacity signals but need at least ${MIN_SIGNALS} to generate a CCI.`;
+        const uniqueDays = new Set(
+          logs.map(log => log.localDate || new Date(log.timestamp).toISOString().slice(0, 10)),
+        );
+        if (uniqueDays.size < MIN_DAYS) {
+          const msg = `Insufficient data. You have ${uniqueDays.size} unique logging days but need at least ${MIN_DAYS} to generate a CCI.`;
           setError(msg);
           return { success: false, error: msg };
         }
@@ -86,7 +89,7 @@ export function useCCIGeneration(): UseCCIGenerationReturn {
         // Gate 4: Generate PDF
         // =====================================================================
         const result = await generateCCIPdf(logs, {
-          minimumSignals: MIN_SIGNALS,
+          minimumDays: MIN_DAYS,
           ...options,
         });
 
