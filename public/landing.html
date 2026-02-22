@@ -196,16 +196,6 @@
   .circles-banner h3{font-size:22px;font-weight:700;color:#fff;margin-bottom:12px}
   .circles-banner p{font-size:15px;color:rgba(255,255,255,0.5);max-width:480px;margin:0 auto;line-height:1.6}
 
-  /* ---- CTA ---- */
-  .cta-section{
-    text-align:center;padding:100px 0 60px;
-  }
-  .cta-section h2{margin-bottom:12px}
-  .cta-section p{
-    color:rgba(255,255,255,0.45);font-size:16px;
-    max-width:420px;margin:0 auto 40px;
-  }
-
   /* ---- Footer ---- */
   footer{
     border-top:1px solid rgba(255,255,255,0.06);
@@ -229,6 +219,183 @@
   }
   .disclaimer p{font-size:12px;color:rgba(255,255,255,0.3);text-align:center;line-height:1.6}
 
+  /* ---- Hero badge ---- */
+  .hero-badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(245,183,0,0.08);
+    border:1px solid rgba(245,183,0,0.2);border-radius:100px;
+    padding:8px 20px;margin-bottom:32px;
+    font-size:13px;font-weight:600;color:#F5B700;
+    letter-spacing:0.3px;
+  }
+  .hero-badge-dot{
+    width:6px;height:6px;border-radius:50%;background:#F5B700;
+    animation:badge-pulse 2s ease-in-out infinite;
+  }
+  @keyframes badge-pulse{
+    0%,100%{opacity:1}50%{opacity:0.4}
+  }
+
+  /* ---- Email form ---- */
+  .email-form{
+    display:flex;gap:0;justify-content:center;
+    max-width:440px;margin:0 auto 32px;
+  }
+  .email-input{
+    flex:1;min-width:0;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.1);
+    border-right:none;
+    border-radius:10px 0 0 10px;
+    padding:14px 18px;
+    font-size:15px;color:#fff;
+    font-family:inherit;
+    outline:none;
+    transition:border-color 0.2s;
+  }
+  .email-input::placeholder{color:rgba(255,255,255,0.3)}
+  .email-input:focus{border-color:rgba(0,215,255,0.4)}
+  .email-btn{
+    background:#00D7FF;color:#05060A;
+    border:1px solid #00D7FF;
+    border-radius:0 10px 10px 0;
+    padding:14px 24px;
+    font-size:14px;font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all 0.2s;
+  }
+  .email-btn:hover{background:#33dfff;border-color:#33dfff}
+  .email-note{
+    font-size:12px;color:rgba(255,255,255,0.25);
+    margin-top:-20px;margin-bottom:32px;
+    text-align:center;
+  }
+
+  /* ---- CCI Showcase ---- */
+  .cci-showcase{text-align:center}
+  .cci-showcase h2{margin-bottom:16px}
+  .cci-showcase > p{
+    color:rgba(255,255,255,0.5);font-size:17px;
+    max-width:540px;margin:0 auto 48px;
+  }
+  .cci-screenshot{
+    max-width:720px;margin:0 auto;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:16px;
+    min-height:400px;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;overflow:hidden;
+  }
+  .cci-screenshot::before{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(135deg,rgba(0,215,255,0.03) 0%,rgba(245,183,0,0.03) 50%,rgba(255,59,48,0.03) 100%);
+  }
+  .cci-screenshot-inner{
+    position:relative;z-index:1;padding:40px;text-align:center;
+  }
+  .cci-screenshot-inner .placeholder-icon{
+    font-size:48px;margin-bottom:16px;opacity:0.3;
+  }
+  .cci-screenshot-inner p{
+    font-size:14px;color:rgba(255,255,255,0.25);
+  }
+  .cci-features{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:20px;max-width:720px;margin:32px auto 0;
+  }
+  .cci-feat{
+    padding:16px 20px;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.04);
+    border-radius:10px;
+    text-align:left;
+  }
+  .cci-feat strong{font-size:13px;color:rgba(255,255,255,0.7);display:block;margin-bottom:4px}
+  .cci-feat span{font-size:13px;color:rgba(255,255,255,0.35)}
+
+  /* ---- Pricing ---- */
+  .pricing-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:24px;max-width:860px;margin:0 auto;
+  }
+  .pricing-card{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:20px;padding:36px 32px;
+    display:flex;flex-direction:column;
+    transition:border-color 0.25s;
+  }
+  .pricing-card:hover{border-color:rgba(255,255,255,0.12)}
+  .pricing-card.featured{
+    border-color:rgba(0,215,255,0.25);
+    background:rgba(0,215,255,0.03);
+    position:relative;
+  }
+  .pricing-tag{
+    position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+    background:#00D7FF;color:#05060A;
+    font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;
+    padding:4px 14px;border-radius:100px;
+    white-space:nowrap;
+  }
+  .pricing-card h3{font-size:18px;font-weight:700;color:#fff;margin-bottom:8px}
+  .pricing-card .price{
+    font-size:36px;font-weight:700;color:#fff;line-height:1;margin-bottom:4px;
+  }
+  .pricing-card .price small{font-size:16px;font-weight:500;color:rgba(255,255,255,0.4)}
+  .pricing-card .price-alt{
+    font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:24px;
+  }
+  .pricing-card .plan-desc{
+    font-size:14px;color:rgba(255,255,255,0.4);margin-bottom:24px;line-height:1.5;
+  }
+  .plan-features{list-style:none;padding:0;margin:0 0 28px;flex:1}
+  .plan-features li{
+    font-size:14px;color:rgba(255,255,255,0.55);
+    padding:6px 0 6px 22px;position:relative;line-height:1.5;
+  }
+  .plan-features li::before{
+    content:"\2713";position:absolute;left:0;
+    color:#00D7FF;font-weight:700;font-size:13px;
+  }
+  .pricing-cta{
+    display:block;text-align:center;
+    padding:14px;border-radius:10px;
+    font-size:14px;font-weight:600;
+    text-decoration:none;transition:all 0.2s;
+    font-family:inherit;cursor:pointer;border:none;
+  }
+  .pricing-cta.primary{
+    background:#00D7FF;color:#05060A;
+  }
+  .pricing-cta.primary:hover{background:#33dfff}
+  .pricing-cta.secondary{
+    background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  .pricing-cta.secondary:hover{background:rgba(255,255,255,0.1);color:#fff}
+
+  /* ---- Bottom CTA ---- */
+  .cta-bottom{
+    text-align:center;padding:100px 0 60px;
+  }
+  .cta-bottom h2{
+    font-size:clamp(24px,4vw,36px);font-weight:700;color:#fff;
+    margin-bottom:12px;letter-spacing:-0.3px;
+  }
+  .cta-bottom p.cta-sub{
+    color:rgba(255,255,255,0.45);font-size:16px;
+    max-width:480px;margin:0 auto 36px;line-height:1.55;
+  }
+  .cta-bottom .email-form{margin-bottom:16px}
+  .cta-bottom .cta-fine{
+    font-size:12px;color:rgba(255,255,255,0.2);
+    max-width:360px;margin:0 auto;
+  }
+
   /* ---- Responsive ---- */
   @media(max-width:640px){
     .hero{padding:80px 0 60px}
@@ -237,6 +404,11 @@
     .circles-banner{padding:32px 24px}
     .nav-links a:not(.nav-cta){display:none}
     .footer-inner{flex-direction:column;text-align:center}
+    .email-form{flex-direction:column;gap:10px}
+    .email-input{border-right:1px solid rgba(255,255,255,0.1);border-radius:10px}
+    .email-btn{border-radius:10px}
+    .pricing-grid{grid-template-columns:1fr;max-width:380px}
+    .cci-features{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -249,6 +421,7 @@
     <div class="nav-links">
       <a href="#features">Features</a>
       <a href="#how-it-works">How It Works</a>
+      <a href="#pricing">Pricing</a>
       <a href="#privacy">Privacy</a>
       <a href="/support">Support</a>
     </div>
@@ -258,6 +431,7 @@
 <!-- Hero -->
 <div class="container">
   <section class="hero">
+    <div class="hero-badge"><span class="hero-badge-dot"></span> Founding access — first 100 spots</div>
     <div class="orb-container"><div class="orb"></div></div>
     <h1>Your capacity.<br>Your data.<br>Your instrument.</h1>
     <p class="subtitle">Log your daily capacity in under 30 seconds. See patterns emerge over weeks and months. Private, offline-first, yours.</p>
@@ -267,6 +441,12 @@
       <div class="spectrum-bar"></div>
       <span class="spectrum-label red">Depleted</span>
     </div>
+
+    <form class="email-form" onsubmit="return false;">
+      <input type="email" class="email-input" placeholder="you@email.com" required>
+      <button type="submit" class="email-btn">Get Early Access</button>
+    </form>
+    <p class="email-note">No spam. Unsubscribe anytime.</p>
 
     <div class="store-row">
       <a href="https://apps.apple.com/app/id6757295146" class="store-btn" target="_blank" rel="noopener">
@@ -301,6 +481,35 @@
         <div class="step-num">3</div>
         <h3>See patterns</h3>
         <p>Over days and weeks, Orbital reveals your personal rhythms. Patterns unlock progressively as your data grows.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CCI Showcase -->
+  <section class="cci-showcase">
+    <div class="section-label">Capacity Credential</div>
+    <h2>90 days of check-ins.<br>One clinical-grade report.</h2>
+    <p>The Capacity Credential Index distills your longitudinal data into a formal quarterly PDF — patterns, trends, and observations you can keep or share with a provider.</p>
+
+    <div class="cci-screenshot">
+      <div class="cci-screenshot-inner">
+        <div class="placeholder-icon">&#9635;</div>
+        <p>CCI report preview coming soon</p>
+      </div>
+    </div>
+
+    <div class="cci-features">
+      <div class="cci-feat">
+        <strong>Quarterly synthesis</strong>
+        <span>90 days of signals compressed into one document</span>
+      </div>
+      <div class="cci-feat">
+        <strong>Trend visualization</strong>
+        <span>Charts, weekly rhythms, and capacity trajectories</span>
+      </div>
+      <div class="cci-feat">
+        <strong>Portable PDF</strong>
+        <span>Download, print, or share on your terms</span>
       </div>
     </div>
   </section>
@@ -379,6 +588,57 @@
     </div>
   </section>
 
+  <!-- Pricing -->
+  <section id="pricing">
+    <div class="section-label">Pricing</div>
+    <h2>Simple, transparent pricing</h2>
+    <p>Start free. Upgrade when your data is ready for more.</p>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>Free</h3>
+        <div class="price">$0</div>
+        <p class="plan-desc">Start logging. See what your data reveals.</p>
+        <ul class="plan-features">
+          <li>30 signals per month</li>
+          <li>On-device storage</li>
+          <li>Basic pattern views</li>
+          <li>Data export (JSON/CSV)</li>
+        </ul>
+        <a href="https://apps.apple.com/app/id6757295146" class="pricing-cta secondary" target="_blank" rel="noopener">Download Free</a>
+      </div>
+
+      <div class="pricing-card featured">
+        <div class="pricing-tag">Most Popular</div>
+        <h3>Pro</h3>
+        <div class="price">$29<small>/mo</small></div>
+        <p class="price-alt">or $290/year (save 17%)</p>
+        <ul class="plan-features">
+          <li>Unlimited signals</li>
+          <li>Encrypted cloud sync</li>
+          <li>Full pattern analysis</li>
+          <li>Circles (share with 25 people)</li>
+          <li>Priority support</li>
+        </ul>
+        <button class="pricing-cta primary" onclick="document.querySelector('.hero .email-input').focus();window.scrollTo({top:0,behavior:'smooth'})">Get Early Access</button>
+      </div>
+
+      <div class="pricing-card">
+        <h3>CCI Report</h3>
+        <div class="price">$199</div>
+        <p class="price-alt">$149 for Pro members</p>
+        <p class="plan-desc">Your quarterly capacity credential.</p>
+        <ul class="plan-features">
+          <li>90-day longitudinal synthesis</li>
+          <li>Trend charts and analysis</li>
+          <li>Downloadable PDF artifact</li>
+          <li>Shareable with providers</li>
+        </ul>
+        <button class="pricing-cta secondary" onclick="document.querySelector('.hero .email-input').focus();window.scrollTo({top:0,behavior:'smooth'})">Join Waitlist</button>
+      </div>
+    </div>
+  </section>
+
   <!-- Built for -->
   <section>
     <div class="section-label">Philosophy</div>
@@ -405,20 +665,15 @@
     </div>
   </section>
 
-  <!-- CTA -->
-  <section class="cta-section">
-    <h2>Start logging your capacity</h2>
-    <p>Free to start. Under 30 seconds a day. Patterns emerge as you go.</p>
-    <div class="store-row">
-      <a href="https://apps.apple.com/app/id6757295146" class="store-btn" target="_blank" rel="noopener">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.56 2.93 11.3 4.7 7.72C5.57 5.94 7.36 4.86 9.28 4.84C10.56 4.81 11.78 5.7 12.57 5.7C13.36 5.7 14.85 4.63 16.4 4.8C17.04 4.83 18.84 5.07 19.97 6.77C19.88 6.83 17.64 8.11 17.67 10.82C17.7 14.08 20.53 15.13 20.56 15.14C20.53 15.22 20.07 16.86 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" fill="white"/></svg>
-        <div class="store-btn-text"><small>Download on the</small><span>App Store</span></div>
-      </a>
-      <a href="https://play.google.com/store/apps/details?id=com.erparris.orbital" class="store-btn" target="_blank" rel="noopener">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3.61 1.81L13.53 11.73L3.61 21.66C3.24 21.38 3 20.93 3 20.4V3.07C3 2.54 3.24 2.1 3.61 1.81ZM14.6 12.8L4.68 22.72L17.34 15.37L14.6 12.8ZM20.06 10.95L17.72 9.6L14.88 12.44L17.72 15.28L20.06 13.93C20.83 13.46 20.83 11.42 20.06 10.95ZM4.68 0.75L14.6 10.67L17.34 8.1L4.68 0.75Z" fill="white"/></svg>
-        <div class="store-btn-text"><small>Get it on</small><span>Google Play</span></div>
-      </a>
-    </div>
+  <!-- Bottom CTA -->
+  <section class="cta-bottom">
+    <h2>Join the founding cohort</h2>
+    <p class="cta-sub">First 100 get 3 months of Pro free with CCI purchase.</p>
+    <form class="email-form" onsubmit="return false;">
+      <input type="email" class="email-input" placeholder="you@email.com" required>
+      <button type="submit" class="email-btn">Get Early Access</button>
+    </form>
+    <p class="cta-fine">No spam. No commitment. Just early access to something built for the long game.</p>
   </section>
 
   <!-- Disclaimer -->
