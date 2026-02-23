@@ -5,6 +5,7 @@
     { "source": "/api/:path*", "destination": "/api/:path*" },
     { "source": "/support", "destination": "/support.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/admin", "destination": "/admin.html" },
     { "source": "/", "destination": "/landing.html" },
     { "source": "/((?!api/).*)", "destination": "/_app.html" }
   ],
