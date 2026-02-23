@@ -131,7 +131,7 @@ All three conditions must be met.
 │                                                             │
 │  [QR Code - links to verification endpoint]                 │
 │                                                             │
-│  orbital.health/verify/[document-id]                        │
+│  orbitalhealth.app/verify/[document-id]                        │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```

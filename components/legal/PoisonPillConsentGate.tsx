@@ -62,8 +62,8 @@ interface PoisonPillConsentGateProps {
 
 const READ_DELAY_MS = 3000; // 3-second minimum read time
 const CONSENT_STORAGE_KEY = '@orbital:poison_pill_consents';
-const DURESS_EMAIL = 'contact@orbital.health';
-const DURESS_URL = 'https://orbital.health/report-coercion';
+const DURESS_EMAIL = 'contact@orbitalhealth.app';
+const DURESS_URL = 'https://orbitalhealth.app/report-coercion';
 
 // =============================================================================
 // COMPONENT

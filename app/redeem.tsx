@@ -322,7 +322,7 @@ export default function RedeemScreen() {
               your subscription.
             </Text>
             <Text style={styles.footerContact}>
-              Questions? Contact contact@orbital.health
+              Questions? Contact contact@orbitalhealth.app
             </Text>
           </View>
         </View>

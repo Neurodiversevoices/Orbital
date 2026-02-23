@@ -121,7 +121,7 @@ Standard footer on all screens:
 
 ## DOMAIN
 
-Primary: orbital.health
+Primary: orbitalhealth.app
 
 ---
 

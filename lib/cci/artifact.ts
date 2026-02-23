@@ -1031,7 +1031,7 @@ export function createCCIArtifactJSON(
   const observationEnd = metadata?.observationEnd || '2025-12-31';
 
   return {
-    $schema: 'https://orbital.health/schemas/cci-q4-2025.json',
+    $schema: 'https://orbitalhealth.app/schemas/cci-q4-2025.json',
     type: 'CCI-Q4',
     id: `cci-q4-${Date.now()}`,
     version: 'Q4-2025',

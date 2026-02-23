@@ -74,7 +74,7 @@ function isInstitutionalMode(mode: AppMode): boolean {
 /**
  * Contact URL for institutional access
  */
-const INSTITUTIONAL_CONTACT_URL = 'mailto:contact@orbital.health?subject=Orbital%20Institutional%20Access%20Request';
+const INSTITUTIONAL_CONTACT_URL = 'mailto:contact@orbitalhealth.app?subject=Orbital%20Institutional%20Access%20Request';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 

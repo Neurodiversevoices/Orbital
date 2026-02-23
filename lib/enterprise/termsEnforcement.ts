@@ -384,7 +384,7 @@ export const INSTITUTIONAL_PRIVACY_NOTICE = {
     {
       heading: 'Your Rights',
       content:
-        'You can request a copy of your data or request deletion at any time. Contact privacy@orbital.health.',
+        'You can request a copy of your data or request deletion at any time. Contact privacy@orbitalhealth.app.',
     },
   ],
 } as const;

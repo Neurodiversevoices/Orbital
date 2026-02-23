@@ -324,37 +324,29 @@ export async function canPurchaseBundleCCI(bundleSize?: 10 | 15 | 20): Promise<{
 /**
  * Check if all Circle members have Pro subscription.
  *
- * This verifies that the Circle CCI tier is available.
- * Per doctrine, all Circle members must be Pro to participate.
- *
- * TODO: Integrate with actual Circle membership data from backend
- * For now, returns true if user has Circle (enforced by Circle Pro gate)
+ * Delegates to the canonical implementation in lib/cci/pricing.ts
+ * which queries Supabase for real entitlement data.
  */
-export async function checkCircleAllMembersPro(): Promise<boolean> {
+export async function checkCircleAllMembersPro(circleId?: string | null): Promise<boolean> {
   const hasCircle = await checkHasCircle();
   if (!hasCircle) return false;
 
-  // Per doctrine: Circles require Pro for all members
-  // This is enforced at the Circle service level
-  // If user has Circle, we assume all members are Pro
-  return true;
+  const { checkCircleAllMembersPro: checkPro } = await import('../cci/pricing');
+  return checkPro(circleId ?? null);
 }
 
 /**
  * Check if all Bundle seats are Pro-entitled.
  *
- * This verifies that the Bundle CCI tier is available.
- * Bundles include Pro by definition for all seats.
- *
- * TODO: Integrate with actual Bundle seat data from backend
- * For now, returns true if user has Bundle (Pro included)
+ * Delegates to the canonical implementation in lib/cci/pricing.ts
+ * which queries Supabase for real entitlement data.
  */
-export async function checkBundleAllSeatsPro(): Promise<boolean> {
+export async function checkBundleAllSeatsPro(bundleId?: string | null): Promise<boolean> {
   const hasBundle = await checkHasBundle();
   if (!hasBundle) return false;
 
-  // Bundles include Pro access for all seats by definition
-  return true;
+  const { checkBundleAllSeatsPro: checkPro } = await import('../cci/pricing');
+  return checkPro(bundleId ?? null);
 }
 
 // =============================================================================
