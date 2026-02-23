@@ -7,6 +7,23 @@
 <meta name="description" content="Log your daily capacity. See patterns over time. Private, offline-first, yours.">
 <meta name="theme-color" content="#05060A">
 <link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://orbital-jet.vercel.app/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://orbital-jet.vercel.app/">
+<meta property="og:title" content="Orbital — Your capacity. Your data. Your signal.">
+<meta property="og:description" content="Log your daily capacity in under 30 seconds. See patterns emerge over weeks and months. Private, offline-first, yours.">
+<meta property="og:image" content="https://orbital-jet.vercel.app/og-image.svg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Orbital">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Orbital — Your capacity. Your data. Your signal.">
+<meta name="twitter:description" content="Log your daily capacity in under 30 seconds. See patterns emerge over weeks and months. Private, offline-first, yours.">
+<meta name="twitter:image" content="https://orbital-jet.vercel.app/og-image.svg">
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -267,6 +284,15 @@
     transition:all 0.2s;
   }
   .email-btn:hover{background:#33dfff;border-color:#33dfff}
+  .email-btn:disabled{opacity:0.6;cursor:not-allowed}
+  .email-success{
+    font-size:15px;color:#32D74B;font-weight:600;
+    text-align:center;padding:14px;
+  }
+  .email-error{
+    font-size:13px;color:#FF3B30;
+    text-align:center;margin-top:8px;
+  }
   .email-note{
     font-size:12px;color:rgba(255,255,255,0.25);
     margin-top:-20px;margin-bottom:32px;
@@ -693,6 +719,106 @@
     </div>
   </footer>
 </div>
+
+<script>
+// =========================================================================
+// UTM PARAMS
+// =========================================================================
+const urlParams = new URLSearchParams(window.location.search);
+const utm = {
+  utm_source: urlParams.get('utm_source') || undefined,
+  utm_medium: urlParams.get('utm_medium') || undefined,
+  utm_campaign: urlParams.get('utm_campaign') || undefined,
+};
+
+// =========================================================================
+// EMAIL CAPTURE — wire both forms to /api/waitlist
+// =========================================================================
+function setupEmailForm(form, source) {
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const input = form.querySelector('.email-input');
+    const btn = form.querySelector('.email-btn');
+    const email = input.value.trim();
+
+    if (!email) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    // Remove any existing error/success
+    form.parentElement.querySelectorAll('.email-error').forEach(el => el.remove());
+
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source, ...utm }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        form.innerHTML = '<div class="email-success">You\'re in — check your email</div>';
+        trackEvent('email_captured', { source });
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Get Early Access';
+        const err = document.createElement('div');
+        err.className = 'email-error';
+        err.textContent = data.error || 'Something went wrong. Try again.';
+        form.after(err);
+      }
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Get Early Access';
+      const errEl = document.createElement('div');
+      errEl.className = 'email-error';
+      errEl.textContent = 'Network error. Try again.';
+      form.after(errEl);
+    }
+  });
+}
+
+// Wire hero form (first) and bottom CTA form (second)
+const forms = document.querySelectorAll('.email-form');
+if (forms[0]) setupEmailForm(forms[0], 'hero');
+if (forms[1]) setupEmailForm(forms[1], 'bottom_cta');
+
+// =========================================================================
+// ANALYTICS — lightweight event tracking via /api/track
+// =========================================================================
+function trackEvent(event, metadata) {
+  fetch('/api/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      event,
+      page: window.location.pathname,
+      referrer: document.referrer || undefined,
+      ...utm,
+      metadata: metadata || {},
+    }),
+  }).catch(function() {}); // fire-and-forget
+}
+
+// Track page view
+trackEvent('page_view');
+
+// Track pricing clicks
+document.querySelectorAll('.pricing-cta').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    trackEvent('pricing_clicked', { plan: btn.closest('.pricing-card')?.querySelector('h3')?.textContent || '' });
+  });
+});
+
+// Track download clicks
+document.querySelectorAll('.store-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    trackEvent('download_clicked', { store: btn.href.includes('apple') ? 'ios' : 'android' });
+  });
+});
+</script>
 
 </body>
 </html>
