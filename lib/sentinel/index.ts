@@ -76,7 +76,7 @@ export type { SchoolAgeCohort, UniversityAgeCohort } from './demoData';
  * Contact URL for institutional access requests
  */
 export const SENTINEL_CONTACT_URL =
-  'mailto:contact@orbital.health?subject=Orbital%20Sentinel%20%E2%80%94%20Institutional%20Access%20Request';
+  'mailto:contact@orbitalhealth.app?subject=Orbital%20Sentinel%20%E2%80%94%20Institutional%20Access%20Request';
 
 /**
  * Sentinel feature flags

@@ -189,7 +189,7 @@ function generateFHIRR4Export(data: ExportableData): string {
         }],
         code: {
           coding: [{
-            system: 'http://orbital.health/fhir/capacity',
+            system: 'http://orbitalhealth.app/fhir/capacity',
             code: 'capacity-score',
             display: 'Self-Reported Capacity Score',
           }],

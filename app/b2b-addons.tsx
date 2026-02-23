@@ -40,12 +40,12 @@ import { colors, spacing, borderRadius, commonStyles } from '../theme';
 // =============================================================================
 
 const CONTACT_URLS = {
-  licensing: 'mailto:contact@orbital.health?subject=Volatility%20Index%20Licensing%20Inquiry',
-  healthcare: 'mailto:contact@orbital.health?subject=Nursing%20Sentinel%20%2B%20Clinical%20Briefs%20Inquiry',
-  frms: 'mailto:contact@orbital.health?subject=FRMS%20Safety%20Layer%20Inquiry',
-  higherEd: 'mailto:contact@orbital.health?subject=Higher%20Ed%20Benchmarks%20Inquiry',
-  k12: 'mailto:contact@orbital.health?subject=K-12%20District%20Sentinel%20Inquiry',
-  compliance: 'mailto:contact@orbital.health?subject=Compliance%20%2F%20Vendor%20Risk%20Pack%20Inquiry',
+  licensing: 'mailto:contact@orbitalhealth.app?subject=Volatility%20Index%20Licensing%20Inquiry',
+  healthcare: 'mailto:contact@orbitalhealth.app?subject=Nursing%20Sentinel%20%2B%20Clinical%20Briefs%20Inquiry',
+  frms: 'mailto:contact@orbitalhealth.app?subject=FRMS%20Safety%20Layer%20Inquiry',
+  higherEd: 'mailto:contact@orbitalhealth.app?subject=Higher%20Ed%20Benchmarks%20Inquiry',
+  k12: 'mailto:contact@orbitalhealth.app?subject=K-12%20District%20Sentinel%20Inquiry',
+  compliance: 'mailto:contact@orbitalhealth.app?subject=Compliance%20%2F%20Vendor%20Risk%20Pack%20Inquiry',
 };
 
 // =============================================================================

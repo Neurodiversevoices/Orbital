@@ -171,7 +171,7 @@ Upon complete data deletion:
 │  Verification hash: [SHA-256]                               │
 │                                                             │
 │  This certificate may be verified at:                       │
-│  orbital.health/verify/deletion/[certificate-id]            │
+│  orbitalhealth.app/verify/deletion/[certificate-id]            │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -298,16 +298,16 @@ Orbital provides:
 For data governance inquiries:
 
 **Data Protection Officer**
-governance@orbital.health
+governance@orbitalhealth.app
 
 For institutional partnership inquiries:
 
 **Institutional Partnerships**
-institutions@orbital.health
+institutions@orbitalhealth.app
 
 ---
 
-*This document represents Orbital's binding commitment to data governance. Violations may be reported to governance@orbital.health.*
+*This document represents Orbital's binding commitment to data governance. Violations may be reported to governance@orbitalhealth.app.*
 
 ---
 

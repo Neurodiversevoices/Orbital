@@ -39,7 +39,7 @@ export interface CCIArtifact {
  */
 export interface CCIArtifactJSON {
   /** JSON Schema identifier */
-  $schema: 'https://orbital.health/schemas/cci-q4-2025.json';
+  $schema: 'https://orbitalhealth.app/schemas/cci-q4-2025.json';
   /** Artifact type identifier */
   type: 'CCI-Q4';
   /** Artifact ID (matches HTML artifact) */

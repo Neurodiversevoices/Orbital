@@ -32,7 +32,7 @@ export const PAYMENTS_AVAILABLE = Platform.OS !== 'web' || PAYMENTS_ENABLED;
  * Request Issuance contact email
  * Used when payments are disabled
  */
-export const ISSUANCE_REQUEST_EMAIL = 'contact@orbital.health';
+export const ISSUANCE_REQUEST_EMAIL = 'contact@orbitalhealth.app';
 
 /**
  * Request Issuance URL (mailto or form)

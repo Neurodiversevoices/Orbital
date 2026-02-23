@@ -833,11 +833,11 @@ export default function UpgradeScreen() {
           </Text>
 
           <View style={styles.footerLinks}>
-            <Pressable onPress={() => Linking.openURL('https://orbital.health/terms')}>
+            <Pressable onPress={() => Linking.openURL('https://orbitalhealth.app/terms')}>
               <Text style={styles.footerLink}>Terms</Text>
             </Pressable>
             <Text style={styles.footerDot}>·</Text>
-            <Pressable onPress={() => Linking.openURL('https://orbital.health/privacy')}>
+            <Pressable onPress={() => Linking.openURL('https://orbitalhealth.app/privacy')}>
               <Text style={styles.footerLink}>Privacy</Text>
             </Pressable>
           </View>

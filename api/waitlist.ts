@@ -28,7 +28,7 @@ async function sendWelcomeEmail(email: string): Promise<void> {
     return;
   }
 
-  const fromAddress = process.env.RESEND_FROM_EMAIL || 'eric@orbital.health';
+  const fromAddress = process.env.RESEND_FROM_EMAIL || 'eric@orbitalhealth.app';
 
   const html = `
 <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a;line-height:1.6">
@@ -50,7 +50,7 @@ async function sendWelcomeEmail(email: string): Promise<void> {
     <p style="margin-top:24px">— Eric<br><span style="color:#666;font-size:14px">Founder, Orbital Health Intelligence</span></p>
   </div>
   <div style="padding:16px 0;border-top:1px solid #eee;font-size:12px;color:#999">
-    <p>Orbital Health Intelligence, Inc.<br>You received this because you signed up at orbital.health</p>
+    <p>Orbital Health Intelligence, Inc.<br>You received this because you signed up at orbitalhealth.app</p>
   </div>
 </div>`;
 
