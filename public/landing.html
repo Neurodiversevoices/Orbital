@@ -648,7 +648,8 @@
           <li>Circles (share with 25 people)</li>
           <li>Priority support</li>
         </ul>
-        <button class="pricing-cta primary" onclick="document.querySelector('.hero .email-input').focus();window.scrollTo({top:0,behavior:'smooth'})">Get Early Access</button>
+        <button class="pricing-cta primary" onclick="startCheckout('orbital_pro_monthly')">Start Pro — $29/mo</button>
+        <button class="pricing-cta secondary" style="margin-top:8px;font-size:13px" onclick="startCheckout('orbital_pro_annual')">or $290/year (save 17%)</button>
       </div>
 
       <div class="pricing-card">
@@ -662,7 +663,7 @@
           <li>Downloadable PDF artifact</li>
           <li>Shareable with providers</li>
         </ul>
-        <button class="pricing-cta secondary" onclick="document.querySelector('.hero .email-input').focus();window.scrollTo({top:0,behavior:'smooth'})">Join Waitlist</button>
+        <button class="pricing-cta secondary" onclick="startCheckout('orbital_cci_free')">Buy CCI Report — $199</button>
       </div>
     </div>
   </section>
@@ -786,6 +787,43 @@ function setupEmailForm(form, source) {
 const forms = document.querySelectorAll('.email-form');
 if (forms[0]) setupEmailForm(forms[0], 'hero');
 if (forms[1]) setupEmailForm(forms[1], 'bottom_cta');
+
+// =========================================================================
+// STRIPE CHECKOUT — wire pricing CTAs to /api/create-checkout
+// =========================================================================
+async function startCheckout(productId) {
+  const email = prompt('Enter your email to continue to checkout:');
+  if (!email || !email.includes('@')) {
+    if (email !== null) alert('Please enter a valid email address.');
+    return;
+  }
+
+  try {
+    trackEvent('checkout_started', { product_id: productId });
+
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        product_id: productId,
+        supabase_user_id: 'guest',
+        customer_email: email,
+        success_url: window.location.origin + '/success.html',
+        cancel_url: window.location.origin + '/cancel.html',
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.checkout_url) {
+      window.location.href = data.checkout_url;
+    } else {
+      alert(data.error || 'Something went wrong. Please try again.');
+    }
+  } catch (err) {
+    alert('Network error. Please try again.');
+  }
+}
 
 // =========================================================================
 // ANALYTICS — lightweight event tracking via /api/track
