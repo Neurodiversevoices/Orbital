@@ -5,7 +5,7 @@
  * Returns a simple status page that can be scraped by monitoring tools.
  *
  * Usage:
- *   curl https://orbital-jet.vercel.app/health
+ *   curl https://orbitalhealth.app/health
  *   → Returns HTML with data-status="healthy" for parsing
  */
 

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://orbital-jet.vercel.app/sitemap.xml
+Sitemap: https://orbitalhealth.app/sitemap.xml

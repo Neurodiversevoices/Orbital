@@ -8,7 +8,7 @@ Use this skill when deploying changes to production.
 Feature Branch → master → Vercel Auto-Deploy
 ```
 
-- **Vercel** hosts the web app at `https://orbital-jet.vercel.app`
+- **Vercel** hosts the web app at `https://orbitalhealth.app`
 - Vercel auto-deploys when `master` branch is updated
 - Changes on feature branches do NOT deploy until merged to master
 
@@ -78,7 +78,7 @@ Example: `claude/locate-file-MUWxC`
 | Force Vercel redeploy | Push empty commit to master |
 
 ## Website URL
-Production: https://orbital-jet.vercel.app
+Production: https://orbitalhealth.app
 
 ## REQUIRED: Post-Fix Output Format
 
@@ -90,16 +90,16 @@ Done. [brief description of what was fixed]
 **Deploy:**
 git fetch origin && git checkout master && git merge origin/<branch-name> && git push origin master
 
-**Verify:** https://orbital-jet.vercel.app/<affected-page>
+**Verify:** https://orbitalhealth.app/<affected-page>
 ```
 
 ### Common Page Routes
 | Page | URL |
 |------|-----|
-| Home | https://orbital-jet.vercel.app |
-| Briefings | https://orbital-jet.vercel.app/brief |
-| CCI | https://orbital-jet.vercel.app/cci |
-| Settings | https://orbital-jet.vercel.app/settings |
-| Patterns | https://orbital-jet.vercel.app/patterns |
+| Home | https://orbitalhealth.app |
+| Briefings | https://orbitalhealth.app/brief |
+| CCI | https://orbitalhealth.app/cci |
+| Settings | https://orbitalhealth.app/settings |
+| Patterns | https://orbitalhealth.app/patterns |
 
 **Never skip the verify URL.** The user needs to check the change immediately.

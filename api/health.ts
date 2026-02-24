@@ -10,7 +10,7 @@
  * - Safe for external monitoring services
  *
  * Usage:
- *   curl https://orbital-jet.vercel.app/api/health
+ *   curl https://orbitalhealth.app/api/health
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';

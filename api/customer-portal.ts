@@ -64,7 +64,7 @@ export default async function handler(
       return;
     }
 
-    const origin = req.headers.origin || req.headers.referer || 'https://orbital-jet.vercel.app';
+    const origin = req.headers.origin || req.headers.referer || 'https://orbitalhealth.app';
     const baseUrl = typeof origin === 'string' ? origin.replace(/\/$/, '') : '';
     const finalReturnUrl = return_url || `${baseUrl}/settings`;
 
