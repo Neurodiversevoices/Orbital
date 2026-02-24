@@ -124,8 +124,7 @@ export default async function handler(
       return;
     }
 
-    // Fire-and-forget welcome email (don't block response)
-    sendWelcomeEmail(email.toLowerCase().trim()).catch(() => {});
+    await sendWelcomeEmail(email.toLowerCase().trim());
 
     res.status(200).json({ ok: true });
   } catch (err) {
