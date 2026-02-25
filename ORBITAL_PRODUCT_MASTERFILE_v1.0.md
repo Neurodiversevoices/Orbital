@@ -197,39 +197,170 @@ The `restricted_domains` table blocks known enterprise domains:
 
 ### Class A (Relational) — Self-Serve
 
-| Tier | Price | Seats | Features |
-|------|-------|-------|----------|
-| **Free** | $0/month | 1 | 30 signals/month, local storage |
-| **Pro** | $9.99/month | 1 | Unlimited signals, cloud sync, 90-day history |
-| **Family** | $29.99/month | 5 | Shared visibility, named individuals |
-| **Team** | $49.99/month | 10 | Coach/therapist use case |
-| **Group** | $99.99/month | 20 | Peer support groups |
-| **Community** | $199.99/month | 50 | Community organizations |
+**Tier Ladder:** Starter (Free) → Pro → Circle → Bundles → CCI-Q4
 
-### Class B (Institutional) — Contract Only
+Annual plans are **default-selected**. Annual = 10× monthly. Upgrades allowed; silent downgrades **blocked**.
 
-| Tier | Seats | Requirements |
-|------|-------|--------------|
-| **Pilot** | 25-100 | 90-day trial, no contract |
-| **Enterprise** | 100+ | Annual contract, dedicated support |
-| **Health System** | Custom | HIPAA BAA, compliance review |
+#### Starter (Free)
+
+| Property | Value |
+|----------|-------|
+| **Price** | $0 |
+| **Seats** | 1 |
+| **Signals** | Unlimited |
+| **Pattern History** | 7 days |
+| **Shared Visibility** | None |
+
+#### Pro (Individual)
+
+| Billing | Price |
+|---------|-------|
+| **Monthly** | $29/mo |
+| **Annual** | $290/yr |
+
+- 1 seat
+- Private capacity tracking only
+- Full pattern history
+- Data export (CSV/PDF)
+- No shared visibility
+- Required for Circle and Bundle participation
+
+#### Circle (5 Seats Included)
+
+| Billing | Price |
+|---------|-------|
+| **Monthly** | $79/mo |
+| **Annual** | $790/yr |
+
+- 5 seats included
+- Mesh visibility (all-see-all)
+- Named individuals, mandatory consent per member
+- Pattern sharing + Circle-level insights
+- All members must have active Pro
+
+#### Circle Expansion (Per Additional Seat Beyond 5)
+
+| Billing | Price |
+|---------|-------|
+| **Monthly** | +$10/mo per seat |
+| **Annual** | +$100/yr per seat |
+
+#### Family Add-on (Requires Pro)
+
+| Billing | Price |
+|---------|-------|
+| **Monthly** | $79/mo (base 5 seats) |
+| **Annual** | $790/yr (base 5 seats) |
+| **Extra Seat (Monthly)** | +$9/mo per member |
+| **Extra Seat (Annual)** | +$90/yr per member |
+
+#### Pro Bundles (Annual-Only)
+
+| Bundle | Seats | Annual Price |
+|--------|-------|-------------|
+| **10-Seat** | 10 | $2,700/yr |
+| **15-Seat** | 15 | $4,000/yr |
+| **20-Seat** | 20 | $5,200/yr |
+
+- Full Pro access per seat
+- Includes Admin Dashboard (hub visibility)
+- Annual billing only — no monthly option
+- **Still Class A — NOT institutional**
+
+#### Admin Add-on (Optional for Circle / Bundle)
+
+| Billing | Price |
+|---------|-------|
+| **Monthly** | $29/mo |
+| **Annual** | $290/yr |
+
+- Read-only history access
+- Consent-gated
+
+### Class B (Institutional — "Citadel") — Contract Only
+
+Class B is a **Risk Transfer Protocol**, not a SaaS pricing model. Contract-only. No self-serve. No bundled pricing.
+
+#### Layer 1 — Sovereignty License
+
+| Component | Price |
+|-----------|-------|
+| **Annual Fee** | $250,000/year (flat) |
+
+Provides: private container deployment, domain lock enforcement, SSO integration, Rule-of-5 firewall (K-anonymity), legal boundary documentation. Includes 0 users, 0 dashboards, 0 visibility rights. **Budget Owner:** IT / SecOps
+
+#### Layer 2 — Capacity Coverage
+
+| Component | Price |
+|-----------|-------|
+| **Per-Employee Fee** | $1,000/employee/year |
+
+Provides: right to ingest capacity signals from covered employees, signal storage within sovereign container, aggregation eligibility. **Critical Principle:** Collection ≠ Visibility. No visibility or governance rights included. **Budget Owner:** HR / Benefits / Insurance
+
+#### Layer 3 — Governance & Intelligence Rights
+
+| Component | Price |
+|-----------|-------|
+| **Annual Fee** | $150,000/year (flat) |
+
+Provides: Triage Command Center access, governed aggregation (labor-safe abstraction), K-anonymity enforced views, cached dashboard access (no real-time), export rights (aggregate only). Without this layer, collected signals are intentionally non-actionable. **Budget Owner:** Legal / Risk
+
+#### Layer 4 — Strategic Assurance
+
+| Component | Price |
+|-----------|-------|
+| **Annual Fee** | $100,000/year (flat) |
+
+Provides: Quarterly Operational Risk Statements, board-level artifact signed by Orbital, fiduciary documentation for directors, audit-ready capacity posture reports. **Budget Owner:** CEO / Board
+
+#### Sample Deal — 1,000 Employees
+
+| Layer | Description | Calculation | Annual Cost |
+|-------|-------------|-------------|-------------|
+| 1 | Sovereignty License | Flat | $250,000 |
+| 2 | Capacity Coverage | 1,000 × $1,000 | $1,000,000 |
+| 3 | Governance & Intelligence Rights | Flat | $150,000 |
+| 4 | Strategic Assurance | Flat | $100,000 |
+| | **Total Contract Value (TCV)** | | **$1,500,000** |
 
 ---
 
 ## 2.2 THE QCR (QUARTERLY CAPACITY REPORT)
 
-**Definition:** A premium, paid PDF artifact synthesizing 90 days of capacity data into a clinical-grade report.
+**Definition:** A one-time purchase PDF artifact synthesizing 90 days of capacity data into a clinical-grade report. Scope must match account type.
 
-**Price:** $149/quarter (institutional tier only)
+### Pricing by Scope
 
-### Value Proposition
+| Scope | Price | Requirement |
+|-------|-------|-------------|
+| **Individual QCR** | $149 (one-time) | Active Individual / Pro subscription |
+| **Circle QCR** | $299 (one-time) | Active Circle subscription |
+| **Bundle QCR** | $499 (one-time) | Active Bundle subscription + Admin role |
 
-| Component | Description |
-|-----------|-------------|
-| **The "Why" Analysis** | Pattern identification: what contexts correlate with capacity states |
-| **Resilience Metrics** | Recovery velocity, baseline stability, crisis frequency |
-| **Trend Visualization** | 90-day trajectory with statistical confidence intervals |
-| **Clinical Notes** | Auto-generated observations suitable for provider sharing |
+### Features by Scope
+
+**Individual QCR ($149)**
+- Covers one person only
+- 90-day pattern synthesis
+- Resilience metrics
+- Recovery velocity analysis
+- Clinical-grade PDF export
+- EHR-attachment ready
+
+**Circle QCR ($299)**
+- Covers entire Circle (≤5 people)
+- Relational dynamics analysis
+- Synchronization patterns
+- Load distribution insights
+- Individual + aggregate views
+
+**Bundle QCR ($499)**
+- Program-level analysis
+- Admin-facing insights
+- Aggregate capacity trends
+- Load distribution by cohort
+- Intervention timing recommendations
+- Deterministic templates only (no open-ended AI)
 
 ### The "Air Gap" Guarantee
 
@@ -243,6 +374,32 @@ QCR data is **structurally isolated** from institutional visibility:
 | **Entitlement** | Checked via RevenueCat, not organizational role |
 
 **Implication:** An employer purchasing Orbital cannot use QCR as a backdoor to individual data.
+
+---
+
+## 2.2a THE CCI-Q4 (CLINICAL CAPACITY INSTRUMENT)
+
+**Definition:** A one-time issuance purchase. Not a subscription. Pricing is tiered by account status.
+
+### Pricing by Account Status
+
+| Account Type | Price | Product ID |
+|-------------|-------|------------|
+| **Individual — Free user** | $199 (one-time) | `orbital_cci_free` |
+| **Individual — Pro/paid user** | $149 (one-time) | `orbital_cci_pro` |
+| **Circle — all members (group issuance)** | $399 (one-time) | `orbital_cci_circle_all` |
+| **Bundle — all seats (group issuance)** | $999 (one-time) | `orbital_cci_bundle_all` |
+
+### Eligibility Rules
+
+| Tier | Visibility | Eligibility Condition |
+|------|------------|----------------------|
+| **Individual (Free)** | Always visible | No requirement |
+| **Individual (Paid)** | Always visible | Any active paid subscription |
+| **Circle** | Only if eligible | Active Circle + all members have Pro |
+| **Bundle** | Only if eligible | Active Bundle + all seats Pro-entitled |
+
+**Note:** CCI purchase options are hidden in institutional demo modes.
 
 ---
 
@@ -551,11 +708,62 @@ FRESHNESS_WINDOW_HOURS = 24         // Before "stale" indication
 // DEPLOYMENT CLASS CONSTANTS
 // ═══════════════════════════════════════════════════════════════
 
-CLASS_A_BUNDLE_SIZES = [5, 10, 20, 50]
-CLASS_B_MINIMUM_SEATS = 25
+CLASS_A_CIRCLE_BASE_SEATS = 5
+CLASS_A_BUNDLE_SIZES = [10, 15, 20]   // Annual-only; 25-seat is legacy/deprecated
+CLASS_B_MINIMUM_SEATS = 25            // Layer 2 minimum
 
 TERMS_VERSION_CLASS_A = '1.0-relational'
 TERMS_VERSION_CLASS_B = '1.0-institutional'
+
+// ═══════════════════════════════════════════════════════════════
+// PRICING CONSTANTS (Class A — B2C)
+// ═══════════════════════════════════════════════════════════════
+
+PRO_MONTHLY = 29                    // $29/mo
+PRO_ANNUAL  = 290                   // $290/yr
+
+CIRCLE_MONTHLY = 79                 // $79/mo
+CIRCLE_ANNUAL  = 790                // $790/yr
+CIRCLE_EXPANSION_MONTHLY = 10       // +$10/mo per extra seat
+CIRCLE_EXPANSION_ANNUAL  = 100      // +$100/yr per extra seat
+
+FAMILY_MONTHLY = 79                 // $79/mo (base 5 seats, requires Pro)
+FAMILY_ANNUAL  = 790                // $790/yr
+FAMILY_EXTRA_SEAT_MONTHLY = 9       // +$9/mo per extra member
+FAMILY_EXTRA_SEAT_ANNUAL  = 90      // +$90/yr per extra member
+
+BUNDLE_10_ANNUAL = 2700             // $2,700/yr — annual only
+BUNDLE_15_ANNUAL = 4000             // $4,000/yr — annual only
+BUNDLE_20_ANNUAL = 5200             // $5,200/yr — annual only
+
+ADMIN_ADDON_MONTHLY = 29            // $29/mo
+ADMIN_ADDON_ANNUAL  = 290           // $290/yr
+
+// ═══════════════════════════════════════════════════════════════
+// PRICING CONSTANTS (QCR — One-Time)
+// ═══════════════════════════════════════════════════════════════
+
+QCR_INDIVIDUAL = 149                // $149 one-time
+QCR_CIRCLE     = 299                // $299 one-time
+QCR_BUNDLE     = 499                // $499 one-time
+
+// ═══════════════════════════════════════════════════════════════
+// PRICING CONSTANTS (CCI-Q4 — One-Time Issuance)
+// ═══════════════════════════════════════════════════════════════
+
+CCI_FREE_USER  = 199                // $199 — Free account users
+CCI_PRO_USER   = 149                // $149 — Any paid account users
+CCI_CIRCLE_ALL = 399                // $399 — All Circle members (group issuance)
+CCI_BUNDLE_ALL = 999                // $999 — All Bundle seats (group issuance)
+
+// ═══════════════════════════════════════════════════════════════
+// PRICING CONSTANTS (Class B — Citadel Layers)
+// ═══════════════════════════════════════════════════════════════
+
+CITADEL_LAYER_1_ANNUAL = 250000     // Sovereignty License (flat)
+CITADEL_LAYER_2_PER_EMPLOYEE = 1000 // Capacity Coverage (per employee/yr)
+CITADEL_LAYER_3_ANNUAL = 150000     // Governance & Intelligence (flat)
+CITADEL_LAYER_4_ANNUAL = 100000     // Strategic Assurance (flat)
 
 // ═══════════════════════════════════════════════════════════════
 // OPERATIONAL CONSTANTS
