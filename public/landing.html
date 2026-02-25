@@ -6,6 +6,7 @@
 <title>Orbital — Your capacity. Your data. Your signal.</title>
 <meta name="description" content="Log your daily capacity. See patterns over time. Private, offline-first, yours.">
 <meta name="theme-color" content="#05060A">
+<meta property="og:image" content="/orb.jpg">
 <link rel="icon" href="/favicon.ico">
 <link rel="canonical" href="https://orbitalhealth.app/">
 
@@ -93,14 +94,13 @@
     line-height:1.55;
   }
 
-  /* ---- Hero icon ---- */
-  .hero-icon{
+  /* ---- Orb visual ---- */
+  .orb-container{
     display:flex;justify-content:center;align-items:center;
-    margin:0 auto 48px;position:relative;
+    margin:0 auto 56px;position:relative;
   }
-  .hero-icon img{
-    width:160px;height:160px;
-    object-fit:contain;
+  .orb-img{
+    width:400px;height:auto;display:block;
   }
 
   /* ---- Spectrum bar ---- */
@@ -422,7 +422,7 @@
   /* ---- Responsive ---- */
   @media(max-width:640px){
     .hero{padding:80px 0 60px}
-    .hero-icon img{width:120px;height:120px}
+    .orb-img{width:280px;height:auto}
     .privacy-grid{grid-template-columns:1fr}
     .circles-banner{padding:32px 24px}
     .nav-links a:not(.nav-cta){display:none}
@@ -455,7 +455,7 @@
 <div class="container">
   <section class="hero">
     <div class="hero-badge"><span class="hero-badge-dot"></span> Founding access — first 100 spots</div>
-    <div class="hero-icon"><img src="/og-image.png" alt="Orbital orb" width="160" height="160"></div>
+    <div class="orb-container"><img src="/orb.jpg" alt="Orbital orb" class="orb-img"></div>
     <h1>Your capacity.<br>Your data.<br>Your signal.</h1>
     <p class="subtitle">Log your daily capacity in under 30 seconds. See patterns emerge over weeks and months. Private, offline-first, yours.</p>
 
