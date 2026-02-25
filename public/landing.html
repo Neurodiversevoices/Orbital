@@ -6,6 +6,7 @@
 <title>Orbital — Your capacity. Your data. Your signal.</title>
 <meta name="description" content="Log your daily capacity. See patterns over time. Private, offline-first, yours.">
 <meta name="theme-color" content="#05060A">
+<meta property="og:image" content="/orb.jpg">
 <link rel="icon" href="/favicon.ico">
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -77,16 +78,8 @@
     display:flex;justify-content:center;align-items:center;
     margin:0 auto 56px;position:relative;
   }
-  .orb{
-    width:180px;height:180px;border-radius:50%;
-    background:radial-gradient(circle at 40% 35%,rgba(0,215,255,0.35),rgba(0,215,255,0.08) 50%,transparent 70%);
-    border:1px solid rgba(0,215,255,0.18);
-    box-shadow:0 0 80px rgba(0,215,255,0.1),inset 0 0 40px rgba(0,215,255,0.05);
-    animation:orb-pulse 4s ease-in-out infinite;
-  }
-  @keyframes orb-pulse{
-    0%,100%{box-shadow:0 0 80px rgba(0,215,255,0.1),inset 0 0 40px rgba(0,215,255,0.05)}
-    50%{box-shadow:0 0 100px rgba(0,215,255,0.15),inset 0 0 50px rgba(0,215,255,0.08)}
+  .orb-img{
+    width:400px;height:auto;display:block;
   }
 
   /* ---- Spectrum bar ---- */
@@ -399,7 +392,7 @@
   /* ---- Responsive ---- */
   @media(max-width:640px){
     .hero{padding:80px 0 60px}
-    .orb{width:140px;height:140px}
+    .orb-img{width:280px;height:auto}
     .privacy-grid{grid-template-columns:1fr}
     .circles-banner{padding:32px 24px}
     .nav-links a:not(.nav-cta){display:none}
@@ -432,7 +425,7 @@
 <div class="container">
   <section class="hero">
     <div class="hero-badge"><span class="hero-badge-dot"></span> Founding access — first 100 spots</div>
-    <div class="orb-container"><div class="orb"></div></div>
+    <div class="orb-container"><img src="/orb.jpg" alt="Orbital orb" class="orb-img"></div>
     <h1>Your capacity.<br>Your data.<br>Your signal.</h1>
     <p class="subtitle">Log your daily capacity in under 30 seconds. See patterns emerge over weeks and months. Private, offline-first, yours.</p>
 
