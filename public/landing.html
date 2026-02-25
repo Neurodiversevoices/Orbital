@@ -476,9 +476,9 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.56 2.93 11.3 4.7 7.72C5.57 5.94 7.36 4.86 9.28 4.84C10.56 4.81 11.78 5.7 12.57 5.7C13.36 5.7 14.85 4.63 16.4 4.8C17.04 4.83 18.84 5.07 19.97 6.77C19.88 6.83 17.64 8.11 17.67 10.82C17.7 14.08 20.53 15.13 20.56 15.14C20.53 15.22 20.07 16.86 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" fill="white"/></svg>
         <div class="store-btn-text"><small>Download on the</small><span>App Store</span></div>
       </a>
-      <a href="https://play.google.com/store/apps/details?id=com.erparris.orbital" class="store-btn" target="_blank" rel="noopener">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3.61 1.81L13.53 11.73L3.61 21.66C3.24 21.38 3 20.93 3 20.4V3.07C3 2.54 3.24 2.1 3.61 1.81ZM14.6 12.8L4.68 22.72L17.34 15.37L14.6 12.8ZM20.06 10.95L17.72 9.6L14.88 12.44L17.72 15.28L20.06 13.93C20.83 13.46 20.83 11.42 20.06 10.95ZM4.68 0.75L14.6 10.67L17.34 8.1L4.68 0.75Z" fill="white"/></svg>
-        <div class="store-btn-text"><small>Get it on</small><span>Google Play</span></div>
+      <a href="/app" class="store-btn" style="background:rgba(0,215,255,0.08);border-color:rgba(0,215,255,0.2);color:#00D7FF">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor" opacity="0"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M2 12h20M12 2c-2.5 3-4 6.3-4 10s1.5 7 4 10M12 2c2.5 3 4 6.3 4 10s-1.5 7-4 10" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        <div class="store-btn-text" style="color:#00D7FF"><small style="color:rgba(0,215,255,0.6)">Use in browser</small><span>Open Web App</span></div>
       </a>
     </div>
   </section>
@@ -623,7 +623,7 @@
         <div class="price">$0</div>
         <p class="plan-desc">Start logging. See what your data reveals.</p>
         <ul class="plan-features">
-          <li>30 signals per month</li>
+          <li>Unlimited signals, 7-day history</li>
           <li>On-device storage</li>
           <li>Basic pattern views</li>
           <li>Data export (JSON/CSV)</li>
@@ -631,8 +631,8 @@
         <a href="https://apps.apple.com/app/id6757295146" class="pricing-cta secondary" target="_blank" rel="noopener">Download Free</a>
       </div>
 
-      <div class="pricing-card featured">
-        <div class="pricing-tag">Most Popular</div>
+      <div class="pricing-card" style="position:relative">
+        <div class="pricing-tag" style="background:rgba(255,255,255,0.15);color:#fff">Most Popular</div>
         <h3>Pro</h3>
         <div class="price">$29<small>/mo</small></div>
         <p class="price-alt">or $290/year (save 17%)</p>
@@ -640,25 +640,28 @@
           <li>Unlimited signals</li>
           <li>Encrypted cloud sync</li>
           <li>Full pattern analysis</li>
-          <li>Circles (share with 25 people)</li>
+          <li>90-day pattern history</li>
+          <li>Cloud sync across devices</li>
           <li>Priority support</li>
         </ul>
         <button class="pricing-cta primary" onclick="startCheckout('orbital_pro_monthly')">Start Pro — $29/mo</button>
         <button class="pricing-cta secondary" style="margin-top:8px;font-size:13px" onclick="startCheckout('orbital_pro_annual')">or $290/year (save 17%)</button>
       </div>
 
-      <div class="pricing-card">
-        <h3>CCI Report</h3>
+      <div class="pricing-card featured">
+        <div class="pricing-tag">Clinical Grade</div>
+        <h3>CCI</h3>
         <div class="price">$199</div>
         <p class="price-alt">$149 for Pro members</p>
-        <p class="plan-desc">Your quarterly capacity credential.</p>
+        <p class="plan-desc">90 days of check-ins. One clinical-grade report.</p>
+        <p class="plan-desc" style="margin-top:-16px">The Capacity Credential Index distills your longitudinal data into a formal quarterly PDF — patterns, trends, and observations you can keep or share with a provider.</p>
         <ul class="plan-features">
           <li>90-day longitudinal synthesis</li>
-          <li>Trend charts and analysis</li>
+          <li>Pattern &amp; trend analysis</li>
           <li>Downloadable PDF artifact</li>
           <li>Shareable with providers</li>
         </ul>
-        <button class="pricing-cta secondary" onclick="startCheckout('orbital_cci_free')">Buy CCI Report — $199</button>
+        <button class="pricing-cta primary" onclick="startCheckout('orbital_cci_free')">Get My CCI — $199</button>
       </div>
     </div>
   </section>
