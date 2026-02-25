@@ -185,7 +185,7 @@ export default async function handler(
   }
 
   // Determine URLs
-  const origin = req.headers.origin || req.headers.referer || 'https://orbital-jet.vercel.app';
+  const origin = req.headers.origin || req.headers.referer || 'https://orbitalhealth.app';
   const baseUrl = typeof origin === 'string' ? origin.replace(/\/$/, '') : '';
   const finalSuccessUrl = success_url || `${baseUrl}/upgrade?success=1&session_id={CHECKOUT_SESSION_ID}`;
   const finalCancelUrl = cancel_url || `${baseUrl}/upgrade?cancelled=1`;

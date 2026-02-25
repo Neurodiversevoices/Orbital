@@ -388,7 +388,7 @@ Core type:
 | Current Build | 44 (iOS) |
 | iOS Status | TestFlight ready |
 | Android Status | EAS configured |
-| Web Status | Live at orbital-jet.vercel.app |
+| Web Status | Live at orbitalhealth.app |
 | Sentry | Production alerts enabled |
 | RevenueCat | Configured for iOS/Android |
 

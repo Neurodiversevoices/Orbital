@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbital Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:#05060A;color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    line-height:1.5;padding:0;
+  }
+  .container{max-width:1200px;margin:0 auto;padding:24px}
+
+  /* Auth gate */
+  #auth-gate{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:100vh;gap:20px;text-align:center;
+  }
+  #auth-gate h1{font-size:24px;font-weight:700;letter-spacing:-0.5px}
+  #auth-gate p{color:rgba(255,255,255,0.4);font-size:14px;max-width:360px}
+  .auth-form{display:flex;flex-direction:column;gap:12px;width:320px}
+  .auth-input{
+    background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+    border-radius:8px;padding:12px 16px;color:#fff;font-size:14px;
+    font-family:inherit;outline:none;
+  }
+  .auth-input:focus{border-color:rgba(0,215,255,0.4)}
+  .auth-btn{
+    background:#00D7FF;color:#05060A;border:none;border-radius:8px;
+    padding:12px;font-size:14px;font-weight:600;cursor:pointer;
+    font-family:inherit;transition:background 0.2s;
+  }
+  .auth-btn:hover{background:#33dfff}
+  .auth-btn:disabled{opacity:0.5;cursor:not-allowed}
+  .auth-error{color:#FF3B30;font-size:13px}
+
+  /* Dashboard */
+  #dashboard{display:none}
+  .dash-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 0 32px;border-bottom:1px solid rgba(255,255,255,0.06);
+    margin-bottom:32px;
+  }
+  .dash-header h1{font-size:20px;font-weight:700;letter-spacing:-0.3px}
+  .dash-header .admin-email{font-size:12px;color:rgba(255,255,255,0.3)}
+  .logout-btn{
+    background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);
+    border-radius:6px;padding:8px 16px;color:rgba(255,255,255,0.5);
+    font-size:12px;cursor:pointer;font-family:inherit;
+  }
+  .logout-btn:hover{background:rgba(255,255,255,0.1);color:#fff}
+
+  /* Summary cards */
+  .stat-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:16px;margin-bottom:40px;
+  }
+  .stat-card{
+    background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);
+    border-radius:12px;padding:20px;
+  }
+  .stat-card .label{font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+  .stat-card .value{font-size:28px;font-weight:700;color:#fff}
+  .stat-card .sub{font-size:12px;color:rgba(255,255,255,0.25);margin-top:2px}
+
+  /* Sections */
+  .section{margin-bottom:48px}
+  .section h2{font-size:16px;font-weight:600;margin-bottom:16px;color:rgba(255,255,255,0.7)}
+
+  /* Filters */
+  .filters{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+  .filter-input{
+    background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+    border-radius:6px;padding:8px 12px;color:#fff;font-size:13px;
+    font-family:inherit;outline:none;min-width:200px;
+  }
+  .filter-input:focus{border-color:rgba(0,215,255,0.3)}
+  .filter-select{
+    background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+    border-radius:6px;padding:8px 12px;color:#fff;font-size:13px;
+    font-family:inherit;outline:none;cursor:pointer;
+  }
+  .filter-select option{background:#0d0e13;color:#fff}
+
+  /* Table */
+  .table-wrap{overflow-x:auto;border-radius:10px;border:1px solid rgba(255,255,255,0.06)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead{background:rgba(255,255,255,0.03)}
+  th{
+    text-align:left;padding:10px 14px;font-weight:600;
+    color:rgba(255,255,255,0.45);font-size:11px;
+    text-transform:uppercase;letter-spacing:0.5px;
+    white-space:nowrap;
+  }
+  td{padding:10px 14px;border-top:1px solid rgba(255,255,255,0.04);white-space:nowrap}
+  tr:hover td{background:rgba(255,255,255,0.02)}
+  .badge{
+    display:inline-block;padding:2px 8px;border-radius:4px;
+    font-size:11px;font-weight:600;
+  }
+  .badge-pro{background:rgba(0,215,255,0.1);color:#00D7FF}
+  .badge-free{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4)}
+  .badge-circle{background:rgba(245,183,0,0.1);color:#F5B700}
+  .badge-bundle{background:rgba(50,215,75,0.1);color:#32D74B}
+  .badge-cci{background:rgba(191,90,242,0.1);color:#BF5AF2}
+  .badge-none{background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.2)}
+
+  /* Cohort chart */
+  .cohort-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:16px;
+  }
+  .cohort-card{
+    background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);
+    border-radius:12px;padding:20px;
+  }
+  .cohort-card h3{font-size:16px;font-weight:700;color:#fff;margin-bottom:12px}
+  .cohort-card .cohort-stat{
+    display:flex;justify-content:space-between;padding:4px 0;
+    font-size:13px;color:rgba(255,255,255,0.5);
+  }
+  .cohort-card .cohort-stat span:last-child{color:#fff;font-weight:500}
+  .bar{height:6px;border-radius:3px;background:rgba(255,255,255,0.06);margin-top:12px;overflow:hidden}
+  .bar-inner{height:100%;border-radius:3px;transition:width 0.5s ease}
+  .bar-green{background:#32D74B}
+  .bar-yellow{background:#F5B700}
+  .bar-red{background:#FF3B30}
+
+  /* Loading */
+  .loading{text-align:center;color:rgba(255,255,255,0.3);padding:40px;font-size:14px}
+
+  @media(max-width:640px){
+    .container{padding:16px}
+    .stat-grid{grid-template-columns:repeat(2,1fr)}
+    .cohort-grid{grid-template-columns:1fr}
+    .dash-header{flex-direction:column;gap:12px;align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+
+<!-- Auth Gate -->
+<div id="auth-gate">
+  <h1>Orbital Admin</h1>
+  <p>Sign in with your admin email to access the dashboard.</p>
+  <div class="auth-form">
+    <input type="email" id="email" class="auth-input" placeholder="admin@email.com" autocomplete="email">
+    <input type="password" id="password" class="auth-input" placeholder="Password" autocomplete="current-password">
+    <button id="login-btn" class="auth-btn" onclick="handleLogin()">Sign In</button>
+    <div id="auth-error" class="auth-error"></div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard" class="container">
+  <div class="dash-header">
+    <div>
+      <h1>Orbital Admin Dashboard</h1>
+      <div class="admin-email" id="admin-email"></div>
+    </div>
+    <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="stat-grid" id="summary-grid">
+    <div class="loading">Loading summary...</div>
+  </div>
+
+  <!-- User Roster -->
+  <div class="section">
+    <h2>User Roster</h2>
+    <div class="filters">
+      <input type="text" class="filter-input" id="search-input" placeholder="Search by email..." oninput="applyFilters()">
+      <select class="filter-select" id="plan-filter" onchange="applyFilters()">
+        <option value="">All Plans</option>
+        <option value="free">Free</option>
+        <option value="pro_monthly">Pro Monthly</option>
+        <option value="pro_annual">Pro Annual</option>
+        <option value="circle">Circle</option>
+        <option value="bundle">Bundle</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Created</th>
+            <th>Plan</th>
+            <th>Source</th>
+            <th>CCI</th>
+            <th>Signals</th>
+            <th>Days Logged</th>
+            <th>Last Active</th>
+            <th>CCI Eligible In</th>
+          </tr>
+        </thead>
+        <tbody id="roster-body">
+          <tr><td colspan="9" class="loading">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="roster-count" style="font-size:12px;color:rgba(255,255,255,0.25);margin-top:8px;text-align:right"></div>
+  </div>
+
+  <!-- Age Cohort Analytics -->
+  <div class="section">
+    <h2>Capacity by Age Cohort (90 days)</h2>
+    <div class="cohort-grid" id="cohort-grid">
+      <div class="loading">Loading cohort data...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let accessToken = null;
+  let fullRoster = [];
+
+  // =========================================================================
+  // AUTH (proxied through /api/admin-login — no client-side credentials)
+  // =========================================================================
+
+  async function handleLogin() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const errorEl = document.getElementById('auth-error');
+    const btn = document.getElementById('login-btn');
+
+    errorEl.textContent = '';
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+
+    try {
+      const res = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        errorEl.textContent = data.error || 'Sign in failed';
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+        return;
+      }
+
+      accessToken = data.access_token;
+      sessionStorage.setItem('orbital_admin_token', accessToken);
+      showDashboard(data.email || email);
+    } catch (e) {
+      errorEl.textContent = 'Network error. Try again.';
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  }
+
+  function handleLogout() {
+    accessToken = null;
+    sessionStorage.removeItem('orbital_admin_token');
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('auth-gate').style.display = 'flex';
+    document.getElementById('password').value = '';
+  }
+
+  // Check for existing session
+  (function checkSession() {
+    const token = sessionStorage.getItem('orbital_admin_token');
+    if (token) {
+      accessToken = token;
+      // Validate by fetching summary
+      fetchAPI('summary').then(data => {
+        if (data.error) {
+          handleLogout();
+        } else {
+          showDashboard(data.admin || 'admin');
+        }
+      }).catch(() => handleLogout());
+    }
+  })();
+
+  // Enter key on password field
+  document.getElementById('password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+
+  // =========================================================================
+  // DASHBOARD
+  // =========================================================================
+
+  async function showDashboard(email) {
+    document.getElementById('auth-gate').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('admin-email').textContent = email;
+
+    // Load all data
+    loadSummary();
+    loadRoster();
+    loadCohorts();
+  }
+
+  async function fetchAPI(view) {
+    const res = await fetch(`/api/admin-analytics?view=${view}`, {
+      headers: { 'Authorization': `Bearer ${accessToken}` },
+    });
+    return res.json();
+  }
+
+  // =========================================================================
+  // SUMMARY
+  // =========================================================================
+
+  async function loadSummary() {
+    const data = await fetchAPI('summary');
+    if (data.error) {
+      document.getElementById('summary-grid').innerHTML = `<div class="loading">${esc(data.error)}</div>`;
+      if (data.error.includes('Unauthorized') || data.error.includes('token')) handleLogout();
+      return;
+    }
+    const s = data.summary;
+    if (!s) { document.getElementById('summary-grid').innerHTML = '<div class="loading">No data</div>'; return; }
+
+    document.getElementById('summary-grid').innerHTML = `
+      <div class="stat-card"><div class="label">Total Users</div><div class="value">${num(s.total_users)}</div></div>
+      <div class="stat-card"><div class="label">Pro Users</div><div class="value">${num(s.total_pro)}</div><div class="sub">${pct(s.total_pro, s.total_users)} of total</div></div>
+      <div class="stat-card"><div class="label">Free Users</div><div class="value">${num(s.total_free)}</div></div>
+      <div class="stat-card"><div class="label">CCI Purchased</div><div class="value">${num(s.total_cci_purchased)}</div></div>
+      <div class="stat-card"><div class="label">Total Signals</div><div class="value">${num(s.total_signals)}</div></div>
+      <div class="stat-card"><div class="label">Active Today</div><div class="value">${num(s.total_active_today)}</div></div>
+      <div class="stat-card"><div class="label">Active 7d</div><div class="value">${num(s.total_active_7d)}</div></div>
+      <div class="stat-card"><div class="label">Active 30d</div><div class="value">${num(s.total_active_30d)}</div></div>
+    `;
+  }
+
+  // =========================================================================
+  // ROSTER
+  // =========================================================================
+
+  async function loadRoster() {
+    const data = await fetchAPI('roster');
+    if (data.error) {
+      document.getElementById('roster-body').innerHTML = `<tr><td colspan="9" class="loading">${esc(data.error)}</td></tr>`;
+      return;
+    }
+    fullRoster = data.roster || [];
+    renderRoster(fullRoster);
+  }
+
+  function renderRoster(roster) {
+    const tbody = document.getElementById('roster-body');
+    if (roster.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" class="loading">No users match filters</td></tr>';
+      document.getElementById('roster-count').textContent = '0 users';
+      return;
+    }
+
+    tbody.innerHTML = roster.map(u => `
+      <tr>
+        <td style="color:rgba(255,255,255,0.7)">${esc(u.email || '—')}</td>
+        <td>${shortDate(u.user_created_at)}</td>
+        <td>${planBadge(u.plan_status)}</td>
+        <td style="color:rgba(255,255,255,0.35)">${esc(u.entitlement_source || '—')}</td>
+        <td>${cciBadge(u.cci_status, u.cci_tier)}</td>
+        <td>${num(u.total_signals)}</td>
+        <td>${num(u.total_unique_days)}</td>
+        <td>${shortDate(u.last_active_date)}</td>
+        <td>${u.days_until_cci_eligible > 0
+              ? `<span style="color:rgba(255,255,255,0.35)">${u.days_until_cci_eligible}d</span>`
+              : '<span style="color:#32D74B">Eligible</span>'}</td>
+      </tr>
+    `).join('');
+
+    document.getElementById('roster-count').textContent = `${roster.length} user${roster.length === 1 ? '' : 's'}`;
+  }
+
+  function applyFilters() {
+    const search = document.getElementById('search-input').value.toLowerCase();
+    const plan = document.getElementById('plan-filter').value;
+
+    let filtered = fullRoster;
+    if (search) filtered = filtered.filter(u => (u.email || '').toLowerCase().includes(search));
+    if (plan) filtered = filtered.filter(u => u.plan_status === plan);
+    renderRoster(filtered);
+  }
+
+  // =========================================================================
+  // COHORTS
+  // =========================================================================
+
+  async function loadCohorts() {
+    const data = await fetchAPI('cohorts');
+    if (data.error) {
+      document.getElementById('cohort-grid').innerHTML = `<div class="loading">${esc(data.error)}</div>`;
+      return;
+    }
+    const cohorts = data.cohorts || [];
+    if (cohorts.length === 0) {
+      document.getElementById('cohort-grid').innerHTML = '<div class="loading">No cohort data yet (users need year_of_birth set + capacity logs)</div>';
+      return;
+    }
+
+    document.getElementById('cohort-grid').innerHTML = cohorts.map(c => `
+      <div class="cohort-card">
+        <h3>${esc(c.age_cohort)}</h3>
+        <div class="cohort-stat"><span>Users</span><span>${num(c.user_count)}</span></div>
+        <div class="cohort-stat"><span>Signals</span><span>${num(c.total_signals)}</span></div>
+        <div class="cohort-stat"><span>Avg Green %</span><span style="color:#32D74B">${fix(c.avg_green_pct)}%</span></div>
+        <div class="cohort-stat"><span>Avg Depleted %</span><span style="color:#FF3B30">${fix(c.avg_depleted_pct)}%</span></div>
+        <div class="cohort-stat"><span>Stability</span><span>${fix(c.avg_stability_score)}%</span></div>
+        <div class="cohort-stat"><span>Dominant State</span><span>${stateBadge(c.most_common_state)}</span></div>
+        <div class="cohort-stat"><span>Logging Freq</span><span>${fix(c.avg_logging_frequency)}%</span></div>
+        <div class="bar">
+          <div class="bar-inner bar-green" style="width:${fix(c.avg_green_pct)}%"></div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // =========================================================================
+  // HELPERS
+  // =========================================================================
+
+  function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s || '';
+    return d.innerHTML;
+  }
+  function num(n) { return (n ?? 0).toLocaleString(); }
+  function fix(n) { return n != null ? Number(n).toFixed(1) : '0.0'; }
+  function pct(a, b) { return b > 0 ? `${((a / b) * 100).toFixed(1)}%` : '0%'; }
+
+  function shortDate(iso) {
+    if (!iso) return '<span style="color:rgba(255,255,255,0.15)">—</span>';
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function planBadge(status) {
+    const map = {
+      free: ['Free', 'badge-free'],
+      pro_monthly: ['Pro Mo', 'badge-pro'],
+      pro_annual: ['Pro Yr', 'badge-pro'],
+      circle: ['Circle', 'badge-circle'],
+      bundle: ['Bundle', 'badge-bundle'],
+    };
+    const [label, cls] = map[status] || [status || 'Free', 'badge-free'];
+    return `<span class="badge ${cls}">${label}</span>`;
+  }
+
+  function cciBadge(status, tier) {
+    if (status === 'purchased') {
+      return `<span class="badge badge-cci">CCI ${tier || ''}</span>`;
+    }
+    return '<span class="badge badge-none">—</span>';
+  }
+
+  function stateBadge(state) {
+    const colors = { green: '#32D74B', yellow: '#F5B700', red: '#FF3B30', black: '#8E8E93' };
+    return `<span style="color:${colors[state] || '#8E8E93'}">${state || '—'}</span>`;
+  }
+</script>
+</body>
+</html>

@@ -571,7 +571,7 @@ HEALER_LOCK_TIMEOUT_MINUTES = 10    // Stale lock threshold
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| **Web (Vercel)** | ✅ Live | `orbital-jet.vercel.app` |
+| **Web (Vercel)** | ✅ Live | `orbitalhealth.app` |
 | **iOS (TestFlight)** | 🔄 Ready | EAS Build configured |
 | **Android** | 🔄 Ready | EAS Build configured |
 | **Supabase** | ✅ Live | RLS enabled, migrations applied |

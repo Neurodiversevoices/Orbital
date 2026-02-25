@@ -4,111 +4,221 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Orbital — Privacy Policy</title>
+<meta name="robots" content="index, follow">
+<meta name="description" content="Orbital Privacy Policy — how we collect, store, and protect your capacity data.">
+<link rel="icon" href="/favicon.ico">
 <style>
-  body { margin:0; padding:40px 20px; background:#05060A; color:rgba(255,255,255,0.85); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; line-height:1.6; }
-  .container { max-width:640px; margin:0 auto; }
-  h1 { font-size:24px; font-weight:600; margin-bottom:4px; color:#fff; }
-  h2 { font-size:18px; font-weight:600; margin-top:32px; margin-bottom:8px; color:rgba(255,255,255,0.9); }
-  h3 { font-size:15px; font-weight:600; margin-top:20px; margin-bottom:4px; color:rgba(255,255,255,0.8); }
-  p, li { font-size:15px; color:rgba(255,255,255,0.7); }
-  a { color:#00E5FF; text-decoration:none; }
-  a:hover { text-decoration:underline; }
-  .meta { font-size:13px; color:rgba(255,255,255,0.4); margin-bottom:32px; }
-  .divider { border:none; border-top:1px solid rgba(255,255,255,0.08); margin:32px 0; }
-  .disclaimer { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:16px 20px; margin-top:32px; }
-  .disclaimer p { font-size:13px; color:rgba(255,255,255,0.5); }
-  .version { font-size:12px; color:rgba(255,255,255,0.3); margin-top:40px; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:#05060A;
+    color:rgba(255,255,255,0.85);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  nav{
+    position:sticky;top:0;z-index:100;
+    background:rgba(5,6,10,0.85);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .nav-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    max-width:960px;margin:0 auto;padding:16px 24px;
+  }
+  .nav-logo{font-size:18px;font-weight:700;color:#fff;letter-spacing:0.5px;text-decoration:none}
+  .nav-links{display:flex;gap:24px;align-items:center}
+  .nav-links a{font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s}
+  .nav-links a:hover{color:#fff}
+  .container{max-width:720px;margin:0 auto;padding:60px 24px 80px}
+  h1{font-size:28px;font-weight:700;color:#fff;margin-bottom:4px;letter-spacing:-0.3px}
+  .meta{font-size:13px;color:rgba(255,255,255,0.35);margin-bottom:40px}
+  h2{font-size:20px;font-weight:700;color:#fff;margin-top:48px;margin-bottom:12px;letter-spacing:-0.2px}
+  h3{font-size:16px;font-weight:600;color:rgba(255,255,255,0.85);margin-top:24px;margin-bottom:8px}
+  p,li{font-size:15px;color:rgba(255,255,255,0.65);margin-bottom:12px}
+  ul{padding-left:20px;margin-bottom:16px}
+  li{margin-bottom:6px}
+  a{color:#00D7FF;text-decoration:none}
+  a:hover{text-decoration:underline}
+  strong{color:rgba(255,255,255,0.85)}
+  .highlight{
+    background:rgba(0,215,255,0.04);
+    border:1px solid rgba(0,215,255,0.1);
+    border-radius:12px;padding:20px 24px;
+    margin:24px 0;
+  }
+  .highlight p{color:rgba(255,255,255,0.7);margin-bottom:0}
+  .divider{border:none;border-top:1px solid rgba(255,255,255,0.06);margin:48px 0}
+  footer{
+    border-top:1px solid rgba(255,255,255,0.06);padding:40px 0;
+  }
+  .footer-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    max-width:960px;margin:0 auto;padding:0 24px;
+    flex-wrap:wrap;gap:16px;
+  }
+  .footer-left{font-size:13px;color:rgba(255,255,255,0.3)}
+  .footer-links{display:flex;gap:24px}
+  .footer-links a{font-size:13px;color:rgba(255,255,255,0.35);text-decoration:none}
+  .footer-links a:hover{color:rgba(255,255,255,0.6)}
+  @media(max-width:640px){
+    .nav-links a:not(:last-child){display:none}
+    .footer-inner{flex-direction:column;text-align:center}
+  }
 </style>
 </head>
 <body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Orbital</a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/support">Support</a>
+    </div>
+  </div>
+</nav>
+
 <div class="container">
 
-<h1>Orbital — Privacy Policy</h1>
-<p class="meta">Version 1.0.0 | Effective January 1, 2025</p>
+<h1>Privacy Policy</h1>
+<p class="meta">Orbital Health Intelligence, Inc. &middot; Effective February 1, 2026 &middot; Version 2.0</p>
 
-<h2>1. Introduction</h2>
-<p>This Privacy Policy describes how Orbital collects, uses, and protects your information when you use our capacity tracking service.</p>
+<div class="highlight">
+  <p><strong>The short version:</strong> Your capacity data is stored locally on your device by default. We don't sell your data. We don't show ads. You can export or delete everything at any time.</p>
+</div>
 
-<h2>2. Information We Collect</h2>
-<h3>2.1 Information You Provide</h3>
-<ul>
-<li>Capacity state recordings (resourced, stretched, depleted)</li>
-<li>Category tags (sensory, demand, social)</li>
-<li>Optional notes you add to entries</li>
-<li>Account information if using sync features</li>
-</ul>
-<h3>2.2 Information Collected Automatically</h3>
-<ul>
-<li>Device type and operating system</li>
-<li>App version</li>
-<li>Usage patterns (aggregate, anonymized)</li>
-<li>Error logs for debugging</li>
-</ul>
+<h2>1. Who We Are</h2>
+<p>Orbital is operated by <strong>Orbital Health Intelligence, Inc.</strong> ("Orbital," "we," "us"). Orbital is a longitudinal capacity tracking tool — you log how you're doing each day, and over time, the app reveals your personal patterns.</p>
+<p>For privacy questions: <a href="mailto:privacy@orbitalhealth.app">privacy@orbitalhealth.app</a></p>
 
-<h2>3. How We Use Your Information</h2>
-<p>We use your information to:</p>
+<h2>2. What We Collect</h2>
+
+<h3>2.1 Data You Provide</h3>
 <ul>
-<li>Provide the capacity tracking service</li>
-<li>Generate pattern visualizations</li>
-<li>Enable data export features</li>
-<li>Improve service quality</li>
-<li>Respond to support requests</li>
+  <li><strong>Capacity signals</strong> — your self-reported state (resourced, stretched, or depleted), optional category tags (sensory, demand, social), and optional free-text notes</li>
+  <li><strong>Email address</strong> — when you create an account or join the waitlist</li>
+  <li><strong>Year of birth</strong> — collected during onboarding for age-appropriate experience and aggregate cohort analytics (never shared individually)</li>
+  <li><strong>Payment information</strong> — processed by Stripe (credit card details are never stored on our servers)</li>
 </ul>
 
-<h2>4. Data Storage and Security</h2>
+<h3>2.2 Data Collected Automatically</h3>
 <ul>
-<li>Your data is stored locally on your device by default</li>
-<li>If sync is enabled, data is encrypted in transit and at rest</li>
-<li>We implement industry-standard security measures</li>
-<li>We do not sell your personal information</li>
+  <li>Device type, operating system, and app version</li>
+  <li>Crash reports and error logs (via Sentry) for debugging</li>
+  <li>Aggregate, anonymized usage metrics (page views, feature usage counts)</li>
 </ul>
 
-<h2>5. Data Sharing</h2>
-<p>We may share data only:</p>
+<h3>2.3 Data We Do NOT Collect</h3>
 <ul>
-<li>With your explicit consent (e.g., sharing features)</li>
-<li>To comply with legal obligations</li>
-<li>With service providers under strict confidentiality agreements</li>
-<li>In aggregate, anonymized form for research (with consent)</li>
+  <li>Location data</li>
+  <li>Contacts or address book</li>
+  <li>Health data from HealthKit, Google Fit, or any other health platform</li>
+  <li>Biometric data</li>
+  <li>Browsing history</li>
 </ul>
 
-<h2>6. Your Rights</h2>
+<h2>3. How We Store Your Data</h2>
+
+<div class="highlight">
+  <p><strong>Local-first architecture.</strong> All capacity signals are stored on your device by default. Data only leaves your device if you enable cloud sync.</p>
+</div>
+
+<ul>
+  <li><strong>On-device storage</strong> — AsyncStorage (encrypted at the OS level on iOS and Android)</li>
+  <li><strong>Cloud sync (optional)</strong> — when enabled, data is encrypted in transit (TLS 1.3) and at rest. Stored in Supabase with row-level security — only you can access your rows</li>
+  <li><strong>Backups</strong> — cloud data is backed up with Supabase's infrastructure (AWS, US regions)</li>
+</ul>
+
+<h2>4. How We Use Your Data</h2>
+<ul>
+  <li>To provide the capacity tracking service and generate pattern visualizations</li>
+  <li>To generate your Capacity Credential Index (CCI) reports when purchased</li>
+  <li>To enable Circles sharing features (only with your explicit consent per circle)</li>
+  <li>To send transactional emails (receipts, account changes) and waitlist updates</li>
+  <li>To improve service quality through aggregate, anonymized analytics</li>
+  <li>To respond to support requests</li>
+</ul>
+
+<h2>5. What We Never Do</h2>
+<ul>
+  <li><strong>We never sell your data.</strong> Not to advertisers, data brokers, researchers, or anyone else.</li>
+  <li><strong>We never show ads.</strong> Our revenue comes from subscriptions and CCI purchases.</li>
+  <li><strong>We never share individual data</strong> without your explicit consent.</li>
+  <li><strong>We never use your data to train AI models.</strong></li>
+</ul>
+
+<h2>6. Third-Party Services</h2>
+<p>We use a limited number of third-party services, each under strict data processing agreements:</p>
+<ul>
+  <li><strong>Supabase</strong> — encrypted cloud storage and authentication</li>
+  <li><strong>Stripe</strong> — payment processing (PCI DSS Level 1 compliant)</li>
+  <li><strong>RevenueCat</strong> — mobile subscription management (Apple/Google in-app purchases)</li>
+  <li><strong>Sentry</strong> — error monitoring and crash reporting (no capacity data sent)</li>
+  <li><strong>Resend</strong> — transactional email delivery</li>
+</ul>
+
+<h2>7. Cookies</h2>
+<p>The Orbital website and app <strong>do not use cookies</strong> for tracking. We do not use any third-party analytics cookies, social media pixels, or advertising trackers. The only cookies are essential session cookies for authentication when you sign in to the web admin panel.</p>
+
+<h2>8. Your Rights</h2>
 <p>You have the right to:</p>
 <ul>
-<li>Access your data</li>
-<li>Export your data</li>
-<li>Delete your data</li>
-<li>Revoke sharing permissions</li>
-<li>Withdraw from optional features</li>
+  <li><strong>Access</strong> — view all data we have about you (Settings &rarr; Export)</li>
+  <li><strong>Export</strong> — download your full dataset as JSON or CSV at any time</li>
+  <li><strong>Delete</strong> — permanently delete all your data (Settings &rarr; Delete Account)</li>
+  <li><strong>Revoke sharing</strong> — leave any Circle and revoke consent instantly</li>
+  <li><strong>Withdraw</strong> — stop using cloud sync at any time; your local data stays on your device</li>
 </ul>
+<p>To exercise any of these rights, use the in-app settings or email <a href="mailto:privacy@orbitalhealth.app">privacy@orbitalhealth.app</a>. We respond within 30 days.</p>
 
-<h2>7. Data Retention</h2>
+<h2>9. Data Retention</h2>
 <ul>
-<li>Active data: Retained while you use the Service</li>
-<li>After termination: Export window provided, then deletion</li>
-<li>Audit logs: Retained per compliance requirements</li>
+  <li><strong>Active accounts</strong> — data retained while your account is active</li>
+  <li><strong>Account deletion</strong> — all data permanently deleted within 30 days of request</li>
+  <li><strong>Waitlist signups</strong> — email retained until you unsubscribe or launch period ends</li>
+  <li><strong>Payment records</strong> — retained for 7 years per tax and financial compliance requirements</li>
 </ul>
 
-<h2>8. Children's Privacy</h2>
-<p>Orbital is not intended for users under 13. If institutional deployment includes minors, appropriate consents must be obtained.</p>
+<h2>10. Children's Privacy (COPPA)</h2>
+<p>Orbital requires users to be <strong>13 years of age or older</strong>. We enforce this through a year-of-birth gate during onboarding. We do not knowingly collect data from children under 13. If you believe a child under 13 has created an account, contact us at <a href="mailto:privacy@orbitalhealth.app">privacy@orbitalhealth.app</a> and we will delete the account and all associated data within 48 hours.</p>
 
-<h2>9. International Users</h2>
-<p>Data may be processed in different jurisdictions. We comply with applicable data protection regulations.</p>
+<h2>11. International Users</h2>
+<p>Data may be processed in the United States. By using Orbital, you consent to the transfer of data to the US. We comply with applicable data protection regulations including GDPR (for EU users) and CCPA (for California residents).</p>
 
-<h2>10. Contact</h2>
-<p>For privacy questions, contact <a href="mailto:privacy@orbital.health">privacy@orbital.health</a>.</p>
-<p>For general support, contact <a href="mailto:contact@orbital.health">contact@orbital.health</a>.</p>
+<h2>12. Security</h2>
+<ul>
+  <li>TLS 1.3 encryption in transit</li>
+  <li>AES-256 encryption at rest</li>
+  <li>Row-level security (RLS) on all database tables</li>
+  <li>Admin functions locked to service_role only</li>
+  <li>No shared credentials — each user has isolated access</li>
+</ul>
 
-<h2>11. Updates</h2>
-<p>We may update this Privacy Policy. Material changes will be communicated through the Service.</p>
+<h2>13. Changes to This Policy</h2>
+<p>We may update this policy. Material changes will be communicated through the app and via email to account holders. The "Effective" date at the top reflects the most recent version.</p>
+
+<h2>14. Contact</h2>
+<p>For privacy questions: <a href="mailto:privacy@orbitalhealth.app">privacy@orbitalhealth.app</a><br>
+For general support: <a href="mailto:contact@orbitalhealth.app">contact@orbitalhealth.app</a><br>
+Mailing address: Orbital Health Intelligence, Inc.</p>
 
 <hr class="divider">
 
-<div class="disclaimer">
-<p><strong>Orbital is not a medical device.</strong> It does not provide medical advice, diagnosis, or treatment. All data is self-reported and subjective. Pattern analysis features identify trends in self-reported data only and do not predict health outcomes. If you have concerns about your health, consult qualified healthcare providers.</p>
+<p style="font-size:13px;color:rgba(255,255,255,0.3);text-align:center"><strong>Orbital is not a medical device.</strong> It does not provide medical advice, diagnosis, or treatment. All data is self-reported and subjective.</p>
+
 </div>
 
-<p class="version">Orbital v1.0.0</p>
-</div>
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">&copy; 2026 Orbital Health. All rights reserved.</div>
+    <div class="footer-links">
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/support">Support</a>
+      <a href="mailto:contact@orbitalhealth.app">Contact</a>
+    </div>
+  </div>
+</footer>
+
 </body>
 </html>

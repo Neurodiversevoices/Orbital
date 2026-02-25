@@ -38,9 +38,9 @@ import { colors, spacing, borderRadius, commonStyles } from '../theme';
 // =============================================================================
 
 const CONTACT_URLS = {
-  alignmentBrief: 'mailto:contact@orbital.health?subject=Executive%20Alignment%20Brief%20Request',
-  boardBrief: 'mailto:contact@orbital.health?subject=Board-Level%20Risk%20Brief%20Request',
-  advisory: 'mailto:contact@orbital.health?subject=Executive%20Advisory%20Inquiry',
+  alignmentBrief: 'mailto:contact@orbitalhealth.app?subject=Executive%20Alignment%20Brief%20Request',
+  boardBrief: 'mailto:contact@orbitalhealth.app?subject=Board-Level%20Risk%20Brief%20Request',
+  advisory: 'mailto:contact@orbitalhealth.app?subject=Executive%20Advisory%20Inquiry',
 };
 
 // =============================================================================

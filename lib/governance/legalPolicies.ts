@@ -280,7 +280,7 @@ Last Updated: ${new Date().toISOString().split('T')[0]}
 - Revoke sharing access
 
 7. CONTACT
-For privacy inquiries, contact privacy@orbital.app`,
+For privacy inquiries, contact privacy@orbitalhealth.app`,
 
     es: `POLÍTICA DE PRIVACIDAD DE ORBITAL
 
@@ -319,7 +319,7 @@ For privacy inquiries, contact privacy@orbital.app`,
 - Revocar acceso compartido
 
 7. CONTACTO
-Para consultas de privacidad, contacte privacy@orbital.app`,
+Para consultas de privacidad, contacte privacy@orbitalhealth.app`,
   },
 
   data_retention_policy: {
@@ -391,7 +391,7 @@ You may cancel your subscription at any time through your account settings.
 - Data exit procedures per offboarding policy
 
 4. REFUND REQUESTS
-Contact support@orbital.app for refund inquiries.`,
+Contact support@orbitalhealth.app for refund inquiries.`,
 
     es: `POLÍTICA DE CANCELACIÓN Y REEMBOLSO DE ORBITAL
 
@@ -411,7 +411,7 @@ Puede cancelar su suscripción en cualquier momento a través de la configuraci�
 - Procedimientos de salida de datos según política de baja
 
 4. SOLICITUDES DE REEMBOLSO
-Contacte support@orbital.app para consultas de reembolso.`,
+Contacte support@orbitalhealth.app para consultas de reembolso.`,
   },
 
   non_diagnostic_disclaimer: {
