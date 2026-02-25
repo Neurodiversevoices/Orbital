@@ -78,33 +78,108 @@ export interface CCIPricingResult {
 // =============================================================================
 
 /**
- * Check if all Circle members have Pro subscription.
- * This is a placeholder that will be implemented when Circle membership
- * tracking is fully integrated.
+ * Check if all Circle members have active Pro subscriptions.
  *
- * TODO: Integrate with actual Circle membership data from backend
+ * Queries the circles and circle_members Supabase tables, then verifies
+ * every active member has 'individual_pro' in user_entitlements.
+ *
+ * If ANY member lacks Pro, returns false — the Circle CCI tier is blocked.
  */
 export async function checkCircleAllMembersPro(
-  _circleId: string | null
+  circleId: string | null
 ): Promise<boolean> {
-  // For now, assume if user has Circle, all members are Pro
-  // This will be enforced by the Circle Pro gate we implemented
-  return true;
+  if (!circleId) return false;
+
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
+    const key = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) return false;
+
+    const supabase = createClient(url, key);
+
+    // Get all active members of this circle
+    const { data: members, error: membersError } = await supabase
+      .from('circle_members')
+      .select('user_id')
+      .eq('circle_id', circleId)
+      .eq('status', 'active');
+
+    if (membersError || !members || members.length === 0) return false;
+
+    // Check each member has individual_pro entitlement
+    const userIds = members.map((m: { user_id: string }) => m.user_id);
+
+    const { data: entitlements, error: entError } = await supabase
+      .from('user_entitlements')
+      .select('user_id')
+      .in('user_id', userIds)
+      .eq('entitlement_id', 'individual_pro');
+
+    if (entError) return false;
+
+    const proUserIds = new Set(
+      (entitlements || []).map((e: { user_id: string }) => e.user_id)
+    );
+
+    // Every member must have Pro
+    return userIds.every((id: string) => proUserIds.has(id));
+  } catch {
+    // If Supabase is not configured or query fails, block the purchase
+    return false;
+  }
 }
 
 /**
  * Check if all Bundle seats are Pro-entitled.
- * This is a placeholder that will be implemented when Bundle seat
- * tracking is fully integrated.
  *
- * TODO: Integrate with actual Bundle seat data from backend
+ * Queries the bundle_seats table, then verifies every active seat holder
+ * has 'individual_pro' in user_entitlements.
+ *
+ * Bundles include Pro by design, but this checks enforcement in case
+ * a subscription lapsed.
  */
 export async function checkBundleAllSeatsPro(
-  _bundleId: string | null
+  bundleId: string | null
 ): Promise<boolean> {
-  // For now, assume if user has Bundle, all seats are Pro
-  // Bundles include Pro by definition
-  return true;
+  if (!bundleId) return false;
+
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
+    const key = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) return false;
+
+    const supabase = createClient(url, key);
+
+    // Get all active seats with assigned users
+    const { data: seats, error: seatsError } = await supabase
+      .from('bundle_seats')
+      .select('user_id')
+      .eq('bundle_id', bundleId)
+      .eq('status', 'active')
+      .not('user_id', 'is', null);
+
+    if (seatsError || !seats || seats.length === 0) return false;
+
+    const userIds = seats.map((s: { user_id: string }) => s.user_id);
+
+    const { data: entitlements, error: entError } = await supabase
+      .from('user_entitlements')
+      .select('user_id')
+      .in('user_id', userIds)
+      .eq('entitlement_id', 'individual_pro');
+
+    if (entError) return false;
+
+    const proUserIds = new Set(
+      (entitlements || []).map((e: { user_id: string }) => e.user_id)
+    );
+
+    return userIds.every((id: string) => proUserIds.has(id));
+  } catch {
+    return false;
+  }
 }
 
 // =============================================================================

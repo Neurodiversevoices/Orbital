@@ -335,6 +335,141 @@ export interface Database {
         };
         Relationships: [];
       };
+      circles: {
+        Row: {
+          id: string;
+          created_by: string;
+          name: string | null;
+          status: 'active' | 'archived';
+          max_members: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          created_by: string;
+          name?: string | null;
+          status?: 'active' | 'archived';
+          max_members?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          created_by?: string;
+          name?: string | null;
+          status?: 'active' | 'archived';
+          max_members?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      circle_members: {
+        Row: {
+          id: string;
+          circle_id: string;
+          user_id: string;
+          invited_by: string | null;
+          status: 'pending' | 'active' | 'revoked' | 'blocked';
+          joined_at: string | null;
+          status_changed_at: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          circle_id: string;
+          user_id: string;
+          invited_by?: string | null;
+          status?: 'pending' | 'active' | 'revoked' | 'blocked';
+          joined_at?: string | null;
+          status_changed_at?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          circle_id?: string;
+          user_id?: string;
+          invited_by?: string | null;
+          status?: 'pending' | 'active' | 'revoked' | 'blocked';
+          joined_at?: string | null;
+          status_changed_at?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      circle_invites: {
+        Row: {
+          id: string;
+          circle_id: string;
+          token: string;
+          inviter_id: string;
+          target_hint: string | null;
+          expires_at: string;
+          used: boolean;
+          used_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          circle_id: string;
+          token: string;
+          inviter_id: string;
+          target_hint?: string | null;
+          expires_at: string;
+          used?: boolean;
+          used_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          circle_id?: string;
+          token?: string;
+          inviter_id?: string;
+          target_hint?: string | null;
+          expires_at?: string;
+          used?: boolean;
+          used_by?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      user_push_tokens: {
+        Row: {
+          id: string;
+          user_id: string;
+          expo_push_token: string;
+          platform: 'ios' | 'android' | 'web';
+          device_id: string | null;
+          active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          expo_push_token: string;
+          platform: 'ios' | 'android' | 'web';
+          device_id?: string | null;
+          active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          expo_push_token?: string;
+          platform?: 'ios' | 'android' | 'web';
+          device_id?: string | null;
+          active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -359,6 +494,14 @@ export interface Database {
       delete_user_data: {
         Args: { p_user_id: string };
         Returns: void;
+      };
+      get_circle_member_count: {
+        Args: { p_circle_id: string };
+        Returns: { active_members: number; pending_members: number; max_members: number }[];
+      };
+      get_bundle_seat_count: {
+        Args: { p_bundle_id: string };
+        Returns: { active_seats: number; pending_seats: number; max_seats: number }[];
       };
     };
     Enums: Record<string, never>;

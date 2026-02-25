@@ -7,6 +7,23 @@
 <meta name="description" content="Log your daily capacity. See patterns over time. Private, offline-first, yours.">
 <meta name="theme-color" content="#05060A">
 <link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://orbitalhealth.app/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://orbitalhealth.app/">
+<meta property="og:title" content="Orbital — Your capacity. Your data. Your signal.">
+<meta property="og:description" content="Log your daily capacity in under 30 seconds. See patterns emerge over weeks and months. Private, offline-first, yours.">
+<meta property="og:image" content="https://orbitalhealth.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Orbital">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Orbital — Your capacity. Your data. Your signal.">
+<meta name="twitter:description" content="Log your daily capacity in under 30 seconds. See patterns emerge over weeks and months. Private, offline-first, yours.">
+<meta name="twitter:image" content="https://orbitalhealth.app/og-image.png">
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -34,7 +51,11 @@
     display:flex;align-items:center;justify-content:space-between;
     max-width:960px;margin:0 auto;padding:16px 24px;
   }
-  .nav-logo{font-size:18px;font-weight:700;color:#fff;letter-spacing:0.5px;text-decoration:none}
+  .nav-logo{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:18px;font-weight:700;color:#fff;letter-spacing:0.5px;text-decoration:none;
+  }
+  .nav-logo img{width:32px;height:32px;border-radius:8px}
   .nav-links{display:flex;gap:24px;align-items:center}
   .nav-links a{font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s}
   .nav-links a:hover{color:#fff}
@@ -72,21 +93,14 @@
     line-height:1.55;
   }
 
-  /* ---- Orb visual ---- */
-  .orb-container{
+  /* ---- Hero icon ---- */
+  .hero-icon{
     display:flex;justify-content:center;align-items:center;
-    margin:0 auto 56px;position:relative;
+    margin:0 auto 48px;position:relative;
   }
-  .orb{
-    width:180px;height:180px;border-radius:50%;
-    background:radial-gradient(circle at 40% 35%,rgba(0,215,255,0.35),rgba(0,215,255,0.08) 50%,transparent 70%);
-    border:1px solid rgba(0,215,255,0.18);
-    box-shadow:0 0 80px rgba(0,215,255,0.1),inset 0 0 40px rgba(0,215,255,0.05);
-    animation:orb-pulse 4s ease-in-out infinite;
-  }
-  @keyframes orb-pulse{
-    0%,100%{box-shadow:0 0 80px rgba(0,215,255,0.1),inset 0 0 40px rgba(0,215,255,0.05)}
-    50%{box-shadow:0 0 100px rgba(0,215,255,0.15),inset 0 0 50px rgba(0,215,255,0.08)}
+  .hero-icon img{
+    width:160px;height:160px;
+    object-fit:contain;
   }
 
   /* ---- Spectrum bar ---- */
@@ -267,6 +281,15 @@
     transition:all 0.2s;
   }
   .email-btn:hover{background:#33dfff;border-color:#33dfff}
+  .email-btn:disabled{opacity:0.6;cursor:not-allowed}
+  .email-success{
+    font-size:15px;color:#32D74B;font-weight:600;
+    text-align:center;padding:14px;
+  }
+  .email-error{
+    font-size:13px;color:#FF3B30;
+    text-align:center;margin-top:8px;
+  }
   .email-note{
     font-size:12px;color:rgba(255,255,255,0.25);
     margin-top:-20px;margin-bottom:32px;
@@ -399,7 +422,7 @@
   /* ---- Responsive ---- */
   @media(max-width:640px){
     .hero{padding:80px 0 60px}
-    .orb{width:140px;height:140px}
+    .hero-icon img{width:120px;height:120px}
     .privacy-grid{grid-template-columns:1fr}
     .circles-banner{padding:32px 24px}
     .nav-links a:not(.nav-cta){display:none}
@@ -417,7 +440,7 @@
 <!-- Nav -->
 <nav>
   <div class="nav-inner">
-    <a href="/" class="nav-logo">Orbital</a>
+    <a href="/" class="nav-logo"><img src="/icon.png" alt="Orbital" width="32" height="32">Orbital</a>
     <div class="nav-links">
       <a href="#features">Features</a>
       <a href="#how-it-works">How It Works</a>
@@ -432,7 +455,7 @@
 <div class="container">
   <section class="hero">
     <div class="hero-badge"><span class="hero-badge-dot"></span> Founding access — first 100 spots</div>
-    <div class="orb-container"><div class="orb"></div></div>
+    <div class="hero-icon"><img src="/og-image.png" alt="Orbital orb" width="160" height="160"></div>
     <h1>Your capacity.<br>Your data.<br>Your signal.</h1>
     <p class="subtitle">Log your daily capacity in under 30 seconds. See patterns emerge over weeks and months. Private, offline-first, yours.</p>
 
@@ -620,7 +643,8 @@
           <li>Circles (share with 25 people)</li>
           <li>Priority support</li>
         </ul>
-        <button class="pricing-cta primary" onclick="document.querySelector('.hero .email-input').focus();window.scrollTo({top:0,behavior:'smooth'})">Get Early Access</button>
+        <button class="pricing-cta primary" onclick="startCheckout('orbital_pro_monthly')">Start Pro — $29/mo</button>
+        <button class="pricing-cta secondary" style="margin-top:8px;font-size:13px" onclick="startCheckout('orbital_pro_annual')">or $290/year (save 17%)</button>
       </div>
 
       <div class="pricing-card">
@@ -634,7 +658,7 @@
           <li>Downloadable PDF artifact</li>
           <li>Shareable with providers</li>
         </ul>
-        <button class="pricing-cta secondary" onclick="document.querySelector('.hero .email-input').focus();window.scrollTo({top:0,behavior:'smooth'})">Join Waitlist</button>
+        <button class="pricing-cta secondary" onclick="startCheckout('orbital_cci_free')">Buy CCI Report — $199</button>
       </div>
     </div>
   </section>
@@ -684,15 +708,152 @@
   <!-- Footer -->
   <footer>
     <div class="footer-inner">
-      <div class="footer-left">&copy; 2025 Orbital Health. All rights reserved.</div>
+      <div class="footer-left">&copy; 2026 Orbital Health. All rights reserved.</div>
       <div class="footer-links">
         <a href="/privacy">Privacy Policy</a>
         <a href="/support">Support</a>
-        <a href="mailto:contact@orbital.health">Contact</a>
+        <a href="mailto:contact@orbitalhealth.app">Contact</a>
       </div>
     </div>
   </footer>
 </div>
+
+<script>
+// =========================================================================
+// UTM PARAMS
+// =========================================================================
+const urlParams = new URLSearchParams(window.location.search);
+const utm = {
+  utm_source: urlParams.get('utm_source') || undefined,
+  utm_medium: urlParams.get('utm_medium') || undefined,
+  utm_campaign: urlParams.get('utm_campaign') || undefined,
+};
+
+// =========================================================================
+// EMAIL CAPTURE — wire both forms to /api/waitlist
+// =========================================================================
+function setupEmailForm(form, source) {
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const input = form.querySelector('.email-input');
+    const btn = form.querySelector('.email-btn');
+    const email = input.value.trim();
+
+    if (!email) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    // Remove any existing error/success
+    form.parentElement.querySelectorAll('.email-error').forEach(el => el.remove());
+
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source, ...utm }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        form.innerHTML = '<div class="email-success">You\'re in — check your email</div>';
+        trackEvent('email_captured', { source });
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Get Early Access';
+        const err = document.createElement('div');
+        err.className = 'email-error';
+        err.textContent = data.error || 'Something went wrong. Try again.';
+        form.after(err);
+      }
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Get Early Access';
+      const errEl = document.createElement('div');
+      errEl.className = 'email-error';
+      errEl.textContent = 'Network error. Try again.';
+      form.after(errEl);
+    }
+  });
+}
+
+// Wire hero form (first) and bottom CTA form (second)
+const forms = document.querySelectorAll('.email-form');
+if (forms[0]) setupEmailForm(forms[0], 'hero');
+if (forms[1]) setupEmailForm(forms[1], 'bottom_cta');
+
+// =========================================================================
+// STRIPE CHECKOUT — wire pricing CTAs to /api/create-checkout
+// =========================================================================
+async function startCheckout(productId) {
+  const email = prompt('Enter your email to continue to checkout:');
+  if (!email || !email.includes('@')) {
+    if (email !== null) alert('Please enter a valid email address.');
+    return;
+  }
+
+  try {
+    trackEvent('checkout_started', { product_id: productId });
+
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        product_id: productId,
+        supabase_user_id: 'guest',
+        customer_email: email,
+        success_url: window.location.origin + '/success.html',
+        cancel_url: window.location.origin + '/cancel.html',
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.checkout_url) {
+      window.location.href = data.checkout_url;
+    } else {
+      alert(data.error || 'Something went wrong. Please try again.');
+    }
+  } catch (err) {
+    alert('Network error. Please try again.');
+  }
+}
+
+// =========================================================================
+// ANALYTICS — lightweight event tracking via /api/track
+// =========================================================================
+function trackEvent(event, metadata) {
+  fetch('/api/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      event,
+      page: window.location.pathname,
+      referrer: document.referrer || undefined,
+      ...utm,
+      metadata: metadata || {},
+    }),
+  }).catch(function() {}); // fire-and-forget
+}
+
+// Track page view
+trackEvent('page_view');
+
+// Track pricing clicks
+document.querySelectorAll('.pricing-cta').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    trackEvent('pricing_clicked', { plan: btn.closest('.pricing-card')?.querySelector('h3')?.textContent || '' });
+  });
+});
+
+// Track download clicks
+document.querySelectorAll('.store-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    trackEvent('download_clicked', { store: btn.href.includes('apple') ? 'ios' : 'android' });
+  });
+});
+</script>
 
 </body>
 </html>

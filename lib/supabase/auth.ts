@@ -294,7 +294,7 @@ export function useAuth(): AuthContext {
       // Get the current origin for redirect (works on Vercel production and localhost)
       const redirectTo = typeof window !== 'undefined'
         ? `${window.location.origin}/auth/callback`
-        : 'https://orbital-jet.vercel.app/auth/callback';
+        : 'https://orbitalhealth.app/auth/callback';
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',

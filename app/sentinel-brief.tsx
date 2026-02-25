@@ -41,7 +41,7 @@ import {
 // CONTACT URL
 // =============================================================================
 
-const CONTACT_URL = 'mailto:contact@orbital.health?subject=Sentinel%20Brief%20Inquiry';
+const CONTACT_URL = 'mailto:contact@orbitalhealth.app?subject=Sentinel%20Brief%20Inquiry';
 
 // =============================================================================
 // MAIN COMPONENT

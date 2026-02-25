@@ -4,48 +4,175 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Orbital — Support</title>
+<meta name="robots" content="index, follow">
+<meta name="description" content="Orbital Support — get help with capacity tracking, subscriptions, data export, and more.">
+<link rel="icon" href="/favicon.ico">
 <style>
-  body { margin:0; padding:40px 20px; background:#05060A; color:rgba(255,255,255,0.85); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; line-height:1.6; }
-  .container { max-width:640px; margin:0 auto; }
-  h1 { font-size:24px; font-weight:600; margin-bottom:8px; color:#fff; }
-  h2 { font-size:18px; font-weight:600; margin-top:32px; margin-bottom:8px; color:rgba(255,255,255,0.9); }
-  p, li { font-size:15px; color:rgba(255,255,255,0.7); }
-  a { color:#00E5FF; text-decoration:none; }
-  a:hover { text-decoration:underline; }
-  .divider { border:none; border-top:1px solid rgba(255,255,255,0.08); margin:32px 0; }
-  .disclaimer { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:16px 20px; margin-top:32px; }
-  .disclaimer p { font-size:13px; color:rgba(255,255,255,0.5); }
-  .version { font-size:12px; color:rgba(255,255,255,0.3); margin-top:40px; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:#05060A;
+    color:rgba(255,255,255,0.85);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  nav{
+    position:sticky;top:0;z-index:100;
+    background:rgba(5,6,10,0.85);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .nav-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    max-width:960px;margin:0 auto;padding:16px 24px;
+  }
+  .nav-logo{font-size:18px;font-weight:700;color:#fff;letter-spacing:0.5px;text-decoration:none}
+  .nav-links{display:flex;gap:24px;align-items:center}
+  .nav-links a{font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s}
+  .nav-links a:hover{color:#fff}
+  .container{max-width:720px;margin:0 auto;padding:60px 24px 80px}
+  h1{font-size:28px;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:-0.3px}
+  h1+p{font-size:16px;color:rgba(255,255,255,0.45);margin-bottom:48px}
+  h2{font-size:20px;font-weight:700;color:#fff;margin-top:48px;margin-bottom:16px;letter-spacing:-0.2px}
+  p,li{font-size:15px;color:rgba(255,255,255,0.65);margin-bottom:12px}
+  a{color:#00D7FF;text-decoration:none}
+  a:hover{text-decoration:underline}
+  strong{color:rgba(255,255,255,0.85)}
+
+  .contact-card{
+    background:rgba(0,215,255,0.04);
+    border:1px solid rgba(0,215,255,0.1);
+    border-radius:12px;padding:24px;
+    margin-bottom:48px;
+  }
+  .contact-card p{margin-bottom:8px}
+  .contact-card p:last-child{margin-bottom:0}
+
+  .faq-item{
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:12px;padding:24px;
+    margin-bottom:16px;
+  }
+  .faq-item h3{
+    font-size:16px;font-weight:600;color:#fff;
+    margin-bottom:8px;
+  }
+  .faq-item p{margin-bottom:0;color:rgba(255,255,255,0.55)}
+  .faq-item p+p{margin-top:8px}
+
+  .divider{border:none;border-top:1px solid rgba(255,255,255,0.06);margin:48px 0}
+
+  footer{
+    border-top:1px solid rgba(255,255,255,0.06);padding:40px 0;
+  }
+  .footer-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    max-width:960px;margin:0 auto;padding:0 24px;
+    flex-wrap:wrap;gap:16px;
+  }
+  .footer-left{font-size:13px;color:rgba(255,255,255,0.3)}
+  .footer-links{display:flex;gap:24px}
+  .footer-links a{font-size:13px;color:rgba(255,255,255,0.35);text-decoration:none}
+  .footer-links a:hover{color:rgba(255,255,255,0.6)}
+  @media(max-width:640px){
+    .nav-links a:not(:last-child){display:none}
+    .footer-inner{flex-direction:column;text-align:center}
+  }
 </style>
 </head>
 <body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Orbital</a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/privacy">Privacy</a>
+    </div>
+  </div>
+</nav>
+
 <div class="container">
 
-<h1>Orbital — Support</h1>
-<p>Orbital is a longitudinal capacity tracking tool for self-reported functional capacity signals.</p>
+<h1>Support</h1>
+<p>Get help with Orbital. If you can't find what you need below, reach out directly.</p>
 
-<h2>Contact</h2>
-<p>For support inquiries, contact us at <a href="mailto:contact@orbital.health">contact@orbital.health</a>.</p>
-<p>For privacy-related questions, contact <a href="mailto:privacy@orbital.health">privacy@orbital.health</a>.</p>
+<div class="contact-card">
+  <p><strong>General support:</strong> <a href="mailto:contact@orbitalhealth.app">contact@orbitalhealth.app</a></p>
+  <p><strong>Privacy questions:</strong> <a href="mailto:privacy@orbitalhealth.app">privacy@orbitalhealth.app</a></p>
+  <p><strong>Response time:</strong> We aim to respond within 24 hours on business days.</p>
+</div>
 
-<h2>Common Topics</h2>
-<ul>
-<li>Your data is stored locally on your device by default.</li>
-<li>You can export or delete your data at any time from Settings.</li>
-<li>Subscription management is handled through your Apple ID account settings.</li>
-<li>For refund requests, contact <a href="mailto:support@orbital.app">support@orbital.app</a>.</li>
-</ul>
+<h2>Frequently Asked Questions</h2>
 
-<h2>Data &amp; Privacy</h2>
-<p>Orbital stores capacity data on-device. If cloud sync is enabled, data is encrypted in transit and at rest. We do not sell your personal information. See our <a href="/privacy">Privacy Policy</a> for full details.</p>
+<div class="faq-item">
+  <h3>What is capacity tracking?</h3>
+  <p>Capacity tracking is a way to log how you're doing each day using three states: <strong>Resourced</strong> (green), <strong>Stretched</strong> (yellow), or <strong>Depleted</strong> (red). It takes under 30 seconds. Over time, Orbital reveals your personal patterns — weekly rhythms, seasonal trends, and capacity trajectories.</p>
+  <p>It's not a mood tracker. It's a functional capacity tracker — designed for people whose energy, focus, and ability fluctuate in meaningful ways.</p>
+</div>
+
+<div class="faq-item">
+  <h3>How does the CCI work?</h3>
+  <p>The <strong>Capacity Credential Index (CCI)</strong> is a quarterly PDF report generated from 90 days of continuous capacity signals. It synthesizes your data into trend charts, weekly patterns, stability scores, and capacity trajectories.</p>
+  <p>You need at least 90 days of logged signals to generate your first CCI. Once eligible, you can purchase the report from the app. CCI reports are downloadable PDFs you can keep, print, or share with a healthcare provider.</p>
+</div>
+
+<div class="faq-item">
+  <h3>How do I cancel my subscription?</h3>
+  <p><strong>iOS:</strong> Open Settings &rarr; tap your name &rarr; Subscriptions &rarr; Orbital &rarr; Cancel Subscription.</p>
+  <p><strong>Android:</strong> Open Google Play &rarr; tap your profile &rarr; Payments &amp; subscriptions &rarr; Subscriptions &rarr; Orbital &rarr; Cancel.</p>
+  <p><strong>Web (Stripe):</strong> If you subscribed via the website, email <a href="mailto:contact@orbitalhealth.app">contact@orbitalhealth.app</a> and we'll process the cancellation immediately. Or use the Customer Portal link in your receipt email.</p>
+</div>
+
+<div class="faq-item">
+  <h3>How do I export my data?</h3>
+  <p>Go to <strong>Settings &rarr; Export Data</strong> in the app. You can export as JSON (for developers) or CSV (for spreadsheets). The export includes all your capacity signals, tags, notes, and timestamps. Your data is always yours to take with you.</p>
+</div>
+
+<div class="faq-item">
+  <h3>How do I delete my account?</h3>
+  <p>Go to <strong>Settings &rarr; Delete Account</strong> in the app. This permanently deletes all your data from our servers within 30 days. Local data on your device is deleted immediately. This action cannot be undone.</p>
+  <p>You can also email <a href="mailto:privacy@orbitalhealth.app">privacy@orbitalhealth.app</a> to request deletion.</p>
+</div>
+
+<div class="faq-item">
+  <h3>What does the 90-day requirement mean?</h3>
+  <p>The CCI requires 90 days of capacity signals because shorter time periods don't reveal meaningful longitudinal patterns. The 90-day threshold is the minimum needed to generate statistically meaningful trend analysis, weekly rhythm detection, and stability scoring.</p>
+  <p>You don't need to log every day — but the more consistently you log, the more accurate your CCI will be.</p>
+</div>
+
+<div class="faq-item">
+  <h3>Is Orbital a medical device?</h3>
+  <p><strong>No.</strong> Orbital is not a medical device. It does not provide medical advice, diagnosis, or treatment. All data is self-reported and subjective. Pattern analysis features identify trends in self-reported data only and do not predict health outcomes. If you have concerns about your health, consult qualified healthcare providers.</p>
+</div>
+
+<div class="faq-item">
+  <h3>What are Circles?</h3>
+  <p>Circles let you share your current capacity state with up to 25 trusted people — family, close friends, or care supporters. Every member must explicitly consent to join. Signals are visible for 90 minutes and then expire. No one can see your historical data or patterns through Circles.</p>
+</div>
+
+<div class="faq-item">
+  <h3>I have a promo code. How do I redeem it?</h3>
+  <p>Go to <strong>Settings &rarr; Redeem Code</strong> in the app and enter your code. The entitlement will be applied immediately. If you have issues, email <a href="mailto:contact@orbitalhealth.app">contact@orbitalhealth.app</a> with your code and account email.</p>
+</div>
 
 <hr class="divider">
 
-<div class="disclaimer">
-<p><strong>Orbital is not a medical device.</strong> It does not provide medical advice, diagnosis, or treatment. All data is self-reported and subjective. Pattern analysis features identify trends in self-reported data only and do not predict health outcomes. If you have concerns about your health, consult qualified healthcare providers.</p>
+<p style="font-size:13px;color:rgba(255,255,255,0.3);text-align:center"><strong>Orbital is not a medical device.</strong> It does not provide medical advice, diagnosis, or treatment. All data is self-reported and subjective.</p>
+
 </div>
 
-<p class="version">Orbital v1.0.0</p>
-</div>
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">&copy; 2026 Orbital Health. All rights reserved.</div>
+    <div class="footer-links">
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/support">Support</a>
+      <a href="mailto:contact@orbitalhealth.app">Contact</a>
+    </div>
+  </div>
+</footer>
+
 </body>
 </html>
