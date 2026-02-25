@@ -7,6 +7,7 @@
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/", "destination": "/landing.html" },
+    { "source": "/:file(.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif))", "destination": "/:file" },
     { "source": "/((?!api/).*)", "destination": "/_app.html" }
   ],
   "env": {
