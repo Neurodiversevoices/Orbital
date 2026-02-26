@@ -173,7 +173,7 @@ export async function getUserEntitlements(): Promise<UserEntitlements> {
     bundleSize,
     hasAdminAddOn,
     hasCCIPurchased,
-    cciPrice: isPro ? CCI_PRICING.proUser : CCI_PRICING.freeUser,
+    cciPrice: isPro ? CCI_PRICING.sixtyDay : CCI_PRICING.ninetyDay,
     rawEntitlements: entitlements,
   };
 }

@@ -55,8 +55,7 @@ import { useSubscription, FREE_TIER_LIMITS } from '../lib/subscription';
 import {
   PRODUCT_IDS,
   PRO_PRICING,
-  FAMILY_ADDON_PRICING,
-  FAMILY_EXTRA_SEAT_PRICING,
+  FAMILY_PRICING,
   CIRCLE_PRICING,
   BUNDLE_PRICING,
   ADMIN_ADDON_PRICING,
@@ -250,7 +249,7 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
   const [confirmationChecked, setConfirmationChecked] = useState(false);
   const [permanentRecordChecked, setPermanentRecordChecked] = useState(false);
   const [notDiagnosisChecked, setNotDiagnosisChecked] = useState(false);
-  const price = isPro ? CCI_PRICING.proUser : CCI_PRICING.freeUser;
+  const price = isPro ? CCI_PRICING.sixtyDay : CCI_PRICING.ninetyDay;
 
   const allConfirmed = confirmationChecked && permanentRecordChecked && notDiagnosisChecked;
   const canPurchase = allConfirmed && !disabled && !hasPurchased;
@@ -277,7 +276,7 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
         </View>
         {!isPro && (
           <Text style={styles.cciProHint}>
-            Pro users pay {formatPrice(CCI_PRICING.proUser)} (save {formatPrice(CCI_PRICING.freeUser - CCI_PRICING.proUser)})
+            Pro users pay {formatPrice(CCI_PRICING.sixtyDay)} (save {formatPrice(CCI_PRICING.ninetyDay - CCI_PRICING.sixtyDay)})
           </Text>
         )}
         {/* CPT 90885 Reimbursement Notice — PATCH 1 */}
@@ -529,7 +528,7 @@ export default function UpgradeScreen() {
               <View style={styles.cciInlineHeader}>
                 <FileText size={16} color="#7A9AAA" />
                 <Text style={styles.cciInlineTitle}>Individual CCI</Text>
-                <Text style={styles.cciInlinePrice}>{formatPrice(CCI_PRICING.freeUser)}</Text>
+                <Text style={styles.cciInlinePrice}>{formatPrice(CCI_PRICING.ninetyDay)}</Text>
               </View>
               <Text style={styles.cciInlineDescription}>Clinical capacity artifact · Issued once</Text>
               <Pressable
@@ -538,7 +537,7 @@ export default function UpgradeScreen() {
                 disabled={isPurchasing || hasCCIPurchased}
               >
                 <Text style={styles.cciInlineButtonText}>
-                  {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.freeUser)}`}
+                  {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.ninetyDay)}`}
                 </Text>
               </Pressable>
             </View>
@@ -589,7 +588,7 @@ export default function UpgradeScreen() {
               <View style={styles.cciInlineHeader}>
                 <FileText size={16} color="#FFD700" />
                 <Text style={styles.cciInlineTitle}>Individual CCI</Text>
-                <Text style={[styles.cciInlinePrice, { color: '#FFD700' }]}>{formatPrice(CCI_PRICING.proUser)}</Text>
+                <Text style={[styles.cciInlinePrice, { color: '#FFD700' }]}>{formatPrice(CCI_PRICING.sixtyDay)}</Text>
               </View>
               <Text style={styles.cciInlineDescription}>Clinical capacity artifact · Issued once</Text>
               <Pressable
@@ -598,7 +597,7 @@ export default function UpgradeScreen() {
                 disabled={isPurchasing || hasCCIPurchased || !isPro}
               >
                 <Text style={styles.cciInlineButtonText}>
-                  {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.proUser)}`}
+                  {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.sixtyDay)}`}
                 </Text>
               </Pressable>
             </View>
@@ -611,7 +610,7 @@ export default function UpgradeScreen() {
             <View style={styles.planCardHeader}>
               <View>
                 <Text style={[styles.planCardName, { color: '#FF9800' }]}>Family</Text>
-                <Text style={styles.planCardPrice}>{formatPrice(FAMILY_ADDON_PRICING.monthly)}/mo · {formatPrice(FAMILY_ADDON_PRICING.annual)}/yr</Text>
+                <Text style={styles.planCardPrice}>{formatPrice(FAMILY_PRICING.monthly)}/mo · {formatPrice(FAMILY_PRICING.annual)}/yr</Text>
               </View>
               {hasFamily && (
                 <View style={[styles.currentBadge, { backgroundColor: '#FF9800' }]}>
@@ -622,25 +621,24 @@ export default function UpgradeScreen() {
             <Text style={styles.planCardDescription}>
               Up to 5 family members · Household insights · Shared visibility
             </Text>
-            {!isPro && <Text style={styles.planCardRequires}>Requires Pro</Text>}
             <View style={styles.planCardButtonRow}>
               <Pressable
-                style={[styles.planCardCtaButton, { backgroundColor: '#FF9800' }, (hasFamily || !isPro) && styles.planCardCtaButtonDisabled]}
+                style={[styles.planCardCtaButton, { backgroundColor: '#FF9800' }, hasFamily && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_ANNUAL, 'Family (Annual)')}
-                disabled={isPurchasing || hasFamily || !isPro}
+                disabled={isPurchasing || hasFamily}
               >
-                <Text style={[styles.planCardCtaButtonText, (hasFamily || !isPro) && styles.planCardCtaButtonTextDisabled]}>
-                  {hasFamily ? 'Active' : `${formatPrice(FAMILY_ADDON_PRICING.annual)}/yr`}
+                <Text style={[styles.planCardCtaButtonText, hasFamily && styles.planCardCtaButtonTextDisabled]}>
+                  {hasFamily ? 'Active' : `${formatPrice(FAMILY_PRICING.annual)}/yr`}
                 </Text>
-                {!hasFamily && isPro && <Text style={styles.savingsBadge}>Save 17%</Text>}
+                {!hasFamily && <Text style={styles.savingsBadge}>Save 17%</Text>}
               </Pressable>
               <Pressable
-                style={[styles.planCardCtaButtonSecondary, (hasFamily || !isPro) && styles.planCardCtaButtonDisabled]}
+                style={[styles.planCardCtaButtonSecondary, hasFamily && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_MONTHLY, 'Family (Monthly)')}
-                disabled={isPurchasing || hasFamily || !isPro}
+                disabled={isPurchasing || hasFamily}
               >
-                <Text style={[styles.planCardCtaButtonSecondaryText, (hasFamily || !isPro) && styles.planCardCtaButtonTextDisabled]}>
-                  {formatPrice(FAMILY_ADDON_PRICING.monthly)}/mo
+                <Text style={[styles.planCardCtaButtonSecondaryText, hasFamily && styles.planCardCtaButtonTextDisabled]}>
+                  {formatPrice(FAMILY_PRICING.monthly)}/mo
                 </Text>
               </Pressable>
             </View>

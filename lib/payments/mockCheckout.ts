@@ -16,8 +16,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   PRODUCT_IDS,
   PRO_PRICING,
-  FAMILY_ADDON_PRICING,
-  FAMILY_EXTRA_SEAT_PRICING,
+  FAMILY_PRICING,
+  FAMILY_PLUS_PRICING,
   CIRCLE_PRICING,
   BUNDLE_PRICING,
   ADMIN_ADDON_PRICING,
@@ -96,44 +96,40 @@ export const PRODUCT_CATALOG: Record<string, ProductInfo> = {
     entitlementId: 'pro_access',
   },
 
-  // Family Add-on
+  // Family (standalone — full Pro features, 5 seats)
   [PRODUCT_IDS.FAMILY_MONTHLY]: {
     id: PRODUCT_IDS.FAMILY_MONTHLY,
-    name: 'Family Add-on (Monthly)',
-    description: 'Add household members to your Pro subscription',
-    price: FAMILY_ADDON_PRICING.monthly,
+    name: 'Family (Monthly)',
+    description: 'Full Pro for the whole household — 5 seats, no Pro required',
+    price: FAMILY_PRICING.monthly,
     billingCycle: 'monthly',
     entitlementId: 'family_access',
-    requiresEntitlement: 'pro_access',
   },
   [PRODUCT_IDS.FAMILY_ANNUAL]: {
     id: PRODUCT_IDS.FAMILY_ANNUAL,
-    name: 'Family Add-on (Annual)',
-    description: 'Add household members to your Pro subscription',
-    price: FAMILY_ADDON_PRICING.annual,
+    name: 'Family (Annual)',
+    description: 'Full Pro for the whole household — 5 seats, no Pro required',
+    price: FAMILY_PRICING.annual,
     billingCycle: 'annual',
     entitlementId: 'family_access',
-    requiresEntitlement: 'pro_access',
   },
 
-  // Family Extra Seat (beyond base 5)
-  [PRODUCT_IDS.FAMILY_EXTRA_SEAT_MONTHLY]: {
-    id: PRODUCT_IDS.FAMILY_EXTRA_SEAT_MONTHLY,
-    name: 'Family Extra Member (Monthly)',
-    description: 'Add one additional family member beyond the base 5',
-    price: FAMILY_EXTRA_SEAT_PRICING.monthly,
+  // Family+ (standalone — full Pro features, 8 seats)
+  [PRODUCT_IDS.FAMILY_PLUS_MONTHLY]: {
+    id: PRODUCT_IDS.FAMILY_PLUS_MONTHLY,
+    name: 'Family+ (Monthly)',
+    description: 'Full Pro for larger or blended families — 8 seats',
+    price: FAMILY_PLUS_PRICING.monthly,
     billingCycle: 'monthly',
-    entitlementId: 'family_extra_seat',
-    requiresEntitlement: 'family_access',
+    entitlementId: 'family_plus_access',
   },
-  [PRODUCT_IDS.FAMILY_EXTRA_SEAT_ANNUAL]: {
-    id: PRODUCT_IDS.FAMILY_EXTRA_SEAT_ANNUAL,
-    name: 'Family Extra Member (Annual)',
-    description: 'Add one additional family member beyond the base 5',
-    price: FAMILY_EXTRA_SEAT_PRICING.annual,
+  [PRODUCT_IDS.FAMILY_PLUS_ANNUAL]: {
+    id: PRODUCT_IDS.FAMILY_PLUS_ANNUAL,
+    name: 'Family+ (Annual)',
+    description: 'Full Pro for larger or blended families — 8 seats',
+    price: FAMILY_PLUS_PRICING.annual,
     billingCycle: 'annual',
-    entitlementId: 'family_extra_seat',
-    requiresEntitlement: 'family_access',
+    entitlementId: 'family_plus_access',
   },
 
   // Circle
@@ -202,20 +198,53 @@ export const PRODUCT_CATALOG: Record<string, ProductInfo> = {
     requiresEntitlement: 'circle_access',
   },
 
-  // CCI-Q4 (tiered pricing handled separately)
+  // CCI Milestone Tiers (one-time, by duration)
+  [PRODUCT_IDS.CCI_30]: {
+    id: PRODUCT_IDS.CCI_30,
+    name: 'CCI — 30-Day Report',
+    description: 'Clinical Capacity Instrument — 30-day milestone report',
+    price: CCI_PRICING.thirtyDay,
+    billingCycle: 'one_time',
+    entitlementId: 'cci_purchased',
+  },
+  [PRODUCT_IDS.CCI_60]: {
+    id: PRODUCT_IDS.CCI_60,
+    name: 'CCI — 60-Day Report',
+    description: 'Clinical Capacity Instrument — 60-day milestone report',
+    price: CCI_PRICING.sixtyDay,
+    billingCycle: 'one_time',
+    entitlementId: 'cci_purchased',
+  },
+  [PRODUCT_IDS.CCI_90]: {
+    id: PRODUCT_IDS.CCI_90,
+    name: 'CCI — 90-Day Report',
+    description: 'Clinical Capacity Instrument — 90-day milestone report',
+    price: CCI_PRICING.ninetyDay,
+    billingCycle: 'one_time',
+    entitlementId: 'cci_purchased',
+  },
+  [PRODUCT_IDS.CCI_BUNDLE]: {
+    id: PRODUCT_IDS.CCI_BUNDLE,
+    name: 'CCI — Full Bundle',
+    description: 'Clinical Capacity Instrument — 30 + 60 + 90-day bundle',
+    price: CCI_PRICING.bundle,
+    billingCycle: 'one_time',
+    entitlementId: 'cci_purchased',
+  },
+  // Legacy CCI IDs (kept for migration; map to nearest milestone price)
   [PRODUCT_IDS.CCI_FREE]: {
     id: PRODUCT_IDS.CCI_FREE,
-    name: 'CCI-Q4 Issuance (Free User)',
-    description: 'Clinical Capacity Instrument quarterly issuance',
-    price: CCI_PRICING.freeUser,
+    name: 'CCI — 90-Day Report (Legacy)',
+    description: 'Legacy CCI issuance — maps to 90-day milestone',
+    price: CCI_PRICING.ninetyDay,
     billingCycle: 'one_time',
     entitlementId: 'cci_purchased',
   },
   [PRODUCT_IDS.CCI_PRO]: {
     id: PRODUCT_IDS.CCI_PRO,
-    name: 'CCI-Q4 Issuance (Pro User)',
-    description: 'Clinical Capacity Instrument quarterly issuance',
-    price: CCI_PRICING.proUser,
+    name: 'CCI — 60-Day Report (Legacy)',
+    description: 'Legacy CCI issuance — maps to 60-day milestone',
+    price: CCI_PRICING.sixtyDay,
     billingCycle: 'one_time',
     entitlementId: 'cci_purchased',
   },
