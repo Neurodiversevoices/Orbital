@@ -6,6 +6,7 @@
     { "source": "/support", "destination": "/support.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/therapists", "destination": "/therapists.html" },
     { "source": "/", "destination": "/landing.html" },
     { "source": "/((?!api/)(?!.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|woff|woff2|ttf|pdf|html)).*)", "destination": "/_app.html" }
   ],
