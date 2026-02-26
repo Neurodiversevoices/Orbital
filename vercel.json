@@ -11,6 +11,7 @@
     { "source": "/coach", "destination": "/coach.html" },
     { "source": "/dashboard", "destination": "/dashboard.html" },
     { "source": "/", "destination": "/landing.html" },
+    { "source": "/app", "destination": "/_app.html" },
     { "source": "/((?!api/)(?!.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|woff|woff2|ttf|pdf|html)).*)", "destination": "/_app.html" }
   ],
   "env": {
