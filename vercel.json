@@ -7,7 +7,7 @@
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/", "destination": "/landing.html" },
-    { "source": "/((?!api/).*)", "destination": "/_app.html" }
+    { "source": "/((?!api/)(?!.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|woff|woff2|ttf|pdf|html)).*)", "destination": "/_app.html" }
   ],
   "env": {
     "EXPO_PUBLIC_FOUNDER_DEMO": "0",

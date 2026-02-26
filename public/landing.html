@@ -56,7 +56,7 @@
     display:inline-flex;align-items:center;gap:10px;
     font-size:18px;font-weight:700;color:#fff;letter-spacing:0.5px;text-decoration:none;
   }
-  .nav-logo img{width:32px;height:32px;border-radius:8px}
+  .nav-logo img{width:36px;height:36px;border-radius:50%}
   .nav-links{display:flex;gap:24px;align-items:center}
   .nav-links a{font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s}
   .nav-links a:hover{color:#fff}
@@ -100,7 +100,7 @@
     margin:0 auto 56px;position:relative;
   }
   .orb-img{
-    width:400px;height:auto;display:block;
+    width:400px;height:auto;display:block;border-radius:0;box-shadow:none;
   }
 
   /* ---- Spectrum bar ---- */
@@ -422,7 +422,7 @@
   /* ---- Responsive ---- */
   @media(max-width:640px){
     .hero{padding:80px 0 60px}
-    .orb-img{width:280px;height:auto}
+    .orb-img{width:280px;height:auto;border-radius:0;box-shadow:none}
     .privacy-grid{grid-template-columns:1fr}
     .circles-banner{padding:32px 24px}
     .nav-links a:not(.nav-cta){display:none}
@@ -440,7 +440,7 @@
 <!-- Nav -->
 <nav>
   <div class="nav-inner">
-    <a href="/" class="nav-logo"><img src="/icon.png" alt="Orbital" width="32" height="32">Orbital</a>
+    <a href="/" class="nav-logo"><img src="/Orbital.png?v=2" alt="Orbital" width="36" height="36">Orbital</a>
     <div class="nav-links">
       <a href="#features">Features</a>
       <a href="#how-it-works">How It Works</a>
@@ -455,7 +455,7 @@
 <div class="container">
   <section class="hero">
     <div class="hero-badge"><span class="hero-badge-dot"></span> Founding access — first 100 spots</div>
-    <div class="orb-container"><img src="/orb.jpg" alt="Orbital orb" class="orb-img"></div>
+    <div class="orb-container"><img src="/Orbital.png?v=2" alt="Orbital orb" class="orb-img"></div>
     <h1>Your capacity.<br>Your data.<br>Your signal.</h1>
     <p class="subtitle">Log your daily capacity in under 30 seconds. See patterns emerge over weeks and months. Private, offline-first, yours.</p>
 
@@ -515,10 +515,7 @@
     <p>The Capacity Credential Index distills your longitudinal data into a formal quarterly PDF — patterns, trends, and observations you can keep or share with a provider.</p>
 
     <div class="cci-screenshot">
-      <div class="cci-screenshot-inner">
-        <div class="placeholder-icon">&#9635;</div>
-        <p>CCI report preview coming soon</p>
-      </div>
+      <img src="/cci-preview.png" alt="CCI Report Preview" style="width:100%;max-width:600px;border-radius:12px;display:block;margin:0 auto;">
     </div>
 
     <div class="cci-features">
@@ -631,8 +628,7 @@
         <a href="https://apps.apple.com/app/id6757295146" class="pricing-cta secondary" target="_blank" rel="noopener">Download Free</a>
       </div>
 
-      <div class="pricing-card" style="position:relative">
-        <div class="pricing-tag" style="background:rgba(255,255,255,0.15);color:#fff">Most Popular</div>
+      <div class="pricing-card">
         <h3>Pro</h3>
         <div class="price">$29<small>/mo</small></div>
         <p class="price-alt">or $290/year (save 17%)</p>
@@ -654,7 +650,7 @@
         <div class="price">$199</div>
         <p class="price-alt">$149 for Pro members</p>
         <p class="plan-desc">90 days of check-ins. One clinical-grade report.</p>
-        <p class="plan-desc" style="margin-top:-16px">The Capacity Credential Index distills your longitudinal data into a formal quarterly PDF — patterns, trends, and observations you can keep or share with a provider.</p>
+        <p class="plan-desc" style="margin-top:-12px;margin-bottom:24px">The Capacity Credential Index distills your longitudinal data into a formal quarterly PDF — patterns, trends, and observations you can keep or share with a provider.</p>
         <ul class="plan-features">
           <li>90-day longitudinal synthesis</li>
           <li>Pattern &amp; trend analysis</li>
