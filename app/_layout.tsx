@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 
 import React, { useEffect, useCallback, useState, useRef } from 'react';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -165,8 +165,8 @@ function IdleTimeoutWrapper({ children }: { children: React.ReactNode }) {
       await logSessionExpired();
       await auth.signOut();
       setShowWarning(false);
-      // Navigate to cloud-sync for re-authentication
-      router.replace('/cloud-sync');
+      // Navigate to auth gate for re-authentication
+      router.replace('/auth');
     }
   }, [auth, router]);
 
@@ -215,6 +215,33 @@ function IdleTimeoutWrapper({ children }: { children: React.ReactNode }) {
       </Modal>
     </>
   );
+}
+
+// =============================================================================
+// AUTH GATE — Redirects unauthenticated users to /auth. No exceptions.
+// Must live inside the navigation tree so useRouter/useSegments work.
+// =============================================================================
+
+function AuthGate({ children }: { children: React.ReactNode }) {
+  const auth = useAuth();
+  const router = useRouter();
+  const segments = useSegments();
+
+  useEffect(() => {
+    if (auth.isLoading) return;
+
+    const inAuthGroup = segments[0] === 'auth';
+
+    if (!auth.isAuthenticated && !inAuthGroup) {
+      // Not signed in and not on the auth screen — redirect to auth
+      router.replace('/auth');
+    } else if (auth.isAuthenticated && inAuthGroup) {
+      // Signed in but still on the auth screen — push to tabs
+      router.replace('/(tabs)');
+    }
+  }, [auth.isLoading, auth.isAuthenticated, segments, router]);
+
+  return <>{children}</>;
 }
 
 const idleStyles = StyleSheet.create({
@@ -322,6 +349,7 @@ function RootLayout() {
                 <StartupPhase phase="providers_ready" onFired={() => setProvidersReady(true)} />
                 {/* AGE GATE — LEGAL REQUIRED: Blocks ALL access until 13+ verified */}
                 <AgeGate>
+                <AuthGate>
                 <IdleTimeoutWrapper>
                 <StatusBar style="light" />
                 <Stack
@@ -331,6 +359,13 @@ function RootLayout() {
                     animation: 'fade',
                   }}
                 >
+                  <Stack.Screen
+                    name="auth"
+                    options={{
+                      animation: 'fade',
+                      gestureEnabled: false,
+                    }}
+                  />
                   <Stack.Screen name="(tabs)" />
                   <Stack.Screen
                     name="tutorial"
@@ -475,6 +510,7 @@ function RootLayout() {
                   />
                 </Stack>
                 </IdleTimeoutWrapper>
+                </AuthGate>
                 </AgeGate>
               </TermsAcceptanceProvider>
             </SubscriptionProvider>
