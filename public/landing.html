@@ -419,6 +419,27 @@
     max-width:360px;margin:0 auto;
   }
 
+  /* ---- Pricing sub-note ---- */
+  .pricing-sub-note{font-size:14px;color:rgba(255,255,255,0.4);margin-top:-32px;margin-bottom:48px}
+  .pricing-sub-note a{color:rgba(0,215,255,0.7);text-decoration:none}
+  .pricing-sub-note a:hover{color:#00D7FF;text-decoration:underline}
+
+  /* ---- CCI Tiers ---- */
+  .cci-tiers{list-style:none;padding:0;margin:0 0 24px;border:1px solid rgba(255,255,255,0.06);border-radius:10px;overflow:hidden}
+  .cci-tiers li{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:14px;color:rgba(255,255,255,0.5);border-bottom:1px solid rgba(255,255,255,0.05)}
+  .cci-tiers li:last-child{border-bottom:none}
+  .cci-tiers li.featured-tier{color:#fff;font-weight:600;background:rgba(0,215,255,0.06)}
+  .cci-tier-price{color:rgba(255,255,255,0.35);font-size:13px}
+  .featured-tier .cci-tier-price{color:#00D7FF}
+
+  /* ---- Therapist Plans ---- */
+  .therapist-section-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:8px}
+  .therapist-section-desc{font-size:14px;color:rgba(255,255,255,0.45);max-width:580px;margin-bottom:28px;line-height:1.55}
+  .therapist-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+  .save-annual{font-size:12px;color:rgba(245,183,0,0.6);margin:0 0 16px}
+  .save-annual a{color:rgba(245,183,0,0.7);text-decoration:none}
+  .save-annual a:hover{color:#F5B700;text-decoration:underline}
+
   /* ---- Responsive ---- */
   @media(max-width:640px){
     .hero{padding:80px 0 60px}
@@ -613,6 +634,7 @@
     <div class="section-label">Pricing</div>
     <h2>Simple, transparent pricing</h2>
     <p>Start free. Upgrade when your data is ready for more.</p>
+    <p class="pricing-sub-note">For therapists and clinical programs, <a href="#therapists">see therapist plans below</a>.</p>
 
     <div class="pricing-grid">
       <div class="pricing-card">
@@ -647,17 +669,89 @@
       <div class="pricing-card featured">
         <div class="pricing-tag">Clinical Grade</div>
         <h3>CCI</h3>
-        <div class="price">$199</div>
-        <p class="price-alt">$149 for Pro members</p>
-        <p class="plan-desc">90 days of check-ins. One clinical-grade report.</p>
-        <p class="plan-desc" style="margin-top:-12px;margin-bottom:24px">The Capacity Credential Index distills your longitudinal data into a formal quarterly PDF — patterns, trends, and observations you can keep or share with a provider.</p>
+        <p class="plan-desc" style="margin-bottom:16px">Longitudinal capacity report — clinical-grade PDF you can keep or share with a provider.</p>
+        <ul class="cci-tiers">
+          <li><span class="cci-tier-name">30-day CCI</span><span class="cci-tier-price">$99</span></li>
+          <li><span class="cci-tier-name">60-day CCI</span><span class="cci-tier-price">$149</span></li>
+          <li class="featured-tier"><span class="cci-tier-name">90-day CCI</span><span class="cci-tier-price">$199</span></li>
+          <li><span class="cci-tier-name">Full Bundle</span><span class="cci-tier-price">$349</span></li>
+        </ul>
         <ul class="plan-features">
-          <li>90-day longitudinal synthesis</li>
+          <li>Longitudinal synthesis</li>
           <li>Pattern &amp; trend analysis</li>
           <li>Downloadable PDF artifact</li>
           <li>Shareable with providers</li>
         </ul>
         <button class="pricing-cta primary" onclick="startCheckout('orbital_cci_free')">Get My CCI — $199</button>
+      </div>
+    </div>
+
+    <!-- For Therapists -->
+    <div id="therapists" style="margin-top:72px;padding-top:48px;border-top:1px solid rgba(255,255,255,0.06)">
+      <h3 class="therapist-section-title">For Therapists</h3>
+      <p class="therapist-section-desc">Private practice tools for supporting clients who use Orbital. Anonymized dashboards, capacity alerts, and clinical milestone tracking — built for solo therapists and growing clinics alike.</p>
+      <div class="therapist-grid">
+
+        <div class="pricing-card">
+          <h3>Solo</h3>
+          <div class="price">$39<small>/mo</small></div>
+          <p class="plan-desc">5 client seats</p>
+          <ul class="plan-features">
+            <li>Anonymized client dashboard</li>
+            <li>Capacity alerts</li>
+            <li>CCI milestone notifications</li>
+            <li>Group session tagging</li>
+            <li>Client invite by email</li>
+          </ul>
+          <p class="save-annual"><a href="mailto:contact@orbitalhealth.app?subject=Annual Therapist Plan">Save 17% annually</a></p>
+          <a href="mailto:contact@orbitalhealth.app?subject=Therapist Plan Interest" class="pricing-cta secondary">Start Free Trial</a>
+        </div>
+
+        <div class="pricing-card">
+          <h3>Practice</h3>
+          <div class="price">$89<small>/mo</small></div>
+          <p class="plan-desc">15 client seats</p>
+          <ul class="plan-features">
+            <li>Anonymized client dashboard</li>
+            <li>Capacity alerts</li>
+            <li>CCI milestone notifications</li>
+            <li>Group session tagging</li>
+            <li>Client invite by email</li>
+          </ul>
+          <p class="save-annual"><a href="mailto:contact@orbitalhealth.app?subject=Annual Therapist Plan">Save 17% annually</a></p>
+          <a href="mailto:contact@orbitalhealth.app?subject=Therapist Plan Interest" class="pricing-cta secondary">Start Free Trial</a>
+        </div>
+
+        <div class="pricing-card">
+          <h3>Group</h3>
+          <div class="price">$159<small>/mo</small></div>
+          <p class="plan-desc">30 client seats</p>
+          <ul class="plan-features">
+            <li>Anonymized client dashboard</li>
+            <li>Capacity alerts</li>
+            <li>CCI milestone notifications</li>
+            <li>Group session tagging</li>
+            <li>Client invite by email</li>
+          </ul>
+          <p class="save-annual"><a href="mailto:contact@orbitalhealth.app?subject=Annual Therapist Plan">Save 17% annually</a></p>
+          <a href="mailto:contact@orbitalhealth.app?subject=Therapist Plan Interest" class="pricing-cta secondary">Start Free Trial</a>
+        </div>
+
+        <div class="pricing-card">
+          <h3>Clinic</h3>
+          <div class="price">$279<small>/mo</small></div>
+          <p class="plan-desc">60 client seats</p>
+          <ul class="plan-features">
+            <li>Anonymized client dashboard</li>
+            <li>Capacity alerts</li>
+            <li>CCI milestone notifications</li>
+            <li>Group session tagging</li>
+            <li>Client invite by email</li>
+          </ul>
+          <p class="save-annual"><a href="mailto:contact@orbitalhealth.app?subject=Annual Therapist Plan">Save 17% annually</a></p>
+          <a href="mailto:contact@orbitalhealth.app?subject=Therapist Plan Interest" class="pricing-cta secondary">Start Free Trial</a>
+        </div>
+
       </div>
     </div>
   </section>
