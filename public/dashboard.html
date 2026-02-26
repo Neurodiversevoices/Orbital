@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbital — Therapist Dashboard</title>
+<meta name="description" content="Orbital therapist dashboard — anonymized client capacity overview.">
+<meta name="theme-color" content="#080810">
+<link rel="icon" href="/favicon.ico">
+<!--
+  SUPABASE CONFIG
+  Inject these meta tags server-side, or set window.ORBITAL_DASHBOARD_CONFIG = { supabaseUrl, supabaseKey }
+  before this page loads.
+-->
+<meta name="supabase-url" content="">
+<meta name="supabase-anon-key" content="">
+<style>
+/* ============================================================
+   RESET + BASE
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  background:#080810;
+  color:rgba(255,255,255,0.82);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* ============================================================
+   SCREEN SWITCHING
+   ============================================================ */
+.screen{display:none;width:100%;height:100%}
+.screen.active{display:flex}
+
+/* centered screens */
+#screen-init,#screen-config,#screen-login,#screen-unauthorized{
+  align-items:center;justify-content:center;flex-direction:column;
+  background:#080810;
+}
+
+/* ---- Spinner ---- */
+.spinner{
+  width:36px;height:36px;border-radius:50%;
+  border:3px solid rgba(0,209,255,0.15);
+  border-top-color:#00D1FF;
+  animation:spin 0.8s linear infinite;
+  margin-bottom:16px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-label{font-size:13px;color:rgba(255,255,255,0.3)}
+
+/* ---- Login card ---- */
+.auth-card{
+  background:#12121E;
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:20px;
+  padding:48px 40px;
+  width:100%;max-width:400px;
+}
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;justify-content:center}
+.auth-logo img{width:36px;height:36px;border-radius:50%}
+.auth-logo-text{font-size:18px;font-weight:700;color:#fff}
+.auth-logo-sub{font-size:11px;color:rgba(255,255,255,0.35);font-weight:400;display:block;margin-top:1px}
+.auth-card h2{font-size:22px;font-weight:700;color:#fff;margin-bottom:6px}
+.auth-card p{font-size:14px;color:rgba(255,255,255,0.4);margin-bottom:28px}
+.auth-field{margin-bottom:14px}
+.auth-field label{display:block;font-size:12px;font-weight:600;color:rgba(255,255,255,0.45);margin-bottom:6px;letter-spacing:0.4px;text-transform:uppercase}
+.auth-field input{
+  width:100%;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.09);
+  border-radius:8px;
+  padding:11px 14px;
+  font-size:14px;color:#fff;font-family:inherit;outline:none;
+  transition:border-color 0.2s;
+}
+.auth-field input:focus{border-color:rgba(0,209,255,0.4)}
+.auth-field input::placeholder{color:rgba(255,255,255,0.2)}
+.auth-btn{
+  width:100%;margin-top:8px;
+  background:#00D1FF;color:#080810;
+  border:none;border-radius:8px;
+  padding:12px;font-size:14px;font-weight:700;font-family:inherit;
+  cursor:pointer;transition:background 0.2s;
+}
+.auth-btn:hover{background:#33daff}
+.auth-btn:disabled{opacity:0.5;cursor:not-allowed}
+.auth-divider{text-align:center;margin:18px 0;font-size:12px;color:rgba(255,255,255,0.2)}
+.auth-link-btn{
+  width:100%;
+  background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);
+  border:1px solid rgba(255,255,255,0.08);border-radius:8px;
+  padding:11px;font-size:13px;font-weight:600;font-family:inherit;
+  cursor:pointer;transition:all 0.2s;
+}
+.auth-link-btn:hover{background:rgba(255,255,255,0.09);color:#fff}
+.auth-link-btn:disabled{opacity:0.5;cursor:not-allowed}
+.auth-feedback{
+  margin-top:12px;font-size:13px;text-align:center;min-height:18px;
+}
+.auth-feedback.success{color:#32D74B}
+.auth-feedback.error{color:#FF4D4D}
+.unauth-card{text-align:center;max-width:360px}
+.unauth-card h2{font-size:20px;font-weight:700;color:#fff;margin-bottom:10px}
+.unauth-card p{font-size:14px;color:rgba(255,255,255,0.45);margin-bottom:24px;line-height:1.6}
+.unauth-card a{color:#00D1FF;text-decoration:none}
+
+/* ---- Config error ---- */
+.config-card{
+  background:#12121E;border:1px solid rgba(255,59,48,0.2);
+  border-radius:16px;padding:40px;max-width:480px;text-align:center;
+}
+.config-card h2{font-size:18px;font-weight:700;color:#FF4D4D;margin-bottom:10px}
+.config-card p{font-size:13px;color:rgba(255,255,255,0.4);line-height:1.7;margin-bottom:10px}
+.config-card code{
+  display:block;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
+  border-radius:6px;padding:12px;font-family:monospace;font-size:12px;
+  color:rgba(255,255,255,0.6);text-align:left;margin-top:12px;white-space:pre;
+}
+
+/* ============================================================
+   DASHBOARD LAYOUT
+   ============================================================ */
+#screen-dashboard{
+  flex-direction:row;
+  overflow:hidden;
+}
+
+/* ---- Sidebar ---- */
+.sidebar{
+  width:200px;flex-shrink:0;
+  background:#0C0C1A;
+  border-right:1px solid rgba(255,255,255,0.05);
+  display:flex;flex-direction:column;
+  padding:0;overflow:hidden;
+}
+.sidebar-logo{
+  padding:20px 16px 18px;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.sidebar-logo-inner{display:flex;align-items:center;gap:9px}
+.sidebar-logo img{width:28px;height:28px;border-radius:50%;flex-shrink:0}
+.sidebar-logo-text{font-size:14px;font-weight:700;color:#fff;line-height:1.2}
+.sidebar-logo-sub{font-size:10px;color:rgba(255,255,255,0.3);display:block;font-weight:400}
+.sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:8px;
+  font-size:13px;font-weight:500;color:rgba(255,255,255,0.45);
+  cursor:pointer;transition:all 0.15s;margin-bottom:2px;
+  text-decoration:none;
+}
+.nav-item:hover{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.75)}
+.nav-item.active{background:rgba(0,209,255,0.1);color:#00D1FF}
+.nav-item-icon{width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sidebar-bottom{
+  padding:12px 8px 16px;
+  border-top:1px solid rgba(255,255,255,0.05);
+}
+.sidebar-support{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:rgba(255,255,255,0.25);
+  padding:7px 10px;border-radius:8px;
+  text-decoration:none;transition:color 0.15s;
+}
+.sidebar-support:hover{color:rgba(255,255,255,0.5)}
+.sidebar-user{
+  padding:10px 10px 6px;
+  font-size:11px;color:rgba(255,255,255,0.25);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.signout-btn{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:rgba(255,255,255,0.25);
+  padding:7px 10px;border-radius:8px;
+  cursor:pointer;transition:color 0.15s;background:none;border:none;font-family:inherit;
+  width:100%;text-align:left;
+}
+.signout-btn:hover{color:rgba(255,59,48,0.7)}
+
+/* ---- Main area ---- */
+.main{
+  flex:1;display:flex;flex-direction:column;overflow:hidden;
+}
+.content-area{
+  flex:1;display:grid;
+  grid-template-columns:35% 30% 35%;
+  overflow:hidden;
+  min-height:0;
+}
+
+/* ---- Shared column styles ---- */
+.col{
+  overflow-y:auto;
+  border-right:1px solid rgba(255,255,255,0.04);
+  display:flex;flex-direction:column;
+}
+.col:last-child{border-right:none}
+.col-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 16px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  position:sticky;top:0;z-index:10;
+  background:#080810;flex-shrink:0;
+}
+.col-title{font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.35)}
+
+/* ============================================================
+   COLUMN 1 — CLIENT LIST
+   ============================================================ */
+.invite-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(0,209,255,0.1);color:#00D1FF;
+  border:1px solid rgba(0,209,255,0.2);border-radius:6px;
+  padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit;
+  cursor:pointer;text-decoration:none;transition:all 0.15s;
+}
+.invite-btn:hover{background:rgba(0,209,255,0.18)}
+.reveal-btn{
+  background:none;border:none;font-family:inherit;
+  color:rgba(255,255,255,0.25);font-size:11px;font-weight:600;
+  cursor:pointer;padding:4px 6px;border-radius:4px;transition:all 0.15s;
+  letter-spacing:0.3px;
+}
+.reveal-btn:hover{color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.05)}
+.reveal-btn.active{color:#00D1FF}
+.col-header-row{display:flex;flex-direction:column;gap:4px;min-width:0}
+
+.client-row{
+  display:flex;flex-direction:column;
+  padding:12px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  cursor:pointer;transition:background 0.15s;
+  gap:6px;
+}
+.client-row:hover{background:rgba(255,255,255,0.025)}
+.client-row.selected{background:rgba(0,209,255,0.05);border-left:2px solid #00D1FF;padding-left:14px}
+.client-row-top{display:flex;align-items:center;gap:8px}
+.client-alias{
+  font-size:13px;font-weight:600;color:rgba(255,255,255,0.82);
+  flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.client-score-num{
+  font-size:13px;font-weight:700;color:#fff;
+  flex-shrink:0;width:36px;text-align:right;
+}
+.trend-arrow{font-size:12px;flex-shrink:0}
+.trend-up{color:#32D74B}
+.trend-down{color:#FF4D4D}
+.trend-flat{color:rgba(255,255,255,0.25)}
+.freshness-dot{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;
+}
+.freshness-dot.today{background:#32D74B}
+.freshness-dot.yesterday{background:rgba(50,215,75,0.4)}
+.freshness-dot.stale{background:transparent;border:1.5px solid rgba(255,255,255,0.2)}
+.freshness-dot.none{background:transparent;border:1.5px solid rgba(255,255,255,0.1)}
+
+/* Score bar */
+.score-bar-track{
+  height:4px;border-radius:2px;background:rgba(255,255,255,0.06);overflow:hidden;
+}
+.score-bar-fill{
+  height:100%;border-radius:2px;transition:width 0.8s ease;
+}
+
+/* Flags */
+.client-flags{display:flex;gap:6px;flex-wrap:wrap}
+.flag{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;
+  padding:2px 7px;border-radius:4px;
+}
+.flag-burnout{background:rgba(255,77,77,0.12);color:#FF4D4D;border:1px solid rgba(255,77,77,0.2)}
+.flag-inactive{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.08)}
+.flag-cci{background:rgba(0,209,255,0.08);color:#00D1FF;border:1px solid rgba(0,209,255,0.2)}
+.flag-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+.client-empty{
+  padding:40px 20px;text-align:center;
+  color:rgba(255,255,255,0.25);font-size:13px;line-height:1.7;
+}
+.client-empty strong{color:rgba(255,255,255,0.5);display:block;margin-bottom:6px}
+
+/* ============================================================
+   COLUMN 2 — THERMOMETER / CRYSTAL
+   ============================================================ */
+.col-viz{
+  align-items:center;justify-content:flex-start;
+  padding:24px 16px;gap:0;
+  background:#09090F;
+  border-right:1px solid rgba(255,255,255,0.04);
+}
+.thermo-wrapper{
+  width:100%;display:flex;flex-direction:column;align-items:center;
+  flex:1;
+}
+.thermo-label-top{
+  font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  color:rgba(255,255,255,0.25);margin-bottom:20px;text-align:center;
+}
+.thermo-tube{
+  width:56px;
+  flex:1;
+  min-height:200px;
+  max-height:380px;
+  border-radius:28px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.08);
+  position:relative;overflow:hidden;
+  box-shadow:0 0 40px rgba(0,0,0,0.6),inset 0 0 20px rgba(0,0,0,0.4);
+}
+.thermo-fill{
+  position:absolute;bottom:0;left:0;right:0;
+  border-radius:0 0 28px 28px;
+  transition:height 1.6s cubic-bezier(0.4,0,0.2,1);
+}
+.thermo-shine{
+  position:absolute;top:0;left:4px;bottom:0;
+  width:8px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.12) 0%,rgba(255,255,255,0) 80%);
+  border-radius:4px;pointer-events:none;
+}
+.thermo-pct{
+  font-size:36px;font-weight:700;color:#fff;margin-top:20px;
+  text-align:center;line-height:1;
+}
+.thermo-pct-label{
+  font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;text-align:center;
+  letter-spacing:0.5px;
+}
+.thermo-scale{
+  display:flex;flex-direction:column;justify-content:space-between;
+  position:absolute;right:-28px;top:4px;bottom:4px;
+  font-size:10px;color:rgba(255,255,255,0.18);text-align:right;
+}
+.thermo-scale-wrap{
+  position:relative;
+}
+.thermo-breakdown{
+  width:100%;margin-top:24px;display:flex;flex-direction:column;gap:6px;
+}
+.thermo-state-row{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;font-size:12px;
+}
+.thermo-state-label{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,0.35)}
+.thermo-state-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.thermo-state-val{font-weight:600;color:rgba(255,255,255,0.55)}
+
+/* ============================================================
+   COLUMN 3 — RIGHT PANEL
+   ============================================================ */
+.right-panel-section{
+  padding:16px;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  flex-shrink:0;
+}
+.right-panel-title{
+  font-size:11px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;
+  color:rgba(255,255,255,0.3);margin-bottom:14px;
+}
+
+/* Driver chart */
+.driver-row{
+  display:flex;align-items:center;gap:10px;margin-bottom:10px;
+}
+.driver-row:last-child{margin-bottom:0}
+.driver-name{font-size:12px;color:rgba(255,255,255,0.45);width:100px;flex-shrink:0}
+.driver-bar-track{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.06);overflow:hidden}
+.driver-bar-fill{height:100%;border-radius:3px;background:#00D1FF;transition:width 0.8s ease}
+.driver-pct{font-size:11px;color:rgba(255,255,255,0.3);width:32px;text-align:right;flex-shrink:0}
+.driver-empty{font-size:12px;color:rgba(255,255,255,0.2);padding:8px 0}
+
+/* Activity feed */
+.activity-row{
+  display:flex;flex-direction:column;
+  padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);gap:3px;
+}
+.activity-row:last-child{border-bottom:none}
+.activity-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.activity-alias{font-size:12px;font-weight:600;color:rgba(255,255,255,0.65)}
+.activity-date{font-size:11px;color:rgba(255,255,255,0.2)}
+.activity-state{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:600;letter-spacing:0.3px;padding:2px 7px;border-radius:4px;
+}
+.state-resourced{background:rgba(0,209,255,0.1);color:#00D1FF}
+.state-stretched{background:rgba(255,179,71,0.1);color:#FFB347}
+.state-depleted{background:rgba(255,77,77,0.1);color:#FF4D4D}
+.activity-note{font-size:12px;color:rgba(255,255,255,0.3);font-style:italic}
+.activity-empty{font-size:12px;color:rgba(255,255,255,0.2);padding:8px 0}
+
+/* CCI ready banner */
+.cci-ready-banner{
+  background:rgba(0,209,255,0.05);
+  border:1px solid rgba(0,209,255,0.15);
+  border-radius:8px;
+  padding:12px 14px;margin-top:12px;
+  display:flex;align-items:center;gap:10px;
+}
+.cci-ready-icon{font-size:16px;flex-shrink:0}
+.cci-ready-text strong{display:block;font-size:12px;font-weight:700;color:#00D1FF;letter-spacing:0.3px}
+.cci-ready-text span{font-size:11px;color:rgba(255,255,255,0.35)}
+
+/* ============================================================
+   BOTTOM BAR
+   ============================================================ */
+.bottom-bar{
+  height:44px;flex-shrink:0;
+  background:#0A0A16;
+  border-top:1px solid rgba(255,255,255,0.05);
+  display:flex;align-items:center;padding:0 20px;
+  gap:16px;
+}
+.bottom-bar-session{
+  display:flex;align-items:center;gap:10px;
+  font-size:12px;color:rgba(255,255,255,0.35);
+}
+.session-dot{
+  width:6px;height:6px;border-radius:50%;background:#FFB347;
+  flex-shrink:0;
+}
+.session-label{color:rgba(255,255,255,0.55);font-weight:600}
+.bottom-bar-right{
+  margin-left:auto;font-size:11px;color:rgba(255,255,255,0.2);
+}
+
+/* ============================================================
+   LOADING OVERLAY (inside dashboard)
+   ============================================================ */
+.col-loading{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:48px 16px;gap:12px;flex:1;
+}
+.col-loading .spinner{margin-bottom:0}
+.col-loading span{font-size:12px;color:rgba(255,255,255,0.25)}
+
+/* ============================================================
+   SCROLLBAR STYLING
+   ============================================================ */
+.col::-webkit-scrollbar{width:4px}
+.col::-webkit-scrollbar-track{background:transparent}
+.col::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+
+/* ============================================================
+   RESPONSIVE (desktop-first; below 900px stack layout hint)
+   ============================================================ */
+@media(max-width:900px){
+  .content-area{grid-template-columns:1fr}
+  .col:not(:first-child){display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SCREEN: INIT (loading)
+     ============================================================ -->
+<div id="screen-init" class="screen active">
+  <div class="spinner"></div>
+  <span class="spinner-label">Loading dashboard…</span>
+</div>
+
+<!-- ============================================================
+     SCREEN: CONFIG ERROR
+     ============================================================ -->
+<div id="screen-config" class="screen">
+  <div class="config-card">
+    <h2>Supabase not configured</h2>
+    <p>This dashboard needs a Supabase URL and anon key to connect. Add them as meta tags or set <code>window.ORBITAL_DASHBOARD_CONFIG</code> before the page loads.</p>
+    <code>window.ORBITAL_DASHBOARD_CONFIG = {
+  supabaseUrl: 'https://xxx.supabase.co',
+  supabaseKey: 'your-anon-key'
+};</code>
+    <p style="margin-top:16px">Or inject via meta tags:</p>
+    <code>&lt;meta name="supabase-url" content="https://xxx.supabase.co"&gt;
+&lt;meta name="supabase-anon-key" content="your-anon-key"&gt;</code>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN: LOGIN
+     ============================================================ -->
+<div id="screen-login" class="screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <img src="/Orbital.png?v=2" alt="Orbital" width="36" height="36">
+      <div>
+        <span class="auth-logo-text">Orbital</span>
+        <span class="auth-logo-sub">Therapist Dashboard</span>
+      </div>
+    </div>
+
+    <h2>Sign in</h2>
+    <p>Access is restricted to therapist accounts.</p>
+
+    <!-- Email/password form -->
+    <form id="login-form" autocomplete="on">
+      <div class="auth-field">
+        <label for="login-email">Email</label>
+        <input id="login-email" type="email" placeholder="you@practice.com" required autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label for="login-password">Password</label>
+        <input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button type="submit" class="auth-btn" id="login-submit-btn">Sign In</button>
+    </form>
+
+    <div class="auth-divider">or</div>
+
+    <!-- Magic link -->
+    <button class="auth-link-btn" id="magic-link-btn" type="button">Send magic link instead</button>
+
+    <div class="auth-feedback" id="auth-feedback"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN: UNAUTHORIZED
+     ============================================================ -->
+<div id="screen-unauthorized" class="screen">
+  <div class="unauth-card">
+    <h2>Access restricted</h2>
+    <p>This dashboard is only available to therapist accounts. If you believe this is an error, contact <a href="mailto:contact@orbitalhealth.app">contact@orbitalhealth.app</a>.</p>
+    <button class="auth-btn" id="unauth-signout-btn" style="margin-top:8px">Sign out</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN: DASHBOARD
+     ============================================================ -->
+<div id="screen-dashboard" class="screen">
+
+  <!-- Sidebar -->
+  <nav class="sidebar" role="navigation" aria-label="Dashboard navigation">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-inner">
+        <img src="/Orbital.png?v=2" alt="Orbital" width="28" height="28">
+        <div>
+          <span class="sidebar-logo-text">Orbital</span>
+          <span class="sidebar-logo-sub">Therapist Dashboard</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <a class="nav-item active" data-nav="dashboard" href="#" onclick="return false">
+        <span class="nav-item-icon">&#9671;</span> Dashboard
+      </a>
+      <a class="nav-item" data-nav="clients" href="#" onclick="return false">
+        <span class="nav-item-icon">&#9679;</span> Clients
+      </a>
+      <a class="nav-item" data-nav="reports" href="#" onclick="return false">
+        <span class="nav-item-icon">&#9636;</span> Reports
+      </a>
+      <a class="nav-item" data-nav="groups" href="#" onclick="return false">
+        <span class="nav-item-icon">&#9679;</span> Group Sessions
+      </a>
+      <a class="nav-item" data-nav="settings" href="#" onclick="return false">
+        <span class="nav-item-icon">&#9881;</span> Settings
+      </a>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-user" id="sidebar-user-email"></div>
+      <button class="signout-btn" id="signout-btn">&#8592; Sign out</button>
+      <a class="sidebar-support" href="/support">&#63; Support</a>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <div class="main">
+    <div class="content-area">
+
+      <!-- ── Column 1: Client List ── -->
+      <div class="col" id="col-clients">
+        <div class="col-header">
+          <div class="col-header-row">
+            <span class="col-title">Client Overview</span>
+            <button class="reveal-btn" id="reveal-btn" onclick="toggleNames()">Reveal Names</button>
+          </div>
+          <a class="invite-btn" href="mailto:contact@orbitalhealth.app?subject=Client Invite Request">&#43; Invite</a>
+        </div>
+        <div id="client-list-body">
+          <div class="col-loading">
+            <div class="spinner"></div>
+            <span>Loading clients…</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Column 2: Thermometer ── -->
+      <div class="col col-viz" id="col-viz">
+        <div class="thermo-wrapper">
+          <div class="thermo-label-top">Group Capacity</div>
+
+          <div class="thermo-scale-wrap">
+            <div class="thermo-tube" id="thermo-tube">
+              <div class="thermo-fill" id="thermo-fill"></div>
+              <div class="thermo-shine"></div>
+            </div>
+            <div class="thermo-scale">
+              <span>High</span>
+              <span>Mid</span>
+              <span>Low</span>
+            </div>
+          </div>
+
+          <div class="thermo-pct" id="thermo-pct">—</div>
+          <div class="thermo-pct-label">avg capacity</div>
+
+          <div class="thermo-breakdown" id="thermo-breakdown">
+            <div class="thermo-state-row">
+              <span class="thermo-state-label"><span class="thermo-state-dot" style="background:#00D1FF"></span>Resourced</span>
+              <span class="thermo-state-val" id="pct-resourced">—</span>
+            </div>
+            <div class="thermo-state-row">
+              <span class="thermo-state-label"><span class="thermo-state-dot" style="background:#FFB347"></span>Stretched</span>
+              <span class="thermo-state-val" id="pct-stretched">—</span>
+            </div>
+            <div class="thermo-state-row">
+              <span class="thermo-state-label"><span class="thermo-state-dot" style="background:#FF4D4D"></span>Depleted</span>
+              <span class="thermo-state-val" id="pct-depleted">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Column 3: Right Panel ── -->
+      <div class="col" id="col-right">
+        <!-- Capacity Influences -->
+        <div class="right-panel-section">
+          <div class="right-panel-title">Capacity Influences — this week</div>
+          <div id="driver-chart">
+            <div class="col-loading" style="padding:20px 0">
+              <div class="spinner" style="width:22px;height:22px;border-width:2px"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Client Activity -->
+        <div class="right-panel-section" style="flex:1">
+          <div class="right-panel-title">Recent Client Activity</div>
+          <div id="activity-feed">
+            <div class="activity-empty">Loading…</div>
+          </div>
+          <div id="cci-ready-banner" style="display:none">
+            <div class="cci-ready-banner">
+              <span class="cci-ready-icon">&#9670;</span>
+              <div class="cci-ready-text">
+                <strong>REPORT AVAILABLE</strong>
+                <span>One or more clients have a CCI report ready.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content-area -->
+
+    <!-- Bottom bar -->
+    <div class="bottom-bar">
+      <div class="bottom-bar-session">
+        <span class="session-dot"></span>
+        <span class="session-label">Next session:</span>
+        <span>Apr 26 · 7:00 PM · Capacity Group Session · 8 Clients</span>
+      </div>
+      <div class="bottom-bar-right" id="bottom-client-count"></div>
+    </div>
+  </div><!-- /main -->
+
+</div><!-- /screen-dashboard -->
+
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+<script>
+'use strict';
+
+// ============================================================
+// CONFIG
+// ============================================================
+const CONFIG = (function() {
+  if (window.ORBITAL_DASHBOARD_CONFIG) return window.ORBITAL_DASHBOARD_CONFIG;
+  const urlMeta = document.querySelector('meta[name="supabase-url"]');
+  const keyMeta = document.querySelector('meta[name="supabase-anon-key"]');
+  return {
+    supabaseUrl: (urlMeta && urlMeta.content) || '',
+    supabaseKey: (keyMeta && keyMeta.content) || '',
+  };
+})();
+
+// ============================================================
+// STATE
+// ============================================================
+let db = null;
+let currentSession = null;
+let showNames = false;
+let selectedClientId = null;
+
+const dashState = {
+  clients: [],          // processed client objects
+  groupCapacity: 0,
+  groupBreakdown: { r: 0, s: 0, d: 0 },
+  drivers: {},          // { driverKey: count }
+  recentLogs: [],
+  cciReadyCount: 0,
+  loaded: false,
+};
+
+// ============================================================
+// SCREEN HELPERS
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  var el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', function() {
+  if (!CONFIG.supabaseUrl || !CONFIG.supabaseKey) {
+    showScreen('screen-config');
+    return;
+  }
+
+  db = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
+
+  // Auth state listener
+  db.auth.onAuthStateChange(function(event, session) {
+    currentSession = session;
+    if (!session) {
+      showScreen('screen-login');
+    } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      showScreen('screen-init');
+      loadAndRender();
+    }
+  });
+
+  // Check existing session
+  db.auth.getSession().then(function(result) {
+    var session = result.data && result.data.session;
+    if (!session) {
+      showScreen('screen-login');
+    } else {
+      currentSession = session;
+      loadAndRender();
+    }
+  });
+
+  // Wire auth forms
+  wireAuthForms();
+  wireSignOut();
+  wireNavItems();
+});
+
+// ============================================================
+// AUTH FORMS
+// ============================================================
+function wireAuthForms() {
+  var loginForm = document.getElementById('login-form');
+  var magicBtn  = document.getElementById('magic-link-btn');
+
+  loginForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var email    = document.getElementById('login-email').value.trim();
+    var password = document.getElementById('login-password').value;
+    if (!email) return;
+    setAuthFeedback('', '');
+    setAuthLoading(true);
+
+    db.auth.signInWithPassword({ email: email, password: password })
+      .then(function(result) {
+        if (result.error) {
+          setAuthFeedback(result.error.message, 'error');
+          setAuthLoading(false);
+        }
+        // success handled by onAuthStateChange
+      });
+  });
+
+  magicBtn.addEventListener('click', function() {
+    var email = document.getElementById('login-email').value.trim();
+    if (!email || !email.includes('@')) {
+      setAuthFeedback('Enter your email address first.', 'error');
+      return;
+    }
+    setAuthFeedback('', '');
+    setAuthLoading(true);
+
+    db.auth.signInWithOtp({ email: email, options: { shouldCreateUser: false } })
+      .then(function(result) {
+        setAuthLoading(false);
+        if (result.error) {
+          setAuthFeedback(result.error.message, 'error');
+        } else {
+          setAuthFeedback('Magic link sent — check your email.', 'success');
+        }
+      });
+  });
+}
+
+function setAuthFeedback(msg, type) {
+  var el = document.getElementById('auth-feedback');
+  el.textContent = msg;
+  el.className = 'auth-feedback' + (type ? ' ' + type : '');
+}
+
+function setAuthLoading(loading) {
+  document.getElementById('login-submit-btn').disabled = loading;
+  document.getElementById('magic-link-btn').disabled   = loading;
+}
+
+// ============================================================
+// SIGN OUT
+// ============================================================
+function wireSignOut() {
+  document.getElementById('signout-btn').addEventListener('click', signOut);
+  document.getElementById('unauth-signout-btn').addEventListener('click', signOut);
+}
+
+function signOut() {
+  db.auth.signOut().then(function() { showScreen('screen-login'); });
+}
+
+// ============================================================
+// NAV ITEMS
+// ============================================================
+function wireNavItems() {
+  document.querySelectorAll('.nav-item[data-nav]').forEach(function(item) {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+      item.classList.add('active');
+    });
+  });
+}
+
+// ============================================================
+// DATA LOAD + RENDER
+// ============================================================
+async function loadAndRender() {
+  if (!currentSession) { showScreen('screen-login'); return; }
+
+  try {
+    // 1. Check therapist entitlement
+    var { data: ent, error: entErr } = await db
+      .from('user_entitlements')
+      .select('entitlement_id, metadata, expires_at')
+      .eq('user_id', currentSession.user.id)
+      .in('entitlement_id', ['therapist_access', 'admin_addon', 'admin_access', 'admin_dashboard'])
+      .maybeSingle();
+
+    if (!ent) {
+      showScreen('screen-unauthorized');
+      return;
+    }
+
+    // Show dashboard shell immediately
+    showScreen('screen-dashboard');
+    document.getElementById('sidebar-user-email').textContent =
+      currentSession.user.email || '';
+
+    // Derive org_id: from entitlement metadata → fallback to user_id
+    var orgId = (ent.metadata && ent.metadata.org_id) || currentSession.user.id;
+
+    // 2. Load org_memberships (clients)
+    var { data: members } = await db
+      .from('org_memberships')
+      .select('user_id, consent_given_at')
+      .eq('org_id', orgId)
+      .is('revoked_at', null);
+
+    if (!members || members.length === 0) {
+      renderEmptyState();
+      return;
+    }
+
+    var clientIds = members.map(function(m) { return m.user_id; });
+
+    // Date helpers
+    var now     = new Date();
+    var today   = toDateStr(now);
+    var yest    = toDateStr(new Date(now - 86400000));
+    var d7ago   = toDateStr(new Date(now - 7  * 86400000));
+    var d14ago  = toDateStr(new Date(now - 14 * 86400000));
+    var d7agoISO = new Date(now - 7 * 86400000).toISOString();
+
+    // 3. Load daily metrics (last 14 days for trend)
+    var { data: metrics } = await db
+      .from('user_daily_metrics')
+      .select('user_id, date, resourced_count, stretched_count, depleted_count, total_signals')
+      .in('user_id', clientIds)
+      .gte('date', d14ago)
+      .order('date', { ascending: false });
+
+    // 4. Load capacity logs (last 7 days for drivers + activity)
+    var { data: logs } = await db
+      .from('capacity_logs')
+      .select('user_id, occurred_at, state, drivers, note')
+      .in('user_id', clientIds)
+      .gte('occurred_at', d7agoISO)
+      .is('deleted_at', null)
+      .order('occurred_at', { ascending: false })
+      .limit(200);
+
+    // 5. Load CCI entitlements
+    var { data: cciEnts } = await db
+      .from('user_entitlements')
+      .select('user_id')
+      .in('user_id', clientIds)
+      .in('entitlement_id', ['cci_purchased', 'cci_ready']);
+
+    // Process all data
+    processData(members, metrics || [], logs || [], cciEnts || [], {
+      today, yest, d7ago, d14ago
+    });
+
+    renderAll();
+
+  } catch (err) {
+    console.error('Dashboard load error:', err);
+    renderError(err.message);
+  }
+}
+
+// ============================================================
+// DATA PROCESSING
+// ============================================================
+function processData(members, metrics, logs, cciEnts, dates) {
+  var cciUserIds = new Set((cciEnts || []).map(function(e) { return e.user_id; }));
+
+  // Process each client
+  dashState.clients = members.map(function(member, idx) {
+    var uid   = member.user_id;
+    var alias = 'Client ' + (idx + 1);
+
+    var userMetrics = metrics.filter(function(m) { return m.user_id === uid; });
+    var thisWeek    = userMetrics.filter(function(m) { return m.date >= dates.d7ago; });
+    var lastWeek    = userMetrics.filter(function(m) { return m.date >= dates.d14ago && m.date < dates.d7ago; });
+
+    var thisScore = calcWeightedScore(thisWeek);
+    var lastScore = calcWeightedScore(lastWeek);
+    var trend = 'none';
+    if (thisScore !== null && lastScore !== null) {
+      if (thisScore > lastScore + 5)       trend = 'up';
+      else if (thisScore < lastScore - 5)  trend = 'down';
+      else                                 trend = 'flat';
+    }
+
+    // Freshness (most recent date in metrics)
+    var sorted = userMetrics.slice().sort(function(a, b) { return b.date.localeCompare(a.date); });
+    var lastDate = sorted.length ? sorted[0].date : null;
+    var freshness = !lastDate          ? 'none'
+                  : lastDate === dates.today ? 'today'
+                  : lastDate === dates.yest  ? 'yesterday' : 'stale';
+    var daysSince = lastDate
+      ? Math.floor((new Date() - new Date(lastDate)) / 86400000)
+      : 999;
+
+    // Burnout: 3+ consecutive days depleted
+    var burnout = false;
+    var streak = 0;
+    for (var i = 0; i < sorted.length; i++) {
+      var m = sorted[i];
+      if (m.total_signals > 0 && m.depleted_count === m.total_signals) {
+        streak++;
+        if (streak >= 3) { burnout = true; break; }
+      } else {
+        break;
+      }
+    }
+
+    return {
+      userId:       uid,
+      alias:        alias,
+      realName:     null,       // populated by future admin API or profile table
+      score:        thisScore,
+      trend:        trend,
+      freshness:    freshness,
+      daysSince:    daysSince,
+      burnout:      burnout,
+      inactive:     daysSince >= 5,
+      cciReady:     cciUserIds.has(uid),
+    };
+  });
+
+  // Group capacity (avg of clients with data)
+  var validScores = dashState.clients
+    .filter(function(c) { return c.score !== null; })
+    .map(function(c) { return c.score; });
+  dashState.groupCapacity = validScores.length
+    ? Math.round(validScores.reduce(function(a, b) { return a + b; }, 0) / validScores.length)
+    : 0;
+
+  // Group state breakdown (from thisWeek metrics across all clients)
+  var totalR = 0, totalS = 0, totalD = 0;
+  metrics.forEach(function(m) {
+    if (m.date >= dates.d7ago) {
+      totalR += m.resourced_count || 0;
+      totalS += m.stretched_count || 0;
+      totalD += m.depleted_count  || 0;
+    }
+  });
+  var totalAll = totalR + totalS + totalD || 1;
+  dashState.groupBreakdown = {
+    r: Math.round(totalR / totalAll * 100),
+    s: Math.round(totalS / totalAll * 100),
+    d: Math.round(totalD / totalAll * 100),
+  };
+
+  // Driver aggregation from capacity_logs.drivers JSONB array
+  var driverMap = {};
+  var driverTotal = 0;
+  logs.forEach(function(log) {
+    var drivers = log.drivers;
+    if (!drivers) return;
+    if (!Array.isArray(drivers)) {
+      // might be a plain JSONB object
+      try { drivers = JSON.parse(drivers); } catch(e) { return; }
+    }
+    drivers.forEach(function(d) {
+      var key = typeof d === 'string' ? d
+              : (d.category || d.type || d.name || JSON.stringify(d));
+      key = normalizeDriverKey(key);
+      driverMap[key] = (driverMap[key] || 0) + 1;
+      driverTotal++;
+    });
+  });
+  // Convert to percentages
+  dashState.drivers = {};
+  Object.keys(driverMap).forEach(function(k) {
+    dashState.drivers[k] = driverTotal
+      ? Math.round(driverMap[k] / driverTotal * 100)
+      : 0;
+  });
+
+  // Recent logs (last 5, anonymized)
+  var aliasMap = {};
+  dashState.clients.forEach(function(c) { aliasMap[c.userId] = c.alias; });
+  dashState.recentLogs = logs.slice(0, 5).map(function(log) {
+    return {
+      alias: aliasMap[log.user_id] || 'Client',
+      state: log.state,
+      date:  log.occurred_at,
+      note:  log.note ? log.note.substring(0, 40) + (log.note.length > 40 ? '…' : '') : '',
+    };
+  });
+
+  dashState.cciReadyCount = dashState.clients.filter(function(c) { return c.cciReady; }).length;
+  dashState.loaded = true;
+}
+
+// ============================================================
+// SCORE CALCULATION
+// ============================================================
+function calcWeightedScore(metrics) {
+  var r = 0, s = 0, d = 0;
+  metrics.forEach(function(m) {
+    r += m.resourced_count || 0;
+    s += m.stretched_count || 0;
+    d += m.depleted_count  || 0;
+  });
+  var total = r + s + d;
+  if (total === 0) return null;
+  return Math.round((r * 100 + s * 60 + d * 20) / total);
+}
+
+function scoreColor(score) {
+  if (score === null) return 'rgba(255,255,255,0.15)';
+  if (score >= 70) return '#00D1FF';
+  if (score >= 45) return '#FFB347';
+  return '#FF4D4D';
+}
+
+function thermoFillStyle(pct) {
+  // Gradient: high pct = cyan, mid = amber, low = crimson
+  if (pct >= 70) return 'linear-gradient(0deg, #00D1FF 0%, #2de3ff 100%)';
+  if (pct >= 45) return 'linear-gradient(0deg, #FF8C00 0%, #FFB347 100%)';
+  return 'linear-gradient(0deg, #CC1111 0%, #FF4D4D 100%)';
+}
+
+function normalizeDriverKey(raw) {
+  var map = {
+    'sensory': 'Sensory Load',
+    'demand':  'Cognitive Load',
+    'social':  'Social Energy',
+    'sleep':   'Sleep',
+    'stress':  'Stress',
+    'exercise':'Exercise',
+    'meds':    'Medication',
+    'food':    'Food / Nutrition',
+  };
+  var lower = (raw || '').toLowerCase().trim();
+  return map[lower] || (raw.charAt(0).toUpperCase() + raw.slice(1));
+}
+
+function toDateStr(d) {
+  return d.toISOString().split('T')[0];
+}
+
+function relativeDate(isoStr) {
+  var d = new Date(isoStr);
+  var now = new Date();
+  var diff = Math.floor((now - d) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  return diff + 'd ago';
+}
+
+// ============================================================
+// RENDER — MAIN ENTRY
+// ============================================================
+function renderAll() {
+  renderClientList();
+  renderThermometer();
+  renderDriverChart();
+  renderActivityFeed();
+  renderBottomBar();
+}
+
+// ============================================================
+// RENDER — CLIENT LIST
+// ============================================================
+function renderClientList() {
+  var body = document.getElementById('client-list-body');
+  if (!dashState.clients.length) {
+    body.innerHTML = '<div class="client-empty"><strong>No clients yet</strong>Invite clients using the button above.<br>They\'ll appear here once they join your practice.</div>';
+    return;
+  }
+
+  body.innerHTML = dashState.clients.map(function(c) {
+    var label   = showNames && c.realName ? c.realName : c.alias;
+    var scoreNum = c.score !== null ? c.score + '%' : '—';
+    var barW    = c.score !== null ? c.score : 0;
+    var barColor = scoreColor(c.score);
+
+    var trendIcon = '';
+    if (c.trend === 'up')   trendIcon = '<span class="trend-arrow trend-up">&#8593;</span>';
+    if (c.trend === 'down') trendIcon = '<span class="trend-arrow trend-down">&#8595;</span>';
+    if (c.trend === 'flat') trendIcon = '<span class="trend-arrow trend-flat">&#8212;</span>';
+
+    var freshClass = c.freshness === 'today' ? 'today'
+                   : c.freshness === 'yesterday' ? 'yesterday'
+                   : c.freshness === 'stale' ? 'stale' : 'none';
+
+    var flags = '';
+    if (c.burnout)  flags += '<span class="flag flag-burnout"><span class="flag-dot"></span>BURNOUT</span>';
+    if (c.inactive) flags += '<span class="flag flag-inactive"><span class="flag-dot"></span>INACTIVE</span>';
+    if (c.cciReady) flags += '<span class="flag flag-cci"><span class="flag-dot"></span>CCI READY</span>';
+
+    var selected = (c.userId === selectedClientId) ? ' selected' : '';
+
+    return '<div class="client-row' + selected + '" data-uid="' + c.userId + '" onclick="selectClient(\'' + c.userId + '\')">'
+      + '<div class="client-row-top">'
+        + '<span class="freshness-dot ' + freshClass + '" title="' + (c.freshness === 'today' ? 'Logged today' : c.freshness === 'yesterday' ? 'Logged yesterday' : 'No recent log') + '"></span>'
+        + '<span class="client-alias">' + escHtml(label) + '</span>'
+        + '<span class="client-score-num">' + scoreNum + '</span>'
+        + trendIcon
+      + '</div>'
+      + '<div class="score-bar-track"><div class="score-bar-fill" style="width:' + barW + '%;background:' + barColor + '"></div></div>'
+      + (flags ? '<div class="client-flags">' + flags + '</div>' : '')
+      + '</div>';
+  }).join('');
+
+  // Update bottom bar client count
+  document.getElementById('bottom-client-count').textContent =
+    dashState.clients.length + ' client' + (dashState.clients.length !== 1 ? 's' : '') + ' monitored';
+}
+
+// ============================================================
+// RENDER — THERMOMETER
+// ============================================================
+function renderThermometer() {
+  var pct  = dashState.groupCapacity;
+  var fill = document.getElementById('thermo-fill');
+  var pctEl = document.getElementById('thermo-pct');
+  var brk  = dashState.groupBreakdown;
+
+  pctEl.textContent = dashState.clients.length ? pct + '%' : '—';
+
+  if (fill) {
+    fill.style.height = (dashState.clients.length ? pct : 0) + '%';
+    fill.style.background = thermoFillStyle(pct);
+  }
+
+  var rEl = document.getElementById('pct-resourced');
+  var sEl = document.getElementById('pct-stretched');
+  var dEl = document.getElementById('pct-depleted');
+  if (rEl) rEl.textContent = dashState.clients.length ? brk.r + '%' : '—';
+  if (sEl) sEl.textContent = dashState.clients.length ? brk.s + '%' : '—';
+  if (dEl) dEl.textContent = dashState.clients.length ? brk.d + '%' : '—';
+}
+
+// ============================================================
+// RENDER — DRIVER CHART
+// ============================================================
+function renderDriverChart() {
+  var el = document.getElementById('driver-chart');
+
+  // Priority drivers to always show (in order)
+  var priorityKeys = ['Sleep', 'Sensory Load', 'Cognitive Load', 'Social Energy'];
+  var drivers = dashState.drivers;
+  var allKeys = Object.keys(drivers).sort(function(a, b) { return (drivers[b] || 0) - (drivers[a] || 0); });
+
+  // Merge: priority first, then others up to 6 total
+  var displayKeys = [];
+  priorityKeys.forEach(function(k) {
+    if (!displayKeys.includes(k)) displayKeys.push(k);
+  });
+  allKeys.forEach(function(k) {
+    if (!displayKeys.includes(k) && displayKeys.length < 6) displayKeys.push(k);
+  });
+
+  var maxVal = displayKeys.reduce(function(mx, k) { return Math.max(mx, drivers[k] || 0); }, 1);
+
+  if (displayKeys.every(function(k) { return !drivers[k]; })) {
+    el.innerHTML = '<div class="driver-empty">No driver data this week.</div>';
+    return;
+  }
+
+  el.innerHTML = displayKeys.map(function(k) {
+    var pct  = drivers[k] || 0;
+    var barW = maxVal > 0 ? Math.round(pct / maxVal * 100) : 0;
+    return '<div class="driver-row">'
+      + '<span class="driver-name">' + escHtml(k) + '</span>'
+      + '<div class="driver-bar-track"><div class="driver-bar-fill" style="width:' + barW + '%"></div></div>'
+      + '<span class="driver-pct">' + pct + '%</span>'
+      + '</div>';
+  }).join('');
+}
+
+// ============================================================
+// RENDER — ACTIVITY FEED
+// ============================================================
+function renderActivityFeed() {
+  var el  = document.getElementById('activity-feed');
+  var banner = document.getElementById('cci-ready-banner');
+
+  if (!dashState.recentLogs.length) {
+    el.innerHTML = '<div class="activity-empty">No recent activity.</div>';
+  } else {
+    el.innerHTML = dashState.recentLogs.map(function(log) {
+      var stateClass = 'state-' + (log.state || 'resourced');
+      var stateLabel = (log.state || '').charAt(0).toUpperCase() + (log.state || '').slice(1);
+      return '<div class="activity-row">'
+        + '<div class="activity-top">'
+          + '<span class="activity-alias">' + escHtml(log.alias) + '</span>'
+          + '<span class="activity-state ' + stateClass + '">' + stateLabel + '</span>'
+          + '<span class="activity-date">' + relativeDate(log.date) + '</span>'
+        + '</div>'
+        + (log.note ? '<div class="activity-note">' + escHtml(log.note) + '</div>' : '')
+        + '</div>';
+    }).join('');
+  }
+
+  if (banner) {
+    banner.style.display = dashState.cciReadyCount > 0 ? 'block' : 'none';
+    var span = banner.querySelector('.cci-ready-text span');
+    if (span) {
+      span.textContent = dashState.cciReadyCount + ' client' +
+        (dashState.cciReadyCount !== 1 ? 's have' : ' has') + ' a CCI report ready.';
+    }
+  }
+}
+
+// ============================================================
+// RENDER — BOTTOM BAR
+// ============================================================
+function renderBottomBar() {
+  var el = document.getElementById('bottom-client-count');
+  if (el) {
+    el.textContent = dashState.clients.length + ' client' +
+      (dashState.clients.length !== 1 ? 's' : '') + ' monitored';
+  }
+}
+
+// ============================================================
+// RENDER — EMPTY / ERROR STATES
+// ============================================================
+function renderEmptyState() {
+  showScreen('screen-dashboard');
+  document.getElementById('sidebar-user-email').textContent = currentSession.user.email || '';
+  document.getElementById('client-list-body').innerHTML =
+    '<div class="client-empty"><strong>No clients yet</strong>Use "+ Invite" to add your first client.<br>They\'ll appear here once they join.</div>';
+  document.getElementById('thermo-pct').textContent = '—';
+  document.getElementById('driver-chart').innerHTML = '<div class="driver-empty">No data yet.</div>';
+  document.getElementById('activity-feed').innerHTML = '<div class="activity-empty">No activity yet.</div>';
+}
+
+function renderError(msg) {
+  document.getElementById('client-list-body').innerHTML =
+    '<div class="client-empty"><strong style="color:#FF4D4D">Load error</strong>' + escHtml(msg) + '</div>';
+}
+
+// ============================================================
+// INTERACTIONS
+// ============================================================
+function selectClient(uid) {
+  selectedClientId = (selectedClientId === uid) ? null : uid;
+  renderClientList();
+}
+
+function toggleNames() {
+  showNames = !showNames;
+  var btn = document.getElementById('reveal-btn');
+  btn.textContent = showNames ? 'Hide Names' : 'Reveal Names';
+  btn.classList.toggle('active', showNames);
+
+  if (showNames && dashState.clients.some(function(c) { return !c.realName; })) {
+    // Real names would come from an admin function or user_profiles.display_name.
+    // For now, show a note and leave aliases.
+    console.info('[Orbital] Real name lookup requires service-role access or a future user_profiles.display_name column.');
+  }
+  renderClientList();
+}
+
+// ============================================================
+// SECURITY UTILITY
+// ============================================================
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+</script>
+
+</body>
+</html>
