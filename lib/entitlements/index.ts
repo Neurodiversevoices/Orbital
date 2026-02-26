@@ -122,7 +122,7 @@ export async function checkHasCCIPurchased(): Promise<boolean> {
  */
 export async function getUserCCIPrice(): Promise<number> {
   const isPro = await checkIsPro();
-  return getCCIPrice(isPro);
+  return getCCIPrice(isPro ? 60 : 90);
 }
 
 /**
@@ -130,7 +130,7 @@ export async function getUserCCIPrice(): Promise<number> {
  */
 export async function getUserCCIProductId(): Promise<string> {
   const isPro = await checkIsPro();
-  return getCCIProductId(isPro);
+  return getCCIProductId(isPro ? 60 : 90);
 }
 
 // =============================================================================
@@ -258,7 +258,7 @@ export async function canPurchaseCCI(): Promise<{ eligible: boolean; price: numb
   const isPro = await checkIsPro();
   return {
     eligible: true, // Always eligible
-    price: getCCIPrice(isPro),
+    price: getCCIPrice(isPro ? 60 : 90),
   };
 }
 
