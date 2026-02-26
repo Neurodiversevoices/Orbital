@@ -106,16 +106,20 @@ Dark theme always. Colors:
 8. Always run tsc --noEmit before pushing
 9. Keep Eric informed of findings before making changes
 ---
-## GH CLI COMMANDS (use these)
+## GH CLI — HOW THIS WORKS
+gh CLI is installed on Eric's machine but NOT in this environment.
+Claude Code cannot run gh commands directly.
+Workflow:
+1. Claude Code pushes branch and creates PR via GitHub URL
+2. At the end of EVERY session, output this exact block for Eric to run:
+---
+**Run this in your terminal to merge:**
 ```bash
-# Create and merge a PR
-gh pr create --base master --head BRANCH_NAME --title "TITLE" --body "DESCRIPTION"
 gh pr merge PR_NUMBER --merge --delete-branch
-# Check PR status
-gh pr status
-# List open PRs
-gh pr list
 ```
+---
+Always give Eric the PR number and this command at session end.
+Never ask Eric to click through the GitHub UI.
 ---
 *Last updated: Feb 26, 2026*
 *Update this file whenever the stack, pricing, or status changes.*
