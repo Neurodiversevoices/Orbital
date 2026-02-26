@@ -5,7 +5,7 @@
   "scripts": {
     "start": "expo start --web",
     "web": "expo start --web",
-    "build:web": "expo export -p web && mv dist/index.html dist/_app.html",
+    "build:web": "expo export -p web && mv dist/index.html dist/_app.html && cp public/dashboard.html dist/dashboard.html && node scripts/inject-dashboard-config.js",
     "doctor": "node scripts/doctor.js",
     "preflight": "node scripts/preflight.js",
     "test": "npx playwright test",
