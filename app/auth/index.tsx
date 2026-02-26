@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 34,
     fontWeight: '700',
-    color: colors.text,
+    color: '#FFFFFF',
     letterSpacing: 0.5,
     marginBottom: spacing.xs,
     marginTop: -spacing.lg, // pull up under the scaled-down orb
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   primaryBtn: {
-    backgroundColor: colors.accent,
+    backgroundColor: '#00D1FF',
   },
   primaryBtnText: {
     color: '#000000',
@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
   formTitle: {
     fontSize: 22,
     fontWeight: '600',
-    color: colors.text,
+    color: '#FFFFFF',
     textAlign: 'center',
     marginBottom: spacing.lg,
   },
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.11)',
     borderRadius: borderRadius.md,
-    color: colors.text,
+    color: '#FFFFFF',
     fontSize: 16,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
