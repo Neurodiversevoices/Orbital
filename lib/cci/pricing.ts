@@ -256,7 +256,7 @@ export async function resolveCCIPricing(
         id: 'individual_paid',
         label: 'Individual CCI',
         description: 'Clinical Capacity Instrument for your personal record',
-        price: CCI_PRICING.proUser,
+        price: CCI_PRICING.sixtyDay,
         scope: 'individual',
         productId: PRODUCT_IDS.CCI_PRO,
         visible: true,
@@ -267,7 +267,7 @@ export async function resolveCCIPricing(
         id: 'individual_free',
         label: 'Individual CCI',
         description: 'Clinical Capacity Instrument for your personal record',
-        price: CCI_PRICING.freeUser,
+        price: CCI_PRICING.ninetyDay,
         scope: 'individual',
         productId: PRODUCT_IDS.CCI_FREE,
         visible: true,
@@ -333,7 +333,7 @@ export async function resolveCCIPricing(
  * Get the appropriate individual CCI price for display.
  */
 export function getIndividualCCIPrice(isPaid: boolean): number {
-  return isPaid ? CCI_PRICING.proUser : CCI_PRICING.freeUser;
+  return isPaid ? CCI_PRICING.sixtyDay : CCI_PRICING.ninetyDay;
 }
 
 /**
@@ -351,12 +351,12 @@ export function formatCCIPriceWithDiscount(
 ): { price: number; discount?: { amount: number; label: string } } {
   if (isPaid) {
     return {
-      price: CCI_PRICING.proUser,
+      price: CCI_PRICING.sixtyDay,
       discount: {
-        amount: CCI_PRICING.freeUser - CCI_PRICING.proUser,
+        amount: CCI_PRICING.ninetyDay - CCI_PRICING.sixtyDay,
         label: 'PRO DISCOUNT',
       },
     };
   }
-  return { price: CCI_PRICING.freeUser };
+  return { price: CCI_PRICING.ninetyDay };
 }
