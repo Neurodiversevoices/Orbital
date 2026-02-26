@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbital Groups — Therapist-led capacity groups</title>
+<meta name="description" content="Therapist-led capacity groups for people who experience the world differently. Track between sessions. Show up with data.">
+<meta name="theme-color" content="#05060A">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://orbitalhealth.app/groups">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://orbitalhealth.app/groups">
+<meta property="og:title" content="Orbital Groups — Therapist-led capacity groups">
+<meta property="og:description" content="Therapist-led capacity groups for people who experience the world differently. Track between sessions. Show up with data.">
+<meta property="og:image" content="https://orbitalhealth.app/og-image.png">
+<meta property="og:site_name" content="Orbital">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Orbital Groups — Therapist-led capacity groups">
+<meta name="twitter:description" content="Therapist-led capacity groups for people who experience the world differently.">
+<meta name="twitter:image" content="https://orbitalhealth.app/og-image.png">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:#05060A;
+    color:rgba(255,255,255,0.85);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-x:hidden;
+  }
+
+  /* ---- Layout ---- */
+  .container{max-width:960px;margin:0 auto;padding:0 24px}
+
+  /* ---- Nav ---- */
+  nav{
+    position:sticky;top:0;z-index:100;
+    background:rgba(5,6,10,0.85);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .nav-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    max-width:960px;margin:0 auto;padding:16px 24px;
+  }
+  .nav-logo{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:18px;font-weight:700;color:#fff;letter-spacing:0.5px;text-decoration:none;
+  }
+  .nav-logo img{width:36px;height:36px;border-radius:50%}
+  .nav-links{display:flex;gap:24px;align-items:center}
+  .nav-links a{font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s}
+  .nav-links a:hover{color:#fff}
+  .nav-cta{
+    background:rgba(0,215,255,0.12);color:#00D7FF;
+    border:1px solid rgba(0,215,255,0.25);border-radius:8px;
+    padding:8px 18px;font-size:14px;font-weight:600;
+    text-decoration:none;transition:all 0.2s;
+  }
+  .nav-cta:hover{background:rgba(0,215,255,0.2);color:#00D7FF}
+
+  /* ---- Hero ---- */
+  .hero{
+    padding:100px 0 80px;
+    text-align:center;
+    position:relative;
+  }
+  .hero::before{
+    content:"";position:absolute;
+    top:0;left:50%;transform:translateX(-50%);
+    width:600px;height:500px;
+    background:radial-gradient(circle,rgba(245,183,0,0.04) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .section-label{
+    font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+    color:#00D7FF;margin-bottom:12px;
+  }
+  .hero h1{
+    font-size:clamp(36px,6vw,56px);
+    font-weight:700;color:#fff;
+    line-height:1.15;margin-bottom:20px;
+    letter-spacing:-0.5px;
+  }
+  .hero p.subtitle{
+    font-size:clamp(16px,2.5vw,19px);
+    color:rgba(255,255,255,0.5);
+    max-width:540px;margin:0 auto;
+    line-height:1.55;
+  }
+
+  /* ---- Sections ---- */
+  section{padding:64px 0}
+  section h2{
+    font-size:clamp(22px,3.5vw,32px);font-weight:700;color:#fff;
+    margin-bottom:16px;letter-spacing:-0.3px;
+  }
+  section > p{
+    color:rgba(255,255,255,0.5);font-size:16px;max-width:560px;margin-bottom:48px;line-height:1.6;
+  }
+
+  /* ---- Group card ---- */
+  .group-card{
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:20px;padding:40px;
+    max-width:700px;
+    transition:border-color 0.25s;
+  }
+  .group-card:hover{border-color:rgba(255,255,255,0.13)}
+  .group-card-header{
+    display:flex;align-items:flex-start;justify-content:space-between;
+    gap:20px;margin-bottom:24px;flex-wrap:wrap;
+  }
+  .group-card-meta{flex:1;min-width:0}
+  .status-badge{
+    display:inline-flex;align-items:center;gap:7px;
+    background:rgba(245,183,0,0.08);
+    border:1px solid rgba(245,183,0,0.18);border-radius:100px;
+    padding:5px 14px;
+    font-size:12px;font-weight:600;color:#F5B700;
+    letter-spacing:0.2px;white-space:nowrap;flex-shrink:0;
+  }
+  .status-badge-dot{width:6px;height:6px;border-radius:50%;background:#F5B700;flex-shrink:0}
+  .group-name{font-size:22px;font-weight:700;color:#fff;margin-bottom:6px}
+  .group-led-by{font-size:14px;color:rgba(255,255,255,0.4);margin-bottom:0}
+  .group-led-by strong{color:rgba(255,255,255,0.7)}
+  .group-desc{
+    font-size:15px;color:rgba(255,255,255,0.55);
+    line-height:1.65;margin-bottom:28px;
+  }
+  .group-details{
+    display:flex;flex-wrap:wrap;gap:12px;margin-bottom:32px;
+  }
+  .group-detail-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.07);border-radius:8px;
+    padding:7px 14px;font-size:13px;color:rgba(255,255,255,0.5);
+  }
+  .group-detail-pill strong{color:rgba(255,255,255,0.75);font-weight:600}
+  .group-price-note{
+    font-size:13px;color:rgba(255,255,255,0.35);margin-bottom:20px;
+  }
+  .group-cta{
+    display:inline-block;
+    background:#00D7FF;color:#05060A;
+    border-radius:10px;
+    padding:14px 30px;
+    font-size:15px;font-weight:700;
+    text-decoration:none;transition:all 0.2s;
+  }
+  .group-cta:hover{background:#33dfff}
+
+  /* ---- Therapist CTA ---- */
+  .therapist-cta-banner{
+    background:rgba(0,215,255,0.04);
+    border:1px solid rgba(0,215,255,0.1);
+    border-radius:16px;padding:40px 48px;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:24px;flex-wrap:wrap;
+  }
+  .therapist-cta-banner h3{font-size:20px;font-weight:700;color:#fff;margin-bottom:8px}
+  .therapist-cta-banner p{font-size:14px;color:rgba(255,255,255,0.45);max-width:420px;line-height:1.6}
+  .therapist-cta-link{
+    display:inline-block;
+    background:rgba(0,215,255,0.12);color:#00D7FF;
+    border:1px solid rgba(0,215,255,0.25);border-radius:10px;
+    padding:12px 24px;font-size:14px;font-weight:600;
+    text-decoration:none;transition:all 0.2s;white-space:nowrap;flex-shrink:0;
+  }
+  .therapist-cta-link:hover{background:rgba(0,215,255,0.2)}
+
+  /* ---- Coming soon placeholder ---- */
+  .coming-soon-row{
+    display:flex;align-items:center;gap:16px;
+    padding:28px 32px;
+    background:rgba(255,255,255,0.01);
+    border:1px dashed rgba(255,255,255,0.07);
+    border-radius:16px;max-width:700px;
+  }
+  .coming-soon-icon{
+    width:44px;height:44px;border-radius:10px;
+    background:rgba(255,255,255,0.04);
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;flex-shrink:0;
+  }
+  .coming-soon-text h4{font-size:15px;font-weight:600;color:rgba(255,255,255,0.4);margin-bottom:4px}
+  .coming-soon-text p{font-size:13px;color:rgba(255,255,255,0.25)}
+
+  /* ---- Footer ---- */
+  footer{border-top:1px solid rgba(255,255,255,0.06);padding:40px 0}
+  .footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+  .footer-left{font-size:13px;color:rgba(255,255,255,0.3)}
+  .footer-links{display:flex;gap:24px}
+  .footer-links a{font-size:13px;color:rgba(255,255,255,0.35);text-decoration:none;transition:color 0.2s}
+  .footer-links a:hover{color:rgba(255,255,255,0.6)}
+
+  /* ---- Responsive ---- */
+  @media(max-width:640px){
+    .hero{padding:64px 0 48px}
+    .nav-links a:not(.nav-cta){display:none}
+    .footer-inner{flex-direction:column;text-align:center}
+    .group-card{padding:28px 24px}
+    .therapist-cta-banner{padding:28px 24px;flex-direction:column;text-align:center}
+    .group-card-header{flex-direction:column}
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo"><img src="/Orbital.png?v=2" alt="Orbital" width="36" height="36">Orbital</a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/therapists">For Therapists</a>
+      <a href="/support">Support</a>
+      <a href="mailto:contact@orbitalhealth.app?subject=Group Interest" class="nav-cta">Express Interest</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="section-label">Orbital Groups</div>
+    <h1>Find your group.</h1>
+    <p class="subtitle">Therapist-led capacity groups for people who experience the world differently. Track between sessions. Show up with data.</p>
+  </section>
+
+  <!-- Group Listings -->
+  <section>
+    <div class="section-label">Now Forming</div>
+    <h2>Spring 2026 cohorts</h2>
+    <p>Groups are small, intentional, and clinician-led. Every participant uses Orbital between sessions — so you arrive with 7 days of data, not just a feeling.</p>
+
+    <!-- Ali's Group -->
+    <div class="group-card">
+      <div class="group-card-header">
+        <div class="group-card-meta">
+          <div class="group-name">Burnout &amp; Capacity — 6-Week Program</div>
+          <div class="group-led-by">Led by <strong>Ali</strong></div>
+        </div>
+        <div class="status-badge"><span class="status-badge-dot"></span>Forming — Spring 2026</div>
+      </div>
+
+      <p class="group-desc">A structured 6-week group focused on burnout recovery, capacity awareness, and neurodivergent overload. Use Orbital between sessions to track your patterns. Leave with 6 weeks of data and the option to generate your first CCI report.</p>
+
+      <div class="group-details">
+        <div class="group-detail-pill"><strong>Format:</strong> Weekly, 6 sessions</div>
+        <div class="group-detail-pill"><strong>Size:</strong> 8 participants max</div>
+        <div class="group-detail-pill"><strong>Track:</strong> Burnout &amp; Recovery</div>
+      </div>
+
+      <p class="group-price-note">Price: Contact to enroll</p>
+
+      <a href="mailto:contact@orbitalhealth.app?subject=Group Interest - Ali Burnout Program" class="group-cta">Express Interest</a>
+    </div>
+
+    <!-- Coming soon placeholder -->
+    <div class="coming-soon-row" style="margin-top:20px">
+      <div class="coming-soon-icon">&#43;</div>
+      <div class="coming-soon-text">
+        <h4>More groups coming</h4>
+        <p>ADHD &amp; Executive Function, Sensory Overload Recovery, Caregiver Capacity, and more — apply to host.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Therapist CTA -->
+  <section>
+    <div class="therapist-cta-banner">
+      <div>
+        <h3>Are you a therapist?</h3>
+        <p>Host your own group on Orbital. List it on the marketplace, set your own fee, and let Orbital handle enrollment, billing, and participant onboarding. You keep 80%.</p>
+      </div>
+      <a href="/therapists" class="therapist-cta-link">See Therapist Plans &#8594;</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-left">&copy; 2026 Orbital Health. All rights reserved.</div>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/therapists">For Therapists</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/support">Support</a>
+        <a href="mailto:contact@orbitalhealth.app">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+function trackEvent(event, metadata) {
+  fetch('/api/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      event,
+      page: window.location.pathname,
+      referrer: document.referrer || undefined,
+      metadata: metadata || {},
+    }),
+  }).catch(function() {});
+}
+
+trackEvent('page_view');
+
+document.querySelectorAll('a[href^="mailto"]').forEach(function(link) {
+  link.addEventListener('click', function() {
+    var subject = decodeURIComponent((link.href.split('subject=')[1] || ''));
+    trackEvent('group_cta_clicked', { subject: subject });
+  });
+});
+</script>
+
+</body>
+</html>

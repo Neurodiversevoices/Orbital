@@ -440,6 +440,45 @@
   .save-annual a{color:rgba(245,183,0,0.7);text-decoration:none}
   .save-annual a:hover{color:#F5B700;text-decoration:underline}
 
+  /* ---- Spot counter ---- */
+  .spot-counter{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(0,215,255,0.07);
+    border:1px solid rgba(0,215,255,0.18);border-radius:100px;
+    padding:7px 18px;margin-bottom:32px;
+    font-size:13px;font-weight:600;color:#00D7FF;
+    letter-spacing:0.2px;
+  }
+  .spot-counter-dot{
+    width:7px;height:7px;border-radius:50%;background:#32D74B;
+    flex-shrink:0;
+  }
+
+  /* ---- FAQ ---- */
+  .faq-section{padding:80px 0}
+  .faq-list{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:0}
+  .faq-item{
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    padding:24px 0;
+  }
+  .faq-item:last-child{border-bottom:none}
+  .faq-q{
+    font-size:16px;font-weight:600;color:#fff;margin-bottom:10px;
+    cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+  }
+  .faq-q::after{
+    content:"+";font-size:20px;font-weight:400;color:rgba(255,255,255,0.3);
+    flex-shrink:0;line-height:1.3;transition:transform 0.2s;
+  }
+  .faq-item.open .faq-q::after{transform:rotate(45deg);color:rgba(255,255,255,0.5)}
+  .faq-a{
+    font-size:14px;color:rgba(255,255,255,0.5);line-height:1.65;
+    display:none;padding-right:32px;
+  }
+  .faq-item.open .faq-a{display:block}
+  .faq-a a{color:rgba(0,215,255,0.7);text-decoration:none}
+  .faq-a a:hover{color:#00D7FF;text-decoration:underline}
+
   /* ---- Responsive ---- */
   @media(max-width:640px){
     .hero{padding:80px 0 60px}
@@ -479,6 +518,8 @@
     <div class="orb-container"><img src="/Orbital.png?v=2" alt="Orbital orb" class="orb-img"></div>
     <h1>Your capacity.<br>Your data.<br>Your signal.</h1>
     <p class="subtitle">Log your daily capacity in under 30 seconds. See patterns emerge over weeks and months. Private, offline-first, yours.</p>
+
+    <div><span class="spot-counter"><span class="spot-counter-dot"></span>&#x1F7E2; 67 of 100 founding spots remaining</span></div>
 
     <div class="spectrum">
       <span class="spectrum-label cyan">Resourced</span>
@@ -678,7 +719,8 @@
           <li>Shared household view</li>
           <li>Full Pro features for every seat</li>
         </ul>
-        <a href="mailto:contact@orbitalhealth.app?subject=Family Plan" class="pricing-cta primary">Get Family Plan</a>
+        <button class="pricing-cta primary" onclick="startCheckout('orbital_family_monthly')">Get Family Plan — $49/mo</button>
+        <button class="pricing-cta secondary" style="margin-top:8px;font-size:13px" onclick="startCheckout('orbital_family_annual')">or $490/year (save 17%)</button>
       </div>
 
       <div class="pricing-card">
@@ -693,18 +735,19 @@
           <li>Shared household view</li>
           <li>Full Pro features for every seat</li>
         </ul>
-        <a href="mailto:contact@orbitalhealth.app?subject=Family Plan" class="pricing-cta primary">Get Family+ Plan</a>
+        <button class="pricing-cta primary" onclick="startCheckout('orbital_family_plus_monthly')">Get Family+ — $69/mo</button>
+        <button class="pricing-cta secondary" style="margin-top:8px;font-size:13px" onclick="startCheckout('orbital_family_plus_annual')">or $690/year (save 17%)</button>
       </div>
 
       <div class="pricing-card featured">
         <div class="pricing-tag">Clinical Grade</div>
         <h3>CCI</h3>
         <p class="plan-desc" style="margin-bottom:16px">Longitudinal capacity report — clinical-grade PDF you can keep or share with a provider.</p>
-        <ul class="cci-tiers">
-          <li><span class="cci-tier-name">30-day CCI</span><span class="cci-tier-price">$99</span></li>
-          <li><span class="cci-tier-name">60-day CCI</span><span class="cci-tier-price">$149</span></li>
-          <li class="featured-tier"><span class="cci-tier-name">90-day CCI</span><span class="cci-tier-price">$199</span></li>
-          <li><span class="cci-tier-name">Full Bundle</span><span class="cci-tier-price">$349</span></li>
+        <ul class="cci-tiers" style="cursor:pointer">
+          <li onclick="startCheckout('orbital_cci_30')" title="Buy 30-day CCI — $99"><span class="cci-tier-name">30-day CCI</span><span class="cci-tier-price">$99</span></li>
+          <li onclick="startCheckout('orbital_cci_60')" title="Buy 60-day CCI — $149"><span class="cci-tier-name">60-day CCI</span><span class="cci-tier-price">$149</span></li>
+          <li class="featured-tier" onclick="startCheckout('orbital_cci_90')" title="Buy 90-day CCI — $199"><span class="cci-tier-name">90-day CCI</span><span class="cci-tier-price">$199</span></li>
+          <li onclick="startCheckout('orbital_cci_bundle')" title="Buy Full Bundle — $349"><span class="cci-tier-name">Full Bundle</span><span class="cci-tier-price">$349</span></li>
         </ul>
         <ul class="plan-features">
           <li>Longitudinal synthesis</li>
@@ -713,6 +756,7 @@
           <li>Shareable with providers</li>
         </ul>
         <button class="pricing-cta primary" onclick="startCheckout('orbital_cci_90')">Get My CCI — $199</button>
+        <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:10px">Tap any tier above to choose 30, 60, 90-day, or bundle</p>
       </div>
     </div>
 
@@ -808,6 +852,39 @@
       <div class="feature-card" style="text-align:center;padding:24px 20px">
         <h3 style="font-size:14px;margin-bottom:4px">Yours</h3>
         <p>You record. You own. You decide what to share.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="section-label">FAQ</div>
+    <h2>Common questions.</h2>
+
+    <div class="faq-list">
+      <div class="faq-item open">
+        <div class="faq-q">Is the app really free?</div>
+        <div class="faq-a">Yes. Download, track, and use Orbital forever at no cost. CCI reports are optional purchases when your data is ready.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What is a CCI report?</div>
+        <div class="faq-a">A Capacity Credential Index report is a clinical-grade PDF generated from your tracking data. It synthesizes your patterns, drivers, and trends into a document you can keep or share with a provider.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Do I need to log every day?</div>
+        <div class="faq-a">No — but more data means better patterns. Most people find the check-in takes less time than unlocking their phone.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is my data private?</div>
+        <div class="faq-a">Your data never leaves your device unless you choose to sync. CCI reports are generated from your data and belong to you.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">I'm a therapist or coach. Is there a professional plan?</div>
+        <div class="faq-a">Yes. Visit <a href="/therapists">/therapists</a> or <a href="/coach">/coach</a> to see professional plans starting at $39/month.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What devices does Orbital work on?</div>
+        <div class="faq-a">iOS app available now. Web app available at <a href="/app">orbitalhealth.app/app</a>. Android coming soon.</div>
       </div>
     </div>
   </section>
@@ -974,6 +1051,22 @@ document.querySelectorAll('.pricing-cta').forEach(function(btn) {
 document.querySelectorAll('.store-btn').forEach(function(btn) {
   btn.addEventListener('click', function() {
     trackEvent('download_clicked', { store: btn.href.includes('apple') ? 'ios' : 'android' });
+  });
+});
+
+// =========================================================================
+// FAQ ACCORDION
+// =========================================================================
+document.querySelectorAll('.faq-item').forEach(function(item) {
+  item.querySelector('.faq-q').addEventListener('click', function() {
+    var isOpen = item.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('open'); });
+    // Toggle clicked
+    if (!isOpen) {
+      item.classList.add('open');
+      trackEvent('faq_opened', { question: item.querySelector('.faq-q').textContent.replace('+','').trim() });
+    }
   });
 });
 </script>

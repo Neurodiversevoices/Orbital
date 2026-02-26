@@ -7,6 +7,9 @@
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/therapists", "destination": "/therapists.html" },
+    { "source": "/groups", "destination": "/groups.html" },
+    { "source": "/coach", "destination": "/coach.html" },
+    { "source": "/dashboard", "destination": "/dashboard.html" },
     { "source": "/", "destination": "/landing.html" },
     { "source": "/((?!api/)(?!.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|woff|woff2|ttf|pdf|html)).*)", "destination": "/_app.html" }
   ],
@@ -44,7 +47,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io wss://*.supabase.co https://api.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io wss://*.supabase.co https://api.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com"
         }
       ]
     }
