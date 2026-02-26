@@ -106,6 +106,16 @@ export default function AuthScreen() {
       const result = await auth.signUpWithEmail(email, password);
       setIsSubmitting(false);
       if (result.success) {
+        // Enroll in welcome sequence — fire-and-forget, never blocks the UI
+        const apiBase = process.env.EXPO_PUBLIC_API_URL || 'https://orbitalhealth.app';
+        const rawName = email.split('@')[0].split(/[._-]/)[0] ?? '';
+        const firstName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+        fetch(`${apiBase}/api/welcome-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.toLowerCase().trim(), first_name: firstName }),
+        }).catch(() => {});
+
         // If Supabase has email confirmation enabled, user is not yet authenticated.
         // If confirmation is disabled, AuthGate will redirect automatically via
         // onAuthStateChange. Either way, prompt them to confirm/sign in.
