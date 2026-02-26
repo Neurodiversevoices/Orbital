@@ -341,8 +341,8 @@
 
   /* ---- Pricing ---- */
   .pricing-grid{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-    gap:24px;max-width:860px;margin:0 auto;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:24px;max-width:1100px;margin:0 auto;
   }
   .pricing-card{
     background:rgba(255,255,255,0.03);
@@ -666,6 +666,36 @@
         <button class="pricing-cta secondary" style="margin-top:8px;font-size:13px" onclick="startCheckout('orbital_pro_annual')">or $290/year (save 17%)</button>
       </div>
 
+      <div class="pricing-card">
+        <h3>Family</h3>
+        <div class="price">$49<small>/mo</small></div>
+        <p class="price-alt">or $490/year (save 17%)</p>
+        <p class="plan-desc">Full Pro for the whole household — 5 seats</p>
+        <ul class="plan-features">
+          <li>Unlimited signals</li>
+          <li>90-day history</li>
+          <li>Cloud sync</li>
+          <li>Shared household view</li>
+          <li>Full Pro features for every seat</li>
+        </ul>
+        <a href="mailto:contact@orbitalhealth.app?subject=Family Plan" class="pricing-cta primary">Get Family Plan</a>
+      </div>
+
+      <div class="pricing-card">
+        <h3>Family+</h3>
+        <div class="price">$69<small>/mo</small></div>
+        <p class="price-alt">or $690/year (save 17%)</p>
+        <p class="plan-desc">For larger or blended families — 8 seats</p>
+        <ul class="plan-features">
+          <li>Unlimited signals</li>
+          <li>90-day history</li>
+          <li>Cloud sync</li>
+          <li>Shared household view</li>
+          <li>Full Pro features for every seat</li>
+        </ul>
+        <a href="mailto:contact@orbitalhealth.app?subject=Family Plan" class="pricing-cta primary">Get Family+ Plan</a>
+      </div>
+
       <div class="pricing-card featured">
         <div class="pricing-tag">Clinical Grade</div>
         <h3>CCI</h3>
@@ -682,7 +712,7 @@
           <li>Downloadable PDF artifact</li>
           <li>Shareable with providers</li>
         </ul>
-        <button class="pricing-cta primary" onclick="startCheckout('orbital_cci_free')">Get My CCI — $199</button>
+        <button class="pricing-cta primary" onclick="startCheckout('orbital_cci_90')">Get My CCI — $199</button>
       </div>
     </div>
 
