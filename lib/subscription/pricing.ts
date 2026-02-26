@@ -1,16 +1,16 @@
 /**
- * Orbital Pricing Configuration — FINAL LOCK (January 2026)
+ * Orbital Pricing Configuration — FINAL LOCK (February 2026)
  *
  * Single source of truth for all B2C subscription tiers and artifacts.
  *
- * TIER LADDER (B2C): Free → Pro → Family → Circles → CCI-Q4
+ * TIER LADDER (B2C): Free → Pro → Family → Family+ → Circles → CCI
  *
  * PRO (INDIVIDUAL):
  * - Pro: $29/mo | $290/yr (required for Circles/Bundles participation)
  *
- * FAMILY ADD-ON (requires Pro):
- * - Family Base (5 seats): $79/mo | $790/yr
- * - Additional members: +$9/mo | +$90/yr per member
+ * FAMILY (standalone — full Pro features for all seats):
+ * - Family:  $49/mo | $490/yr — 5 seats
+ * - Family+: $69/mo | $690/yr — 8 seats
  *
  * CIRCLES (container, requires Pro for all members):
  * - Circle: $79/mo | $790/yr (5 buddies max)
@@ -23,9 +23,11 @@
  * ADMIN ADD-ON (optional for Circle/Bundle):
  * - Admin: $29/mo | $290/yr (read-only history access, consent-gated)
  *
- * CCI-Q4 (one-time issuance):
- * - Free users: $199
- * - Pro users: $149
+ * CCI MILESTONE TIERS (one-time, by duration):
+ * - 30-day:  $99  (orbital_cci_30)
+ * - 60-day:  $149 (orbital_cci_60)
+ * - 90-day:  $199 (orbital_cci_90)
+ * - Bundle:  $349 (orbital_cci_bundle)
  *
  * CHECKOUT RULES:
  * - Annual plans are DEFAULT-SELECTED
@@ -43,13 +45,13 @@ export const PRODUCT_IDS = {
   PRO_MONTHLY: 'orbital_pro_monthly',
   PRO_ANNUAL: 'orbital_pro_annual',
 
-  // Family Add-on (requires Pro, base 5 seats)
+  // Family — standalone, full Pro features for all seats (5 seats)
   FAMILY_MONTHLY: 'orbital_family_monthly',
   FAMILY_ANNUAL: 'orbital_family_annual',
 
-  // Family Extra Seat (beyond base 5)
-  FAMILY_EXTRA_SEAT_MONTHLY: 'orbital_family_extra_seat_monthly',
-  FAMILY_EXTRA_SEAT_ANNUAL: 'orbital_family_extra_seat_annual',
+  // Family+ — standalone, full Pro features for all seats (8 seats)
+  FAMILY_PLUS_MONTHLY: 'orbital_family_plus_monthly',
+  FAMILY_PLUS_ANNUAL: 'orbital_family_plus_annual',
 
   // Circle (5 buddies max, all must be Pro)
   CIRCLE_MONTHLY: 'orbital_circle_monthly',
@@ -64,15 +66,23 @@ export const PRODUCT_IDS = {
   ADMIN_ADDON_MONTHLY: 'orbital_admin_addon_monthly',
   ADMIN_ADDON_ANNUAL: 'orbital_admin_addon_annual',
 
-  // CCI-Q4 Issuance (one-time, tiered pricing)
-  CCI_FREE: 'orbital_cci_free',    // $199 for Free users
-  CCI_PRO: 'orbital_cci_pro',      // $149 for Pro users
+  // CCI Milestone Tiers (one-time, by duration)
+  CCI_30: 'orbital_cci_30',        // $99  — 30-day report
+  CCI_60: 'orbital_cci_60',        // $149 — 60-day report
+  CCI_90: 'orbital_cci_90',        // $199 — 90-day report
+  CCI_BUNDLE: 'orbital_cci_bundle', // $349 — full bundle
+
+  // CCI Group (all members on one CCI)
   CCI_CIRCLE_ALL: 'orbital_cci_circle_all',  // $399 for all circle members
   CCI_BUNDLE_ALL: 'orbital_cci_bundle_all',  // $999 for all bundle members
 
-  // Legacy IDs (keep for migration / PRICING_TIERS compatibility)
+  // Legacy IDs (keep for migration)
   INDIVIDUAL_MONTHLY: 'orbital_individual_monthly',
   INDIVIDUAL_ANNUAL: 'orbital_individual_annual',
+  FAMILY_EXTRA_SEAT_MONTHLY: 'orbital_family_extra_seat_monthly',  // Legacy (removed)
+  FAMILY_EXTRA_SEAT_ANNUAL: 'orbital_family_extra_seat_annual',    // Legacy (removed)
+  CCI_FREE: 'orbital_cci_free',    // Legacy (replaced by CCI_90)
+  CCI_PRO: 'orbital_cci_pro',      // Legacy (replaced by CCI_60)
   BUNDLE_10_MONTHLY: 'orbital_bundle_10_monthly',  // Legacy (bundles now annual-only)
   BUNDLE_25_MONTHLY: 'orbital_bundle_25_monthly',  // Legacy
   BUNDLE_25_ANNUAL: 'orbital_bundle_25_annual',    // Legacy (replaced by 15/20)
@@ -104,8 +114,8 @@ export const ENTITLEMENTS = {
   // B2C Tier Entitlements
   FREE: 'free_access',
   PRO: 'pro_access',              // $29/mo | $290/yr - Required for Circles/Bundles
-  FAMILY: 'family_access',        // Base 5 seats, requires Pro
-  FAMILY_EXTRA_SEAT: 'family_extra_seat',  // Per-seat expansion beyond base 5
+  FAMILY: 'family_access',        // Standalone 5-seat plan, full Pro features
+  FAMILY_PLUS: 'family_plus_access', // Standalone 8-seat plan, full Pro features
   CIRCLE: 'circle_access',        // 5 buddies max, all must be Pro
   BUNDLE_10: 'bundle_10_access',  // Annual-only
   BUNDLE_15: 'bundle_15_access',  // Annual-only
@@ -119,6 +129,7 @@ export const ENTITLEMENTS = {
 
   // Legacy entitlements (keep for migration / PRICING_TIERS compatibility)
   INDIVIDUAL: 'individual_access',
+  FAMILY_EXTRA_SEAT: 'family_extra_seat',  // Legacy (per-seat add-on, removed)
   BUNDLE_25: 'bundle_25_access',       // Legacy (replaced by 15/20)
   ADMIN_DASHBOARD: 'admin_dashboard',
   SHARED_VISIBILITY: 'shared_visibility',
@@ -189,6 +200,68 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
     productIds: {
       monthly: PRODUCT_IDS.PRO_MONTHLY,
       annual: PRODUCT_IDS.PRO_ANNUAL,
+    },
+  },
+
+  // ===========================================================================
+  // FAMILY — Standalone, full Pro features for all seats (5 seats)
+  // ===========================================================================
+  family: {
+    id: 'family',
+    name: 'Family',
+    shortName: 'Family',
+    description: 'Full Pro for the whole household',
+    pricing: {
+      monthly: 49,
+      annual: 490,
+      annualSavingsPercent: 17,
+    },
+    seats: 5,
+    features: [
+      'Unlimited signals',
+      '90-day history',
+      'Cloud sync',
+      'Shared household view',
+      'Full Pro features for every seat',
+    ],
+    entitlements: [ENTITLEMENTS.FAMILY],
+    hasSharedVisibility: true,
+    hasAdminDashboard: false,
+    isBundle: false,
+    productIds: {
+      monthly: PRODUCT_IDS.FAMILY_MONTHLY,
+      annual: PRODUCT_IDS.FAMILY_ANNUAL,
+    },
+  },
+
+  // ===========================================================================
+  // FAMILY+ — Standalone, full Pro features for all seats (8 seats)
+  // ===========================================================================
+  family_plus: {
+    id: 'family_plus',
+    name: 'Family+',
+    shortName: 'Family+',
+    description: 'For larger or blended families',
+    pricing: {
+      monthly: 69,
+      annual: 690,
+      annualSavingsPercent: 17,
+    },
+    seats: 8,
+    features: [
+      'Unlimited signals',
+      '90-day history',
+      'Cloud sync',
+      'Shared household view',
+      'Full Pro features for every seat',
+    ],
+    entitlements: [ENTITLEMENTS.FAMILY_PLUS],
+    hasSharedVisibility: true,
+    hasAdminDashboard: false,
+    isBundle: false,
+    productIds: {
+      monthly: PRODUCT_IDS.FAMILY_PLUS_MONTHLY,
+      annual: PRODUCT_IDS.FAMILY_PLUS_ANNUAL,
     },
   },
 
@@ -442,24 +515,25 @@ export const PRO_PRICING = {
 } as const;
 
 /**
- * Family add-on pricing (requires Pro)
- * Base Family includes up to 5 family members
+ * Family plan pricing (standalone — full Pro features for all seats)
+ * 5 seats included
  */
-export const FAMILY_ADDON_PRICING = {
-  monthly: 79,
-  annual: 790,
+export const FAMILY_PRICING = {
+  monthly: 49,
+  annual: 490,
   annualSavingsPercent: 17,
-  baseSeats: 5,
+  seats: 5,
 } as const;
 
 /**
- * Family extra seat pricing (beyond base 5 members)
- * $9/month or $90/year per additional member
+ * Family+ plan pricing (standalone — full Pro features for all seats)
+ * 8 seats included, for larger or blended families
  */
-export const FAMILY_EXTRA_SEAT_PRICING = {
-  monthly: 9,
-  annual: 90,
-  annualSavingsPercent: 17, // ~$18 savings vs monthly ($108/yr)
+export const FAMILY_PLUS_PRICING = {
+  monthly: 69,
+  annual: 690,
+  annualSavingsPercent: 17,
+  seats: 8,
 } as const;
 
 /**
@@ -492,11 +566,13 @@ export const ADMIN_ADDON_PRICING = {
 } as const;
 
 /**
- * CCI-Q4 issuance pricing (tiered by user status)
+ * CCI milestone tier pricing (one-time, by report duration)
  */
 export const CCI_PRICING = {
-  freeUser: 199,   // Free users pay $199
-  proUser: 149,    // Pro users pay $149
+  thirtyDay: 99,   // 30-day report  — orbital_cci_30
+  sixtyDay: 149,   // 60-day report  — orbital_cci_60
+  ninetyDay: 199,  // 90-day report  — orbital_cci_90
+  bundle: 349,     // Full bundle    — orbital_cci_bundle
 } as const;
 
 /**
@@ -510,17 +586,23 @@ export const CCI_GROUP_PRICING = {
 } as const;
 
 /**
- * Get CCI price based on user's Pro status
+ * Get CCI price by milestone duration
  */
-export function getCCIPrice(isPro: boolean): number {
-  return isPro ? CCI_PRICING.proUser : CCI_PRICING.freeUser;
+export function getCCIPrice(days: 30 | 60 | 90 | 'bundle'): number {
+  if (days === 30) return CCI_PRICING.thirtyDay;
+  if (days === 60) return CCI_PRICING.sixtyDay;
+  if (days === 90) return CCI_PRICING.ninetyDay;
+  return CCI_PRICING.bundle;
 }
 
 /**
- * Get CCI product ID based on user's Pro status
+ * Get CCI product ID by milestone duration
  */
-export function getCCIProductId(isPro: boolean): ProductId {
-  return isPro ? PRODUCT_IDS.CCI_PRO : PRODUCT_IDS.CCI_FREE;
+export function getCCIProductId(days: 30 | 60 | 90 | 'bundle'): ProductId {
+  if (days === 30) return PRODUCT_IDS.CCI_30;
+  if (days === 60) return PRODUCT_IDS.CCI_60;
+  if (days === 90) return PRODUCT_IDS.CCI_90;
+  return PRODUCT_IDS.CCI_BUNDLE;
 }
 
 /**
@@ -596,29 +678,6 @@ export function calculateCircleExpansionCost(
   return billingCycle === 'monthly'
     ? expansion.monthly * additionalSeats
     : expansion.annual * additionalSeats;
-}
-
-/**
- * Calculate Family expansion cost (additional members beyond base 5)
- */
-export function calculateFamilyExpansionCost(
-  additionalMembers: number,
-  billingCycle: 'monthly' | 'annual'
-): number {
-  if (additionalMembers <= 0) return 0;
-
-  return billingCycle === 'monthly'
-    ? FAMILY_EXTRA_SEAT_PRICING.monthly * additionalMembers
-    : FAMILY_EXTRA_SEAT_PRICING.annual * additionalMembers;
-}
-
-/**
- * Get Family extra seat price for display
- */
-export function getFamilyExtraSeatPrice(billingCycle: 'monthly' | 'annual'): number {
-  return billingCycle === 'monthly'
-    ? FAMILY_EXTRA_SEAT_PRICING.monthly
-    : FAMILY_EXTRA_SEAT_PRICING.annual;
 }
 
 /**

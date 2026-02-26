@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbital for Therapists — Real-time capacity intelligence for your clients</title>
+<meta name="description" content="Orbital gives therapists anonymized, real-time capacity intelligence — burnout alerts, CCI milestones, and group program tools built for clinical practice.">
+<meta name="theme-color" content="#05060A">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://orbitalhealth.app/therapists">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://orbitalhealth.app/therapists">
+<meta property="og:title" content="Orbital for Therapists — Real-time capacity intelligence for your clients">
+<meta property="og:description" content="Orbital gives therapists anonymized, real-time capacity intelligence — burnout alerts, CCI milestones, and group program tools built for clinical practice.">
+<meta property="og:image" content="https://orbitalhealth.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Orbital">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Orbital for Therapists — Real-time capacity intelligence for your clients">
+<meta name="twitter:description" content="Orbital gives therapists anonymized, real-time capacity intelligence — burnout alerts, CCI milestones, and group program tools built for clinical practice.">
+<meta name="twitter:image" content="https://orbitalhealth.app/og-image.png">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:#05060A;
+    color:rgba(255,255,255,0.85);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-x:hidden;
+  }
+
+  /* ---- Layout ---- */
+  .container{max-width:960px;margin:0 auto;padding:0 24px}
+
+  /* ---- Nav ---- */
+  nav{
+    position:sticky;top:0;z-index:100;
+    background:rgba(5,6,10,0.85);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .nav-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    max-width:960px;margin:0 auto;padding:16px 24px;
+  }
+  .nav-logo{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:18px;font-weight:700;color:#fff;letter-spacing:0.5px;text-decoration:none;
+  }
+  .nav-logo img{width:36px;height:36px;border-radius:50%}
+  .nav-links{display:flex;gap:24px;align-items:center}
+  .nav-links a{font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s}
+  .nav-links a:hover{color:#fff}
+  .nav-cta{
+    background:rgba(0,215,255,0.12);color:#00D7FF;
+    border:1px solid rgba(0,215,255,0.25);border-radius:8px;
+    padding:8px 18px;font-size:14px;font-weight:600;
+    text-decoration:none;transition:all 0.2s;
+  }
+  .nav-cta:hover{background:rgba(0,215,255,0.2);color:#00D7FF}
+
+  /* ---- Hero ---- */
+  .hero{
+    padding:100px 0 80px;
+    text-align:center;
+    position:relative;
+  }
+  .hero::before{
+    content:"";position:absolute;
+    top:0;left:50%;transform:translateX(-50%);
+    width:640px;height:500px;
+    background:radial-gradient(circle,rgba(0,215,255,0.05) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .hero h1{
+    font-size:clamp(32px,5.5vw,52px);
+    font-weight:700;color:#fff;
+    line-height:1.15;margin-bottom:20px;
+    letter-spacing:-0.5px;
+  }
+  .hero p.subtitle{
+    font-size:clamp(16px,2.5vw,19px);
+    color:rgba(255,255,255,0.5);
+    max-width:540px;margin:0 auto 40px;
+    line-height:1.55;
+  }
+  .hero-cta{
+    display:inline-block;
+    background:#00D7FF;color:#05060A;
+    border-radius:10px;
+    padding:16px 36px;
+    font-size:15px;font-weight:700;
+    text-decoration:none;
+    transition:background 0.2s;
+  }
+  .hero-cta:hover{background:#33dfff}
+
+  /* ---- Section ---- */
+  section{padding:80px 0}
+  .section-label{
+    font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+    color:#00D7FF;margin-bottom:12px;
+  }
+  section h2{
+    font-size:clamp(24px,4vw,36px);font-weight:700;color:#fff;
+    margin-bottom:16px;letter-spacing:-0.3px;
+  }
+  section h2 + p{
+    color:rgba(255,255,255,0.5);font-size:17px;max-width:560px;margin-bottom:48px;
+  }
+
+  /* ---- How it works ---- */
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:32px}
+  .step{text-align:center}
+  .step-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:40px;height:40px;border-radius:50%;
+    background:rgba(0,215,255,0.08);border:1px solid rgba(0,215,255,0.2);
+    color:#00D7FF;font-size:16px;font-weight:700;
+    margin-bottom:16px;
+  }
+  .step h3{font-size:16px;font-weight:600;color:#fff;margin-bottom:8px}
+  .step p{font-size:14px;color:rgba(255,255,255,0.5);line-height:1.6}
+
+  /* ---- Dashboard list ---- */
+  .dashboard-list{
+    list-style:none;padding:0;margin:0;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;
+  }
+  .dashboard-list li{
+    display:flex;align-items:flex-start;gap:12px;
+    padding:18px 20px;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:12px;
+    font-size:14px;color:rgba(255,255,255,0.55);
+    line-height:1.5;
+  }
+  .dash-icon{
+    flex-shrink:0;width:24px;height:24px;border-radius:6px;
+    background:rgba(0,215,255,0.1);
+    display:flex;align-items:center;justify-content:center;
+    color:#00D7FF;font-size:13px;font-weight:700;
+    margin-top:1px;
+  }
+  .dashboard-list li strong{color:rgba(255,255,255,0.85)}
+
+  /* ---- CCI Tiers ---- */
+  .cci-tiers{list-style:none;padding:0;margin:0 0 24px;border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden}
+  .cci-tiers li{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 18px;font-size:14px;color:rgba(255,255,255,0.5);
+    border-bottom:1px solid rgba(255,255,255,0.05);gap:12px;flex-wrap:wrap;
+  }
+  .cci-tiers li:last-child{border-bottom:none}
+  .cci-tiers li.featured-tier{color:#fff;font-weight:600;background:rgba(0,215,255,0.06)}
+  .cci-tier-name{flex-shrink:0}
+  .cci-tier-right{display:flex;align-items:center;gap:16px}
+  .cci-tier-desc{font-size:12px;color:rgba(255,255,255,0.3)}
+  .featured-tier .cci-tier-desc{color:rgba(0,215,255,0.5)}
+  .cci-tier-price{font-size:13px;color:rgba(255,255,255,0.35);white-space:nowrap}
+  .featured-tier .cci-tier-price{color:#00D7FF}
+
+  /* ---- Group Programs ---- */
+  .group-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+  .group-item{
+    padding:22px 22px;
+    background:rgba(245,183,0,0.03);
+    border:1px solid rgba(245,183,0,0.08);
+    border-radius:12px;
+    font-size:14px;color:rgba(255,255,255,0.5);line-height:1.55;
+  }
+  .group-item strong{color:rgba(255,255,255,0.85);display:block;margin-bottom:6px}
+
+  /* ---- Pricing ---- */
+  .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+  .pricing-card{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:20px;padding:28px 24px;
+    display:flex;flex-direction:column;
+    transition:border-color 0.25s;
+  }
+  .pricing-card:hover{border-color:rgba(255,255,255,0.12)}
+  .pricing-card h3{font-size:18px;font-weight:700;color:#fff;margin-bottom:8px}
+  .pricing-card .price{font-size:32px;font-weight:700;color:#fff;line-height:1;margin-bottom:4px}
+  .pricing-card .price small{font-size:15px;font-weight:500;color:rgba(255,255,255,0.4)}
+  .pricing-card .plan-desc{font-size:14px;color:rgba(255,255,255,0.4);margin-bottom:20px;line-height:1.5}
+  .plan-features{list-style:none;padding:0;margin:0 0 20px;flex:1}
+  .plan-features li{
+    font-size:14px;color:rgba(255,255,255,0.55);
+    padding:5px 0 5px 20px;position:relative;line-height:1.5;
+  }
+  .plan-features li::before{content:"\2713";position:absolute;left:0;color:#00D7FF;font-weight:700;font-size:13px}
+  .save-annual{font-size:12px;color:rgba(245,183,0,0.6);margin:0 0 14px}
+  .save-annual a{color:rgba(245,183,0,0.7);text-decoration:none}
+  .save-annual a:hover{color:#F5B700;text-decoration:underline}
+  .pricing-cta{
+    display:block;text-align:center;
+    padding:12px;border-radius:10px;
+    font-size:14px;font-weight:600;
+    text-decoration:none;transition:all 0.2s;
+    font-family:inherit;cursor:pointer;border:none;
+  }
+  .pricing-cta.secondary{
+    background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  .pricing-cta.secondary:hover{background:rgba(255,255,255,0.1);color:#fff}
+
+  /* ---- Founding Partner ---- */
+  .founding-banner{
+    background:rgba(245,183,0,0.04);
+    border:1px solid rgba(245,183,0,0.12);
+    border-radius:20px;padding:56px 48px;
+    text-align:center;
+  }
+  .founding-banner h2{
+    font-size:clamp(22px,3.5vw,32px);font-weight:700;color:#fff;
+    margin-bottom:16px;letter-spacing:-0.3px;
+  }
+  .founding-banner p{
+    font-size:16px;color:rgba(255,255,255,0.5);
+    max-width:540px;margin:0 auto 32px;line-height:1.6;
+  }
+  .founding-cta{
+    display:inline-block;
+    background:#F5B700;color:#05060A;
+    border-radius:10px;
+    padding:16px 36px;
+    font-size:15px;font-weight:700;
+    text-decoration:none;
+    transition:background 0.2s;
+  }
+  .founding-cta:hover{background:#f7c533}
+
+  /* ---- Disclaimer ---- */
+  .disclaimer{
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.04);
+    border-radius:10px;padding:20px 24px;
+    margin:40px auto 0;max-width:640px;
+  }
+  .disclaimer p{font-size:12px;color:rgba(255,255,255,0.3);text-align:center;line-height:1.6}
+
+  /* ---- Footer ---- */
+  footer{border-top:1px solid rgba(255,255,255,0.06);padding:40px 0}
+  .footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+  .footer-left{font-size:13px;color:rgba(255,255,255,0.3)}
+  .footer-links{display:flex;gap:24px}
+  .footer-links a{font-size:13px;color:rgba(255,255,255,0.35);text-decoration:none;transition:color 0.2s}
+  .footer-links a:hover{color:rgba(255,255,255,0.6)}
+
+  /* ---- Responsive ---- */
+  @media(max-width:640px){
+    .hero{padding:60px 0 48px}
+    .founding-banner{padding:36px 24px}
+    .nav-links a:not(.nav-cta){display:none}
+    .footer-inner{flex-direction:column;text-align:center}
+    .pricing-grid{grid-template-columns:1fr 1fr}
+    .dashboard-list{grid-template-columns:1fr}
+    .cci-tiers li{flex-direction:column;align-items:flex-start;gap:4px}
+    .cci-tier-right{gap:8px}
+  }
+  @media(max-width:480px){
+    .pricing-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo"><img src="/Orbital.png?v=2" alt="Orbital" width="36" height="36">Orbital</a>
+    <div class="nav-links">
+      <a href="/#features">Features</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/therapists" style="color:#fff;font-weight:600">For Therapists</a>
+      <a href="/support">Support</a>
+      <a href="mailto:contact@orbitalhealth.app?subject=Therapist Early Access" class="nav-cta">Apply for Access</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="section-label">For Therapists</div>
+    <h1>The clinical dashboard<br>your clients will never see.</h1>
+    <p class="subtitle">Orbital gives therapists real-time capacity intelligence — anonymized by default, clinical-grade by design.</p>
+    <a href="mailto:contact@orbitalhealth.app?subject=Therapist Early Access" class="hero-cta">Apply for Early Access</a>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how-it-works">
+    <div class="section-label">How It Works</div>
+    <h2>Three steps. Then it runs itself.</h2>
+    <p>No integrations to configure. No EHR required.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>You subscribe</h3>
+        <p>Pick a plan based on your client volume. $39/month gets you 5 seats.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>You invite clients</h3>
+        <p>They download the free Orbital app and start tracking daily. No setup on their end.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>You see the patterns</h3>
+        <p>Your dashboard shows capacity trends, burnout alerts, and CCI milestones. All anonymized.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Dashboard -->
+  <section id="dashboard">
+    <div class="section-label">The Dashboard</div>
+    <h2>Everything you need.<br>Nothing your client didn't consent to share.</h2>
+    <p>Clients control their own data. You see anonymized signals, trends, and alerts — nothing raw, nothing identifiable by default.</p>
+
+    <ul class="dashboard-list">
+      <li>
+        <div class="dash-icon">&#9678;</div>
+        <div><strong>Anonymized client list</strong> with capacity scores and 7-day trends at a glance</div>
+      </li>
+      <li>
+        <div class="dash-icon">&#128065;</div>
+        <div><strong>One-click name reveal</strong> — only you can see it, only on your device</div>
+      </li>
+      <li>
+        <div class="dash-icon" style="background:rgba(255,59,48,0.1);color:#FF3B30">&#9888;</div>
+        <div><strong>Burnout alert</strong> — notified when a client hits 3+ consecutive burnout days</div>
+      </li>
+      <li>
+        <div class="dash-icon" style="background:rgba(245,183,0,0.1);color:#F5B700">&#9685;</div>
+        <div><strong>Inactivity alert</strong> — notified when a client hasn't logged in 5 days</div>
+      </li>
+      <li>
+        <div class="dash-icon">&#9873;</div>
+        <div><strong>CCI milestone flag</strong> — e.g. "Client 4's 30-day report is ready"</div>
+      </li>
+      <li>
+        <div class="dash-icon" style="background:rgba(245,183,0,0.1);color:#F5B700">&#9776;</div>
+        <div><strong>Group session tagging</strong> — link sessions to participant capacity snapshots</div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- CCI Reports -->
+  <section id="cci">
+    <div class="section-label">CCI Reports</div>
+    <h2>Your clients generate their own clinical reports.<br>You get notified when they're ready.</h2>
+    <p>Clients purchase directly. No ethical conflict for you.</p>
+
+    <ul class="cci-tiers" style="max-width:600px">
+      <li>
+        <span class="cci-tier-name">30-day CCI</span>
+        <span class="cci-tier-right">
+          <span class="cci-tier-desc">Early pattern identification</span>
+          <span class="cci-tier-price">$99</span>
+        </span>
+      </li>
+      <li>
+        <span class="cci-tier-name">60-day CCI</span>
+        <span class="cci-tier-right">
+          <span class="cci-tier-desc">Intervention response measurement</span>
+          <span class="cci-tier-price">$149</span>
+        </span>
+      </li>
+      <li class="featured-tier">
+        <span class="cci-tier-name">90-day CCI</span>
+        <span class="cci-tier-right">
+          <span class="cci-tier-desc">Full longitudinal credential, shareable with providers</span>
+          <span class="cci-tier-price">$199</span>
+        </span>
+      </li>
+    </ul>
+
+    <p style="font-size:13px;color:rgba(255,255,255,0.3);max-width:560px;line-height:1.6">CCI reports are purchased directly by clients. Therapists receive a notification milestone flag when a report is generated for a client in their practice.</p>
+  </section>
+
+  <!-- Group Programs -->
+  <section id="groups">
+    <div class="section-label">Group Programs</div>
+    <h2>Host capacity groups.<br>Orbital handles the billing.</h2>
+    <p>List your practice on Orbital's group marketplace and let the platform do the administration.</p>
+
+    <div class="group-grid">
+      <div class="group-item">
+        <strong>List on the marketplace</strong>
+        Post your group program to Orbital's built-in marketplace. No separate website needed.
+      </div>
+      <div class="group-item">
+        <strong>Your fee, your schedule</strong>
+        Set your own per-session fee and time slot. You control the program.
+      </div>
+      <div class="group-item">
+        <strong>Open to anyone</strong>
+        Orbital users or new clients can join — automatic onboarding to the app included.
+      </div>
+      <div class="group-item">
+        <strong>80/20 revenue split</strong>
+        You keep 80%. Orbital takes 20% to cover payment processing and platform. Every participant is automatically onboarded to Orbital.
+      </div>
+    </div>
+  </section>
+
+  <!-- Plans -->
+  <section id="plans">
+    <div class="section-label">Plans</div>
+    <h2>Pick the plan that fits your practice.</h2>
+    <p>All plans include every feature. Seats determine how many clients you can monitor.</p>
+
+    <div class="pricing-grid">
+
+      <div class="pricing-card">
+        <h3>Solo</h3>
+        <div class="price">$39<small>/mo</small></div>
+        <p class="plan-desc">5 client seats</p>
+        <ul class="plan-features">
+          <li>Anonymized client dashboard</li>
+          <li>Capacity alerts</li>
+          <li>CCI milestone notifications</li>
+          <li>Group session tagging</li>
+          <li>Client invite by email</li>
+        </ul>
+        <p class="save-annual"><a href="mailto:contact@orbitalhealth.app?subject=Annual Therapist Plan">Save 17% annually</a></p>
+        <a href="mailto:contact@orbitalhealth.app?subject=Therapist Plan Interest" class="pricing-cta secondary">Start Free Trial</a>
+      </div>
+
+      <div class="pricing-card">
+        <h3>Practice</h3>
+        <div class="price">$89<small>/mo</small></div>
+        <p class="plan-desc">15 client seats</p>
+        <ul class="plan-features">
+          <li>Anonymized client dashboard</li>
+          <li>Capacity alerts</li>
+          <li>CCI milestone notifications</li>
+          <li>Group session tagging</li>
+          <li>Client invite by email</li>
+        </ul>
+        <p class="save-annual"><a href="mailto:contact@orbitalhealth.app?subject=Annual Therapist Plan">Save 17% annually</a></p>
+        <a href="mailto:contact@orbitalhealth.app?subject=Therapist Plan Interest" class="pricing-cta secondary">Start Free Trial</a>
+      </div>
+
+      <div class="pricing-card">
+        <h3>Group</h3>
+        <div class="price">$159<small>/mo</small></div>
+        <p class="plan-desc">30 client seats</p>
+        <ul class="plan-features">
+          <li>Anonymized client dashboard</li>
+          <li>Capacity alerts</li>
+          <li>CCI milestone notifications</li>
+          <li>Group session tagging</li>
+          <li>Client invite by email</li>
+        </ul>
+        <p class="save-annual"><a href="mailto:contact@orbitalhealth.app?subject=Annual Therapist Plan">Save 17% annually</a></p>
+        <a href="mailto:contact@orbitalhealth.app?subject=Therapist Plan Interest" class="pricing-cta secondary">Start Free Trial</a>
+      </div>
+
+      <div class="pricing-card">
+        <h3>Clinic</h3>
+        <div class="price">$279<small>/mo</small></div>
+        <p class="plan-desc">60 client seats</p>
+        <ul class="plan-features">
+          <li>Anonymized client dashboard</li>
+          <li>Capacity alerts</li>
+          <li>CCI milestone notifications</li>
+          <li>Group session tagging</li>
+          <li>Client invite by email</li>
+        </ul>
+        <p class="save-annual"><a href="mailto:contact@orbitalhealth.app?subject=Annual Therapist Plan">Save 17% annually</a></p>
+        <a href="mailto:contact@orbitalhealth.app?subject=Therapist Plan Interest" class="pricing-cta secondary">Start Free Trial</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Founding Partner Program -->
+  <section>
+    <div class="founding-banner">
+      <div class="section-label" style="color:#F5B700;margin-bottom:16px">Founding Partners</div>
+      <h2>We are onboarding our first 10 therapists now.</h2>
+      <p>The first cohort of Orbital therapists will shape how this platform develops. You get 6 months free, co-authorship on the clinical program guide, and founding partner status. After the pilot, standard plans apply.</p>
+      <a href="mailto:contact@orbitalhealth.app?subject=Founding Partner Application" class="founding-cta">Apply to Be a Founding Partner</a>
+    </div>
+  </section>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <p><strong>Orbital is not a medical device.</strong> It does not provide medical advice, diagnosis, or treatment. All data is self-reported and subjective. Pattern analysis identifies trends in self-reported data only and does not predict health outcomes. Orbital does not create a therapeutic relationship between clinicians and clients. If you have concerns about a client's health, refer to qualified healthcare providers.</p>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-left">&copy; 2026 Orbital Health. All rights reserved.</div>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/support">Support</a>
+        <a href="mailto:contact@orbitalhealth.app">Contact</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+// =========================================================================
+// ANALYTICS
+// =========================================================================
+const urlParams = new URLSearchParams(window.location.search);
+const utm = {
+  utm_source: urlParams.get('utm_source') || undefined,
+  utm_medium: urlParams.get('utm_medium') || undefined,
+  utm_campaign: urlParams.get('utm_campaign') || undefined,
+};
+
+function trackEvent(event, metadata) {
+  fetch('/api/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      event,
+      page: window.location.pathname,
+      referrer: document.referrer || undefined,
+      ...utm,
+      metadata: metadata || {},
+    }),
+  }).catch(function() {});
+}
+
+trackEvent('page_view');
+
+document.querySelectorAll('a[href^="mailto:"], .hero-cta, .founding-cta, .nav-cta, .pricing-cta').forEach(function(el) {
+  el.addEventListener('click', function() {
+    trackEvent('therapist_cta_clicked', { label: el.textContent.trim() });
+  });
+});
+</script>
+
+</body>
+</html>
