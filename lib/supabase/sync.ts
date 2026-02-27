@@ -15,6 +15,12 @@ import { getSupabase, isSupabaseConfigured } from './client';
 import { getCurrentUserId } from './auth';
 import { CapacityLog, CapacityLogInsert, CapacityState, LocalCapacityLog, SyncStatus } from './types';
 
+/** Row shape returned by the capacity_logs upsert .select('id, local_id') */
+interface CapacityLogUpsertRow {
+  id: string;
+  local_id: string | null;
+}
+
 // =============================================================================
 // CONSTANTS
 // =============================================================================
@@ -106,19 +112,20 @@ async function pushToCloud(logs: LocalCapacityLog[]): Promise<{ synced: string[]
       local_id: log.localId,
     }));
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase generated types omit chained .select() overloads; shape typed via CapacityLogUpsertRow
     const { data, error } = await (supabase as any)
       .from('capacity_logs')
       .upsert(inserts, {
         onConflict: 'user_id,local_id',
         ignoreDuplicates: false,
       })
-      .select('id, local_id');
+      .select('id, local_id') as { data: CapacityLogUpsertRow[] | null; error: { message: string } | null };
 
     if (error) {
       if (__DEV__) console.error('[Sync] Push failed:', error);
       failed.push(...batch.map(l => l.localId));
     } else if (data) {
-      synced.push(...(data as any[]).map((d: any) => d.local_id).filter(Boolean));
+      synced.push(...data.map((d: CapacityLogUpsertRow) => d.local_id).filter((id): id is string => id !== null));
     }
   }
 

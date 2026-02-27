@@ -77,12 +77,12 @@ export default function CCIInstrumentScreen() {
   const rawType = params.type;
   const cciType = normalizeCCIType(rawType);
 
-  console.log('[CCI] Raw params.type:', rawType);
-  console.log('[CCI] Normalized cciType:', cciType);
+  if (__DEV__) { console.log('[CCI] Raw params.type:', rawType); }
+  if (__DEV__) { console.log('[CCI] Normalized cciType:', cciType); }
 
   // FAIL CLOSED: Invalid type specified — hard error, no fallback
   if (cciType === 'invalid') {
-    console.error('[CCI] HARD ERROR: Invalid CCI type "' + rawType + '" — refusing to render');
+    if (__DEV__) { console.error('[CCI] HARD ERROR: Invalid CCI type "' + rawType + '" — refusing to render'); }
     return (
       <SafeAreaView style={commonStyles.screen}>
         <View style={styles.errorContainer}>
@@ -118,10 +118,10 @@ export default function CCIInstrumentScreen() {
   };
 
   const bundleSeatCount = parseBundleSeats(params.seats);
-  console.log('[CCI] Bundle seats from URL:', bundleSeatCount, '(raw:', params.seats, ')');
+  if (__DEV__) { console.log('[CCI] Bundle seats from URL:', bundleSeatCount, '(raw:', params.seats, ')'); }
   // =======================================================
 
-  console.log('[CCI] isCircle:', isCircle, '| isBundle:', isBundle, '| seats:', bundleSeatCount);
+  if (__DEV__) { console.log('[CCI] isCircle:', isCircle, '| isBundle:', isBundle, '| seats:', bundleSeatCount); }
 
   const [isViewing, setIsViewing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -149,7 +149,7 @@ export default function CCIInstrumentScreen() {
     ? getBundleGoldenMasterHTML(bundleSeatCount)
     : getGoldenMasterHTML();
 
-  console.log('[CCI] Rendering artifact:', isCircle ? 'Circle' : isBundle ? 'Bundle' : 'Individual');
+  if (__DEV__) { console.log('[CCI] Rendering artifact:', isCircle ? 'Circle' : isBundle ? 'Bundle' : 'Individual'); }
 
   // View instrument in new window (web only)
   const handleViewInstrument = useCallback(() => {

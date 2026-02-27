@@ -145,13 +145,13 @@ export default function SettingsScreen() {
   const handleGenerateData = useCallback(async () => {
     // Alert.alert doesn't work on web, just run directly
     setIsProcessing(true);
-    console.log('[Orbital] Generate button pressed');
+    if (__DEV__) { console.log('[Orbital] Generate button pressed'); }
     try {
       await generateFakeData(0.5);
       await refresh();
-      console.log('[Orbital] Generation complete');
+      if (__DEV__) { console.log('[Orbital] Generation complete'); }
     } catch (error) {
-      console.error('[Orbital] Generation failed:', error);
+      if (__DEV__) { console.error('[Orbital] Generation failed:', error); }
     } finally {
       setIsProcessing(false);
     }

@@ -65,14 +65,14 @@ export function CCI90DayChart({
   title,
 }: CCI90DayChartProps) {
   // DEBUG: Verify component is rendering
-  console.log('[CCI90DayChart] Rendering with data:', data?.series?.length, 'series');
+  if (__DEV__) { console.log('[CCI90DayChart] Rendering with data:', data?.series?.length, 'series'); }
 
   // Generate all chart props from the unified spec
   let props;
   try {
     props = generateChartProps(data);
   } catch (err) {
-    console.error('[CCI90DayChart] generateChartProps error:', err);
+    if (__DEV__) { console.error('[CCI90DayChart] generateChartProps error:', err); }
     return (
       <View style={styles.container}>
         <Text style={{ color: 'red', padding: 20 }}>Chart Error: {String(err)}</Text>

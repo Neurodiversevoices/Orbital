@@ -16,8 +16,9 @@
  * - Year of Birth gate (required)
  * - Personal mode only by default
  * - Capacity logging allowed
- * - Limited history retention (7 days)
- * - Limited signals per month (30)
+ * - Signal count and history retention are UNLIMITED for QA (no artificial caps)
+ *   Rationale: QA testing must not be blocked by signal/retention limits.
+ *   Real Free tier limits are applied at the server/product layer, not in QA mode.
  * - No CCI discount ($199 not $149)
  *
  * WHAT IS BLOCKED IN QA FREE MODE:

@@ -81,7 +81,7 @@ export interface CCIPricingResult {
  * Check if all Circle members have active Pro subscriptions.
  *
  * Queries the circles and circle_members Supabase tables, then verifies
- * every active member has 'individual_pro' in user_entitlements.
+ * every active member has 'pro_access' in user_entitlements (canonical key).
  *
  * If ANY member lacks Pro, returns false — the Circle CCI tier is blocked.
  */
@@ -107,14 +107,14 @@ export async function checkCircleAllMembersPro(
 
     if (membersError || !members || members.length === 0) return false;
 
-    // Check each member has individual_pro entitlement
+    // Check each member has 'pro_access' entitlement (canonical key written by grantEntitlement)
     const userIds = members.map((m: { user_id: string }) => m.user_id);
 
     const { data: entitlements, error: entError } = await supabase
       .from('user_entitlements')
       .select('user_id')
       .in('user_id', userIds)
-      .eq('entitlement_id', 'individual_pro');
+      .eq('entitlement_id', 'pro_access');
 
     if (entError) return false;
 
@@ -134,7 +134,7 @@ export async function checkCircleAllMembersPro(
  * Check if all Bundle seats are Pro-entitled.
  *
  * Queries the bundle_seats table, then verifies every active seat holder
- * has 'individual_pro' in user_entitlements.
+ * has 'pro_access' in user_entitlements (canonical key).
  *
  * Bundles include Pro by design, but this checks enforcement in case
  * a subscription lapsed.
@@ -168,7 +168,7 @@ export async function checkBundleAllSeatsPro(
       .from('user_entitlements')
       .select('user_id')
       .in('user_id', userIds)
-      .eq('entitlement_id', 'individual_pro');
+      .eq('entitlement_id', 'pro_access');
 
     if (entError) return false;
 
@@ -251,6 +251,9 @@ export async function resolveCCIPricing(
       : false);
 
   // Build Individual tier
+  // Pro subscribers always receive the 90-day milestone artifact at the Pro-discounted price
+  // regardless of which milestone window they selected. CCI_90_PRO is intentional here.
+  // If per-milestone Pro pricing is required in future, route by milestone key here instead.
   const individualTier: CCIPricingTier = isPaid
     ? {
         id: 'individual_paid',
@@ -258,7 +261,7 @@ export async function resolveCCIPricing(
         description: 'Structured capacity artifact for your personal record',
         price: CCI_PRICING.sixtyDay,
         scope: 'individual',
-        productId: PRODUCT_IDS.CCI_90_PRO,
+        productId: PRODUCT_IDS.CCI_90_PRO, // intentional: Pro always gets 90-day at Pro price
         visible: true,
         eligible: true,
         purchased: entitlements.hasCCIPurchased,
@@ -338,9 +341,11 @@ export function getIndividualCCIPrice(isPaid: boolean): number {
 
 /**
  * Get the appropriate individual CCI product ID.
+ * Pro subscribers always receive CCI_90_PRO (90-day at Pro price) regardless of selected window.
+ * If per-milestone Pro pricing is required in future, route by milestone key here instead.
  */
 export function getIndividualCCIProductId(isPaid: boolean): ProductId {
-  return isPaid ? PRODUCT_IDS.CCI_90_PRO : PRODUCT_IDS.CCI_90;
+  return isPaid ? PRODUCT_IDS.CCI_90_PRO : PRODUCT_IDS.CCI_90; // CCI_90_PRO intentional — see above
 }
 
 /**

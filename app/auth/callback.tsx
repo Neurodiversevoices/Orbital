@@ -17,7 +17,7 @@ export default function AuthCallbackScreen() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       if (!isSupabaseConfigured()) {
-        console.error('[AuthCallback] Supabase not configured');
+        if (__DEV__) { console.error('[AuthCallback] Supabase not configured'); }
         router.replace('/');
         return;
       }
@@ -30,20 +30,20 @@ export default function AuthCallbackScreen() {
         const { data: { session }, error } = await supabase.auth.getSession();
 
         if (error) {
-          console.error('[AuthCallback] Error getting session:', error.message);
+          if (__DEV__) { console.error('[AuthCallback] Error getting session:', error.message); }
           router.replace('/');
           return;
         }
 
         if (session) {
-          console.log('[AuthCallback] Session established, redirecting to home');
+          if (__DEV__) { console.log('[AuthCallback] Session established, redirecting to home'); }
           router.replace('/');
         } else {
           // No session yet - might still be processing
           // Listen for auth state change
           const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_IN' && session) {
-              console.log('[AuthCallback] Signed in via auth state change');
+              if (__DEV__) { console.log('[AuthCallback] Signed in via auth state change'); }
               subscription.unsubscribe();
               router.replace('/');
             }
@@ -56,7 +56,7 @@ export default function AuthCallbackScreen() {
           }, 5000);
         }
       } catch (e) {
-        console.error('[AuthCallback] Unexpected error:', e);
+        if (__DEV__) { console.error('[AuthCallback] Unexpected error:', e); }
         router.replace('/');
       }
     };

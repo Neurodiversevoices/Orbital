@@ -60,38 +60,42 @@ export function useQCR({ logs }: UseQCROptions): UseQCRReturn {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Check QCR entitlement on mount (BUG FIX: was useState, must be useEffect)
+  // Check QCR entitlement on mount and when demo mode changes.
+  // Logic is inlined so all closed-over values appear in the dep array.
+  // ENTITLEMENTS.QCR and Platform.OS are module-level constants — intentionally excluded.
   useEffect(() => {
-    checkQCREntitlement();
-  }, [isDemoMode]);
+    let cancelled = false;
 
-  async function checkQCREntitlement() {
-    // Founder demo mode always has access
-    if (FOUNDER_DEMO_ENABLED && isDemoMode) {
-      setHasQCRAccess(true);
-      setIsCheckingAccess(false);
-      return;
-    }
+    const run = async () => {
+      // Founder demo mode always has access
+      if (FOUNDER_DEMO_ENABLED && isDemoMode) {
+        if (!cancelled) { setHasQCRAccess(true); setIsCheckingAccess(false); }
+        return;
+      }
 
-    // Skip on web
-    if (Platform.OS === 'web') {
-      setIsCheckingAccess(false);
-      return;
-    }
+      // Skip on web
+      if (Platform.OS === 'web') {
+        if (!cancelled) setIsCheckingAccess(false);
+        return;
+      }
 
-    try {
-      const PurchasesModule = await import('react-native-purchases');
-      Purchases = PurchasesModule.default;
+      try {
+        const PurchasesModule = await import('react-native-purchases');
+        Purchases = PurchasesModule.default;
 
-      const customerInfo = await Purchases.getCustomerInfo();
-      const hasAccess = !!customerInfo.entitlements.active[ENTITLEMENTS.QCR];
-      setHasQCRAccess(hasAccess);
-    } catch (e) {
-      // RevenueCat unavailable - no access
-      if (__DEV__) console.log('[QCR] RevenueCat unavailable');
-    }
-    setIsCheckingAccess(false);
-  }
+        const customerInfo = await Purchases.getCustomerInfo();
+        const hasAccess = !!customerInfo.entitlements.active[ENTITLEMENTS.QCR];
+        if (!cancelled) setHasQCRAccess(hasAccess);
+      } catch (e) {
+        // RevenueCat unavailable — no access
+        if (__DEV__) console.log('[QCR] RevenueCat unavailable');
+      }
+      if (!cancelled) setIsCheckingAccess(false);
+    };
+
+    run();
+    return () => { cancelled = true; };
+  }, [isDemoMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Compute available quarters from logs
   const availableQuarters = useMemo(() => {

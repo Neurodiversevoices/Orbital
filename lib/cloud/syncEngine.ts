@@ -91,9 +91,10 @@ export async function pushToCloud(): Promise<{ synced: number; failed: number }>
     if (logs.length > 0) {
       try {
         // Use batch upsert RPC
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase generated types do not include custom RPCs; shape validated at runtime
         const { data, error } = await (supabase as any).rpc('batch_upsert_capacity_logs', {
           p_logs: logs,
-        });
+        }) as { data: { synced_count?: number } | null; error: { message: string } | null };
 
         if (error) {
           if (__DEV__) console.error('[Sync] Push batch failed:', error);
@@ -175,10 +176,11 @@ export async function pullFromCloud(): Promise<CloudCapacityLog[]> {
   const lastPull = await getLastPullTime();
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase generated types do not include custom RPCs; shape validated at runtime
     const { data, error } = await (supabase as any).rpc('pull_capacity_logs', {
       p_since: lastPull?.toISOString() ?? null,
       p_limit: SYNC_CONFIG.PULL_LIMIT,
-    });
+    }) as { data: CloudCapacityLog[] | null; error: { message: string } | null };
 
     if (error) {
       if (__DEV__) console.error('[Sync] Pull failed:', error);

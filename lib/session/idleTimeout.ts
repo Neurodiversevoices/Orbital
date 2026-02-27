@@ -87,7 +87,7 @@ export function useIdleTimeout(options: UseIdleTimeoutOptions): IdleTimeoutState
   const resetActivity = useCallback(() => {
     lastActivityRef.current = Date.now();
     warningShownRef.current = false;
-    updateLastActivity();
+    void updateLastActivity(); // intentional fire-and-forget: sync callback cannot be async
     setState({
       isIdle: false,
       showWarning: false,

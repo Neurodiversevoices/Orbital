@@ -736,14 +736,18 @@ export function createCCIArtifact(
  * Uses the exact timestamp/hash from the golden master PDF
  */
 export function getGoldenMasterHTML(): string {
-  console.log('[INDIVIDUAL-ARTIFACT-TRACE] getGoldenMasterHTML() CALLED');
-  console.log('[INDIVIDUAL-ARTIFACT-TRACE] This is the INDIVIDUAL CCI artifact (not Bundle, not Circle)');
+  if (__DEV__) {
+    console.log('[INDIVIDUAL-ARTIFACT-TRACE] getGoldenMasterHTML() CALLED');
+    console.log('[INDIVIDUAL-ARTIFACT-TRACE] This is the INDIVIDUAL CCI artifact (not Bundle, not Circle)');
+  }
   const html = generateCCIArtifactHTML({
     generatedAt: '2026-01-10 14:02:41 UTC',
     integrityHash: 'sha256:8f43c9d11e7a2b8f...a72b5f1d2',
   });
-  console.log('[INDIVIDUAL-ARTIFACT-TRACE] Generated HTML length:', html.length);
-  console.log('[INDIVIDUAL-ARTIFACT-TRACE] HTML contains "BUNDLE":', html.includes('BUNDLE'));
+  if (__DEV__) {
+    console.log('[INDIVIDUAL-ARTIFACT-TRACE] Generated HTML length:', html.length);
+    console.log('[INDIVIDUAL-ARTIFACT-TRACE] HTML contains "BUNDLE":', html.includes('BUNDLE'));
+  }
   return html;
 }
 

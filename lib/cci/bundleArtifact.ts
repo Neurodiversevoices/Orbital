@@ -505,15 +505,19 @@ ${needsPagination ? `
  * Get the Bundle CCI golden master HTML
  */
 export function getBundleGoldenMasterHTML(seatCount: 10 | 15 | 20 = 10): string {
-  console.log('[BUNDLE-ARTIFACT-TRACE] getBundleGoldenMasterHTML() CALLED');
-  console.log('[BUNDLE-ARTIFACT-TRACE] seatCount param:', seatCount);
+  if (__DEV__) {
+    console.log('[BUNDLE-ARTIFACT-TRACE] getBundleGoldenMasterHTML() CALLED');
+    console.log('[BUNDLE-ARTIFACT-TRACE] seatCount param:', seatCount);
+  }
   const html = generateBundleCCIArtifactHTML(seatCount, {
     generatedAt: '2026-01-10 14:02:41 UTC',
     integrityHash: 'sha256:b7d3f9a81c2e4b6f...e91c2d8a4',
   });
-  console.log('[BUNDLE-ARTIFACT-TRACE] Generated HTML length:', html.length);
-  console.log('[BUNDLE-ARTIFACT-TRACE] HTML contains "BUNDLE":', html.includes('BUNDLE'));
-  console.log('[BUNDLE-ARTIFACT-TRACE] HTML contains "mini-chart-card":', html.includes('mini-chart-card'));
+  if (__DEV__) {
+    console.log('[BUNDLE-ARTIFACT-TRACE] Generated HTML length:', html.length);
+    console.log('[BUNDLE-ARTIFACT-TRACE] HTML contains "BUNDLE":', html.includes('BUNDLE'));
+    console.log('[BUNDLE-ARTIFACT-TRACE] HTML contains "mini-chart-card":', html.includes('mini-chart-card'));
+  }
   return html;
 }
 

@@ -52,9 +52,17 @@ export function useCCIGeneration(): UseCCIGenerationReturn {
 
       try {
         // =====================================================================
-        // Gate 1: Entitlement check
+        // Gate 1: Entitlement check — isolated inner try/catch for clear error surface
         // =====================================================================
-        const entitlement = await canPurchaseCCI();
+        let entitlement: Awaited<ReturnType<typeof canPurchaseCCI>>;
+        try {
+          entitlement = await canPurchaseCCI();
+        } catch (eligibilityErr) {
+          const msg = 'Unable to verify purchase eligibility. Please check your connection and try again.';
+          setError(msg);
+          if (__DEV__) console.error('[useCCIGeneration] canPurchaseCCI threw:', eligibilityErr);
+          return { success: false, error: msg };
+        }
         if (!entitlement.eligible) {
           const msg = 'CCI purchase required. Please purchase a CCI to generate your Capacity Clinical Summary.';
           setError(msg);
