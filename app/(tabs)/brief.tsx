@@ -179,7 +179,7 @@ function PersonalBrief() {
         <Text style={styles.cciSubtitle}>CCI-Q4</Text>
 
         <Text style={styles.cciDescription}>
-          Your personal capacity signal rendered as a clinical-grade instrument.
+          Your personal capacity signal rendered as a structured artifact.
           Demo data shown — real issuance reflects your actual capacity patterns.
         </Text>
 

@@ -82,7 +82,7 @@ export function QCRPaywall({
               {/* Title */}
               <Text style={styles.title}>Quarterly Capacity Report</Text>
               <Text style={styles.subtitle}>
-                Institutional-grade reporting for clinical documentation
+                Structured capacity reporting for personal and professional use
               </Text>
 
               {/* Features */}
@@ -94,7 +94,7 @@ export function QCRPaywall({
                   'State distribution with observation counts',
                   'Notable episode identification',
                   'Clinical observations (neutral language)',
-                  'PDF export (EHR attachment ready)',
+                  'PDF export (shareable with providers)',
                 ].map((feature, index) => (
                   <Animated.View
                     key={feature}

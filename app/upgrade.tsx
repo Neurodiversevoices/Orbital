@@ -266,7 +266,7 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
         <FileText size={24} color="#7A9AAA" />
         <View style={styles.cciHeaderText}>
           <Text style={styles.cciTitle}>Individual CCI</Text>
-          <Text style={styles.cciSubtitle}>Clinical Capacity Instrument · Issued per individual</Text>
+          <Text style={styles.cciSubtitle}>Structured capacity artifact · Issued per individual</Text>
         </View>
       </View>
 
@@ -292,7 +292,7 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
         <View style={styles.cciConfirmationContainer}>
           <Text style={styles.cciModalTitle}>Confirm Individual CCI Issuance</Text>
           <Text style={styles.cciModalBody}>
-            This action creates a fixed clinical-grade record derived from your stored capacity history.
+            This action creates a fixed, structured capacity record derived from your stored capacity history.
             Once issued, the artifact cannot be altered. Issued per individual.
           </Text>
           <Pressable
@@ -531,7 +531,7 @@ export default function UpgradeScreen() {
                 <Text style={styles.cciInlineTitle}>Individual CCI</Text>
                 <Text style={styles.cciInlinePrice}>{formatPrice(CCI_PRICING.ninetyDay)}</Text>
               </View>
-              <Text style={styles.cciInlineDescription}>Clinical capacity artifact · Issued once</Text>
+              <Text style={styles.cciInlineDescription}>Structured capacity artifact · Issued once</Text>
               <Pressable
                 style={[styles.cciInlineButton, (isPurchasing || hasCCIPurchased) && styles.cciInlineButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CCI_90, 'Individual CCI')}
@@ -591,7 +591,7 @@ export default function UpgradeScreen() {
                 <Text style={styles.cciInlineTitle}>Individual CCI</Text>
                 <Text style={[styles.cciInlinePrice, { color: '#FFD700' }]}>{formatPrice(CCI_PRICING.sixtyDay)}</Text>
               </View>
-              <Text style={styles.cciInlineDescription}>Clinical capacity artifact · Issued once</Text>
+              <Text style={styles.cciInlineDescription}>Structured capacity artifact · Issued once</Text>
               <Pressable
                 style={[styles.cciInlineButtonPro, (isPurchasing || hasCCIPurchased || !isPro) && styles.cciInlineButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CCI_90_PRO, 'Individual CCI')}

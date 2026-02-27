@@ -47,7 +47,7 @@ function buildDay0Html(firstName: string): string {
     <p>The only thing you need to do right now is your first check-in. Open the app, swipe the orb to where you actually are today — not where you want to be — and optionally tag one driver.</p>
     <p>That's it. That's day one.</p>
     <p>One check-in per day is all it takes. Most people tell me it takes less time than unlocking their phone.</p>
-    <p>At 30 days you'll have your first real picture of your capacity patterns. At 90 days you can generate a CCI report — a clinical-grade summary of your longitudinal data. Something worth keeping.</p>
+    <p>At 30 days you'll have your first real picture of your capacity patterns. At 90 days you can generate a CCI artifact — a structured summary of your longitudinal capacity data. Something worth keeping.</p>
     <p style="margin-top:32px">— Eric<br><span style="color:#666;font-size:14px">Orbital Health Intelligence Inc.</span></p>
   </div>
   <div style="padding:16px 0;border-top:1px solid #eee;font-size:12px;color:#999">

@@ -255,7 +255,7 @@ export async function resolveCCIPricing(
     ? {
         id: 'individual_paid',
         label: 'Individual CCI',
-        description: 'Clinical Capacity Instrument for your personal record',
+        description: 'Structured capacity artifact for your personal record',
         price: CCI_PRICING.sixtyDay,
         scope: 'individual',
         productId: PRODUCT_IDS.CCI_90_PRO,
@@ -266,7 +266,7 @@ export async function resolveCCIPricing(
     : {
         id: 'individual_free',
         label: 'Individual CCI',
-        description: 'Clinical Capacity Instrument for your personal record',
+        description: 'Structured capacity artifact for your personal record',
         price: CCI_PRICING.ninetyDay,
         scope: 'individual',
         productId: PRODUCT_IDS.CCI_90,

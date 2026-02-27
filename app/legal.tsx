@@ -110,9 +110,9 @@ export default function LegalScreen() {
               Orbital does not provide medical advice, diagnosis, or treatment.
             </Text>
             <Text style={styles.disclaimerTextSecondary}>
-              The Clinical Capacity Instrument (CCI-Q4) is informational and designed to
-              support documentation and record review; it does not guarantee reimbursement
-              or clinical outcomes.
+              The CCI-Q4 artifact summarizes self-reported capacity patterns over a defined
+              observation window. It is not a medical device, diagnostic instrument, or
+              clinical assessment. Generated from user-reported inputs only.
             </Text>
           </View>
         </View>
