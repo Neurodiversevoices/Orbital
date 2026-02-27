@@ -72,6 +72,12 @@ export const PRODUCT_IDS = {
   CCI_90: 'orbital_cci_90',        // $199 — 90-day report
   CCI_BUNDLE: 'orbital_cci_bundle', // $349 — full bundle
 
+  // CCI Pro Milestone Tiers (one-time, Pro-discounted — separate SKUs per Apple/Google rules)
+  CCI_30_PRO:     'orbital_cci_30_pro',    // $79  — 30-day report, Pro price
+  CCI_60_PRO:     'orbital_cci_60_pro',    // $119 — 60-day report, Pro price
+  CCI_90_PRO:     'orbital_cci_90_pro',    // $149 — 90-day report, Pro price
+  CCI_BUNDLE_PRO: 'orbital_cci_bundle_pro',// $279 — full bundle, Pro price
+
   // CCI Group (all members on one CCI)
   CCI_CIRCLE_ALL: 'orbital_cci_circle_all',  // $399 for all circle members
   CCI_BUNDLE_ALL: 'orbital_cci_bundle_all',  // $999 for all bundle members
@@ -81,8 +87,12 @@ export const PRODUCT_IDS = {
   INDIVIDUAL_ANNUAL: 'orbital_individual_annual',
   FAMILY_EXTRA_SEAT_MONTHLY: 'orbital_family_extra_seat_monthly',  // Legacy (removed)
   FAMILY_EXTRA_SEAT_ANNUAL: 'orbital_family_extra_seat_annual',    // Legacy (removed)
-  CCI_FREE: 'orbital_cci_free',    // Legacy (replaced by CCI_90)
-  CCI_PRO: 'orbital_cci_pro',      // Legacy (replaced by CCI_60)
+  // DEAD LEGACY IDS — do not use. Removed from App Store Connect.
+  // CCI_FREE was replaced by CCI_90 (standard) and CCI_90_PRO (Pro discount).
+  // CCI_PRO  was replaced by CCI_60 (standard) and CCI_60_PRO (Pro discount).
+  // Keep as string constants only for receipt migration lookups.
+  CCI_FREE_LEGACY: 'orbital_cci_free',
+  CCI_PRO_LEGACY:  'orbital_cci_pro',
   BUNDLE_10_MONTHLY: 'orbital_bundle_10_monthly',  // Legacy (bundles now annual-only)
   BUNDLE_25_MONTHLY: 'orbital_bundle_25_monthly',  // Legacy
   BUNDLE_25_ANNUAL: 'orbital_bundle_25_annual',    // Legacy (replaced by 15/20)
@@ -124,8 +134,12 @@ export const ENTITLEMENTS = {
   // Add-on Entitlements
   ADMIN_ADDON: 'admin_addon',     // READ-ONLY history access, consent-gated
 
-  // CCI Entitlements
-  CCI_PURCHASED: 'cci_purchased', // User has purchased CCI issuance
+  // CCI Milestone Entitlements (one per milestone — both standard and pro SKU map to same key)
+  // RC Dashboard: attach both orbital_cci_30 AND orbital_cci_30_pro to cci_30 entitlement, etc.
+  CCI_30:     'cci_30',     // 30-day CCI artifact
+  CCI_60:     'cci_60',     // 60-day CCI artifact
+  CCI_90:     'cci_90',     // 90-day CCI artifact
+  CCI_BUNDLE: 'cci_bundle', // All three milestones
 
   // Legacy entitlements (keep for migration / PRICING_TIERS compatibility)
   INDIVIDUAL: 'individual_access',
@@ -576,6 +590,18 @@ export const CCI_PRICING = {
 } as const;
 
 /**
+ * CCI Pro pricing — ~20-25% discount for active Pro subscribers.
+ * These map to separate SKUs (_pro suffix) per Apple/Google IAP rules.
+ * Do NOT dynamically change a single SKU price; use separate products.
+ */
+export const CCI_PRO_PRICING = {
+  thirtyDay:  79,  // orbital_cci_30_pro  (vs $99 standard)
+  sixtyDay:   119, // orbital_cci_60_pro  (vs $149 standard)
+  ninetyDay:  149, // orbital_cci_90_pro  (vs $199 standard)
+  bundle:     279, // orbital_cci_bundle_pro (vs $349 standard)
+} as const;
+
+/**
  * CCI Group pricing (all members on one CCI)
  * - Circle: $399 for all circle members together
  * - Bundle: $999 flat rate for any bundle size
@@ -588,21 +614,42 @@ export const CCI_GROUP_PRICING = {
 /**
  * Get CCI price by milestone duration
  */
-export function getCCIPrice(days: 30 | 60 | 90 | 'bundle'): number {
-  if (days === 30) return CCI_PRICING.thirtyDay;
-  if (days === 60) return CCI_PRICING.sixtyDay;
-  if (days === 90) return CCI_PRICING.ninetyDay;
-  return CCI_PRICING.bundle;
+export function getCCIPrice(days: 30 | 60 | 90 | 'bundle', isPro = false): number {
+  const pricing = isPro ? CCI_PRO_PRICING : CCI_PRICING;
+  if (days === 30) return pricing.thirtyDay;
+  if (days === 60) return pricing.sixtyDay;
+  if (days === 90) return pricing.ninetyDay;
+  return pricing.bundle;
 }
 
 /**
- * Get CCI product ID by milestone duration
+ * Get CCI product ID by milestone duration.
+ * Pro subscribers get a separate SKU with discounted pricing.
+ * Apple and Google require separate products for different prices.
  */
-export function getCCIProductId(days: 30 | 60 | 90 | 'bundle'): ProductId {
+export function getCCIProductId(days: 30 | 60 | 90 | 'bundle', isPro = false): ProductId {
+  if (isPro) {
+    if (days === 30) return PRODUCT_IDS.CCI_30_PRO;
+    if (days === 60) return PRODUCT_IDS.CCI_60_PRO;
+    if (days === 90) return PRODUCT_IDS.CCI_90_PRO;
+    return PRODUCT_IDS.CCI_BUNDLE_PRO;
+  }
   if (days === 30) return PRODUCT_IDS.CCI_30;
   if (days === 60) return PRODUCT_IDS.CCI_60;
   if (days === 90) return PRODUCT_IDS.CCI_90;
   return PRODUCT_IDS.CCI_BUNDLE;
+}
+
+/**
+ * Get the CCI entitlement key for a given milestone.
+ * Both standard and Pro SKUs map to the same entitlement so restore works
+ * regardless of which price tier the user originally purchased.
+ */
+export function getCCIEntitlementKey(days: 30 | 60 | 90 | 'bundle'): string {
+  if (days === 30) return ENTITLEMENTS.CCI_30;
+  if (days === 60) return ENTITLEMENTS.CCI_60;
+  if (days === 90) return ENTITLEMENTS.CCI_90;
+  return ENTITLEMENTS.CCI_BUNDLE;
 }
 
 /**

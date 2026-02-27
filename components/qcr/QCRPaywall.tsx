@@ -17,12 +17,12 @@ import {
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { FileText, Check, X, RefreshCw } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../../theme';
-import { QCR_PRICING } from '../../lib/qcr/types';
+import { QCR_PRICING, QCR_PRODUCT_IDS } from '../../lib/qcr/types';
 
 interface QCRPaywallProps {
   visible: boolean;
   onClose: () => void;
-  onPurchase: (productId: 'quarterly') => Promise<boolean>;
+  onPurchase: (productId: string) => Promise<boolean>;
   onRestore: () => Promise<boolean>;
   error?: string | null;
 }
@@ -39,7 +39,7 @@ export function QCRPaywall({
 
   const handlePurchase = async () => {
     setIsPurchasing(true);
-    const success = await onPurchase('quarterly');
+    const success = await onPurchase(QCR_PRODUCT_IDS.QUARTERLY);
     setIsPurchasing(false);
     if (success) {
       onClose();
@@ -109,9 +109,9 @@ export function QCRPaywall({
 
               {/* Pricing */}
               <View style={styles.pricingCard}>
-                <Text style={styles.pricingLabel}>Institutional Access</Text>
+                <Text style={styles.pricingLabel}>Quarterly Report</Text>
                 <Text style={styles.pricingAmount}>{QCR_PRICING.quarterly.label}</Text>
-                <Text style={styles.pricingPeriod}>Billed quarterly</Text>
+                <Text style={styles.pricingPeriod}>One-time purchase</Text>
                 <Text style={styles.pricingNote}>
                   Clinical reporting tier — no consumer discount
                 </Text>
@@ -157,7 +157,7 @@ export function QCRPaywall({
 
               {/* Disclaimer */}
               <Text style={styles.disclaimer}>
-                Payment will be charged to your Apple ID account. Subscription automatically renews unless canceled at least 24 hours before the end of the current period.
+                This is a one-time purchase. Payment will be charged to your Apple ID account at confirmation.
               </Text>
             </View>
           </Pressable>

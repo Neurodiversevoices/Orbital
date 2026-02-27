@@ -45,7 +45,7 @@ interface UseQCRReturn {
   /** Error message if any */
   error: string | null;
   /** Purchase QCR entitlement (institutional tier only) */
-  purchaseQCR: (productId: 'quarterly') => Promise<boolean>;
+  purchaseQCR: (productId: string) => Promise<boolean>;
   /** Restore QCR purchase */
   restoreQCR: () => Promise<boolean>;
   /** Is this a demo report? */
@@ -151,7 +151,7 @@ export function useQCR({ logs }: UseQCROptions): UseQCRReturn {
   }, [logs, isDemoMode]);
 
   // Purchase QCR (institutional tier — quarterly only)
-  const purchaseQCR = useCallback(async (_productId: 'quarterly'): Promise<boolean> => {
+  const purchaseQCR = useCallback(async (_productId: string): Promise<boolean> => {
     if (Platform.OS === 'web') {
       setError('Purchases not available on web');
       return false;

@@ -60,6 +60,7 @@ interface StripeProduct {
  */
 function getProductMap(): Record<string, StripeProduct> {
   return {
+    // ── Pro subscription ────────────────────────────────────────────────────
     orbital_pro_monthly: {
       stripePriceId: process.env.STRIPE_PRICE_PRO_MONTHLY || '',
       entitlementId: 'pro_access',
@@ -72,18 +73,20 @@ function getProductMap(): Record<string, StripeProduct> {
       mode: 'subscription',
       name: 'Pro (Annual)',
     },
-    orbital_cci_free: {
-      stripePriceId: process.env.STRIPE_PRICE_CCI_FREE || '',
-      entitlementId: 'cci_purchased',
-      mode: 'payment',
-      name: 'CCI-Q4 Issuance',
+    // ── Family add-on ────────────────────────────────────────────────────────
+    orbital_family_monthly: {
+      stripePriceId: process.env.STRIPE_PRICE_FAMILY_MONTHLY || '',
+      entitlementId: 'family_access',
+      mode: 'subscription',
+      name: 'Family (Monthly)',
     },
-    orbital_cci_pro: {
-      stripePriceId: process.env.STRIPE_PRICE_CCI_PRO || '',
-      entitlementId: 'cci_purchased',
-      mode: 'payment',
-      name: 'CCI-Q4 Issuance (Pro)',
+    orbital_family_annual: {
+      stripePriceId: process.env.STRIPE_PRICE_FAMILY_ANNUAL || '',
+      entitlementId: 'family_access',
+      mode: 'subscription',
+      name: 'Family (Annual)',
     },
+    // ── Circles ──────────────────────────────────────────────────────────────
     orbital_circle_monthly: {
       stripePriceId: process.env.STRIPE_PRICE_CIRCLE_MONTHLY || '',
       entitlementId: 'circle_access',
@@ -96,18 +99,7 @@ function getProductMap(): Record<string, StripeProduct> {
       mode: 'subscription',
       name: 'Circle (Annual)',
     },
-    orbital_cci_circle_all: {
-      stripePriceId: process.env.STRIPE_PRICE_CCI_CIRCLE || '',
-      entitlementId: 'cci_circle_purchased',
-      mode: 'payment',
-      name: 'Circle CCI',
-    },
-    orbital_cci_bundle_all: {
-      stripePriceId: process.env.STRIPE_PRICE_CCI_BUNDLE || '',
-      entitlementId: 'cci_bundle_purchased',
-      mode: 'payment',
-      name: 'Bundle CCI',
-    },
+    // ── Pro Bundles (annual-only) ─────────────────────────────────────────────
     orbital_bundle_10_annual: {
       stripePriceId: process.env.STRIPE_PRICE_BUNDLE_10 || '',
       entitlementId: 'bundle_10_access',
@@ -125,6 +117,89 @@ function getProductMap(): Record<string, StripeProduct> {
       entitlementId: 'bundle_20_access',
       mode: 'subscription',
       name: '20-Seat Bundle (Annual)',
+    },
+    // ── Admin Add-on ──────────────────────────────────────────────────────────
+    orbital_admin_addon_monthly: {
+      stripePriceId: process.env.STRIPE_PRICE_ADMIN_MONTHLY || '',
+      entitlementId: 'admin_access',
+      mode: 'subscription',
+      name: 'Admin Add-on (Monthly)',
+    },
+    orbital_admin_addon_annual: {
+      stripePriceId: process.env.STRIPE_PRICE_ADMIN_ANNUAL || '',
+      entitlementId: 'admin_access',
+      mode: 'subscription',
+      name: 'Admin Add-on (Annual)',
+    },
+    // ── CCI-Q4 Milestone (standard pricing) ──────────────────────────────────
+    orbital_cci_30: {
+      stripePriceId: process.env.STRIPE_PRICE_CCI_30 || '',
+      entitlementId: 'cci_30',
+      mode: 'payment',
+      name: 'CCI-Q4 30-Day Issuance',
+    },
+    orbital_cci_60: {
+      stripePriceId: process.env.STRIPE_PRICE_CCI_60 || '',
+      entitlementId: 'cci_60',
+      mode: 'payment',
+      name: 'CCI-Q4 60-Day Issuance',
+    },
+    orbital_cci_90: {
+      stripePriceId: process.env.STRIPE_PRICE_CCI_90 || '',
+      entitlementId: 'cci_90',
+      mode: 'payment',
+      name: 'CCI-Q4 90-Day Issuance',
+    },
+    orbital_cci_bundle: {
+      stripePriceId: process.env.STRIPE_PRICE_CCI_BUNDLE_STD || '',
+      entitlementId: 'cci_bundle',
+      mode: 'payment',
+      name: 'CCI-Q4 Full Bundle Issuance',
+    },
+    // ── CCI-Q4 Milestone (Pro-discounted pricing) ─────────────────────────────
+    orbital_cci_30_pro: {
+      stripePriceId: process.env.STRIPE_PRICE_CCI_30_PRO || '',
+      entitlementId: 'cci_30',
+      mode: 'payment',
+      name: 'CCI-Q4 30-Day Issuance (Pro)',
+    },
+    orbital_cci_60_pro: {
+      stripePriceId: process.env.STRIPE_PRICE_CCI_60_PRO || '',
+      entitlementId: 'cci_60',
+      mode: 'payment',
+      name: 'CCI-Q4 60-Day Issuance (Pro)',
+    },
+    orbital_cci_90_pro: {
+      stripePriceId: process.env.STRIPE_PRICE_CCI_90_PRO || '',
+      entitlementId: 'cci_90',
+      mode: 'payment',
+      name: 'CCI-Q4 90-Day Issuance (Pro)',
+    },
+    orbital_cci_bundle_pro: {
+      stripePriceId: process.env.STRIPE_PRICE_CCI_BUNDLE_PRO || '',
+      entitlementId: 'cci_bundle',
+      mode: 'payment',
+      name: 'CCI-Q4 Full Bundle Issuance (Pro)',
+    },
+    // ── Circle / Bundle Aggregate CCI ─────────────────────────────────────────
+    orbital_cci_circle_all: {
+      stripePriceId: process.env.STRIPE_PRICE_CCI_CIRCLE || '',
+      entitlementId: 'cci_circle_purchased',
+      mode: 'payment',
+      name: 'Circle Aggregate CCI',
+    },
+    orbital_cci_bundle_all: {
+      stripePriceId: process.env.STRIPE_PRICE_CCI_BUNDLE_AGG || '',
+      entitlementId: 'cci_bundle_purchased',
+      mode: 'payment',
+      name: 'Bundle Aggregate CCI',
+    },
+    // ── Quarterly Capacity Report (QCR) ──────────────────────────────────────
+    orbital_qcr_quarterly: {
+      stripePriceId: process.env.STRIPE_PRICE_QCR_QUARTERLY || '',
+      entitlementId: 'qcr',
+      mode: 'payment',
+      name: 'Quarterly Capacity Report',
     },
   };
 }

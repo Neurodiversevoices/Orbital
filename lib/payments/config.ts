@@ -35,6 +35,14 @@ export const PAYMENTS_AVAILABLE = Platform.OS !== 'web' || PAYMENTS_ENABLED;
 export const ISSUANCE_REQUEST_EMAIL = 'contact@orbitalhealth.app';
 
 /**
- * Request Issuance URL (mailto or form)
+ * Request Issuance URL — used as SUPPORT fallback only (not a purchase path).
+ * Never surfaced on any paywall or purchase screen.
  */
-export const ISSUANCE_REQUEST_URL = `mailto:${ISSUANCE_REQUEST_EMAIL}?subject=CCI-Q4%20Issuance%20Request`;
+export const ISSUANCE_REQUEST_URL = `mailto:${ISSUANCE_REQUEST_EMAIL}?subject=CCI%20Support%20Request`;
+
+/**
+ * Force mock payments in local development.
+ * MUST remain false in any build targeting TestFlight or App Store.
+ * Only set true explicitly during local dev when testing UI without a sandbox Apple ID.
+ */
+export const FORCE_MOCK_PAYMENTS = false;

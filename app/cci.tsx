@@ -17,15 +17,13 @@ import {
   Pressable,
   ScrollView,
   Platform,
-  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, FileText, Download, Eye, ExternalLink, Mail, Users } from 'lucide-react-native';
+import { ArrowLeft, FileText, Download, Eye, ExternalLink, Users } from 'lucide-react-native';
 import { colors, spacing, borderRadius, commonStyles } from '../theme';
 import { generateCCIArtifactHTML, getGoldenMasterHTML, getCircleGoldenMasterHTML, getBundleGoldenMasterHTML } from '../lib/cci';
 import { FOUNDER_DEMO_ENABLED } from '../lib/hooks/useDemoMode';
-import { ISSUANCE_REQUEST_URL } from '../lib/payments';
 
 /**
  * CCI-Q4 is ALWAYS demo-safe: it uses hardcoded golden master data.
@@ -279,14 +277,6 @@ export default function CCIInstrumentScreen() {
             </View>
           )}
 
-          {/* CPT 90885 Reimbursement Notice — PATCH 1 */}
-          <View style={styles.cptNotice}>
-            <Text style={styles.cptNoticeText}>
-              Supports clinical documentation and record review (e.g., CPT 90885 review).
-              Reimbursement is not guaranteed and varies by payer.
-            </Text>
-          </View>
-
           {/* Legal Reference — PATCH 2 */}
           <Pressable onPress={() => router.push('/legal')} style={styles.legalLink}>
             <Text style={styles.legalLinkText}>
@@ -338,20 +328,6 @@ export default function CCIInstrumentScreen() {
             </View>
           </Pressable>
 
-          {/* Request Issuance */}
-          <Pressable
-            style={styles.actionButton}
-            onPress={() => Linking.openURL(ISSUANCE_REQUEST_URL)}
-          >
-            <View style={styles.actionIcon}>
-              <Mail size={20} color="#00E5FF" />
-            </View>
-            <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>Request Issuance</Text>
-              <Text style={styles.actionDesc}>Contact us for official CCI issuance</Text>
-            </View>
-            <ExternalLink size={16} color="rgba(255,255,255,0.4)" />
-          </Pressable>
         </View>
 
         {/* Golden Master Notice */}
@@ -528,17 +504,6 @@ const styles = StyleSheet.create({
   metaValue: {
     fontSize: 12,
     color: 'rgba(255,255,255,0.8)',
-  },
-  cptNotice: {
-    marginTop: spacing.md,
-    backgroundColor: 'rgba(122,154,170,0.1)',
-    borderRadius: 6,
-    padding: spacing.sm,
-  },
-  cptNoticeText: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.6)',
-    lineHeight: 16,
   },
   legalLink: {
     marginTop: spacing.sm,

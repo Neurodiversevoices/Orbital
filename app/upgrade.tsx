@@ -73,14 +73,15 @@ import {
   checkBundleAllSeatsPro,
   type UserEntitlements,
 } from '../lib/entitlements';
+import { syncEntitlementsFromRC } from '../lib/access/entitlements';
 import { useAuth } from '../lib/supabase';
 import { IS_REVIEW_MODE } from '../lib/reviewMode';
 
 // =============================================================================
-// PURCHASE HANDLER (Mock Checkout)
+// PURCHASE HANDLER
 // =============================================================================
 
-async function handleMockPurchase(
+async function handleRCPurchase(
   productId: string,
   onSuccess: () => void,
   onError: (error: string) => void
@@ -88,7 +89,12 @@ async function handleMockPurchase(
   try {
     const result = await executePurchase(productId as any);
     if (result.success) {
+      if (result.customerInfo?.entitlements?.active) {
+        syncEntitlementsFromRC(result.customerInfo.entitlements.active);
+      }
       onSuccess();
+    } else if (result.userCancelled) {
+      // Silent — user cancelled, no error toast
     } else {
       onError(result.error || 'Purchase failed');
     }
@@ -279,11 +285,6 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
             Pro users pay {formatPrice(CCI_PRICING.sixtyDay)} (save {formatPrice(CCI_PRICING.ninetyDay - CCI_PRICING.sixtyDay)})
           </Text>
         )}
-        {/* CPT 90885 Reimbursement Notice — PATCH 1 */}
-        <Text style={styles.cciCptNotice}>
-          Supports clinical documentation and record review (e.g., CPT 90885 review).
-          Reimbursement is not guaranteed and varies by payer.
-        </Text>
       </View>
 
       {/* ISSUANCE CONFIRMATION — BLOCKING MODAL (PHASE 2-D) */}
@@ -417,7 +418,7 @@ export default function UpgradeScreen() {
     console.log('[PURCHASE] Starting purchase:', productId, productName);
     setIsPurchasing(true);
 
-    await handleMockPurchase(
+    await handleRCPurchase(
       productId,
       () => {
         console.log('[PURCHASE] Success:', productName);
@@ -533,7 +534,7 @@ export default function UpgradeScreen() {
               <Text style={styles.cciInlineDescription}>Clinical capacity artifact · Issued once</Text>
               <Pressable
                 style={[styles.cciInlineButton, (isPurchasing || hasCCIPurchased) && styles.cciInlineButtonDisabled]}
-                onPress={() => handlePurchase(PRODUCT_IDS.CCI_FREE, 'Individual CCI')}
+                onPress={() => handlePurchase(PRODUCT_IDS.CCI_90, 'Individual CCI')}
                 disabled={isPurchasing || hasCCIPurchased}
               >
                 <Text style={styles.cciInlineButtonText}>
@@ -593,7 +594,7 @@ export default function UpgradeScreen() {
               <Text style={styles.cciInlineDescription}>Clinical capacity artifact · Issued once</Text>
               <Pressable
                 style={[styles.cciInlineButtonPro, (isPurchasing || hasCCIPurchased || !isPro) && styles.cciInlineButtonDisabled]}
-                onPress={() => handlePurchase(PRODUCT_IDS.CCI_PRO, 'Individual CCI')}
+                onPress={() => handlePurchase(PRODUCT_IDS.CCI_90_PRO, 'Individual CCI')}
                 disabled={isPurchasing || hasCCIPurchased || !isPro}
               >
                 <Text style={styles.cciInlineButtonText}>

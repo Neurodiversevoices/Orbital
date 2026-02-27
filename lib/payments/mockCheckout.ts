@@ -1,16 +1,21 @@
 /**
- * Mock Checkout System
+ * Mock Checkout System — DEV ONLY
  *
- * STUB IMPLEMENTATION: No real banking yet.
- * All purchases "work" end-to-end by simulating success and granting entitlements.
+ * STUB IMPLEMENTATION: No real banking. Simulates purchase success.
  *
- * STORAGE: Uses Supabase when authenticated, falls back to AsyncStorage.
- *
- * When Stripe is integrated, replace the `executePurchase` implementation
- * while keeping the same interface.
- *
- * INTEGRATION POINT: Replace `simulatePurchase` with Stripe Checkout Session
+ * GUARD: This module must never be the active purchase path in production.
+ * Production builds use lib/payments/revenueCat.ts.
+ * To use mock in local dev: set FORCE_MOCK_PAYMENTS=true in lib/payments/config.ts
  */
+if (!__DEV__) {
+  // Crash loudly if something accidentally imports this in a production build.
+  // A blank catch lets the rest of the module load so tree-shaking still works,
+  // but any actual call to executePurchase will fail fast via the product guard below.
+  console.error(
+    '[mockCheckout] CRITICAL: mockCheckout imported in production build. ' +
+    'All purchases through this module are FREE. Fix the import immediately.',
+  );
+}
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -22,6 +27,7 @@ import {
   BUNDLE_PRICING,
   ADMIN_ADDON_PRICING,
   CCI_PRICING,
+  CCI_PRO_PRICING,
   CCI_GROUP_PRICING,
   getCCIPrice,
   ProductId,
@@ -198,55 +204,75 @@ export const PRODUCT_CATALOG: Record<string, ProductInfo> = {
     requiresEntitlement: 'circle_access',
   },
 
-  // CCI Milestone Tiers (one-time, by duration)
+  // CCI Milestone Tiers — Standard (one-time, per-milestone entitlements)
   [PRODUCT_IDS.CCI_30]: {
     id: PRODUCT_IDS.CCI_30,
     name: 'CCI — 30-Day Report',
-    description: 'Clinical Capacity Instrument — 30-day milestone report',
+    description: 'Capacity Instrument — 30-day milestone report',
     price: CCI_PRICING.thirtyDay,
     billingCycle: 'one_time',
-    entitlementId: 'cci_purchased',
+    entitlementId: 'cci_30',
   },
   [PRODUCT_IDS.CCI_60]: {
     id: PRODUCT_IDS.CCI_60,
     name: 'CCI — 60-Day Report',
-    description: 'Clinical Capacity Instrument — 60-day milestone report',
+    description: 'Capacity Instrument — 60-day milestone report',
     price: CCI_PRICING.sixtyDay,
     billingCycle: 'one_time',
-    entitlementId: 'cci_purchased',
+    entitlementId: 'cci_60',
   },
   [PRODUCT_IDS.CCI_90]: {
     id: PRODUCT_IDS.CCI_90,
     name: 'CCI — 90-Day Report',
-    description: 'Clinical Capacity Instrument — 90-day milestone report',
+    description: 'Capacity Instrument — 90-day milestone report',
     price: CCI_PRICING.ninetyDay,
     billingCycle: 'one_time',
-    entitlementId: 'cci_purchased',
+    entitlementId: 'cci_90',
   },
   [PRODUCT_IDS.CCI_BUNDLE]: {
     id: PRODUCT_IDS.CCI_BUNDLE,
-    name: 'CCI — Full Bundle',
-    description: 'Clinical Capacity Instrument — 30 + 60 + 90-day bundle',
+    name: 'CCI — All Milestones Bundle',
+    description: 'Capacity Instrument — 30 + 60 + 90-day bundle',
     price: CCI_PRICING.bundle,
     billingCycle: 'one_time',
-    entitlementId: 'cci_purchased',
+    entitlementId: 'cci_bundle',
   },
-  // Legacy CCI IDs (kept for migration; map to nearest milestone price)
-  [PRODUCT_IDS.CCI_FREE]: {
-    id: PRODUCT_IDS.CCI_FREE,
-    name: 'CCI — 90-Day Report (Legacy)',
-    description: 'Legacy CCI issuance — maps to 90-day milestone',
-    price: CCI_PRICING.ninetyDay,
+  // CCI Milestone Tiers — Pro (discounted SKUs, same entitlements as standard)
+  [PRODUCT_IDS.CCI_30_PRO]: {
+    id: PRODUCT_IDS.CCI_30_PRO,
+    name: 'CCI — 30-Day Report (Pro)',
+    description: 'Capacity Instrument — 30-day milestone, Pro price',
+    price: CCI_PRO_PRICING.thirtyDay,
     billingCycle: 'one_time',
-    entitlementId: 'cci_purchased',
+    entitlementId: 'cci_30',           // Same entitlement as standard — restore works across both
+    requiresEntitlement: 'pro_access',
   },
-  [PRODUCT_IDS.CCI_PRO]: {
-    id: PRODUCT_IDS.CCI_PRO,
-    name: 'CCI — 60-Day Report (Legacy)',
-    description: 'Legacy CCI issuance — maps to 60-day milestone',
-    price: CCI_PRICING.sixtyDay,
+  [PRODUCT_IDS.CCI_60_PRO]: {
+    id: PRODUCT_IDS.CCI_60_PRO,
+    name: 'CCI — 60-Day Report (Pro)',
+    description: 'Capacity Instrument — 60-day milestone, Pro price',
+    price: CCI_PRO_PRICING.sixtyDay,
     billingCycle: 'one_time',
-    entitlementId: 'cci_purchased',
+    entitlementId: 'cci_60',
+    requiresEntitlement: 'pro_access',
+  },
+  [PRODUCT_IDS.CCI_90_PRO]: {
+    id: PRODUCT_IDS.CCI_90_PRO,
+    name: 'CCI — 90-Day Report (Pro)',
+    description: 'Capacity Instrument — 90-day milestone, Pro price',
+    price: CCI_PRO_PRICING.ninetyDay,
+    billingCycle: 'one_time',
+    entitlementId: 'cci_90',
+    requiresEntitlement: 'pro_access',
+  },
+  [PRODUCT_IDS.CCI_BUNDLE_PRO]: {
+    id: PRODUCT_IDS.CCI_BUNDLE_PRO,
+    name: 'CCI — All Milestones Bundle (Pro)',
+    description: 'Capacity Instrument — 30 + 60 + 90-day bundle, Pro price',
+    price: CCI_PRO_PRICING.bundle,
+    billingCycle: 'one_time',
+    entitlementId: 'cci_bundle',
+    requiresEntitlement: 'pro_access',
   },
   [PRODUCT_IDS.CCI_CIRCLE_ALL]: {
     id: PRODUCT_IDS.CCI_CIRCLE_ALL,

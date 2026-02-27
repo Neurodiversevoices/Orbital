@@ -21,9 +21,9 @@ import { ENTITLEMENTS, PRODUCT_IDS, STARTER_TIER } from './pricing';
 // Primary entitlement for Pro tier (backwards compatible)
 export const ENTITLEMENT_ID = ENTITLEMENTS.PRO;
 
-// RevenueCat product identifiers
-export const PRODUCT_ID_MONTHLY = PRODUCT_IDS.INDIVIDUAL_MONTHLY;
-export const PRODUCT_ID_ANNUAL = PRODUCT_IDS.INDIVIDUAL_ANNUAL;
+// RevenueCat product identifiers — canonical (not legacy INDIVIDUAL_* aliases)
+export const PRODUCT_ID_MONTHLY = PRODUCT_IDS.PRO_MONTHLY;
+export const PRODUCT_ID_ANNUAL  = PRODUCT_IDS.PRO_ANNUAL;
 
 // Starter tier limits (for display, not gating logic)
 export const STARTER_TIER_LIMITS = STARTER_TIER.limits;

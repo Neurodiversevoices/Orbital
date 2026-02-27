@@ -258,7 +258,7 @@ export async function resolveCCIPricing(
         description: 'Clinical Capacity Instrument for your personal record',
         price: CCI_PRICING.sixtyDay,
         scope: 'individual',
-        productId: PRODUCT_IDS.CCI_PRO,
+        productId: PRODUCT_IDS.CCI_90_PRO,
         visible: true,
         eligible: true,
         purchased: entitlements.hasCCIPurchased,
@@ -269,7 +269,7 @@ export async function resolveCCIPricing(
         description: 'Clinical Capacity Instrument for your personal record',
         price: CCI_PRICING.ninetyDay,
         scope: 'individual',
-        productId: PRODUCT_IDS.CCI_FREE,
+        productId: PRODUCT_IDS.CCI_90,
         visible: true,
         eligible: true,
         purchased: entitlements.hasCCIPurchased,
@@ -340,7 +340,7 @@ export function getIndividualCCIPrice(isPaid: boolean): number {
  * Get the appropriate individual CCI product ID.
  */
 export function getIndividualCCIProductId(isPaid: boolean): ProductId {
-  return isPaid ? PRODUCT_IDS.CCI_PRO : PRODUCT_IDS.CCI_FREE;
+  return isPaid ? PRODUCT_IDS.CCI_90_PRO : PRODUCT_IDS.CCI_90;
 }
 
 /**

@@ -102,9 +102,9 @@ async function removeGrant(grantId: string): Promise<void> {
  * Determine effective base tier from grants.
  */
 function resolveBaseTier(grants: AccessGrant[], orgBypass: boolean): BaseTier {
-  if (orgBypass) {
-    return 'individual_pro'; // Org modes get full access
-  }
+  // NOTE: orgBypass no longer short-circuits to individual_pro.
+  // B2B demo modes control UI visibility only; they must not grant paid entitlements
+  // to prevent a reviewer from reaching Pro features without a real IAP purchase.
 
   let highestTier: BaseTier = 'starter';
 
@@ -147,8 +147,9 @@ function hasBundle(grants: AccessGrant[], bundle: BundleType): boolean {
  * Compute feature flags from access state.
  */
 function computeFeatures(baseTier: BaseTier, grants: AccessGrant[], orgBypass: boolean): AccessFeatures {
-  const isProLevel = baseTier === 'individual_pro' || orgBypass;
-  const isIndividualOrHigher = baseTier !== 'starter' || orgBypass;
+  // orgBypass no longer implies Pro — IAP is the only grant source for paid features
+  const isProLevel = baseTier === 'individual_pro';
+  const isIndividualOrHigher = baseTier !== 'starter';
   const hasFamilyAccess = hasFamilyAddon(grants, 'family') || hasFamilyAddon(grants, 'family_pro');
   const hasFamilyProAccess = hasFamilyAddon(grants, 'family_pro');
   const hasBundleAccess = hasBundle(grants, 'circle_pack') || hasBundle(grants, 'sponsor_pack') || hasBundle(grants, 'cohort_pack');
@@ -418,7 +419,7 @@ export function useAccess(): AccessContext {
     // Map RevenueCat entitlements to grants
     const newGrants: AccessGrant[] = [];
 
-    if (entitlements.includes('individual_pro') || entitlements.includes('pro')) {
+    if (entitlements.includes('pro_access')) {
       newGrants.push({
         id: 'rc_individual_pro',
         tier: 'individual_pro',
@@ -609,6 +610,33 @@ export function shouldBypassSubscription(mode: string): boolean {
  */
 export function getStarterLimits() {
   return STARTER_TIER.limits;
+}
+
+// =============================================================================
+// STANDALONE RC ENTITLEMENT STORE
+// Used by lib/payments/revenueCat.ts to persist entitlements without a hook.
+// =============================================================================
+
+let _rcEntitlements: Record<string, boolean> = {};
+
+/**
+ * Sync RevenueCat entitlements into the module-level store.
+ * Call this after every purchase and on app launch.
+ * @param rcActive - customerInfo.entitlements.active from RevenueCat
+ */
+export function syncEntitlementsFromRC(rcActive: Record<string, { isActive: boolean }>): void {
+  _rcEntitlements = {};
+  for (const [key, info] of Object.entries(rcActive)) {
+    _rcEntitlements[key] = info.isActive === true;
+  }
+}
+
+/**
+ * Check if the RC module-level store contains an active entitlement.
+ * Falls back gracefully to false if RC has not been synced yet.
+ */
+export function hasEntitlementFromRC(key: string): boolean {
+  return _rcEntitlements[key] === true;
 }
 
 /**

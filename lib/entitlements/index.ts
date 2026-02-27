@@ -16,7 +16,7 @@
  */
 
 import { getGrantedEntitlements, hasEntitlement } from '../payments/mockCheckout';
-import { ENTITLEMENTS, CCI_PRICING, getCCIPrice, getCCIProductId } from '../subscription/pricing';
+import { ENTITLEMENTS, CCI_PRICING, getCCIPrice, getCCIProductId, getCCIEntitlementKey } from '../subscription/pricing';
 
 // =============================================================================
 // TYPES
@@ -45,7 +45,12 @@ export interface UserEntitlements {
   // Admin
   hasAdminAddOn: boolean;
 
-  // CCI
+  // CCI (per-milestone)
+  hasCCI30: boolean;
+  hasCCI60: boolean;
+  hasCCI90: boolean;
+  hasCCIBundle: boolean;
+  /** True if any CCI milestone has been purchased (for backwards compat) */
   hasCCIPurchased: boolean;
   cciPrice: number;
 
@@ -111,10 +116,35 @@ export async function checkHasAdminAddOn(): Promise<boolean> {
 }
 
 /**
- * Check if user has purchased CCI
+ * Check if user has purchased a specific CCI milestone
+ */
+export async function checkHasCCI30(): Promise<boolean> {
+  return hasEntitlement(ENTITLEMENTS.CCI_30);
+}
+
+export async function checkHasCCI60(): Promise<boolean> {
+  return hasEntitlement(ENTITLEMENTS.CCI_60);
+}
+
+export async function checkHasCCI90(): Promise<boolean> {
+  return hasEntitlement(ENTITLEMENTS.CCI_90);
+}
+
+export async function checkHasCCIBundle(): Promise<boolean> {
+  return hasEntitlement(ENTITLEMENTS.CCI_BUNDLE);
+}
+
+/**
+ * Check if user has purchased any CCI milestone
  */
 export async function checkHasCCIPurchased(): Promise<boolean> {
-  return hasEntitlement(ENTITLEMENTS.CCI_PURCHASED);
+  const entitlements = await getGrantedEntitlements();
+  return (
+    entitlements.includes(ENTITLEMENTS.CCI_30) ||
+    entitlements.includes(ENTITLEMENTS.CCI_60) ||
+    entitlements.includes(ENTITLEMENTS.CCI_90) ||
+    entitlements.includes(ENTITLEMENTS.CCI_BUNDLE)
+  );
 }
 
 /**
@@ -151,7 +181,11 @@ export async function getUserEntitlements(): Promise<UserEntitlements> {
   const hasBundle15 = entitlements.includes(ENTITLEMENTS.BUNDLE_15);
   const hasBundle20 = entitlements.includes(ENTITLEMENTS.BUNDLE_20);
   const hasAdminAddOn = entitlements.includes(ENTITLEMENTS.ADMIN_ADDON);
-  const hasCCIPurchased = entitlements.includes(ENTITLEMENTS.CCI_PURCHASED);
+  const hasCCI30 = entitlements.includes(ENTITLEMENTS.CCI_30);
+  const hasCCI60 = entitlements.includes(ENTITLEMENTS.CCI_60);
+  const hasCCI90 = entitlements.includes(ENTITLEMENTS.CCI_90);
+  const hasCCIBundle = entitlements.includes(ENTITLEMENTS.CCI_BUNDLE);
+  const hasCCIPurchased = hasCCI30 || hasCCI60 || hasCCI90 || hasCCIBundle;
 
   // Determine bundle size
   let bundleSize: 10 | 15 | 20 | null = null;
@@ -172,6 +206,10 @@ export async function getUserEntitlements(): Promise<UserEntitlements> {
     bundleId: bundleSize ? `demo_bundle_${bundleSize}` : null,
     bundleSize,
     hasAdminAddOn,
+    hasCCI30,
+    hasCCI60,
+    hasCCI90,
+    hasCCIBundle,
     hasCCIPurchased,
     cciPrice: isPro ? CCI_PRICING.sixtyDay : CCI_PRICING.ninetyDay,
     rawEntitlements: entitlements,
@@ -397,4 +435,5 @@ export {
   CCI_PRICING,
   getCCIPrice,
   getCCIProductId,
+  getCCIEntitlementKey,
 } from '../subscription/pricing';
