@@ -26,6 +26,10 @@ export interface CapacityLog {
   teamId?: string;
   /** School Zone ID if user is in School Zone context */
   schoolZoneId?: string;
+  /** Continuous capacity value 0.0–1.0 derived from state or orb position */
+  capacity_value?: number;
+  /** Driver intensities keyed by tag name, e.g. {"sensory": 1, "sleep": 1} */
+  driver_data?: Record<string, number>;
 }
 
 // ============================================

@@ -90,10 +90,21 @@ export async function pushToCloud(): Promise<{ synced: number; failed: number }>
 
     if (logs.length > 0) {
       try {
-        // Use batch upsert RPC
-        const { data, error } = await (supabase as any).rpc('batch_upsert_capacity_logs', {
-          p_logs: logs,
-        });
+        // Map CloudLogUpsert fields → DB column names and insert directly
+        const dbRows = logs.map(log => ({
+          user_id: userId,
+          local_id: log.client_log_id,
+          occurred_at: log.occurred_at,
+          state: log.state,
+          tags: log.drivers || [],
+          note: log.note,
+          capacity_value: log.capacity_value ?? null,
+          driver_data: log.driver_data ?? null,
+        }));
+
+        const { data, error } = await supabase
+          .from('capacity_logs')
+          .insert(dbRows as any);
 
         if (error) {
           if (__DEV__) console.error('[Sync] Push batch failed:', error);
@@ -175,10 +186,19 @@ export async function pullFromCloud(): Promise<CloudCapacityLog[]> {
   const lastPull = await getLastPullTime();
 
   try {
-    const { data, error } = await (supabase as any).rpc('pull_capacity_logs', {
-      p_since: lastPull?.toISOString() ?? null,
-      p_limit: SYNC_CONFIG.PULL_LIMIT,
-    });
+    // Direct table query instead of RPC
+    let query = supabase
+      .from('capacity_logs')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true })
+      .limit(SYNC_CONFIG.PULL_LIMIT);
+
+    if (lastPull) {
+      query = query.gt('created_at', lastPull.toISOString());
+    }
+
+    const { data: rows, error } = await query;
 
     if (error) {
       if (__DEV__) console.error('[Sync] Pull failed:', error);
@@ -186,7 +206,21 @@ export async function pullFromCloud(): Promise<CloudCapacityLog[]> {
     }
 
     await updateLastPull();
-    return data || [];
+
+    // Map DB column names → CloudCapacityLog fields
+    return (rows || []).map((row: any) => ({
+      id: row.id,
+      user_id: row.user_id,
+      created_at: row.created_at,
+      occurred_at: row.occurred_at,
+      state: row.state,
+      drivers: row.tags || [],
+      note: row.note,
+      source_device_id: null,
+      client_log_id: row.local_id || row.id,
+      deleted_at: row.deleted_at,
+      synced_at: row.created_at,
+    }));
   } catch (e) {
     if (__DEV__) console.error('[Sync] Pull exception:', e);
     return [];
@@ -225,6 +259,8 @@ export function localToCloudUpsert(
     drivers: localLog.tags || [],
     note: localLog.note || null,
     source_device_id: deviceId,
+    capacity_value: localLog.capacity_value ?? null,
+    driver_data: localLog.driver_data ?? null,
   };
 }
 

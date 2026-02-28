@@ -633,4 +633,6 @@ export interface LocalCapacityLog {
   isDemo: boolean;
   syncedAt: Date | null;
   cloudId: string | null;
+  capacity_value?: number | null;
+  driver_data?: Record<string, number> | null;
 }
