@@ -30,7 +30,6 @@ import {
   DMSans_700Bold,
 } from '@expo-google-fonts/dm-sans';
 import { SpaceMono_400Regular } from '@expo-google-fonts/space-mono';
-import { GlassOrb } from '../../components/GlassOrb';
 import { useAuth, validatePassword, isSupabaseConfigured } from '../../lib/supabase';
 import { getLogs } from '../../lib/storage';
 import { enqueueLog } from '../../lib/cloud/outbox';
@@ -235,19 +234,21 @@ export default function AuthScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Orb with ambient glow */}
-          <View style={styles.orbContainer}>
-            <View style={[styles.glowRing, styles.glowOuter]} />
-            <View style={[styles.glowRing, styles.glowMid]} />
-            <View style={[styles.glowRing, styles.glowInner]} />
-            <GlassOrb state={null} />
+          {/* ── Top section: ambient glow + title ── */}
+          <View style={styles.topSection}>
+            {/* Ambient glow — 3 concentric rings, centered at 30% from top */}
+            <View style={styles.glowAnchor}>
+              <View style={[styles.glowRing, styles.glowOuter]} />
+              <View style={[styles.glowRing, styles.glowMid]} />
+              <View style={[styles.glowRing, styles.glowInner]} />
+            </View>
+
+            {/* Title */}
+            <Text style={styles.title}>Orbital</Text>
+
+            {/* Subtitle */}
+            <Text style={styles.subtitle}>{'· LOG SENSORY INPUT ·'}</Text>
           </View>
-
-          {/* Title */}
-          <Text style={styles.title}>Orbital</Text>
-
-          {/* Tagline */}
-          <Text style={styles.tagline}>Your capacity. Documented.</Text>
 
           {/* Feedback banners */}
           {error ? (
@@ -261,7 +262,7 @@ export default function AuthScreen() {
             </View>
           ) : null}
 
-          {/* Auth entry — either action buttons or email form */}
+          {/* ── Bottom section: auth buttons or email form ── */}
           {authMode === null ? (
             <View style={styles.buttonStack}>
               {/* Apple — iOS only */}
@@ -425,10 +426,9 @@ const styles = StyleSheet.create({
   },
   scroll: {
     flexGrow: 1,
-    alignItems: 'center',
     paddingHorizontal: 32,
-    paddingTop: 48,
     paddingBottom: 32,
+    justifyContent: 'space-between',
   },
   center: {
     flex: 1,
@@ -444,14 +444,20 @@ const styles = StyleSheet.create({
     fontFamily: 'SpaceMono_400Regular',
   },
 
-  // ── Orb + ambient glow ──────────────────────────────────────────────────
-  orbContainer: {
+  // ── Top section: glow + title + subtitle ────────────────────────────────
+  topSection: {
+    alignItems: 'center',
+    paddingTop: '30%',
+  },
+  glowAnchor: {
     alignItems: 'center',
     justifyContent: 'center',
     width: 500,
     height: 500,
-    marginTop: -80,
-    marginBottom: -80,
+    position: 'absolute',
+    top: '30%',
+    alignSelf: 'center',
+    marginTop: -250, // center the 500px glow vertically on the 30% anchor
   },
   glowRing: {
     position: 'absolute',
@@ -483,15 +489,15 @@ const styles = StyleSheet.create({
     marginTop: 28,
   },
 
-  // ── Tagline ─────────────────────────────────────────────────────────────
-  tagline: {
+  // ── Subtitle ────────────────────────────────────────────────────────────
+  subtitle: {
     fontFamily: 'SpaceMono_400Regular',
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.45)',
-    letterSpacing: 1.2,
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.35)',
+    letterSpacing: 3,
     textAlign: 'center',
     marginTop: 8,
-    marginBottom: 36,
+    textTransform: 'uppercase',
   },
 
   // ── Banners ─────────────────────────────────────────────────────────────
@@ -565,7 +571,7 @@ const styles = StyleSheet.create({
   // ── Home screen links ───────────────────────────────────────────────────
   createAccountLink: {
     alignItems: 'center',
-    marginTop: 28,
+    marginTop: 24,
   },
   createAccountText: {
     fontFamily: 'SpaceMono_400Regular',
@@ -579,7 +585,7 @@ const styles = StyleSheet.create({
   forgotLinkHomeText: {
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 12,
-    color: 'rgba(255,255,255,0.35)',
+    color: 'rgba(255,255,255,0.3)',
   },
 
   // ── Email form ──────────────────────────────────────────────────────────

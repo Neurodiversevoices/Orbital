@@ -6,6 +6,7 @@ import { FREE_TIER_LIMITS } from '../subscription/types';
 import { useCloudSync } from '../cloud';
 import { useAuth } from '../supabase/auth';
 import { logCapacityEntry } from '../supabase/auditLog';
+import { scoreLogConfidence } from '../supabase/confidenceScoring';
 
 // Default capacity_value mapping from discrete state → continuous 0.0–1.0
 const STATE_TO_CAPACITY: Record<CapacityState, number> = {
@@ -109,15 +110,26 @@ export function useEnergyLogs(): UseCapacityLogsReturn {
       await savelog(newLog);
       setLogs((prev) => [newLog, ...prev]);
 
-      // Fire-and-forget audit log
+      // Fire-and-forget audit log + confidence scoring
       if (auth.isAuthenticated && auth.user?.id) {
+        const userId = auth.user.id;
+
         logCapacityEntry(
-          auth.user.id,
+          userId,
           newLog.capacity_value ?? null,
           newLog.state,
           newLog.driver_data ?? null,
         ).catch((e) => {
           if (__DEV__) console.error('[useEnergyLogs] Audit log failed:', e);
+        });
+
+        // Fire-and-forget confidence flag computation
+        scoreLogConfidence(userId, {
+          capacity_value: newLog.capacity_value,
+          occurred_at: new Date(newLog.timestamp).toISOString(),
+          created_at: new Date().toISOString(),
+        }).catch((e) => {
+          if (__DEV__) console.error('[useEnergyLogs] Confidence scoring failed:', e);
         });
       }
 

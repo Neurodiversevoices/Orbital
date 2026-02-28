@@ -25,6 +25,7 @@ export interface Database {
           synced_at: string;
           capacity_value: number | null;
           driver_data: Record<string, number> | null;
+          confidence_flags: Record<string, unknown>;
         };
         Insert: {
           id?: string;
@@ -40,6 +41,7 @@ export interface Database {
           synced_at?: string;
           capacity_value?: number | null;
           driver_data?: Record<string, number> | null;
+          confidence_flags?: Record<string, unknown>;
         };
         Update: {
           id?: string;
@@ -55,6 +57,7 @@ export interface Database {
           synced_at?: string;
           capacity_value?: number | null;
           driver_data?: Record<string, number> | null;
+          confidence_flags?: Record<string, unknown>;
         };
         Relationships: [];
       };
