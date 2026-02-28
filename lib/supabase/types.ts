@@ -249,7 +249,11 @@ export interface Database {
           entitlement_id: string;
           source: string;
           purchase_id: string | null;
+          granted_at: string;
+          expires_at: string | null;
+          metadata: Record<string, unknown> | null;
           created_at: string;
+          updated_at: string;
         };
         Insert: {
           id?: string;
@@ -257,7 +261,11 @@ export interface Database {
           entitlement_id: string;
           source?: string;
           purchase_id?: string | null;
+          granted_at?: string;
+          expires_at?: string | null;
+          metadata?: Record<string, unknown> | null;
           created_at?: string;
+          updated_at?: string;
         };
         Update: {
           id?: string;
@@ -265,7 +273,11 @@ export interface Database {
           entitlement_id?: string;
           source?: string;
           purchase_id?: string | null;
+          granted_at?: string;
+          expires_at?: string | null;
+          metadata?: Record<string, unknown> | null;
           created_at?: string;
+          updated_at?: string;
         };
         Relationships: [];
       };

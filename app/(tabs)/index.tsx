@@ -24,7 +24,7 @@ import Animated, {
 import { useRouter, useLocalSearchParams, Redirect } from 'expo-router';
 import { Settings, TrendingUp, TrendingDown, Minus, Sparkles } from 'lucide-react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { GlassOrb, SavePulse, CategorySelector, Composer, COMPOSER_HEIGHT, ModeInsightsPanel, OrgRoleBanner } from '../../components';
+import { SavePulse, CategorySelector, Composer, COMPOSER_HEIGHT, ModeInsightsPanel, OrgRoleBanner } from '../../components';
 import SkiaOrb from '../../components/orb/SkiaOrb';
 import { colors, commonStyles, spacing } from '../../theme';
 import { CapacityState, Category } from '../../types';
@@ -33,7 +33,7 @@ import { useLocale } from '../../lib/hooks/useLocale';
 import { useDemoMode, FOUNDER_DEMO_ENABLED } from '../../lib/hooks/useDemoMode';
 import { useAppMode } from '../../lib/hooks/useAppMode';
 import { useTutorial } from '../../lib/hooks/useTutorial';
-import { useSubscription, shouldBypassSubscription, FREE_TIER_LIMITS } from '../../lib/subscription';
+import { useSubscription, shouldBypassSubscription } from '../../lib/subscription';
 import { Locale } from '../../locales';
 
 function formatDate(locale: Locale): string {
@@ -214,7 +214,7 @@ export default function HomeScreen() {
           setIsSaving(false);
         }, 600);
       } catch (error) {
-        console.error('Failed to save:', error);
+        if (__DEV__) console.error('Failed to save:', error);
         setIsSaving(false);
       }
     }

@@ -7,7 +7,6 @@
  */
 
 import { getSupabase, isSupabaseConfigured } from './client';
-import { CapacityState } from './types';
 
 // =============================================================================
 // HELPERS
