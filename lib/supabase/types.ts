@@ -476,6 +476,57 @@ export interface Database {
         };
         Relationships: [];
       };
+      capacity_baselines: {
+        Row: {
+          id: string;
+          user_id: string;
+          computed_at: string;
+          data_window_start: string;
+          data_window_end: string;
+          log_count: number;
+          baseline_capacity: number | null;
+          variability_index: number | null;
+          sensory_tolerance: number | null;
+          cognitive_resilience: number | null;
+          recovery_pattern: Record<string, unknown>;
+          dominant_drivers: Record<string, unknown>;
+          confidence_score: number | null;
+          version: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          computed_at?: string;
+          data_window_start: string;
+          data_window_end: string;
+          log_count: number;
+          baseline_capacity?: number | null;
+          variability_index?: number | null;
+          sensory_tolerance?: number | null;
+          cognitive_resilience?: number | null;
+          recovery_pattern?: Record<string, unknown>;
+          dominant_drivers?: Record<string, unknown>;
+          confidence_score?: number | null;
+          version?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          computed_at?: string;
+          data_window_start?: string;
+          data_window_end?: string;
+          log_count?: number;
+          baseline_capacity?: number | null;
+          variability_index?: number | null;
+          sensory_tolerance?: number | null;
+          cognitive_resilience?: number | null;
+          recovery_pattern?: Record<string, unknown>;
+          dominant_drivers?: Record<string, unknown>;
+          confidence_score?: number | null;
+          version?: string;
+        };
+        Relationships: [];
+      };
       proof_events: {
         Row: {
           id: string;
@@ -563,6 +614,7 @@ export type OrgAggregateSnapshot = Database['public']['Tables']['org_aggregate_s
 export type AuditEvent = Database['public']['Tables']['audit_events']['Row'];
 export type UserPreferences = Database['public']['Tables']['user_preferences']['Row'];
 export type ProofEvent = Database['public']['Tables']['proof_events']['Row'];
+export type CapacityBaseline = Database['public']['Tables']['capacity_baselines']['Row'];
 
 // Sync types
 export interface SyncStatus {
