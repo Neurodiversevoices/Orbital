@@ -686,15 +686,23 @@ body{
 // ============================================================
 // CONFIG
 // ============================================================
-const CONFIG = (function() {
+function readLocalConfig() {
   if (window.ORBITAL_DASHBOARD_CONFIG) return window.ORBITAL_DASHBOARD_CONFIG;
-  const urlMeta = document.querySelector('meta[name="supabase-url"]');
-  const keyMeta = document.querySelector('meta[name="supabase-anon-key"]');
+  var urlMeta = document.querySelector('meta[name="supabase-url"]');
+  var keyMeta = document.querySelector('meta[name="supabase-anon-key"]');
   return {
     supabaseUrl: (urlMeta && urlMeta.content) || '',
     supabaseKey: (keyMeta && keyMeta.content) || '',
   };
-})();
+}
+
+function fetchRemoteConfig() {
+  return fetch('/api/dashboard-config')
+    .then(function(r) { return r.ok ? r.json() : Promise.reject('not ok'); })
+    .catch(function() { return null; });
+}
+
+var CONFIG = readLocalConfig();
 
 // ============================================================
 // STATE
@@ -726,15 +734,9 @@ function showScreen(id) {
 // ============================================================
 // INIT
 // ============================================================
-window.addEventListener('DOMContentLoaded', function() {
-  if (!CONFIG.supabaseUrl || !CONFIG.supabaseKey) {
-    showScreen('screen-config');
-    return;
-  }
-
+function bootDashboard() {
   db = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
-  // Auth state listener
   db.auth.onAuthStateChange(function(event, session) {
     currentSession = session;
     if (!session) {
@@ -745,7 +747,6 @@ window.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Check existing session
   db.auth.getSession().then(function(result) {
     var session = result.data && result.data.session;
     if (!session) {
@@ -756,10 +757,26 @@ window.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Wire auth forms
   wireAuthForms();
   wireSignOut();
   wireNavItems();
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  if (!CONFIG.supabaseUrl || !CONFIG.supabaseKey) {
+    // Meta tags empty — try runtime API fallback
+    fetchRemoteConfig().then(function(remote) {
+      if (remote && remote.supabaseUrl && remote.supabaseKey) {
+        CONFIG = remote;
+        bootDashboard();
+      } else {
+        showScreen('screen-config');
+      }
+    });
+    return;
+  }
+
+  bootDashboard();
 });
 
 // ============================================================

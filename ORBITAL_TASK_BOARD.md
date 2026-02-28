@@ -1,5 +1,5 @@
 # ORBITAL TASK BOARD
-## Last updated: Feb 26, 2026
+## Last updated: Feb 28, 2026
 ---
 ## 🔴 BLOCKED (waiting on Apple)
 - Fix orb UX — gesture input too clumsy
@@ -7,20 +7,22 @@
 - Patterns screen improvements
 ---
 ## 🟡 IN PROGRESS
-- Dashboard Supabase creds injection (build script written, needs deploy verification)
 - Ali local log migration (waiting for Ali to sign in to app)
 ---
 ## 🟢 READY TO DO (next session priorities)
-1. Verify dashboard.html is connecting to Supabase after deploy
-2. Disable Supabase email confirmation temporarily → re-enable after Resend SMTP wired
-3. Wire Resend into Supabase SMTP (5 min setup)
-4. Load therapist outreach sequence into Apollo (second sequence, separate from coach)
-5. Set up welcome email sequence in Resend (6 emails: Days 1/3/7/30/60/90)
-6. Post founder story on Reddit r/ADHD and r/AuDHD
-7. Schedule 5 LinkedIn posts (use Buffer or LinkedIn native)
-8. Verify orbitalhealth.app/app loads correctly after /app route fix
+1. Disable Supabase email confirmation temporarily → re-enable after Resend SMTP wired
+2. Wire Resend into Supabase SMTP (5 min setup)
+3. Load therapist outreach sequence into Apollo (second sequence, separate from coach)
+4. Set up welcome email sequence in Resend (6 emails: Days 1/3/7/30/60/90)
+5. Post founder story on Reddit r/ADHD and r/AuDHD
+6. Schedule 5 LinkedIn posts (use Buffer or LinkedIn native)
 ---
-## ✅ COMPLETED TODAY (Feb 26, 2026)
+## ✅ COMPLETED (Feb 28, 2026)
+- Dashboard Supabase connection: added /api/dashboard-config runtime fallback so dashboard loads even when build-time meta-tag injection fails
+- Verified /app route works correctly (Vercel rewrite → _app.html → Expo Router redirect to home)
+- tsc --noEmit passes clean
+---
+## ✅ COMPLETED (Feb 26, 2026)
 - Pricing crash fix (TypeError: Cannot read 'monthly') — merged PR #21
 - Auth gate implemented — no anonymous usage, all users must authenticate
 - Local log migration on first sign-in
