@@ -30,5 +30,10 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
+      - name: Decode ASC API Key
+        run: |
+          mkdir -p keys
+          echo "${{ secrets.ASC_API_KEY_P8 }}" | base64 --decode > keys/AuthKey_M29759ZTFQ.p8
+
       - name: Build and submit to TestFlight
         run: eas build --platform ios --profile production --auto-submit --non-interactive
