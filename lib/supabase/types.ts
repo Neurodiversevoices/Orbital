@@ -23,6 +23,8 @@ export interface Database {
           deleted_at: string | null;
           local_id: string | null;
           synced_at: string;
+          capacity_value: number | null;
+          driver_data: Record<string, number> | null;
         };
         Insert: {
           id?: string;
@@ -36,6 +38,8 @@ export interface Database {
           deleted_at?: string | null;
           local_id?: string | null;
           synced_at?: string;
+          capacity_value?: number | null;
+          driver_data?: Record<string, number> | null;
         };
         Update: {
           id?: string;
@@ -49,6 +53,8 @@ export interface Database {
           deleted_at?: string | null;
           local_id?: string | null;
           synced_at?: string;
+          capacity_value?: number | null;
+          driver_data?: Record<string, number> | null;
         };
         Relationships: [];
       };

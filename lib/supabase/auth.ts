@@ -391,7 +391,7 @@ export function useAuth(): AuthContext {
     try {
       const supabase = getSupabase();
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'orbital://auth/reset-password',
+        redirectTo: 'https://orbitalhealth.app/reset-password',
       });
 
       if (error) {

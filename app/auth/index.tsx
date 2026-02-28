@@ -131,6 +131,24 @@ export default function AuthScreen() {
     }
   };
 
+  // ── Forgot password ─────────────────────────────────────────────────────
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      setError('Enter your email above, then tap forgot password.');
+      return;
+    }
+    setIsSubmitting(true);
+    setError(null);
+    const result = await auth.resetPassword(email.trim());
+    setIsSubmitting(false);
+    if (result.success) {
+      setSuccessMsg('Password reset email sent. Check your inbox.');
+    } else {
+      setError(result.error || 'Could not send reset email');
+    }
+  };
+
   // ── Apple (iOS only) ──────────────────────────────────────────────────────
 
   const handleApple = async () => {
@@ -304,6 +322,16 @@ export default function AuthScreen() {
                     ? `  —  ${passwordValidation.errors[0]}`
                     : ''}
                 </Text>
+              ) : null}
+
+              {authMode === 'signin' ? (
+                <Pressable
+                  onPress={handleForgotPassword}
+                  disabled={isSubmitting}
+                  style={styles.forgotLink}
+                >
+                  <Text style={styles.forgotLinkText}>Forgot password?</Text>
+                </Pressable>
               ) : null}
 
               <Pressable
@@ -522,6 +550,15 @@ const styles = StyleSheet.create({
   strengthValue: {
     color: 'rgba(255,255,255,0.65)',
     textTransform: 'capitalize',
+  },
+  forgotLink: {
+    alignSelf: 'flex-end',
+    marginBottom: spacing.md,
+    paddingVertical: 4,
+  },
+  forgotLinkText: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 13,
   },
   backLink: {
     marginTop: spacing.md,

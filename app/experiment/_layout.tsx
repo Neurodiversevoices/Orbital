@@ -1,0 +1,24 @@
+/**
+ * EXPERIMENT ROUTE LAYOUT
+ *
+ * Stack navigator for experiment screens.
+ */
+
+import { Stack } from 'expo-router';
+import { colors } from '../../theme';
+
+export default function ExperimentLayout() {
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: colors.background },
+        animation: 'slide_from_right',
+      }}
+    >
+      <Stack.Screen name="index" />
+      <Stack.Screen name="new" />
+      <Stack.Screen name="[id]" />
+    </Stack>
+  );
+}

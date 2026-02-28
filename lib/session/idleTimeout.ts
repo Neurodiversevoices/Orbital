@@ -83,6 +83,14 @@ export function useIdleTimeout(options: UseIdleTimeoutOptions): IdleTimeoutState
   const appStateRef = useRef<AppStateStatus>('active');
   const warningShownRef = useRef(false);
 
+  // Store callbacks in refs so they never trigger effect re-runs.
+  // Without this, any parent re-render that recreates the callback objects
+  // causes an infinite setState → render → new callback → effect loop.
+  const onTimeoutRef = useRef(onTimeout);
+  const onWarningRef = useRef(onWarning);
+  useEffect(() => { onTimeoutRef.current = onTimeout; }, [onTimeout]);
+  useEffect(() => { onWarningRef.current = onWarning; }, [onWarning]);
+
   // Reset activity timer
   const resetActivity = useCallback(() => {
     lastActivityRef.current = Date.now();
@@ -107,7 +115,7 @@ export function useIdleTimeout(options: UseIdleTimeoutOptions): IdleTimeoutState
     // Timeout reached
     if (elapsed >= timeoutMs) {
       setState({ isIdle: true, showWarning: false, remainingSeconds: 0 });
-      onTimeout();
+      onTimeoutRef.current();
       return;
     }
 
@@ -115,7 +123,7 @@ export function useIdleTimeout(options: UseIdleTimeoutOptions): IdleTimeoutState
     if (remaining <= warningBeforeMs && !warningShownRef.current) {
       warningShownRef.current = true;
       setState(prev => ({ ...prev, showWarning: true, remainingSeconds }));
-      onWarning?.();
+      onWarningRef.current?.();
       return;
     }
 
@@ -123,7 +131,7 @@ export function useIdleTimeout(options: UseIdleTimeoutOptions): IdleTimeoutState
     if (warningShownRef.current) {
       setState(prev => ({ ...prev, remainingSeconds }));
     }
-  }, [enabled, timeoutMs, warningBeforeMs, onTimeout, onWarning]);
+  }, [enabled, timeoutMs, warningBeforeMs]);
 
   // Handle app state changes (native) or visibility changes (web)
   useEffect(() => {
@@ -135,7 +143,7 @@ export function useIdleTimeout(options: UseIdleTimeoutOptions): IdleTimeoutState
             const elapsed = Date.now() - lastActivity;
             if (elapsed >= timeoutMs) {
               setState({ isIdle: true, showWarning: false, remainingSeconds: 0 });
-              onTimeout();
+              onTimeoutRef.current();
             } else {
               lastActivityRef.current = lastActivity;
               checkIdle();
@@ -159,7 +167,7 @@ export function useIdleTimeout(options: UseIdleTimeoutOptions): IdleTimeoutState
           const elapsed = Date.now() - lastActivity;
           if (elapsed >= timeoutMs) {
             setState({ isIdle: true, showWarning: false, remainingSeconds: 0 });
-            onTimeout();
+            onTimeoutRef.current();
           } else {
             lastActivityRef.current = lastActivity;
             checkIdle();
@@ -172,7 +180,7 @@ export function useIdleTimeout(options: UseIdleTimeoutOptions): IdleTimeoutState
     });
 
     return () => subscription.remove();
-  }, [timeoutMs, onTimeout, checkIdle, resetActivity]);
+  }, [timeoutMs, checkIdle, resetActivity]);
 
   // Start/stop idle check timer
   useEffect(() => {

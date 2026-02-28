@@ -160,15 +160,23 @@ function IdleTimeoutWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [showWarning, setShowWarning] = useState(false);
 
+  // Store auth + router in refs so handleTimeout never triggers effect re-runs.
+  // useAuth() returns a new object every render; without this the entire
+  // IdleTimeout effect chain re-fires on every render → infinite loop.
+  const authRef = useRef(auth);
+  const routerRef = useRef(router);
+  useEffect(() => { authRef.current = auth; }, [auth]);
+  useEffect(() => { routerRef.current = router; }, [router]);
+
   const handleTimeout = useCallback(async () => {
-    if (auth.isAuthenticated) {
+    if (authRef.current.isAuthenticated) {
       await logSessionExpired();
-      await auth.signOut();
+      await authRef.current.signOut();
       setShowWarning(false);
       // Navigate to auth gate for re-authentication
-      router.replace('/auth');
+      routerRef.current.replace('/auth');
     }
-  }, [auth, router]);
+  }, []);
 
   const handleWarning = useCallback(() => {
     setShowWarning(true);
