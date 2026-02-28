@@ -18,6 +18,7 @@
     "lib/sentinel/__tests__",
     "tests/e2e",
     "scripts",
-    "api"
+    "api",
+    "supabase/functions"
   ]
 }
