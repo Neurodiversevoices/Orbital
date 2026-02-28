@@ -236,6 +236,10 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const segments = useSegments();
 
   useEffect(() => {
+    // DEV ONLY: skip auth gate so we can see screens past login in the simulator.
+    // Remove this block to re-enable normal auth flow.
+    if (__DEV__) return;
+
     if (auth.isLoading) return;
 
     const inAuthGroup = segments[0] === 'auth';

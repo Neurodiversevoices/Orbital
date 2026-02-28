@@ -2,7 +2,7 @@
  * Auth Gate Screen
  *
  * Required entry point for all users. No skip, no guest mode, no exceptions.
- * Displays the Orbital orb, tagline, and sign-in/sign-up options.
+ * Displays the Orbital orb with ambient glow, tagline, and sign-in/sign-up options.
  * On successful authentication, migrates any pre-auth local logs silently
  * in the background before navigating to the main app.
  */
@@ -22,7 +22,14 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Eye, EyeOff } from 'lucide-react-native';
-import { colors, spacing, borderRadius } from '../../theme';
+import { useFonts } from 'expo-font';
+import {
+  DMSans_400Regular,
+  DMSans_500Medium,
+  DMSans_600SemiBold,
+  DMSans_700Bold,
+} from '@expo-google-fonts/dm-sans';
+import { SpaceMono_400Regular } from '@expo-google-fonts/space-mono';
 import { GlassOrb } from '../../components/GlassOrb';
 import { useAuth, validatePassword, isSupabaseConfigured } from '../../lib/supabase';
 import { getLogs } from '../../lib/storage';
@@ -53,6 +60,12 @@ async function migrateLocalLogs(): Promise<void> {
 }
 
 // =============================================================================
+// CONSTANTS
+// =============================================================================
+
+const BG = '#01020A';
+
+// =============================================================================
 // SCREEN
 // =============================================================================
 
@@ -61,6 +74,14 @@ type AuthMode = 'signup' | 'signin' | null;
 export default function AuthScreen() {
   const router = useRouter();
   const auth = useAuth();
+
+  const [fontsLoaded] = useFonts({
+    DMSans_400Regular,
+    DMSans_500Medium,
+    DMSans_600SemiBold,
+    DMSans_700Bold,
+    SpaceMono_400Regular,
+  });
 
   const [authMode, setAuthMode] = useState<AuthMode>(null);
   const [email, setEmail] = useState('');
@@ -106,9 +127,6 @@ export default function AuthScreen() {
       const result = await auth.signUpWithEmail(email, password);
       setIsSubmitting(false);
       if (result.success) {
-        // If Supabase has email confirmation enabled, user is not yet authenticated.
-        // If confirmation is disabled, AuthGate will redirect automatically via
-        // onAuthStateChange. Either way, prompt them to confirm/sign in.
         setSuccessMsg('Account created! Check your email to confirm, then sign in.');
         setAuthMode('signin');
         setPassword('');
@@ -192,6 +210,18 @@ export default function AuthScreen() {
     );
   }
 
+  // ── Loading fonts ────────────────────────────────────────────────────────
+
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.center}>
+          <ActivityIndicator color="#2DD4BF" size="small" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
@@ -205,15 +235,18 @@ export default function AuthScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Orbital orb — display only, no interaction on auth screen */}
-          <View style={styles.orbWrapper}>
-            <View style={styles.orbScale}>
-              <GlassOrb state={null} />
-            </View>
+          {/* Orb with ambient glow */}
+          <View style={styles.orbContainer}>
+            <View style={[styles.glowRing, styles.glowOuter]} />
+            <View style={[styles.glowRing, styles.glowMid]} />
+            <View style={[styles.glowRing, styles.glowInner]} />
+            <GlassOrb state={null} />
           </View>
 
-          {/* Header */}
-          <Text style={styles.appName}>Orbital</Text>
+          {/* Title */}
+          <Text style={styles.title}>Orbital</Text>
+
+          {/* Tagline */}
           <Text style={styles.tagline}>Your capacity. Documented.</Text>
 
           {/* Feedback banners */}
@@ -231,6 +264,7 @@ export default function AuthScreen() {
           {/* Auth entry — either action buttons or email form */}
           {authMode === null ? (
             <View style={styles.buttonStack}>
+              {/* Apple — iOS only */}
               {Platform.OS === 'ios' ? (
                 <Pressable
                   style={[styles.btn, styles.appleBtn]}
@@ -240,37 +274,51 @@ export default function AuthScreen() {
                   {isSubmitting ? (
                     <ActivityIndicator color="#000" size="small" />
                   ) : (
-                    <Text style={styles.appleBtnText}>Sign in with Apple</Text>
+                    <Text style={styles.appleBtnText}> Sign in with Apple</Text>
                   )}
                 </Pressable>
-              ) : (
+              ) : null}
+
+              {/* Email — always visible */}
+              <Pressable
+                style={[styles.btn, styles.glassBtn]}
+                onPress={() => { setAuthMode('signin'); resetForm(); }}
+                disabled={isSubmitting}
+              >
+                <Text style={styles.glassBtnText}>Sign in with email</Text>
+              </Pressable>
+
+              {/* Google — non-iOS only */}
+              {Platform.OS !== 'ios' ? (
                 <Pressable
-                  style={[styles.btn, styles.googleBtn]}
+                  style={[styles.btn, styles.glassBtn]}
                   onPress={handleGoogle}
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
-                    <ActivityIndicator color="#fff" size="small" />
+                    <ActivityIndicator color="rgba(255,255,255,0.85)" size="small" />
                   ) : (
-                    <Text style={styles.googleBtnText}>Sign in with Google</Text>
+                    <Text style={styles.glassBtnText}>Sign in with Google</Text>
                   )}
                 </Pressable>
-              )}
+              ) : null}
 
+              {/* Create account link */}
               <Pressable
-                style={[styles.btn, styles.primaryBtn]}
-                onPress={() => { setAuthMode('signin'); resetForm(); }}
-                disabled={isSubmitting}
-              >
-                <Text style={styles.primaryBtnText}>Sign in with email</Text>
-              </Pressable>
-
-              <Pressable
-                style={[styles.btn, styles.secondaryBtn]}
                 onPress={() => { setAuthMode('signup'); resetForm(); }}
                 disabled={isSubmitting}
+                style={styles.createAccountLink}
               >
-                <Text style={styles.secondaryBtnText}>Create account</Text>
+                <Text style={styles.createAccountText}>New here? Create account</Text>
+              </Pressable>
+
+              {/* Forgot password link */}
+              <Pressable
+                onPress={() => { setAuthMode('signin'); resetForm(); }}
+                disabled={isSubmitting}
+                style={styles.forgotLinkHome}
+              >
+                <Text style={styles.forgotLinkHomeText}>Forgot password?</Text>
               </Pressable>
             </View>
           ) : (
@@ -335,14 +383,14 @@ export default function AuthScreen() {
               ) : null}
 
               <Pressable
-                style={[styles.btn, styles.primaryBtn, isSubmitting && styles.btnDisabled]}
+                style={[styles.btn, styles.appleBtn, isSubmitting && styles.btnDisabled]}
                 onPress={handleEmailAuth}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
                   <ActivityIndicator color="#000" size="small" />
                 ) : (
-                  <Text style={styles.primaryBtnText}>
+                  <Text style={styles.appleBtnText}>
                     {authMode === 'signup' ? 'Create account' : 'Sign in'}
                   </Text>
                 )}
@@ -364,7 +412,7 @@ export default function AuthScreen() {
 }
 
 // =============================================================================
-// STYLES
+// STYLES — exact values from design spec
 // =============================================================================
 
 const styles = StyleSheet.create({
@@ -373,127 +421,140 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: BG,
   },
   scroll: {
     flexGrow: 1,
     alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
-    paddingBottom: spacing.xl,
+    paddingHorizontal: 32,
+    paddingTop: 48,
+    paddingBottom: 32,
   },
   center: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: spacing.lg,
+    padding: 24,
   },
   configErrorText: {
     color: 'rgba(255,255,255,0.5)',
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 22,
+    fontFamily: 'SpaceMono_400Regular',
   },
 
-  // ── Orb ────────────────────────────────────────────────────────────────────
-  orbWrapper: {
+  // ── Orb + ambient glow ──────────────────────────────────────────────────
+  orbContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.md,
+    width: 500,
+    height: 500,
+    marginTop: -80,
+    marginBottom: -80,
   },
-  orbScale: {
-    transform: [{ scale: 0.65 }],
+  glowRing: {
+    position: 'absolute',
+    borderRadius: 9999,
+  },
+  glowOuter: {
+    width: 500,
+    height: 500,
+    backgroundColor: 'rgba(45,212,191,0.03)',
+  },
+  glowMid: {
+    width: 400,
+    height: 400,
+    backgroundColor: 'rgba(45,212,191,0.06)',
+  },
+  glowInner: {
+    width: 300,
+    height: 300,
+    backgroundColor: 'rgba(45,212,191,0.10)',
   },
 
-  // ── Header ─────────────────────────────────────────────────────────────────
-  appName: {
+  // ── Title ───────────────────────────────────────────────────────────────
+  title: {
+    fontFamily: 'DMSans_700Bold',
     fontSize: 34,
     fontWeight: '700',
     color: '#FFFFFF',
-    letterSpacing: 0.5,
-    marginBottom: spacing.xs,
-    marginTop: -spacing.lg, // pull up under the scaled-down orb
-  },
-  tagline: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.5)',
-    marginBottom: spacing.xl,
-    letterSpacing: 0.2,
+    textAlign: 'center',
+    marginTop: 28,
   },
 
-  // ── Banners ────────────────────────────────────────────────────────────────
+  // ── Tagline ─────────────────────────────────────────────────────────────
+  tagline: {
+    fontFamily: 'SpaceMono_400Regular',
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.45)',
+    letterSpacing: 1.2,
+    textAlign: 'center',
+    marginTop: 8,
+    marginBottom: 36,
+  },
+
+  // ── Banners ─────────────────────────────────────────────────────────────
   banner: {
     width: '100%',
     borderWidth: 1,
-    borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.md,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginBottom: 16,
   },
   errorBanner: {
     backgroundColor: 'rgba(255,82,82,0.10)',
     borderColor: 'rgba(255,82,82,0.30)',
   },
   successBanner: {
-    backgroundColor: 'rgba(0,229,255,0.08)',
-    borderColor: 'rgba(0,229,255,0.28)',
+    backgroundColor: 'rgba(45,212,191,0.08)',
+    borderColor: 'rgba(45,212,191,0.28)',
   },
   bannerErrorText: {
+    fontFamily: 'DMSans_400Regular',
     color: '#FF5252',
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 20,
   },
   bannerSuccessText: {
-    color: '#00E5FF',
+    fontFamily: 'DMSans_400Regular',
+    color: '#2DD4BF',
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 20,
   },
 
-  // ── Buttons ────────────────────────────────────────────────────────────────
+  // ── Buttons ─────────────────────────────────────────────────────────────
   buttonStack: {
     width: '100%',
+    gap: 12,
   },
   btn: {
     width: '100%',
-    minHeight: 52,
-    borderRadius: borderRadius.md,
+    height: 54,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.sm,
   },
   appleBtn: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF',
   },
   appleBtnText: {
+    fontFamily: 'DMSans_600SemiBold',
     color: '#000000',
     fontSize: 16,
     fontWeight: '600',
   },
-  googleBtn: {
-    backgroundColor: '#4285F4',
-  },
-  googleBtnText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  primaryBtn: {
-    backgroundColor: '#00D1FF',
-  },
-  primaryBtnText: {
-    color: '#000000',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondaryBtn: {
-    backgroundColor: 'transparent',
+  glassBtn: {
+    backgroundColor: 'rgba(255,255,255,0.07)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
+    borderColor: 'rgba(255,255,255,0.15)',
   },
-  secondaryBtnText: {
-    color: 'rgba(255,255,255,0.75)',
+  glassBtnText: {
+    fontFamily: 'DMSans_500Medium',
+    color: 'rgba(255,255,255,0.85)',
     fontSize: 16,
     fontWeight: '500',
   },
@@ -501,33 +562,55 @@ const styles = StyleSheet.create({
     opacity: 0.55,
   },
 
-  // ── Email form ─────────────────────────────────────────────────────────────
+  // ── Home screen links ───────────────────────────────────────────────────
+  createAccountLink: {
+    alignItems: 'center',
+    marginTop: 28,
+  },
+  createAccountText: {
+    fontFamily: 'SpaceMono_400Regular',
+    fontSize: 13,
+    color: '#2DD4BF',
+  },
+  forgotLinkHome: {
+    alignItems: 'center',
+    marginTop: 14,
+  },
+  forgotLinkHomeText: {
+    fontFamily: 'SpaceMono_400Regular',
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.35)',
+  },
+
+  // ── Email form ──────────────────────────────────────────────────────────
   form: {
     width: '100%',
   },
   formTitle: {
+    fontFamily: 'DMSans_600SemiBold',
     fontSize: 22,
     fontWeight: '600',
     color: '#FFFFFF',
     textAlign: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: 24,
   },
   input: {
     width: '100%',
     backgroundColor: 'rgba(255,255,255,0.06)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.11)',
-    borderRadius: borderRadius.md,
+    borderRadius: 14,
     color: '#FFFFFF',
+    fontFamily: 'DMSans_400Regular',
     fontSize: 16,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    marginBottom: spacing.sm,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    marginBottom: 10,
   },
   passwordRow: {
     width: '100%',
     position: 'relative',
-    marginBottom: spacing.sm,
+    marginBottom: 10,
   },
   passwordInput: {
     paddingRight: 52,
@@ -535,7 +618,7 @@ const styles = StyleSheet.create({
   },
   eyeBtn: {
     position: 'absolute',
-    right: spacing.md,
+    right: 16,
     top: 0,
     bottom: 0,
     justifyContent: 'center',
@@ -543,9 +626,10 @@ const styles = StyleSheet.create({
     width: 40,
   },
   strengthText: {
+    fontFamily: 'SpaceMono_400Regular',
     fontSize: 12,
     color: 'rgba(255,255,255,0.4)',
-    marginBottom: spacing.md,
+    marginBottom: 16,
   },
   strengthValue: {
     color: 'rgba(255,255,255,0.65)',
@@ -553,19 +637,21 @@ const styles = StyleSheet.create({
   },
   forgotLink: {
     alignSelf: 'flex-end',
-    marginBottom: spacing.md,
+    marginBottom: 16,
     paddingVertical: 4,
   },
   forgotLinkText: {
-    color: 'rgba(255,255,255,0.4)',
-    fontSize: 13,
+    fontFamily: 'SpaceMono_400Regular',
+    color: 'rgba(255,255,255,0.35)',
+    fontSize: 12,
   },
   backLink: {
-    marginTop: spacing.md,
+    marginTop: 16,
     alignItems: 'center',
-    paddingVertical: spacing.sm,
+    paddingVertical: 8,
   },
   backLinkText: {
+    fontFamily: 'SpaceMono_400Regular',
     color: 'rgba(255,255,255,0.4)',
     fontSize: 14,
   },

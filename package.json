@@ -26,6 +26,8 @@
     "bundle:export": "npx tsx scripts/bundle-cci-export-pdf.ts"
   },
   "dependencies": {
+    "@expo-google-fonts/dm-sans": "^0.4.2",
+    "@expo-google-fonts/space-mono": "^0.4.2",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/netinfo": "^11.4.1",
     "@revenuecat/purchases-js": "^1.24.1",
@@ -40,6 +42,7 @@
     "expo-crypto": "~15.0.3",
     "expo-dev-client": "~6.0.20",
     "expo-file-system": "~19.0.6",
+    "expo-font": "~14.0.11",
     "expo-haptics": "~15.0.8",
     "expo-linking": "~8.0.11",
     "expo-local-authentication": "^17.0.8",

@@ -38,9 +38,9 @@ export function useTutorial(): TutorialState {
 
   const loadState = async () => {
     try {
-      // In review mode, auto-dismiss tutorial to prevent interrupting reviewers.
+      // DEV / review mode: auto-dismiss tutorial so we can see the main screens.
       // This does not unlock any features — only skips the onboarding walkthrough.
-      if (IS_REVIEW_MODE) {
+      if (__DEV__ || IS_REVIEW_MODE) {
         await AsyncStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
         setHasSeenTutorial(true);
         setHasLoggedFirstSignal(false);

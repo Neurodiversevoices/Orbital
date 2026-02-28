@@ -59,3 +59,18 @@ keys/*.json
 # Playwright test results
 test-results/
 playwright-report/
+
+# Environment secrets
+.env
+
+# Build artifacts
+build-*.tar.gz
+
+# Supabase temp
+supabase/.temp/
+
+# Local config overrides
+lib/supabase/config.local.ts
+
+# Claude local settings (may contain secrets in permission history)
+.claude/settings.local.json

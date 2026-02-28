@@ -25,7 +25,9 @@
         "ITSAppUsesNonExemptEncryption": false,
         "NSUserTrackingUsageDescription": "This identifier will be used to measure advertising effectiveness.",
         "SKAdNetworkItems": [
-          { "SKAdNetworkIdentifier": "cstr6suwn9.skadnetwork" }
+          {
+            "SKAdNetworkIdentifier": "cstr6suwn9.skadnetwork"
+          }
         ]
       }
     },
@@ -67,7 +69,8 @@
           "organization": "orbital-health",
           "project": "react-native"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "extra": {
       "router": {},
