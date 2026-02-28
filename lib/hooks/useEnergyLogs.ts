@@ -5,6 +5,7 @@ import { getLocalDate } from '../baselineUtils';
 import { FREE_TIER_LIMITS } from '../subscription/types';
 import { useCloudSync } from '../cloud';
 import { useAuth } from '../supabase/auth';
+import { logCapacityEntry } from '../supabase/auditLog';
 
 // Default capacity_value mapping from discrete state → continuous 0.0–1.0
 const STATE_TO_CAPACITY: Record<CapacityState, number> = {
@@ -107,6 +108,18 @@ export function useEnergyLogs(): UseCapacityLogsReturn {
 
       await savelog(newLog);
       setLogs((prev) => [newLog, ...prev]);
+
+      // Fire-and-forget audit log
+      if (auth.isAuthenticated && auth.user?.id) {
+        logCapacityEntry(
+          auth.user.id,
+          newLog.capacity_value ?? null,
+          newLog.state,
+          newLog.driver_data ?? null,
+        ).catch((e) => {
+          if (__DEV__) console.error('[useEnergyLogs] Audit log failed:', e);
+        });
+      }
 
       // Cloud sync is automatic when authenticated
       if (auth.isAuthenticated) {
