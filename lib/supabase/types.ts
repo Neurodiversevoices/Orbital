@@ -476,6 +476,45 @@ export interface Database {
         };
         Relationships: [];
       };
+      proof_events: {
+        Row: {
+          id: string;
+          user_id: string;
+          title: string;
+          event_type: string;
+          event_date: string;
+          tracking_start: string;
+          tracking_end: string | null;
+          status: string;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          title: string;
+          event_type: string;
+          event_date: string;
+          tracking_start?: string;
+          tracking_end?: string | null;
+          status?: string;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          title?: string;
+          event_type?: string;
+          event_date?: string;
+          tracking_start?: string;
+          tracking_end?: string | null;
+          status?: string;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -523,6 +562,7 @@ export type OrgMembership = Database['public']['Tables']['org_memberships']['Row
 export type OrgAggregateSnapshot = Database['public']['Tables']['org_aggregate_snapshots']['Row'];
 export type AuditEvent = Database['public']['Tables']['audit_events']['Row'];
 export type UserPreferences = Database['public']['Tables']['user_preferences']['Row'];
+export type ProofEvent = Database['public']['Tables']['proof_events']['Row'];
 
 // Sync types
 export interface SyncStatus {
