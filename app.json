@@ -18,7 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "44",
+      "buildNumber": "46",
       "appleTeamId": "2KM3QL4UMV",
       "icon": "./assets/icon.png",
       "infoPlist": {
