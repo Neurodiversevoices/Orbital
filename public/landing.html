@@ -3,18 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Orbital — Your capacity. Your data. Your signal.</title>
-<meta name="description" content="Log your daily capacity. See patterns over time. Private, offline-first, yours.">
+<title>Orbital — Clinical-grade capacity tracking for high-performance professionals</title>
+<meta name="description" content="Clinical-grade capacity tracking for high-performance professionals. Daily check-ins become longitudinal capacity records for care teams. Founded for therapists, coaches, and neurodivergent adults.">
 <meta name="theme-color" content="#05060A">
-<meta property="og:image" content="/orb.jpg">
 <link rel="icon" href="/favicon.ico">
 <link rel="canonical" href="https://orbitalhealth.app/">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://orbitalhealth.app/">
-<meta property="og:title" content="Orbital — Your capacity. Your data. Your signal.">
-<meta property="og:description" content="Log your daily capacity in under 30 seconds. See patterns emerge over weeks and months. Private, offline-first, yours.">
+<meta property="og:title" content="Orbital — Clinical-grade capacity tracking for high-performance professionals">
+<meta property="og:description" content="One daily check-in. Three states. 90 days of data becomes a longitudinal Capacity Clinical Instrument your clients can use with their care team.">
 <meta property="og:image" content="https://orbitalhealth.app/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -22,1016 +21,837 @@
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Orbital — Your capacity. Your data. Your signal.">
-<meta name="twitter:description" content="Log your daily capacity in under 30 seconds. See patterns emerge over weeks and months. Private, offline-first, yours.">
+<meta name="twitter:title" content="Orbital — Clinical-grade capacity tracking">
+<meta name="twitter:description" content="One daily check-in. Three states. 90 days of data becomes a longitudinal Capacity Clinical Instrument for care teams.">
 <meta name="twitter:image" content="https://orbitalhealth.app/og-image.png">
+
+<!-- Fonts: DM Sans (headings/buttons), Space Mono (data/labels) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Google Analytics 4 — replace G-XXXXXXXXXX with real measurement ID -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "name": "Orbital Health Intelligence",
+      "url": "https://orbitalhealth.app",
+      "logo": "https://orbitalhealth.app/Orbital.png",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "contact@orbitalhealth.app",
+        "contactType": "customer service"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Orbital",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "iOS, Web",
+      "url": "https://orbitalhealth.app",
+      "description": "Clinical-grade capacity tracking for high-performance professionals. Daily check-ins become longitudinal capacity records for care teams.",
+      "offers": [
+        {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD",
+          "name": "Free"
+        },
+        {
+          "@type": "Offer",
+          "price": "29",
+          "priceCurrency": "USD",
+          "name": "Pro",
+          "billingPeriod": "P1M"
+        },
+        {
+          "@type": "Offer",
+          "price": "199",
+          "priceCurrency": "USD",
+          "name": "CCI Founding Cohort"
+        }
+      ]
+    }
+  ]
+}
+</script>
+
 <style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{
-    background:#05060A;
-    color:rgba(255,255,255,0.85);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    overflow-x:hidden;
+  /* ================================================================
+     CSS CUSTOM PROPERTIES
+     ================================================================ */
+  :root {
+    --bg: #05060A;
+    --cyan: #00D7FF;
+    --cyan-dim: rgba(0, 215, 255, 0.12);
+    --cyan-border: rgba(0, 215, 255, 0.25);
+    --amber: #F5B700;
+    --red: #FF3B30;
+    --text: rgba(255,255,255,0.85);
+    --text-dim: rgba(255,255,255,0.5);
+    --text-faint: rgba(255,255,255,0.3);
+    --surface: rgba(255,255,255,0.03);
+    --surface-hover: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.06);
+    --border-hover: rgba(255,255,255,0.12);
+    --font-heading: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   }
 
-  /* ---- Layout ---- */
-  .container{max-width:960px;margin:0 auto;padding:0 24px}
+  /* ================================================================
+     RESET & BASE
+     ================================================================ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  h1, h2, h3 { font-family: var(--font-heading); }
 
-  /* ---- Nav ---- */
-  nav{
-    position:sticky;top:0;z-index:100;
-    background:rgba(5,6,10,0.85);
-    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-    border-bottom:1px solid rgba(255,255,255,0.06);
-  }
-  .nav-inner{
-    display:flex;align-items:center;justify-content:space-between;
-    max-width:960px;margin:0 auto;padding:16px 24px;
-  }
-  .nav-logo{
-    display:inline-flex;align-items:center;gap:10px;
-    font-size:18px;font-weight:700;color:#fff;letter-spacing:0.5px;text-decoration:none;
-  }
-  .nav-logo img{width:36px;height:36px;border-radius:50%}
-  .nav-links{display:flex;gap:24px;align-items:center}
-  .nav-links a{font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s}
-  .nav-links a:hover{color:#fff}
-  .nav-cta{
-    background:rgba(0,215,255,0.12);color:#00D7FF;
-    border:1px solid rgba(0,215,255,0.25);border-radius:8px;
-    padding:8px 18px;font-size:14px;font-weight:600;
-    text-decoration:none;transition:all 0.2s;
-  }
-  .nav-cta:hover{background:rgba(0,215,255,0.2);color:#00D7FF}
+  /* ================================================================
+     LAYOUT
+     ================================================================ */
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
 
-  /* ---- Hero ---- */
-  .hero{
-    padding:120px 0 100px;
-    text-align:center;
-    position:relative;
+  /* ================================================================
+     NAV
+     ================================================================ */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(5,6,10,0.88);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
   }
-  .hero::before{
-    content:"";position:absolute;
-    top:0;left:50%;transform:translateX(-50%);
-    width:600px;height:600px;
-    background:radial-gradient(circle,rgba(0,215,255,0.06) 0%,transparent 70%);
-    pointer-events:none;
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 960px; margin: 0 auto; padding: 14px 24px;
   }
-  .hero h1{
-    font-size:clamp(36px,6vw,56px);
-    font-weight:700;color:#fff;
-    line-height:1.15;margin-bottom:20px;
-    letter-spacing:-0.5px;
+  .nav-logo {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--font-heading);
+    font-size: 18px; font-weight: 700; color: #fff;
+    letter-spacing: 0.5px; text-decoration: none;
   }
-  .hero p.subtitle{
-    font-size:clamp(16px,2.5vw,20px);
-    color:rgba(255,255,255,0.5);
-    max-width:520px;margin:0 auto 48px;
-    line-height:1.55;
+  .nav-logo img { width: 32px; height: 32px; border-radius: 50%; }
+  .founding-nav-badge {
+    font-family: var(--font-mono);
+    font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+    color: var(--amber); background: rgba(245,183,0,0.1);
+    border: 1px solid rgba(245,183,0,0.2);
+    border-radius: 100px; padding: 3px 10px;
+    animation: pulse-glow 2.5s ease-in-out infinite;
   }
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+  .nav-links { display: flex; gap: 24px; align-items: center; }
+  .nav-links a {
+    font-size: 14px; color: var(--text-dim);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: #fff; }
+  .nav-cta {
+    background: var(--cyan); color: var(--bg);
+    border-radius: 8px; padding: 8px 18px;
+    font-family: var(--font-heading);
+    font-size: 13px; font-weight: 700;
+    text-decoration: none; transition: all 0.2s;
+  }
+  .nav-cta:hover { background: #33e0ff; color: var(--bg); }
 
-  /* ---- Orb visual ---- */
-  .orb-container{
-    display:flex;justify-content:center;align-items:center;
-    margin:0 auto 56px;position:relative;
+  /* ================================================================
+     HERO
+     ================================================================ */
+  .hero {
+    padding: 100px 0 80px;
+    text-align: center;
+    position: relative;
   }
-  .orb-img{
-    width:400px;height:auto;display:block;border-radius:0;box-shadow:none;
+  .hero::before {
+    content: ""; position: absolute;
+    top: -60px; left: 50%; transform: translateX(-50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(0,215,255,0.06) 0%, transparent 65%);
+    pointer-events: none;
   }
-
-  /* ---- Spectrum bar ---- */
-  .spectrum{
-    display:flex;align-items:center;justify-content:center;gap:12px;
-    margin-bottom:56px;
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(245,183,0,0.08);
+    border: 1px solid rgba(245,183,0,0.2); border-radius: 100px;
+    padding: 8px 20px; margin-bottom: 28px;
+    font-family: var(--font-mono);
+    font-size: 12px; font-weight: 700; color: var(--amber);
+    letter-spacing: 0.5px;
   }
-  .spectrum-bar{
-    width:200px;height:4px;border-radius:2px;
-    background:linear-gradient(90deg,#00D7FF 0%,#F5B700 50%,#FF3B30 100%);
+  .hero-badge-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--amber);
+    animation: pulse-glow 2s ease-in-out infinite;
   }
-  .spectrum-label{font-size:12px;font-weight:500;letter-spacing:0.5px;text-transform:uppercase}
-  .spectrum-label.cyan{color:#00D7FF}
-  .spectrum-label.red{color:#FF3B30}
-
-  /* ---- Store buttons ---- */
-  .store-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
-  .store-btn{
-    display:inline-flex;align-items:center;gap:10px;
-    background:rgba(255,255,255,0.06);
-    border:1px solid rgba(255,255,255,0.1);border-radius:12px;
-    padding:14px 28px;text-decoration:none;color:#fff;
-    transition:all 0.2s;
+  .hero h1 {
+    font-size: clamp(32px, 5.5vw, 52px);
+    font-weight: 700; color: #fff;
+    line-height: 1.15; margin-bottom: 20px;
+    letter-spacing: -0.5px;
+    max-width: 720px; margin-left: auto; margin-right: auto;
   }
-  .store-btn:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.18)}
-  .store-btn svg{flex-shrink:0}
-  .store-btn-text{text-align:left;line-height:1.2}
-  .store-btn-text small{font-size:11px;color:rgba(255,255,255,0.45);display:block}
-  .store-btn-text span{font-size:16px;font-weight:600}
-
-  /* ---- Section ---- */
-  section{padding:80px 0}
-  .section-label{
-    font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
-    color:#00D7FF;margin-bottom:12px;
+  .hero .subtitle {
+    font-size: clamp(15px, 2.2vw, 18px);
+    color: var(--text-dim);
+    max-width: 580px; margin: 0 auto 36px;
+    line-height: 1.6;
   }
-  section h2{
-    font-size:clamp(24px,4vw,36px);font-weight:700;color:#fff;
-    margin-bottom:16px;letter-spacing:-0.3px;
+  .hero-cta {
+    display: inline-block;
+    background: var(--cyan); color: var(--bg);
+    font-family: var(--font-heading);
+    font-size: 16px; font-weight: 700;
+    border: none; border-radius: 12px;
+    padding: 18px 40px;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none;
   }
-  section h2 + p{
-    color:rgba(255,255,255,0.5);font-size:17px;max-width:560px;margin-bottom:48px;
+  .hero-cta:hover { background: #33e0ff; transform: translateY(-1px); }
+  .hero-fine {
+    font-size: 13px; color: var(--text-faint);
+    margin-top: 14px; line-height: 1.5;
   }
-
-  /* ---- Feature grid ---- */
-  .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
-  .feature-card{
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.06);
-    border-radius:16px;padding:32px 28px;
-    transition:border-color 0.25s;
+  .spots-counter {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 13px; font-weight: 700; color: var(--cyan);
+    background: rgba(0,215,255,0.06);
+    border: 1px solid rgba(0,215,255,0.15);
+    border-radius: 100px; padding: 8px 20px;
+    margin-top: 20px;
   }
-  .feature-card:hover{border-color:rgba(255,255,255,0.12)}
-  .feature-icon{
-    width:40px;height:40px;border-radius:10px;
-    display:flex;align-items:center;justify-content:center;
-    margin-bottom:16px;font-size:18px;
-  }
-  .feature-icon.cyan{background:rgba(0,215,255,0.1);color:#00D7FF}
-  .feature-icon.amber{background:rgba(245,183,0,0.1);color:#F5B700}
-  .feature-icon.red{background:rgba(255,59,48,0.1);color:#FF3B30}
-  .feature-icon.white{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7)}
-  .feature-card h3{font-size:16px;font-weight:600;color:#fff;margin-bottom:8px}
-  .feature-card p{font-size:14px;color:rgba(255,255,255,0.5);line-height:1.6}
-
-  /* ---- How it works ---- */
-  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:32px;counter-reset:step}
-  .step{position:relative;padding-left:0;text-align:center}
-  .step-num{
-    display:inline-flex;align-items:center;justify-content:center;
-    width:40px;height:40px;border-radius:50%;
-    background:rgba(0,215,255,0.08);border:1px solid rgba(0,215,255,0.2);
-    color:#00D7FF;font-size:16px;font-weight:700;
-    margin-bottom:16px;
-  }
-  .step h3{font-size:16px;font-weight:600;color:#fff;margin-bottom:8px}
-  .step p{font-size:14px;color:rgba(255,255,255,0.5);line-height:1.6}
-
-  /* ---- Privacy section ---- */
-  .privacy-grid{
-    display:grid;grid-template-columns:1fr 1fr;gap:24px;
-  }
-  .privacy-item{
-    display:flex;align-items:flex-start;gap:14px;
-    padding:20px;
-    background:rgba(255,255,255,0.02);
-    border:1px solid rgba(255,255,255,0.04);
-    border-radius:12px;
-  }
-  .privacy-check{
-    flex-shrink:0;width:24px;height:24px;border-radius:6px;
-    background:rgba(0,215,255,0.1);
-    display:flex;align-items:center;justify-content:center;
-    color:#00D7FF;font-size:14px;font-weight:700;
-    margin-top:2px;
-  }
-  .privacy-item p{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.55}
-  .privacy-item strong{color:rgba(255,255,255,0.85)}
-
-  /* ---- Circles section ---- */
-  .circles-banner{
-    background:rgba(245,183,0,0.04);
-    border:1px solid rgba(245,183,0,0.1);
-    border-radius:20px;padding:48px;
-    text-align:center;
-  }
-  .circles-banner h3{font-size:22px;font-weight:700;color:#fff;margin-bottom:12px}
-  .circles-banner p{font-size:15px;color:rgba(255,255,255,0.5);max-width:480px;margin:0 auto;line-height:1.6}
-
-  /* ---- Footer ---- */
-  footer{
-    border-top:1px solid rgba(255,255,255,0.06);
-    padding:40px 0;
-  }
-  .footer-inner{
-    display:flex;align-items:center;justify-content:space-between;
-    flex-wrap:wrap;gap:16px;
-  }
-  .footer-left{font-size:13px;color:rgba(255,255,255,0.3)}
-  .footer-links{display:flex;gap:24px}
-  .footer-links a{font-size:13px;color:rgba(255,255,255,0.35);text-decoration:none;transition:color 0.2s}
-  .footer-links a:hover{color:rgba(255,255,255,0.6)}
-
-  /* ---- Disclaimer ---- */
-  .disclaimer{
-    background:rgba(255,255,255,0.02);
-    border:1px solid rgba(255,255,255,0.04);
-    border-radius:10px;padding:20px 24px;
-    margin:40px auto 0;max-width:640px;
-  }
-  .disclaimer p{font-size:12px;color:rgba(255,255,255,0.3);text-align:center;line-height:1.6}
-
-  /* ---- Hero badge ---- */
-  .hero-badge{
-    display:inline-flex;align-items:center;gap:8px;
-    background:rgba(245,183,0,0.08);
-    border:1px solid rgba(245,183,0,0.2);border-radius:100px;
-    padding:8px 20px;margin-bottom:32px;
-    font-size:13px;font-weight:600;color:#F5B700;
-    letter-spacing:0.3px;
-  }
-  .hero-badge-dot{
-    width:6px;height:6px;border-radius:50%;background:#F5B700;
-    animation:badge-pulse 2s ease-in-out infinite;
-  }
-  @keyframes badge-pulse{
-    0%,100%{opacity:1}50%{opacity:0.4}
+  .spots-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #32D74B;
+    flex-shrink: 0;
   }
 
-  /* ---- Email form ---- */
-  .email-form{
-    display:flex;gap:0;justify-content:center;
-    max-width:440px;margin:0 auto 32px;
+  /* ================================================================
+     SOCIAL PROOF BAR
+     ================================================================ */
+  .social-proof {
+    padding: 40px 0;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
   }
-  .email-input{
-    flex:1;min-width:0;
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.1);
-    border-right:none;
-    border-radius:10px 0 0 10px;
-    padding:14px 18px;
-    font-size:15px;color:#fff;
-    font-family:inherit;
-    outline:none;
-    transition:border-color 0.2s;
+  .social-proof-label {
+    font-size: 12px; color: var(--text-faint);
+    letter-spacing: 1px; text-transform: uppercase;
+    margin-bottom: 16px; font-weight: 500;
   }
-  .email-input::placeholder{color:rgba(255,255,255,0.3)}
-  .email-input:focus{border-color:rgba(0,215,255,0.4)}
-  .email-btn{
-    background:#00D7FF;color:#05060A;
-    border:1px solid #00D7FF;
-    border-radius:0 10px 10px 0;
-    padding:14px 24px;
-    font-size:14px;font-weight:700;
-    font-family:inherit;
-    cursor:pointer;
-    white-space:nowrap;
-    transition:all 0.2s;
+  .proof-pills {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
   }
-  .email-btn:hover{background:#33dfff;border-color:#33dfff}
-  .email-btn:disabled{opacity:0.6;cursor:not-allowed}
-  .email-success{
-    font-size:15px;color:#32D74B;font-weight:600;
-    text-align:center;padding:14px;
-  }
-  .email-error{
-    font-size:13px;color:#FF3B30;
-    text-align:center;margin-top:8px;
-  }
-  .email-note{
-    font-size:12px;color:rgba(255,255,255,0.25);
-    margin-top:-20px;margin-bottom:32px;
-    text-align:center;
+  .proof-pill {
+    font-family: var(--font-heading);
+    font-size: 13px; font-weight: 600; color: var(--text-dim);
+    background: var(--surface);
+    border: 1px solid var(--border); border-radius: 100px;
+    padding: 8px 20px;
   }
 
-  /* ---- CCI Showcase ---- */
-  .cci-showcase{text-align:center}
-  .cci-showcase h2{margin-bottom:16px}
-  .cci-showcase > p{
-    color:rgba(255,255,255,0.5);font-size:17px;
-    max-width:540px;margin:0 auto 48px;
+  /* ================================================================
+     SECTIONS — SHARED
+     ================================================================ */
+  section { padding: 80px 0; }
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--cyan); margin-bottom: 12px;
   }
-  .cci-screenshot{
-    max-width:720px;margin:0 auto;
-    background:rgba(255,255,255,0.02);
-    border:1px solid rgba(255,255,255,0.06);
-    border-radius:16px;
-    min-height:400px;
-    display:flex;align-items:center;justify-content:center;
-    position:relative;overflow:hidden;
+  section h2 {
+    font-size: clamp(24px, 4vw, 36px); font-weight: 700; color: #fff;
+    margin-bottom: 16px; letter-spacing: -0.3px;
   }
-  .cci-screenshot::before{
-    content:"";position:absolute;inset:0;
-    background:linear-gradient(135deg,rgba(0,215,255,0.03) 0%,rgba(245,183,0,0.03) 50%,rgba(255,59,48,0.03) 100%);
-  }
-  .cci-screenshot-inner{
-    position:relative;z-index:1;padding:40px;text-align:center;
-  }
-  .cci-screenshot-inner .placeholder-icon{
-    font-size:48px;margin-bottom:16px;opacity:0.3;
-  }
-  .cci-screenshot-inner p{
-    font-size:14px;color:rgba(255,255,255,0.25);
-  }
-  .cci-features{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:20px;max-width:720px;margin:32px auto 0;
-  }
-  .cci-feat{
-    padding:16px 20px;
-    background:rgba(255,255,255,0.02);
-    border:1px solid rgba(255,255,255,0.04);
-    border-radius:10px;
-    text-align:left;
-  }
-  .cci-feat strong{font-size:13px;color:rgba(255,255,255,0.7);display:block;margin-bottom:4px}
-  .cci-feat span{font-size:13px;color:rgba(255,255,255,0.35)}
-
-  /* ---- Pricing ---- */
-  .pricing-grid{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-    gap:24px;max-width:1100px;margin:0 auto;
-  }
-  .pricing-card{
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.06);
-    border-radius:20px;padding:36px 32px;
-    display:flex;flex-direction:column;
-    transition:border-color 0.25s;
-  }
-  .pricing-card:hover{border-color:rgba(255,255,255,0.12)}
-  .pricing-card.featured{
-    border-color:rgba(0,215,255,0.25);
-    background:rgba(0,215,255,0.03);
-    position:relative;
-  }
-  .pricing-tag{
-    position:absolute;top:-12px;left:50%;transform:translateX(-50%);
-    background:#00D7FF;color:#05060A;
-    font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;
-    padding:4px 14px;border-radius:100px;
-    white-space:nowrap;
-  }
-  .pricing-card h3{font-size:18px;font-weight:700;color:#fff;margin-bottom:8px}
-  .pricing-card .price{
-    font-size:36px;font-weight:700;color:#fff;line-height:1;margin-bottom:4px;
-  }
-  .pricing-card .price small{font-size:16px;font-weight:500;color:rgba(255,255,255,0.4)}
-  .pricing-card .price-alt{
-    font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:24px;
-  }
-  .pricing-card .plan-desc{
-    font-size:14px;color:rgba(255,255,255,0.4);margin-bottom:24px;line-height:1.5;
-  }
-  .plan-features{list-style:none;padding:0;margin:0 0 28px;flex:1}
-  .plan-features li{
-    font-size:14px;color:rgba(255,255,255,0.55);
-    padding:6px 0 6px 22px;position:relative;line-height:1.5;
-  }
-  .plan-features li::before{
-    content:"\2713";position:absolute;left:0;
-    color:#00D7FF;font-weight:700;font-size:13px;
-  }
-  .pricing-cta{
-    display:block;text-align:center;
-    padding:14px;border-radius:10px;
-    font-size:14px;font-weight:600;
-    text-decoration:none;transition:all 0.2s;
-    font-family:inherit;cursor:pointer;border:none;
-  }
-  .pricing-cta.primary{
-    background:#00D7FF;color:#05060A;
-  }
-  .pricing-cta.primary:hover{background:#33dfff}
-  .pricing-cta.secondary{
-    background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);
-    border:1px solid rgba(255,255,255,0.08);
-  }
-  .pricing-cta.secondary:hover{background:rgba(255,255,255,0.1);color:#fff}
-
-  /* ---- Bottom CTA ---- */
-  .cta-bottom{
-    text-align:center;padding:100px 0 60px;
-  }
-  .cta-bottom h2{
-    font-size:clamp(24px,4vw,36px);font-weight:700;color:#fff;
-    margin-bottom:12px;letter-spacing:-0.3px;
-  }
-  .cta-bottom p.cta-sub{
-    color:rgba(255,255,255,0.45);font-size:16px;
-    max-width:480px;margin:0 auto 36px;line-height:1.55;
-  }
-  .cta-bottom .email-form{margin-bottom:16px}
-  .cta-bottom .cta-fine{
-    font-size:12px;color:rgba(255,255,255,0.2);
-    max-width:360px;margin:0 auto;
+  section h2 + p.section-sub, p.section-sub {
+    color: var(--text-dim); font-size: 16px;
+    max-width: 580px; margin-bottom: 48px; line-height: 1.6;
   }
 
-  /* ---- Pricing sub-note ---- */
-  .pricing-sub-note{font-size:14px;color:rgba(255,255,255,0.4);margin-top:-32px;margin-bottom:48px}
-  .pricing-sub-note a{color:rgba(0,215,255,0.7);text-decoration:none}
-  .pricing-sub-note a:hover{color:#00D7FF;text-decoration:underline}
-
-  /* ---- CCI Tiers ---- */
-  .cci-tiers{list-style:none;padding:0;margin:0 0 24px;border:1px solid rgba(255,255,255,0.06);border-radius:10px;overflow:hidden}
-  .cci-tiers li{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:14px;color:rgba(255,255,255,0.5);border-bottom:1px solid rgba(255,255,255,0.05)}
-  .cci-tiers li:last-child{border-bottom:none}
-  .cci-tiers li.featured-tier{color:#fff;font-weight:600;background:rgba(0,215,255,0.06)}
-  .cci-tier-price{color:rgba(255,255,255,0.35);font-size:13px}
-  .featured-tier .cci-tier-price{color:#00D7FF}
-
-  /* ---- Therapist Plans ---- */
-  .therapist-section-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:8px}
-  .therapist-section-desc{font-size:14px;color:rgba(255,255,255,0.45);max-width:580px;margin-bottom:28px;line-height:1.55}
-  .therapist-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
-  .save-annual{font-size:12px;color:rgba(245,183,0,0.6);margin:0 0 16px}
-  .save-annual a{color:rgba(245,183,0,0.7);text-decoration:none}
-  .save-annual a:hover{color:#F5B700;text-decoration:underline}
-
-  /* ---- Spot counter ---- */
-  .spot-counter{
-    display:inline-flex;align-items:center;gap:8px;
-    background:rgba(0,215,255,0.07);
-    border:1px solid rgba(0,215,255,0.18);border-radius:100px;
-    padding:7px 18px;margin-bottom:32px;
-    font-size:13px;font-weight:600;color:#00D7FF;
-    letter-spacing:0.2px;
+  /* ================================================================
+     HOW IT WORKS — 3 CARDS
+     ================================================================ */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
   }
-  .spot-counter-dot{
-    width:7px;height:7px;border-radius:50%;background:#32D74B;
-    flex-shrink:0;
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 32px 28px;
+    transition: border-color 0.25s;
+  }
+  .step-card:hover { border-color: var(--border-hover); }
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(0,215,255,0.08); border: 1px solid rgba(0,215,255,0.2);
+    font-family: var(--font-mono);
+    color: var(--cyan); font-size: 14px; font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .step-card h3 {
+    font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;
+  }
+  .step-card p {
+    font-size: 14px; color: var(--text-dim); line-height: 1.65;
   }
 
-  /* ---- FAQ ---- */
-  .faq-section{padding:80px 0}
-  .faq-list{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:0}
-  .faq-item{
-    border-bottom:1px solid rgba(255,255,255,0.06);
-    padding:24px 0;
+  /* ================================================================
+     CCI SHOWCASE
+     ================================================================ */
+  .cci-showcase { text-align: center; }
+  .cci-showcase h2 { margin-bottom: 16px; }
+  .cci-showcase .section-sub {
+    max-width: 620px; margin-left: auto; margin-right: auto;
   }
-  .faq-item:last-child{border-bottom:none}
-  .faq-q{
-    font-size:16px;font-weight:600;color:#fff;margin-bottom:10px;
-    cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+  .cci-preview-box {
+    width: 100%; max-width: 400px; height: 300px;
+    margin: 0 auto 36px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-faint); font-size: 14px;
+    font-family: var(--font-mono);
   }
-  .faq-q::after{
-    content:"+";font-size:20px;font-weight:400;color:rgba(255,255,255,0.3);
-    flex-shrink:0;line-height:1.3;transition:transform 0.2s;
+  .cci-cta {
+    display: inline-block;
+    background: var(--cyan); color: var(--bg);
+    font-family: var(--font-heading);
+    font-size: 15px; font-weight: 700;
+    border: none; border-radius: 10px;
+    padding: 16px 36px;
+    cursor: pointer; transition: all 0.2s;
   }
-  .faq-item.open .faq-q::after{transform:rotate(45deg);color:rgba(255,255,255,0.5)}
-  .faq-a{
-    font-size:14px;color:rgba(255,255,255,0.5);line-height:1.65;
-    display:none;padding-right:32px;
-  }
-  .faq-item.open .faq-a{display:block}
-  .faq-a a{color:rgba(0,215,255,0.7);text-decoration:none}
-  .faq-a a:hover{color:#00D7FF;text-decoration:underline}
+  .cci-cta:hover { background: #33e0ff; transform: translateY(-1px); }
 
-  /* ---- Responsive ---- */
-  @media(max-width:640px){
-    .hero{padding:80px 0 60px}
-    .orb-img{width:280px;height:auto;border-radius:0;box-shadow:none}
-    .privacy-grid{grid-template-columns:1fr}
-    .circles-banner{padding:32px 24px}
-    .nav-links a:not(.nav-cta){display:none}
-    .footer-inner{flex-direction:column;text-align:center}
-    .email-form{flex-direction:column;gap:10px}
-    .email-input{border-right:1px solid rgba(255,255,255,0.1);border-radius:10px}
-    .email-btn{border-radius:10px}
-    .pricing-grid{grid-template-columns:1fr;max-width:380px}
-    .cci-features{grid-template-columns:1fr}
+  /* ================================================================
+     PRICING — 3 CARDS
+     ================================================================ */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px; max-width: 960px; margin: 0 auto;
+    align-items: start;
+  }
+  .pricing-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px; padding: 36px 28px;
+    display: flex; flex-direction: column;
+    transition: border-color 0.25s;
+  }
+  .pricing-card:hover { border-color: var(--border-hover); }
+  .pricing-card.featured {
+    border-color: rgba(0,215,255,0.35);
+    background: rgba(0,215,255,0.03);
+    box-shadow: 0 0 40px rgba(0,215,255,0.06), 0 0 80px rgba(0,215,255,0.03);
+    position: relative;
+  }
+  .pricing-tag {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--cyan); color: var(--bg);
+    font-family: var(--font-heading);
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+    padding: 4px 16px; border-radius: 100px;
+    white-space: nowrap;
+  }
+  .pricing-card h3 {
+    font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px;
+  }
+  .pricing-card .price {
+    font-family: var(--font-heading);
+    font-size: 36px; font-weight: 700; color: #fff;
+    line-height: 1; margin-bottom: 4px;
+  }
+  .pricing-card .price small {
+    font-size: 16px; font-weight: 500; color: var(--text-faint);
+  }
+  .pricing-card .price-note {
+    font-size: 13px; color: var(--text-faint); margin-bottom: 24px;
+  }
+  .plan-features {
+    list-style: none; padding: 0; margin: 0 0 28px; flex: 1;
+  }
+  .plan-features li {
+    font-size: 14px; color: var(--text-dim);
+    padding: 6px 0 6px 22px; position: relative; line-height: 1.5;
+  }
+  .plan-features li::before {
+    content: "\2713"; position: absolute; left: 0;
+    color: var(--cyan); font-weight: 700; font-size: 13px;
+  }
+  .pricing-cta {
+    display: block; text-align: center;
+    padding: 14px; border-radius: 10px;
+    font-family: var(--font-heading);
+    font-size: 14px; font-weight: 600;
+    text-decoration: none; transition: all 0.2s;
+    cursor: pointer; border: none;
+  }
+  .pricing-cta.primary {
+    background: var(--cyan); color: var(--bg);
+  }
+  .pricing-cta.primary:hover { background: #33e0ff; }
+  .pricing-cta.secondary {
+    background: var(--surface-hover); color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+  .pricing-cta.secondary:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+  /* ================================================================
+     FAQ ACCORDION
+     ================================================================ */
+  .faq-list { max-width: 680px; margin: 0 auto; }
+  .faq-item { border-bottom: 1px solid var(--border); padding: 24px 0; }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q {
+    font-family: var(--font-heading);
+    font-size: 16px; font-weight: 600; color: #fff;
+    cursor: pointer;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+  }
+  .faq-q::after {
+    content: "+"; font-size: 20px; font-weight: 400;
+    color: var(--text-faint); flex-shrink: 0;
+    line-height: 1.3; transition: transform 0.2s;
+  }
+  .faq-item.open .faq-q::after { transform: rotate(45deg); color: var(--text-dim); }
+  .faq-a {
+    font-size: 14px; color: var(--text-dim); line-height: 1.65;
+    display: none; padding: 12px 32px 0 0;
+  }
+  .faq-item.open .faq-a { display: block; }
+
+  /* ================================================================
+     BOTTOM CTA
+     ================================================================ */
+  .cta-bottom {
+    text-align: center; padding: 100px 0 60px;
+  }
+  .cta-bottom h2 {
+    font-size: clamp(24px, 4vw, 36px); font-weight: 700; color: #fff;
+    margin-bottom: 12px; letter-spacing: -0.3px;
+  }
+  .cta-bottom .cta-sub {
+    color: var(--text-dim); font-size: 16px;
+    max-width: 500px; margin: 0 auto 36px; line-height: 1.55;
+  }
+  .bottom-cta-btn {
+    display: inline-block;
+    background: var(--cyan); color: var(--bg);
+    font-family: var(--font-heading);
+    font-size: 16px; font-weight: 700;
+    border: none; border-radius: 12px;
+    padding: 18px 40px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .bottom-cta-btn:hover { background: #33e0ff; transform: translateY(-1px); }
+
+  /* ================================================================
+     FOOTER
+     ================================================================ */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 0 32px;
+  }
+  .footer-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .footer-left { font-size: 13px; color: var(--text-faint); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a {
+    font-size: 13px; color: rgba(255,255,255,0.35);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--text-dim); }
+  .footer-disclaimer {
+    width: 100%; text-align: center;
+    font-size: 11px; color: rgba(255,255,255,0.2);
+    margin-top: 20px; line-height: 1.5;
+  }
+
+  /* ================================================================
+     CHECKOUT MODAL
+     ================================================================ */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-box {
+    background: #0D0E14;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 40px 36px;
+    max-width: 420px; width: 90%;
+    text-align: center;
+    position: relative;
+  }
+  .modal-box h3 {
+    font-family: var(--font-heading);
+    font-size: 20px; font-weight: 700; color: #fff;
+    margin-bottom: 8px;
+  }
+  .modal-box .modal-sub {
+    font-size: 14px; color: var(--text-dim); margin-bottom: 24px;
+  }
+  .modal-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 15px; color: #fff;
+    font-family: var(--font-body);
+    outline: none; transition: border-color 0.2s;
+    margin-bottom: 16px;
+  }
+  .modal-input::placeholder { color: var(--text-faint); }
+  .modal-input:focus { border-color: rgba(0,215,255,0.4); }
+  .modal-input.error { border-color: var(--red); }
+  .modal-submit {
+    width: 100%;
+    background: var(--cyan); color: var(--bg);
+    font-family: var(--font-heading);
+    font-size: 15px; font-weight: 700;
+    border: none; border-radius: 10px;
+    padding: 16px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .modal-submit:hover { background: #33e0ff; }
+  .modal-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: none; border: none;
+    color: var(--text-faint); font-size: 24px;
+    cursor: pointer; line-height: 1;
+  }
+  .modal-close:hover { color: #fff; }
+  .modal-error {
+    font-size: 13px; color: var(--red);
+    margin-top: 12px;
+  }
+
+  /* ================================================================
+     SUCCESS BANNER
+     ================================================================ */
+  .success-banner {
+    background: rgba(50,215,75,0.1);
+    border-bottom: 1px solid rgba(50,215,75,0.2);
+    color: #32D74B;
+    text-align: center; padding: 14px 24px;
+    font-family: var(--font-heading);
+    font-size: 14px; font-weight: 600;
+  }
+
+  /* ================================================================
+     RESPONSIVE
+     ================================================================ */
+  @media (max-width: 768px) {
+    .steps { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+    .hero { padding: 80px 0 60px; }
+    .nav-links a:not(.nav-cta) { display: none; }
+    .footer-inner { flex-direction: column; text-align: center; }
+  }
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 28px; }
+    .hero-cta, .bottom-cta-btn, .cci-cta { padding: 16px 28px; font-size: 15px; }
   }
 </style>
 </head>
 <body>
 
-<!-- Nav -->
+<!-- Success banner (shown on return from Stripe) -->
+<div id="success-banner" class="success-banner" style="display:none">
+  Thank you! Check your email for next steps.
+</div>
+
+<!-- ================================================================
+     SECTION 1 — NAV
+     ================================================================ -->
 <nav>
   <div class="nav-inner">
-    <a href="/" class="nav-logo"><img src="/Orbital.png?v=2" alt="Orbital" width="36" height="36">Orbital</a>
+    <a href="/" class="nav-logo">
+      <img src="/Orbital.png?v=2" alt="Orbital" width="32" height="32">
+      Orbital
+      <span class="founding-nav-badge">Founding Offer</span>
+    </a>
     <div class="nav-links">
-      <a href="#features">Features</a>
       <a href="#how-it-works">How It Works</a>
       <a href="#pricing">Pricing</a>
-      <a href="#privacy">Privacy</a>
-      <a href="/support">Support</a>
+      <a href="#faq">FAQ</a>
+      <a href="#pricing" class="nav-cta">Claim Founding Access</a>
     </div>
   </div>
 </nav>
 
-<!-- Hero -->
+<!-- ================================================================
+     SECTION 2 — HERO
+     ================================================================ -->
 <div class="container">
   <section class="hero">
-    <div class="hero-badge"><span class="hero-badge-dot"></span> Founding access — first 100 spots</div>
-    <div class="orb-container"><img src="/Orbital.png?v=2" alt="Orbital orb" class="orb-img"></div>
-    <h1>Your capacity.<br>Your data.<br>Your signal.</h1>
-    <p class="subtitle">Log your daily capacity in under 30 seconds. See patterns emerge over weeks and months. Private, offline-first, yours.</p>
+    <div class="hero-badge"><span class="hero-badge-dot"></span> Founding Cohort &mdash; 100 Spots</div>
 
-    <div><span class="spot-counter"><span class="spot-counter-dot"></span>&#x1F7E2; 67 of 100 founding spots remaining</span></div>
+    <h1>Clinical-grade capacity tracking for high-performance professionals</h1>
 
-    <div class="spectrum">
-      <span class="spectrum-label cyan">Resourced</span>
-      <div class="spectrum-bar"></div>
-      <span class="spectrum-label red">Depleted</span>
-    </div>
+    <p class="subtitle">One daily check-in. Three states. 90 days of data becomes a longitudinal Capacity Clinical Instrument your clients can use with their care team.</p>
 
-    <form class="email-form" onsubmit="return false;">
-      <input type="email" class="email-input" placeholder="you@email.com" required>
-      <button type="submit" class="email-btn">Get Early Access</button>
-    </form>
-    <p class="email-note">No spam. Unsubscribe anytime.</p>
+    <button class="hero-cta cta-founding" type="button">Claim Founding Access &mdash; $199</button>
 
-    <div class="store-row">
-      <a href="https://apps.apple.com/app/id6757295146" class="store-btn" target="_blank" rel="noopener">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.56 2.93 11.3 4.7 7.72C5.57 5.94 7.36 4.86 9.28 4.84C10.56 4.81 11.78 5.7 12.57 5.7C13.36 5.7 14.85 4.63 16.4 4.8C17.04 4.83 18.84 5.07 19.97 6.77C19.88 6.83 17.64 8.11 17.67 10.82C17.7 14.08 20.53 15.13 20.56 15.14C20.53 15.22 20.07 16.86 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" fill="white"/></svg>
-        <div class="store-btn-text"><small>Download on the</small><span>App Store</span></div>
-      </a>
-      <a href="/app" class="store-btn" style="background:rgba(0,215,255,0.08);border-color:rgba(0,215,255,0.2);color:#00D7FF">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor" opacity="0"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M2 12h20M12 2c-2.5 3-4 6.3-4 10s1.5 7 4 10M12 2c2.5 3 4 6.3 4 10s-1.5 7-4 10" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
-        <div class="store-btn-text" style="color:#00D7FF"><small style="color:rgba(0,215,255,0.6)">Use in browser</small><span>Open Web App</span></div>
-      </a>
-    </div>
+    <p class="hero-fine">Includes 3 months Pro free. First 100 only.</p>
+
+    <div><span class="spots-counter"><span class="spots-dot"></span> <span class="counter-text">Loading spots...</span></span></div>
   </section>
 
-  <!-- How It Works -->
+  <!-- ================================================================
+       SECTION 3 — SOCIAL PROOF BAR
+       ================================================================ -->
+  <div class="social-proof">
+    <div class="social-proof-label">Built for:</div>
+    <div class="proof-pills">
+      <span class="proof-pill">Therapists</span>
+      <span class="proof-pill">Executive Coaches</span>
+      <span class="proof-pill">Sports Performance</span>
+      <span class="proof-pill">Occupational Health</span>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       SECTION 4 — HOW IT WORKS
+       ================================================================ -->
   <section id="how-it-works">
     <div class="section-label">How It Works</div>
-    <h2>Three states. That's it.</h2>
-    <p>No long forms. No journals. Swipe the orb, tag a category if you want, and move on with your day.</p>
+    <h2>Three steps. Zero friction.</h2>
 
     <div class="steps">
-      <div class="step">
+      <div class="step-card">
         <div class="step-num">1</div>
-        <h3>Log your state</h3>
-        <p>Swipe the glass orb to record where you are right now: Resourced, Stretched, or Depleted.</p>
+        <h3>Check in daily</h3>
+        <p>5 seconds. Swipe to set your capacity state. Resourced, Stretched, or Depleted.</p>
       </div>
-      <div class="step">
+      <div class="step-card">
         <div class="step-num">2</div>
-        <h3>Add context</h3>
-        <p>Optionally tag what's driving your capacity: Sensory, Demand, or Social. Add a note if you like.</p>
+        <h3>Patterns emerge</h3>
+        <p>After 14 days, Orbital detects trends in your capacity data automatically.</p>
       </div>
-      <div class="step">
+      <div class="step-card">
         <div class="step-num">3</div>
-        <h3>See patterns</h3>
-        <p>Over days and weeks, Orbital reveals your personal rhythms. Patterns unlock progressively as your data grows.</p>
+        <h3>Generate your CCI</h3>
+        <p>At 90 days, receive a clinical-grade Capacity Clinical Instrument &mdash; a longitudinal record for care teams.</p>
       </div>
     </div>
   </section>
 
-  <!-- CCI Showcase -->
+  <!-- ================================================================
+       SECTION 5 — CCI SHOWCASE
+       ================================================================ -->
   <section class="cci-showcase">
-    <div class="section-label">Capacity Credential</div>
-    <h2>90 days of check-ins.<br>One clinical-grade report.</h2>
-    <p>The Capacity Credential Index distills your longitudinal data into a formal quarterly PDF — patterns, trends, and observations you can keep or share with a provider.</p>
+    <div class="section-label">Capacity Clinical Instrument</div>
+    <h2>90 days of check-ins. One clinical-grade report.</h2>
+    <p class="section-sub">The Capacity Clinical Instrument (CCI) is a longitudinal capacity record &mdash; not a mood score, not a symptom checklist. It tracks how you perform under cognitive, emotional, and environmental load over time.</p>
 
-    <div class="cci-screenshot">
-      <img src="/cci-preview.png" alt="CCI Report Preview" style="width:100%;max-width:600px;border-radius:12px;display:block;margin:0 auto;">
-    </div>
+    <div class="cci-preview-box">CCI Report Preview</div>
 
-    <div class="cci-features">
-      <div class="cci-feat">
-        <strong>Quarterly synthesis</strong>
-        <span>90 days of signals compressed into one document</span>
-      </div>
-      <div class="cci-feat">
-        <strong>Trend visualization</strong>
-        <span>Charts, weekly rhythms, and capacity trajectories</span>
-      </div>
-      <div class="cci-feat">
-        <strong>Portable PDF</strong>
-        <span>Download, print, or share on your terms</span>
-      </div>
-    </div>
+    <button class="cci-cta cta-founding" type="button">Claim Founding Access &mdash; $199</button>
   </section>
 
-  <!-- Features -->
-  <section id="features">
-    <div class="section-label">Features</div>
-    <h2>Built for the long game</h2>
-    <p>Value compounds over time. The longer you log, the more your data reveals.</p>
-
-    <div class="features">
-      <div class="feature-card">
-        <div class="feature-icon cyan">&#9678;</div>
-        <h3>Signal Logging</h3>
-        <p>Record your capacity in under 30 seconds. Three states, optional tags, no friction. Designed for daily use without daily effort.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon amber">&#9638;</div>
-        <h3>Pattern Discovery</h3>
-        <p>Trends unlock at 7, 14, 30, and 90 signals. See weekly rhythms and capacity patterns emerge from your own data.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon white">&#8644;</div>
-        <h3>Data Export</h3>
-        <p>Export your full dataset as JSON or CSV at any time. Your data is always yours to take with you. No lock-in, ever.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon cyan">&#9711;</div>
-        <h3>Circles</h3>
-        <p>Share your current capacity state with up to 25 trusted people. Bidirectional consent required. Signals expire after 90 minutes.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon red">&#9724;</div>
-        <h3>Capacity Credential</h3>
-        <p>Generate formal quarterly PDF documents synthesizing your capacity patterns for personal records or professional use.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon white">&#9881;</div>
-        <h3>Accessibility-First</h3>
-        <p>Colorblind modes, text scaling, button scaling, haptic control, high contrast, and simple mode. Built for everyone.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Privacy -->
-  <section id="privacy">
-    <div class="section-label">Privacy</div>
-    <h2>Private by default</h2>
-    <p>Your data stays on your device. When you sign in, it syncs encrypted. Nobody else can see your logs. Not even us.</p>
-
-    <div class="privacy-grid">
-      <div class="privacy-item">
-        <div class="privacy-check">&#10003;</div>
-        <p><strong>Local-first storage.</strong> Everything lives on your device unless you choose to sync.</p>
-      </div>
-      <div class="privacy-item">
-        <div class="privacy-check">&#10003;</div>
-        <p><strong>Encrypted sync.</strong> Data encrypted in transit and at rest with row-level access control.</p>
-      </div>
-      <div class="privacy-item">
-        <div class="privacy-check">&#10003;</div>
-        <p><strong>No data sales. Ever.</strong> We never sell, license, or share your data with advertisers or brokers.</p>
-      </div>
-      <div class="privacy-item">
-        <div class="privacy-check">&#10003;</div>
-        <p><strong>Export or delete anytime.</strong> Full data portability. Leave whenever you want with everything you logged.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Circles -->
-  <section>
-    <div class="circles-banner">
-      <h3>Share on your terms</h3>
-      <p>Circles let you share capacity with people you trust — family, close friends, supporters. Every member must explicitly consent. No surprises. No surveillance. Signals expire automatically.</p>
-    </div>
-  </section>
-
-  <!-- Pricing -->
+  <!-- ================================================================
+       SECTION 6 — PRICING
+       ================================================================ -->
   <section id="pricing">
     <div class="section-label">Pricing</div>
     <h2>Simple, transparent pricing</h2>
-    <p>Start free. Upgrade when your data is ready for more.</p>
-    <p class="pricing-sub-note">For therapists and clinical programs, <a href="#therapists">see therapist plans below</a>.</p>
+    <p class="section-sub">Start free. Upgrade when your data is ready.</p>
 
     <div class="pricing-grid">
+      <!-- Free -->
       <div class="pricing-card">
         <h3>Free</h3>
         <div class="price">$0</div>
-        <p class="plan-desc">Start logging. See what your data reveals.</p>
+        <p class="price-note">Free forever</p>
         <ul class="plan-features">
-          <li>Unlimited signals, 7-day history</li>
+          <li>Daily check-ins</li>
+          <li>3 capacity states</li>
+          <li>7-day history</li>
           <li>On-device storage</li>
-          <li>Basic pattern views</li>
-          <li>Data export (JSON/CSV)</li>
         </ul>
-        <a href="https://apps.apple.com/app/id6757295146" class="pricing-cta secondary" target="_blank" rel="noopener">Download Free</a>
+        <a href="https://apps.apple.com/app/id6757295146" class="pricing-cta secondary" target="_blank" rel="noopener" data-tier="free">Download Free</a>
       </div>
 
+      <!-- Pro -->
       <div class="pricing-card">
         <h3>Pro</h3>
         <div class="price">$29<small>/mo</small></div>
-        <p class="price-alt">or $290/year (save 17%)</p>
+        <p class="price-note">Full capacity intelligence</p>
         <ul class="plan-features">
-          <li>Unlimited signals</li>
+          <li>Full history</li>
+          <li>Pattern detection</li>
+          <li>Driver tracking</li>
+          <li>Trend analysis</li>
           <li>Encrypted cloud sync</li>
-          <li>Full pattern analysis</li>
-          <li>90-day pattern history</li>
-          <li>Cloud sync across devices</li>
-          <li>Priority support</li>
         </ul>
-        <button class="pricing-cta primary" onclick="startCheckout('orbital_pro_monthly')">Start Pro — $29/mo</button>
-        <button class="pricing-cta secondary" style="margin-top:8px;font-size:13px" onclick="startCheckout('orbital_pro_annual')">or $290/year (save 17%)</button>
+        <a href="https://apps.apple.com/app/id6757295146" class="pricing-cta secondary" target="_blank" rel="noopener" data-tier="pro">Start Pro</a>
       </div>
 
-      <div class="pricing-card">
-        <h3>Family</h3>
-        <div class="price">$49<small>/mo</small></div>
-        <p class="price-alt">or $490/year (save 17%)</p>
-        <p class="plan-desc">Full Pro for the whole household — 5 seats</p>
-        <ul class="plan-features">
-          <li>Unlimited signals</li>
-          <li>90-day history</li>
-          <li>Cloud sync</li>
-          <li>Shared household view</li>
-          <li>Full Pro features for every seat</li>
-        </ul>
-        <button class="pricing-cta primary" onclick="startCheckout('orbital_family_monthly')">Get Family Plan — $49/mo</button>
-        <button class="pricing-cta secondary" style="margin-top:8px;font-size:13px" onclick="startCheckout('orbital_family_annual')">or $490/year (save 17%)</button>
-      </div>
-
-      <div class="pricing-card">
-        <h3>Family+</h3>
-        <div class="price">$69<small>/mo</small></div>
-        <p class="price-alt">or $690/year (save 17%)</p>
-        <p class="plan-desc">For larger or blended families — 8 seats</p>
-        <ul class="plan-features">
-          <li>Unlimited signals</li>
-          <li>90-day history</li>
-          <li>Cloud sync</li>
-          <li>Shared household view</li>
-          <li>Full Pro features for every seat</li>
-        </ul>
-        <button class="pricing-cta primary" onclick="startCheckout('orbital_family_plus_monthly')">Get Family+ — $69/mo</button>
-        <button class="pricing-cta secondary" style="margin-top:8px;font-size:13px" onclick="startCheckout('orbital_family_plus_annual')">or $690/year (save 17%)</button>
-      </div>
-
+      <!-- CCI Founding — featured -->
       <div class="pricing-card featured">
-        <div class="pricing-tag">Clinical Grade</div>
-        <h3>CCI</h3>
-        <p class="plan-desc" style="margin-bottom:16px">Longitudinal capacity report — clinical-grade PDF you can keep or share with a provider.</p>
-        <ul class="cci-tiers" style="cursor:pointer">
-          <li onclick="startCheckout('orbital_cci_30')" title="Buy 30-day CCI — $99"><span class="cci-tier-name">30-day CCI</span><span class="cci-tier-price">$99</span></li>
-          <li onclick="startCheckout('orbital_cci_60')" title="Buy 60-day CCI — $149"><span class="cci-tier-name">60-day CCI</span><span class="cci-tier-price">$149</span></li>
-          <li class="featured-tier" onclick="startCheckout('orbital_cci_90')" title="Buy 90-day CCI — $199"><span class="cci-tier-name">90-day CCI</span><span class="cci-tier-price">$199</span></li>
-          <li onclick="startCheckout('orbital_cci_bundle')" title="Buy Full Bundle — $349"><span class="cci-tier-name">Full Bundle</span><span class="cci-tier-price">$349</span></li>
-        </ul>
+        <div class="pricing-tag">First 100 Only</div>
+        <h3>CCI Founding</h3>
+        <div class="price">$199<small> one-time</small></div>
+        <p class="price-note">Full CCI report at 90 days + 3 months Pro free</p>
         <ul class="plan-features">
-          <li>Longitudinal synthesis</li>
-          <li>Pattern &amp; trend analysis</li>
-          <li>Downloadable PDF artifact</li>
-          <li>Shareable with providers</li>
+          <li>Full CCI report at 90 days</li>
+          <li>3 months Pro access free</li>
+          <li>Longitudinal capacity record</li>
+          <li>Shareable with care teams</li>
+          <li>Founding price locked forever</li>
         </ul>
-        <button class="pricing-cta primary" onclick="startCheckout('orbital_cci_90')">Get My CCI — $199</button>
-        <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:10px">Tap any tier above to choose 30, 60, 90-day, or bundle</p>
-      </div>
-    </div>
-
-    <!-- For Therapists -->
-    <div id="therapists" style="margin-top:72px;padding-top:48px;border-top:1px solid rgba(255,255,255,0.06)">
-      <h3 class="therapist-section-title">For Therapists</h3>
-      <p class="therapist-section-desc">Private practice tools for supporting clients who use Orbital. Anonymized dashboards, capacity alerts, and clinical milestone tracking — built for solo therapists and growing clinics alike.</p>
-      <div class="therapist-grid">
-
-        <div class="pricing-card">
-          <h3>Solo</h3>
-          <div class="price">$39<small>/mo</small></div>
-          <p class="plan-desc">5 client seats</p>
-          <ul class="plan-features">
-            <li>Anonymized client dashboard</li>
-            <li>Capacity alerts</li>
-            <li>CCI milestone notifications</li>
-            <li>Group session tagging</li>
-            <li>Client invite by email</li>
-          </ul>
-          <p class="save-annual"><a href="mailto:contact@orbitalhealth.app?subject=Annual Therapist Plan">Save 17% annually</a></p>
-          <a href="mailto:contact@orbitalhealth.app?subject=Therapist Plan Interest" class="pricing-cta secondary">Start Free Trial</a>
-        </div>
-
-        <div class="pricing-card">
-          <h3>Practice</h3>
-          <div class="price">$89<small>/mo</small></div>
-          <p class="plan-desc">15 client seats</p>
-          <ul class="plan-features">
-            <li>Anonymized client dashboard</li>
-            <li>Capacity alerts</li>
-            <li>CCI milestone notifications</li>
-            <li>Group session tagging</li>
-            <li>Client invite by email</li>
-          </ul>
-          <p class="save-annual"><a href="mailto:contact@orbitalhealth.app?subject=Annual Therapist Plan">Save 17% annually</a></p>
-          <a href="mailto:contact@orbitalhealth.app?subject=Therapist Plan Interest" class="pricing-cta secondary">Start Free Trial</a>
-        </div>
-
-        <div class="pricing-card">
-          <h3>Group</h3>
-          <div class="price">$159<small>/mo</small></div>
-          <p class="plan-desc">30 client seats</p>
-          <ul class="plan-features">
-            <li>Anonymized client dashboard</li>
-            <li>Capacity alerts</li>
-            <li>CCI milestone notifications</li>
-            <li>Group session tagging</li>
-            <li>Client invite by email</li>
-          </ul>
-          <p class="save-annual"><a href="mailto:contact@orbitalhealth.app?subject=Annual Therapist Plan">Save 17% annually</a></p>
-          <a href="mailto:contact@orbitalhealth.app?subject=Therapist Plan Interest" class="pricing-cta secondary">Start Free Trial</a>
-        </div>
-
-        <div class="pricing-card">
-          <h3>Clinic</h3>
-          <div class="price">$279<small>/mo</small></div>
-          <p class="plan-desc">60 client seats</p>
-          <ul class="plan-features">
-            <li>Anonymized client dashboard</li>
-            <li>Capacity alerts</li>
-            <li>CCI milestone notifications</li>
-            <li>Group session tagging</li>
-            <li>Client invite by email</li>
-          </ul>
-          <p class="save-annual"><a href="mailto:contact@orbitalhealth.app?subject=Annual Therapist Plan">Save 17% annually</a></p>
-          <a href="mailto:contact@orbitalhealth.app?subject=Therapist Plan Interest" class="pricing-cta secondary">Start Free Trial</a>
-        </div>
-
+        <button class="pricing-cta primary cta-founding" type="button" data-tier="cci">Claim Founding Access &mdash; $199</button>
       </div>
     </div>
   </section>
 
-  <!-- Built for -->
-  <section>
-    <div class="section-label">Philosophy</div>
-    <h2>Built for people who think differently</h2>
-    <p>Designed for neurodivergent individuals, people with chronic conditions, caregivers, and anyone whose capacity fluctuates in ways that standard tools don't capture.</p>
-
-    <div class="features" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
-      <div class="feature-card" style="text-align:center;padding:24px 20px">
-        <h3 style="font-size:14px;margin-bottom:4px">Calm</h3>
-        <p>No notifications. No nudges. No engagement pressure.</p>
-      </div>
-      <div class="feature-card" style="text-align:center;padding:24px 20px">
-        <h3 style="font-size:14px;margin-bottom:4px">Non-Diagnostic</h3>
-        <p>Observations only. No labels, no scores, no clinical claims.</p>
-      </div>
-      <div class="feature-card" style="text-align:center;padding:24px 20px">
-        <h3 style="font-size:14px;margin-bottom:4px">Longitudinal</h3>
-        <p>Value compounds over months and years, not days.</p>
-      </div>
-      <div class="feature-card" style="text-align:center;padding:24px 20px">
-        <h3 style="font-size:14px;margin-bottom:4px">Yours</h3>
-        <p>You record. You own. You decide what to share.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="faq-section">
+  <!-- ================================================================
+       SECTION 7 — FAQ
+       ================================================================ -->
+  <section id="faq">
     <div class="section-label">FAQ</div>
-    <h2>Common questions.</h2>
+    <h2>Common questions</h2>
 
     <div class="faq-list">
-      <div class="faq-item open">
-        <div class="faq-q">Is the app really free?</div>
-        <div class="faq-a">Yes. Download, track, and use Orbital forever at no cost. CCI reports are optional purchases when your data is ready.</div>
+      <div class="faq-item">
+        <div class="faq-q">What is a Capacity Clinical Instrument?</div>
+        <div class="faq-a">A longitudinal record of your capacity states over 90+ days. Unlike mood scales or symptom checklists, the CCI tracks how you perform under real-world cognitive, emotional, and environmental load. It's designed to be shared with therapists, coaches, and care teams.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What is a CCI report?</div>
-        <div class="faq-a">A Capacity Credential Index report is a clinical-grade PDF generated from your tracking data. It synthesizes your patterns, drivers, and trends into a document you can keep or share with a provider.</div>
+        <div class="faq-q">Is this a diagnostic tool?</div>
+        <div class="faq-a">No. Orbital is not a medical device and does not diagnose conditions. The CCI is an observational capacity record that supplements clinical judgment.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Do I need to log every day?</div>
-        <div class="faq-a">No — but more data means better patterns. Most people find the check-in takes less time than unlocking their phone.</div>
+        <div class="faq-q">What does the founding offer include?</div>
+        <div class="faq-a">$199 one-time payment. You get the full CCI report generated after 90 days of daily logging, plus 3 months of Pro access free. This price is locked for the first 100 users only.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Is my data private?</div>
-        <div class="faq-a">Your data never leaves your device unless you choose to sync. CCI reports are generated from your data and belong to you.</div>
+        <div class="faq-q">How long does a daily check-in take?</div>
+        <div class="faq-a">About 5 seconds. You swipe to set your state and optionally add context tags.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">I'm a therapist or coach. Is there a professional plan?</div>
-        <div class="faq-a">Yes. Visit <a href="/therapists">/therapists</a> or <a href="/coach">/coach</a> to see professional plans starting at $39/month.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">What devices does Orbital work on?</div>
-        <div class="faq-a">iOS app available now. Web app available at <a href="/app">orbitalhealth.app/app</a>. Android coming soon.</div>
+        <div class="faq-q">Who is this for?</div>
+        <div class="faq-a">High-performance professionals, neurodivergent adults, therapists tracking client capacity, executive coaches, and sports performance staff.</div>
       </div>
     </div>
   </section>
 
-  <!-- Bottom CTA -->
+  <!-- ================================================================
+       SECTION 8 — BOTTOM CTA
+       ================================================================ -->
   <section class="cta-bottom">
-    <h2>Join the founding cohort</h2>
-    <p class="cta-sub">First 100 get 3 months of Pro free with CCI purchase.</p>
-    <form class="email-form" onsubmit="return false;">
-      <input type="email" class="email-input" placeholder="you@email.com" required>
-      <button type="submit" class="email-btn">Get Early Access</button>
-    </form>
-    <p class="cta-fine">No spam. No commitment. Just early access to something built for the long game.</p>
+    <h2>Join the founding cohort.</h2>
+    <p class="cta-sub">First 100 get the CCI at founding price &mdash; locked forever.</p>
+
+    <button class="bottom-cta-btn cta-founding" type="button">Claim Your Spot &mdash; $199</button>
+
+    <div style="margin-top:20px"><span class="spots-counter"><span class="spots-dot"></span> <span class="counter-text">Loading spots...</span></span></div>
   </section>
 
-  <!-- Disclaimer -->
-  <div class="disclaimer">
-    <p><strong>Orbital is not a medical device.</strong> It does not provide medical advice, diagnosis, or treatment. All data is self-reported and subjective. Pattern analysis features identify trends in self-reported data only and do not predict health outcomes. If you have concerns about your health, consult qualified healthcare providers.</p>
-  </div>
-
-  <!-- Footer -->
+  <!-- ================================================================
+       SECTION 9 — FOOTER
+       ================================================================ -->
   <footer>
     <div class="footer-inner">
-      <div class="footer-left">&copy; 2026 Orbital Health. All rights reserved.</div>
+      <div class="footer-left">&copy; 2026 Orbital Health Intelligence, Inc.</div>
       <div class="footer-links">
-        <a href="/privacy">Privacy Policy</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/support">Terms</a>
         <a href="/support">Support</a>
-        <a href="mailto:contact@orbitalhealth.app">Contact</a>
+        <a href="mailto:contact@orbitalhealth.app">contact@orbitalhealth.app</a>
       </div>
+      <p class="footer-disclaimer">Orbital is not a medical device and does not provide medical advice, diagnosis, or treatment. The CCI is an observational record only.</p>
     </div>
   </footer>
 </div>
 
+<!-- ================================================================
+     CHECKOUT MODAL
+     ================================================================ -->
+<div id="checkout-modal" class="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close" type="button" aria-label="Close">&times;</button>
+    <h3>Continue to checkout</h3>
+    <p class="modal-sub">Enter your email to claim your founding spot.</p>
+    <input type="email" id="checkout-email" class="modal-input" placeholder="you@example.com" autocomplete="email">
+    <button id="checkout-submit" class="modal-submit" type="button">Continue to Checkout &mdash; $199</button>
+    <div id="checkout-error" class="modal-error" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ================================================================
+     JAVASCRIPT
+     ================================================================ -->
 <script>
 // =========================================================================
 // UTM PARAMS
 // =========================================================================
-const urlParams = new URLSearchParams(window.location.search);
-const utm = {
+var urlParams = new URLSearchParams(window.location.search);
+var utm = {
   utm_source: urlParams.get('utm_source') || undefined,
   utm_medium: urlParams.get('utm_medium') || undefined,
   utm_campaign: urlParams.get('utm_campaign') || undefined,
 };
 
 // =========================================================================
-// EMAIL CAPTURE — wire both forms to /api/waitlist
+// SUCCESS STATE (return from Stripe checkout)
 // =========================================================================
-function setupEmailForm(form, source) {
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const input = form.querySelector('.email-input');
-    const btn = form.querySelector('.email-btn');
-    const email = input.value.trim();
-
-    if (!email) return;
-
-    btn.disabled = true;
-    btn.textContent = 'Submitting...';
-
-    // Remove any existing error/success
-    form.parentElement.querySelectorAll('.email-error').forEach(el => el.remove());
-
-    try {
-      const res = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source, ...utm }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        form.innerHTML = '<div class="email-success">You\'re in — check your email</div>';
-        trackEvent('email_captured', { source });
-      } else {
-        btn.disabled = false;
-        btn.textContent = 'Get Early Access';
-        const err = document.createElement('div');
-        err.className = 'email-error';
-        err.textContent = data.error || 'Something went wrong. Try again.';
-        form.after(err);
-      }
-    } catch (err) {
-      btn.disabled = false;
-      btn.textContent = 'Get Early Access';
-      const errEl = document.createElement('div');
-      errEl.className = 'email-error';
-      errEl.textContent = 'Network error. Try again.';
-      form.after(errEl);
-    }
-  });
-}
-
-// Wire hero form (first) and bottom CTA form (second)
-const forms = document.querySelectorAll('.email-form');
-if (forms[0]) setupEmailForm(forms[0], 'hero');
-if (forms[1]) setupEmailForm(forms[1], 'bottom_cta');
-
-// =========================================================================
-// STRIPE CHECKOUT — wire pricing CTAs to /api/create-checkout
-// =========================================================================
-async function startCheckout(productId) {
-  const email = prompt('Enter your email to continue to checkout:');
-  if (!email || !email.includes('@')) {
-    if (email !== null) alert('Please enter a valid email address.');
-    return;
-  }
-
-  try {
-    trackEvent('checkout_started', { product_id: productId });
-
-    const res = await fetch('/api/create-checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        product_id: productId,
-        supabase_user_id: 'guest',
-        customer_email: email,
-        success_url: window.location.origin + '/success.html',
-        cancel_url: window.location.origin + '/cancel.html',
-      }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok && data.checkout_url) {
-      window.location.href = data.checkout_url;
-    } else {
-      alert(data.error || 'Something went wrong. Please try again.');
-    }
-  } catch (err) {
-    alert('Network error. Please try again.');
-  }
+if (urlParams.get('purchased') === '1') {
+  var banner = document.getElementById('success-banner');
+  if (banner) banner.style.display = 'block';
 }
 
 // =========================================================================
-// ANALYTICS — lightweight event tracking via /api/track
+// ANALYTICS — keep existing custom trackEvent system
 // =========================================================================
 function trackEvent(event, metadata) {
   fetch('/api/track', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      event,
+      event: event,
       page: window.location.pathname,
       referrer: document.referrer || undefined,
-      ...utm,
+      utm_source: utm.utm_source,
+      utm_medium: utm.utm_medium,
+      utm_campaign: utm.utm_campaign,
       metadata: metadata || {},
     }),
   }).catch(function() {}); // fire-and-forget
@@ -1040,17 +860,114 @@ function trackEvent(event, metadata) {
 // Track page view
 trackEvent('page_view');
 
-// Track pricing clicks
-document.querySelectorAll('.pricing-cta').forEach(function(btn) {
+// =========================================================================
+// CCI COUNTER — fetch from /api/cci-counter
+// =========================================================================
+(function loadCounter() {
+  var counterEls = document.querySelectorAll('.counter-text');
+  fetch('/api/cci-counter')
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var remaining = typeof data.remaining === 'number' ? data.remaining : 100;
+      counterEls.forEach(function(el) {
+        el.textContent = remaining + ' of 100 founding spots remaining';
+      });
+    })
+    .catch(function() {
+      counterEls.forEach(function(el) {
+        el.textContent = 'Limited spots remaining';
+      });
+    });
+})();
+
+// =========================================================================
+// CHECKOUT MODAL — wire all .cta-founding buttons
+// =========================================================================
+var modal = document.getElementById('checkout-modal');
+var emailInput = document.getElementById('checkout-email');
+var submitBtn = document.getElementById('checkout-submit');
+var errorEl = document.getElementById('checkout-error');
+
+// Open modal on any founding CTA click
+document.querySelectorAll('.cta-founding').forEach(function(btn) {
   btn.addEventListener('click', function() {
-    trackEvent('pricing_clicked', { plan: btn.closest('.pricing-card')?.querySelector('h3')?.textContent || '' });
+    modal.classList.add('active');
+    emailInput.value = '';
+    emailInput.classList.remove('error');
+    errorEl.style.display = 'none';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Continue to Checkout \u2014 $199';
+    setTimeout(function() { emailInput.focus(); }, 100);
+    trackEvent('founding_cta_clicked');
   });
 });
 
-// Track download clicks
-document.querySelectorAll('.store-btn').forEach(function(btn) {
+// Close modal
+modal.querySelector('.modal-close').addEventListener('click', function() {
+  modal.classList.remove('active');
+});
+modal.addEventListener('click', function(e) {
+  if (e.target === modal) modal.classList.remove('active');
+});
+
+// Handle enter key in email input
+emailInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') submitBtn.click();
+});
+
+// Submit checkout
+submitBtn.addEventListener('click', async function() {
+  var email = emailInput.value.trim();
+  if (!email || !email.includes('@') || !email.includes('.')) {
+    emailInput.classList.add('error');
+    errorEl.textContent = 'Please enter a valid email address.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  emailInput.classList.remove('error');
+  errorEl.style.display = 'none';
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Redirecting to Stripe...';
+
+  try {
+    trackEvent('checkout_started', { product_id: 'cci_founding' });
+
+    var res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        product_id: 'cci_founding',
+        supabase_user_id: 'guest',
+        customer_email: email,
+        success_url: window.location.origin + '/?purchased=1',
+        cancel_url: window.location.origin + '/',
+      }),
+    });
+
+    var data = await res.json();
+
+    if (res.ok && data.checkout_url) {
+      window.location.href = data.checkout_url;
+    } else {
+      throw new Error(data.error || 'Checkout unavailable');
+    }
+  } catch (err) {
+    // TODO: Fallback to mailto if Stripe STRIPE_PRICE_CCI_FOUNDING env var is not set
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Continue to Checkout \u2014 $199';
+    errorEl.innerHTML = 'Checkout temporarily unavailable. <a href="mailto:contact@orbitalhealth.app?subject=CCI%20Founding%20Access" style="color:#00D7FF;text-decoration:underline;">Email us instead</a>';
+    errorEl.style.display = 'block';
+  }
+});
+
+// =========================================================================
+// PRICING CARD CLICKS — track tier
+// =========================================================================
+document.querySelectorAll('.pricing-cta').forEach(function(btn) {
   btn.addEventListener('click', function() {
-    trackEvent('download_clicked', { store: btn.href.includes('apple') ? 'ios' : 'android' });
+    var tier = btn.getAttribute('data-tier') || '';
+    trackEvent('pricing_card_clicked', { tier: tier });
   });
 });
 

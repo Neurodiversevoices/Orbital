@@ -72,6 +72,12 @@ function getProductMap(): Record<string, StripeProduct> {
       mode: 'subscription',
       name: 'Pro (Annual)',
     },
+    cci_founding: {
+      stripePriceId: process.env.STRIPE_PRICE_CCI_FOUNDING || '',
+      entitlementId: 'cci_founding',
+      mode: 'payment',
+      name: 'CCI Founding Cohort',
+    },
     orbital_cci_free: {
       stripePriceId: process.env.STRIPE_PRICE_CCI_FREE || '',
       entitlementId: 'cci_purchased',
