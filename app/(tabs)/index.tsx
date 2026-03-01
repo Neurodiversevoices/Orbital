@@ -27,14 +27,19 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { SavePulse, CategorySelector, Composer, COMPOSER_HEIGHT, ModeInsightsPanel, OrgRoleBanner } from '../../components';
 import { GlassOrb } from '../../components/GlassOrb';
 
-// Dynamically load ClinicalOrb — falls back to GlassOrb when native Skia module isn't available
-let ClinicalOrbComponent: typeof import('../../components/orb/ClinicalOrb').default | null = null;
-let ClinicalGaugeComponent: typeof import('../../components/orb/ClinicalGauge').default | null = null;
+// Dynamically load ClinicalOrb — V10 preferred, V9 fallback, GlassOrb last resort
+let ClinicalOrbComponent: any = null;
+let ClinicalGaugeComponent: any = null;
 try {
-  ClinicalOrbComponent = require('../../components/orb/ClinicalOrb').default;
-  ClinicalGaugeComponent = require('../../components/orb/ClinicalGauge').default;
+  ClinicalOrbComponent = require('../../components/orb/ClinicalOrbV10').default;
+  ClinicalGaugeComponent = require('../../components/orb/ClinicalGaugeV10').default;
 } catch {
-  // RNSkiaModule not in this build — GlassOrb will be used instead
+  try {
+    ClinicalOrbComponent = require('../../components/orb/ClinicalOrb').default;
+    ClinicalGaugeComponent = require('../../components/orb/ClinicalGauge').default;
+  } catch {
+    // RNSkiaModule not in this build — GlassOrb will be used instead
+  }
 }
 import { colors, commonStyles, spacing } from '../../theme';
 import { CapacityState, Category } from '../../types';
@@ -325,13 +330,13 @@ export default function HomeScreen() {
                 <ClinicalOrbComponent
                   size={368}
                   initialCapacity={0.82}
-                  onCapacityChange={(cap) => {
+                  onCapacityChange={(cap: number) => {
                     capacityShared.value = cap;
                     if (cap >= 0.7) handleStateChange('resourced');
                     else if (cap >= 0.4) handleStateChange('stretched');
                     else handleStateChange('depleted');
                   }}
-                  onStateChange={(state) => {
+                  onStateChange={(state: string) => {
                     if (state === 'RESOURCED' || state === 'STABLE') handleStateChange('resourced');
                     else if (state === 'ELEVATED') handleStateChange('stretched');
                     else handleStateChange('depleted');
