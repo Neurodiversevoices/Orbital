@@ -31,6 +31,7 @@ const STOPS: { at: number; color: RGB }[] = [
 // =============================================================================
 
 function lerp(a: number, b: number, t: number): number {
+  'worklet';
   return a + (b - a) * t;
 }
 
@@ -38,6 +39,7 @@ function lerp(a: number, b: number, t: number): number {
  * Get the RGB color for a capacity value (0.0–1.0).
  */
 export function getOrbColor(capacity: number): RGB {
+  'worklet';
   const c = Math.max(0, Math.min(1, capacity));
 
   // Find the surrounding stops
@@ -62,6 +64,7 @@ export function getOrbColor(capacity: number): RGB {
  * Get an rgba() string for Skia from a capacity value.
  */
 export function capacityToSkiaColor(capacity: number, alpha: number = 1): string {
+  'worklet';
   const { r, g, b } = getOrbColor(capacity);
   return `rgba(${r},${g},${b},${alpha})`;
 }
@@ -74,6 +77,7 @@ export function capacityToSkiaColor(capacity: number, alpha: number = 1): string
  * Get the discrete state label for a capacity value.
  */
 export function getStateLabel(capacity: number): string {
+  'worklet';
   if (capacity < 0.15) return 'CRITICAL';
   if (capacity < 0.3) return 'LIMIT';
   if (capacity < 0.5) return 'ELEVATED';
@@ -85,6 +89,7 @@ export function getStateLabel(capacity: number): string {
  * Get the clinical context line for a capacity value.
  */
 export function getStateContext(capacity: number): string {
+  'worklet';
   if (capacity < 0.15) return 'System overload — immediate rest needed';
   if (capacity < 0.3) return 'Approaching threshold — reduce demands';
   if (capacity < 0.5) return 'Elevated load — monitor inputs';

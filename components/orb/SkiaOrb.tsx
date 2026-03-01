@@ -134,6 +134,7 @@ function polarToXY(
   angle: number,
   distance: number,
 ): { x: number; y: number } {
+  'worklet';
   return {
     x: cx + Math.cos(angle) * distance,
     y: cy + Math.sin(angle) * distance,
@@ -204,6 +205,7 @@ function buildLightningPathString(
   bolt: LightningBolt,
   phase: number,
 ): string {
+  'worklet';
   // Lightning goes from near center outward to a point on the inner edge
   const startDist = innerRadius * 0.08;
   const endDist = innerRadius * 0.92;
@@ -242,6 +244,7 @@ function buildNeuralPathwayString(
   nodes: NodePoint[],
   capacityVal: number,
 ): string {
+  'worklet';
   const nodeFrom = nodes[pathway.from];
   const nodeTo = nodes[pathway.to];
 
