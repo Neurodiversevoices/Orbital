@@ -21,6 +21,7 @@ import { AgeGate } from '../components/legal/AgeGate';
 import { useIdleTimeout, updateLastActivity } from '../lib/session';
 import { useAuth } from '../lib/supabase';
 import { logSessionExpired, createDeviceSession } from '../lib/session';
+import { isDevAutoLoginEnabled, performDevAutoLogin } from '../lib/dev/autoLogin';
 
 // =============================================================================
 // COLD-LAUNCH TIMING — Breadcrumbs for Sentry startup trace
@@ -234,10 +235,30 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const auth = useAuth();
   const router = useRouter();
   const segments = useSegments();
+  const autoLoginAttempted = useRef(false);
+
+  // DEV AUTO-LOGIN: Sign in automatically before any routing decisions.
+  // Fires once on mount when EXPO_PUBLIC_DEV_AUTO_LOGIN=true.
+  useEffect(() => {
+    if (!isDevAutoLoginEnabled()) return;
+    if (autoLoginAttempted.current) return;
+    autoLoginAttempted.current = true;
+
+    performDevAutoLogin().then((success) => {
+      if (success) {
+        // Force navigate to home after auto-login establishes session.
+        // The auth state listener in useAuth will pick up the new session.
+        router.replace('/(tabs)');
+      }
+    });
+  }, [router]);
 
   useEffect(() => {
+    // DEV AUTO-LOGIN active: routing is handled by the auto-login effect above.
+    // Skip the normal auth gate entirely so it doesn't fight the redirect.
+    if (isDevAutoLoginEnabled()) return;
+
     // DEV ONLY: skip auth gate so we can see screens past login in the simulator.
-    // Remove this block to re-enable normal auth flow.
     if (__DEV__) return;
 
     if (auth.isLoading) return;
