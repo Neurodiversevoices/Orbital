@@ -25,24 +25,7 @@ import { useRouter, useLocalSearchParams, Redirect } from 'expo-router';
 import { Settings, TrendingUp, TrendingDown, Minus, Sparkles } from 'lucide-react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SavePulse, CategorySelector, Composer, COMPOSER_HEIGHT, ModeInsightsPanel, OrgRoleBanner } from '../../components';
-import { GlassOrb } from '../../components/GlassOrb';
-
-// Dynamically load orb — WaveOrb preferred, ClinicalOrb fallback, GlassOrb last resort
-let WaveOrbComponent: any = null;
-let ClinicalOrbComponent: any = null;
-let ClinicalGaugeComponent: any = null;
-try {
-  WaveOrbComponent = require('../../components/orb/WaveOrb').default;
-} catch {}
-try {
-  ClinicalOrbComponent = require('../../components/orb/ClinicalOrbV10').default;
-  ClinicalGaugeComponent = require('../../components/orb/ClinicalGaugeV10').default;
-} catch {
-  try {
-    ClinicalOrbComponent = require('../../components/orb/ClinicalOrb').default;
-    ClinicalGaugeComponent = require('../../components/orb/ClinicalGauge').default;
-  } catch {}
-}
+import ShaderOrb from '../../components/orb/ShaderOrb';
 import { colors, commonStyles, spacing } from '../../theme';
 import { CapacityState, Category } from '../../types';
 import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
@@ -328,55 +311,7 @@ export default function HomeScreen() {
 
             <View style={styles.orbContainer}>
               {currentState && <SavePulse trigger={saveTrigger} state={currentState} />}
-              {WaveOrbComponent ? (
-                <WaveOrbComponent
-                  size={320}
-                  capacity={capacityShared}
-                  onCapacityChange={(cap: number) => {
-                    if (cap >= 0.7) handleStateChange('resourced');
-                    else if (cap >= 0.4) handleStateChange('stretched');
-                    else handleStateChange('depleted');
-                  }}
-                />
-              ) : ClinicalOrbComponent ? (
-                <ClinicalOrbComponent
-                  size={368}
-                  initialCapacity={0.82}
-                  onCapacityChange={(cap: number) => {
-                    capacityShared.value = cap;
-                    if (cap >= 0.7) handleStateChange('resourced');
-                    else if (cap >= 0.4) handleStateChange('stretched');
-                    else handleStateChange('depleted');
-                  }}
-                  onStateChange={(state: string) => {
-                    if (state === 'RESOURCED' || state === 'STABLE') handleStateChange('resourced');
-                    else if (state === 'ELEVATED') handleStateChange('stretched');
-                    else handleStateChange('depleted');
-                  }}
-                />
-              ) : (
-                <GlassOrb state={currentState} onStateChange={handleStateChange} onSave={handleSave} />
-              )}
-              {!WaveOrbComponent && ClinicalGaugeComponent ? (
-                <ClinicalGaugeComponent width={280} height={48} capacity={capacityShared} />
-              ) : (
-                <View style={styles.spectrumContainer}>
-                  <View style={styles.spectrumTrack}>
-                    <View style={[styles.spectrumEndcap, styles.spectrumEndcapLeft]} />
-                    <View style={styles.spectrumBar}>
-                      <View style={[styles.spectrumSegment, { backgroundColor: '#00E5FF' }]} />
-                      <View style={[styles.spectrumSegment, { backgroundColor: '#E8A830' }]} />
-                      <View style={[styles.spectrumSegment, { backgroundColor: '#F44336' }]} />
-                    </View>
-                    <View style={[styles.spectrumEndcap, styles.spectrumEndcapRight]} />
-                    {currentState && <Animated.View style={[styles.spectrumTick, tickStyle]} />}
-                  </View>
-                  <View style={styles.spectrumLabels}>
-                    <Text style={styles.spectrumLabel}>{t.home.spectrum.high}</Text>
-                    <Text style={styles.spectrumLabel}>{t.home.spectrum.low}</Text>
-                  </View>
-                </View>
-              )}
+              <ShaderOrb size={280} capacity={capacityShared} />
             </View>
 
             {currentState && (

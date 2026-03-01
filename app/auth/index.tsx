@@ -20,6 +20,7 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import ShaderOrb from '../../components/orb/ShaderOrb';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { useFonts } from 'expo-font';
@@ -234,20 +235,17 @@ export default function AuthScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* ── Top section: ambient glow + title ── */}
+          {/* ── Top section: ShaderOrb + title ── */}
           <View style={styles.topSection}>
-            {/* Ambient glow — 3 concentric rings, centered at 30% from top */}
-            <View style={styles.glowAnchor}>
-              <View style={[styles.glowRing, styles.glowOuter]} />
-              <View style={[styles.glowRing, styles.glowMid]} />
-              <View style={[styles.glowRing, styles.glowInner]} />
+            <View style={styles.orbWrap}>
+              <ShaderOrb size={220} staticCapacity={1.0} disabled />
             </View>
 
             {/* Title */}
             <Text style={styles.title}>Orbital</Text>
 
             {/* Subtitle */}
-            <Text style={styles.subtitle}>{'· LOG SENSORY INPUT ·'}</Text>
+            <Text style={styles.subtitle}>{'CAPACITY INTELLIGENCE'}</Text>
           </View>
 
           {/* Feedback banners */}
@@ -444,39 +442,15 @@ const styles = StyleSheet.create({
     fontFamily: 'SpaceMono_400Regular',
   },
 
-  // ── Top section: glow + title + subtitle ────────────────────────────────
+  // ── Top section: orb + title + subtitle ──────────────────────────────────
   topSection: {
     alignItems: 'center',
-    paddingTop: '30%',
+    paddingTop: 48,
   },
-  glowAnchor: {
+  orbWrap: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 500,
-    height: 500,
-    position: 'absolute',
-    top: '30%',
-    alignSelf: 'center',
-    marginTop: -250, // center the 500px glow vertically on the 30% anchor
-  },
-  glowRing: {
-    position: 'absolute',
-    borderRadius: 9999,
-  },
-  glowOuter: {
-    width: 500,
-    height: 500,
-    backgroundColor: 'rgba(45,212,191,0.03)',
-  },
-  glowMid: {
-    width: 400,
-    height: 400,
-    backgroundColor: 'rgba(45,212,191,0.06)',
-  },
-  glowInner: {
-    width: 300,
-    height: 300,
-    backgroundColor: 'rgba(45,212,191,0.10)',
+    marginBottom: 12,
   },
 
   // ── Title ───────────────────────────────────────────────────────────────
@@ -486,7 +460,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
     textAlign: 'center',
-    marginTop: 28,
+    marginTop: 12,
   },
 
   // ── Subtitle ────────────────────────────────────────────────────────────
