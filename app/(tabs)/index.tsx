@@ -86,6 +86,7 @@ const stateLabels: Record<CapacityState, string> = {
 
 /** Derive CapacityState from a capacity value using equal-thirds thresholds */
 function capacityToState(cap: number): CapacityState {
+  'worklet';
   if (cap >= THRESHOLD_RESOURCED) return 'resourced';
   if (cap >= THRESHOLD_STRETCHED) return 'stretched';
   return 'depleted';
