@@ -50,18 +50,10 @@ function getSupabaseAdmin() {
  * Fallback: Use price ID → entitlement lookup here.
  */
 const PRICE_TO_ENTITLEMENT: Record<string, string> = {
-  // These will be populated from Stripe product metadata at runtime.
-  // If metadata is missing, this static map is the fallback.
-  // Add your Stripe Price IDs here after creating products:
-  //
-  // 'price_xxxxx': 'pro_access',        // Pro Monthly
-  // 'price_xxxxx': 'pro_access',        // Pro Annual
-  // 'price_xxxxx': 'cci_purchased',     // CCI Free
-  // 'price_xxxxx': 'cci_purchased',     // CCI Pro
-  // 'price_xxxxx': 'circle_access',     // Circle Monthly
-  // 'price_xxxxx': 'circle_access',     // Circle Annual
-  // 'price_xxxxx': 'cci_circle_purchased', // Circle CCI
-  // 'price_xxxxx': 'cci_bundle_purchased', // Bundle CCI
+  // CCI Founding Cohort — price ID resolved from env at module load
+  ...(process.env.STRIPE_PRICE_CCI_FOUNDING
+    ? { [process.env.STRIPE_PRICE_CCI_FOUNDING]: 'cci_founding' }
+    : {}),
 };
 
 /**
@@ -225,6 +217,22 @@ async function handleCheckoutCompleted(
       },
     );
 
+    // CCI Founding bonus: grant 90-day Pro trial
+    if (entitlementId === 'cci_founding') {
+      await grantEntitlement(
+        userId,
+        'pro_trial',
+        'cci_founding_bonus',
+        session.id,
+        {
+          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+          stripe_customer_id: session.customer,
+          price_id: item.price?.id,
+        },
+      );
+      console.log(`[stripe-webhook] Granted 90-day pro_trial bonus to ${userId}`);
+    }
+
     const billingCycle = session.mode === 'subscription' ? 'recurring' : 'one_time';
     await recordPurchase(
       userId,
@@ -301,6 +309,14 @@ async function handlePaymentFailed(
 // MAIN HANDLER
 // =============================================================================
 
+// Disable Vercel's automatic body parsing so we get the raw body
+// for Stripe webhook signature verification.
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
@@ -329,10 +345,12 @@ export default async function handler(
   const stripe = getStripe();
 
   try {
-    // Vercel provides raw body as Buffer when Content-Type is not JSON-parsed
-    const rawBody = typeof req.body === 'string'
-      ? req.body
-      : JSON.stringify(req.body);
+    // Read the raw body from the request stream (bodyParser is disabled)
+    const chunks: Buffer[] = [];
+    for await (const chunk of req) {
+      chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+    }
+    const rawBody = Buffer.concat(chunks).toString('utf8');
 
     event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
   } catch (err) {
