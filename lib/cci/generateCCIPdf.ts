@@ -12,7 +12,7 @@
  * 5. mapFunctionalImpact(computedData, projection)
  * 6. formatCCIDynamicData(data)
  * 7. assertGovernanceCompliance(strings)
- * 8. generateCCIPowerHTML(input)
+ * 8. generateCCIArtifactHTML(metadata, dynamicData, projection, narrative, impact, driverStats)
  * 9. Print.printToFileAsync({ html })
  * 10. FileSystem.moveAsync to proper path
  * 11. Sharing.shareAsync
@@ -28,7 +28,8 @@ import { computeCCIDynamicData, formatCCIDynamicData, assertGovernanceCompliance
 import { computeProjection } from './dynamic/projection';
 import { generateNarrative } from './dynamic/narrative';
 import { mapFunctionalImpact } from './dynamic/impact';
-import { generateCCIPowerHTML, CCIPowerTemplateInput } from './powerTemplate';
+import { findProhibitedWords } from './dynamic/governance';
+import { generateCCIArtifactHTML } from './artifact';
 import { CCIIssuanceMetadata } from './types';
 import type { CCIComputeConfig, CCIDynamicData } from './dynamic/types';
 
@@ -190,6 +191,15 @@ export async function generateCCIPdf(
     const formatted = formatCCIDynamicData(dynamicData);
     assertGovernanceCompliance(formatted);
 
+    // Also scan narrative for prohibited language
+    const narrativeViolations = findProhibitedWords(narrative.summary);
+    if (narrativeViolations.length > 0) {
+      return {
+        success: false,
+        error: `CCI Governance Violation in narrative: ${narrativeViolations.join(', ')}`,
+      };
+    }
+
     // =========================================================================
     // Step 8: Build metadata
     // =========================================================================
@@ -205,19 +215,16 @@ export async function generateCCIPdf(
     };
 
     // =========================================================================
-    // Step 9: Generate HTML
+    // Step 9: Generate HTML via dark-theme artifact template
     // =========================================================================
-    const templateInput: CCIPowerTemplateInput = {
+    const html = generateCCIArtifactHTML(
       metadata,
-      formatted,
       dynamicData,
       projection,
       narrative,
       impact,
       driverStats,
-    };
-
-    const html = generateCCIPowerHTML(templateInput);
+    );
 
     // =========================================================================
     // Step 10: HTML → PDF via expo-print
