@@ -27,9 +27,13 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { SavePulse, CategorySelector, Composer, COMPOSER_HEIGHT, ModeInsightsPanel, OrgRoleBanner } from '../../components';
 import { GlassOrb } from '../../components/GlassOrb';
 
-// Dynamically load ClinicalOrb — V10 preferred, V9 fallback, GlassOrb last resort
+// Dynamically load orb — WaveOrb preferred, ClinicalOrb fallback, GlassOrb last resort
+let WaveOrbComponent: any = null;
 let ClinicalOrbComponent: any = null;
 let ClinicalGaugeComponent: any = null;
+try {
+  WaveOrbComponent = require('../../components/orb/WaveOrb').default;
+} catch {}
 try {
   ClinicalOrbComponent = require('../../components/orb/ClinicalOrbV10').default;
   ClinicalGaugeComponent = require('../../components/orb/ClinicalGaugeV10').default;
@@ -37,9 +41,7 @@ try {
   try {
     ClinicalOrbComponent = require('../../components/orb/ClinicalOrb').default;
     ClinicalGaugeComponent = require('../../components/orb/ClinicalGauge').default;
-  } catch {
-    // RNSkiaModule not in this build — GlassOrb will be used instead
-  }
+  } catch {}
 }
 import { colors, commonStyles, spacing } from '../../theme';
 import { CapacityState, Category } from '../../types';
@@ -326,7 +328,17 @@ export default function HomeScreen() {
 
             <View style={styles.orbContainer}>
               {currentState && <SavePulse trigger={saveTrigger} state={currentState} />}
-              {ClinicalOrbComponent ? (
+              {WaveOrbComponent ? (
+                <WaveOrbComponent
+                  size={320}
+                  capacity={capacityShared}
+                  onCapacityChange={(cap: number) => {
+                    if (cap >= 0.7) handleStateChange('resourced');
+                    else if (cap >= 0.4) handleStateChange('stretched');
+                    else handleStateChange('depleted');
+                  }}
+                />
+              ) : ClinicalOrbComponent ? (
                 <ClinicalOrbComponent
                   size={368}
                   initialCapacity={0.82}
