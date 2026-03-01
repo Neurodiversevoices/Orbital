@@ -27,10 +27,12 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { SavePulse, CategorySelector, Composer, COMPOSER_HEIGHT, ModeInsightsPanel, OrgRoleBanner } from '../../components';
 import { GlassOrb } from '../../components/GlassOrb';
 
-// Dynamically load SkiaOrb — falls back to GlassOrb when native Skia module isn't available
-let SkiaOrbComponent: typeof import('../../components/orb/SkiaOrb').default | null = null;
+// Dynamically load ClinicalOrb — falls back to GlassOrb when native Skia module isn't available
+let ClinicalOrbComponent: typeof import('../../components/orb/ClinicalOrb').default | null = null;
+let ClinicalGaugeComponent: typeof import('../../components/orb/ClinicalGauge').default | null = null;
 try {
-  SkiaOrbComponent = require('../../components/orb/SkiaOrb').default;
+  ClinicalOrbComponent = require('../../components/orb/ClinicalOrb').default;
+  ClinicalGaugeComponent = require('../../components/orb/ClinicalGauge').default;
 } catch {
   // RNSkiaModule not in this build — GlassOrb will be used instead
 }
@@ -84,6 +86,7 @@ export default function HomeScreen() {
 
   const headerScale = useSharedValue(1);
   const headerOpacity = useSharedValue(1);
+  const capacityShared = useSharedValue(0.82);
 
   useEffect(() => {
     const keyboardWillShow = Keyboard.addListener(
@@ -318,31 +321,45 @@ export default function HomeScreen() {
 
             <View style={styles.orbContainer}>
               {currentState && <SavePulse trigger={saveTrigger} state={currentState} />}
-              {SkiaOrbComponent ? (
-                <SkiaOrbComponent size={320} initialCapacity={0.82} onCapacityChange={(cap) => {
-                  if (cap >= 0.7) handleStateChange('resourced');
-                  else if (cap >= 0.4) handleStateChange('stretched');
-                  else handleStateChange('depleted');
-                }} />
+              {ClinicalOrbComponent ? (
+                <ClinicalOrbComponent
+                  size={368}
+                  initialCapacity={0.82}
+                  onCapacityChange={(cap) => {
+                    capacityShared.value = cap;
+                    if (cap >= 0.7) handleStateChange('resourced');
+                    else if (cap >= 0.4) handleStateChange('stretched');
+                    else handleStateChange('depleted');
+                  }}
+                  onStateChange={(state) => {
+                    if (state === 'RESOURCED' || state === 'STABLE') handleStateChange('resourced');
+                    else if (state === 'ELEVATED') handleStateChange('stretched');
+                    else handleStateChange('depleted');
+                  }}
+                />
               ) : (
                 <GlassOrb state={currentState} onStateChange={handleStateChange} onSave={handleSave} />
               )}
-              <View style={styles.spectrumContainer}>
-                <View style={styles.spectrumTrack}>
-                  <View style={[styles.spectrumEndcap, styles.spectrumEndcapLeft]} />
-                  <View style={styles.spectrumBar}>
-                    <View style={[styles.spectrumSegment, { backgroundColor: '#00E5FF' }]} />
-                    <View style={[styles.spectrumSegment, { backgroundColor: '#E8A830' }]} />
-                    <View style={[styles.spectrumSegment, { backgroundColor: '#F44336' }]} />
+              {ClinicalGaugeComponent ? (
+                <ClinicalGaugeComponent width={280} height={48} capacity={capacityShared} />
+              ) : (
+                <View style={styles.spectrumContainer}>
+                  <View style={styles.spectrumTrack}>
+                    <View style={[styles.spectrumEndcap, styles.spectrumEndcapLeft]} />
+                    <View style={styles.spectrumBar}>
+                      <View style={[styles.spectrumSegment, { backgroundColor: '#00E5FF' }]} />
+                      <View style={[styles.spectrumSegment, { backgroundColor: '#E8A830' }]} />
+                      <View style={[styles.spectrumSegment, { backgroundColor: '#F44336' }]} />
+                    </View>
+                    <View style={[styles.spectrumEndcap, styles.spectrumEndcapRight]} />
+                    {currentState && <Animated.View style={[styles.spectrumTick, tickStyle]} />}
                   </View>
-                  <View style={[styles.spectrumEndcap, styles.spectrumEndcapRight]} />
-                  {currentState && <Animated.View style={[styles.spectrumTick, tickStyle]} />}
+                  <View style={styles.spectrumLabels}>
+                    <Text style={styles.spectrumLabel}>{t.home.spectrum.high}</Text>
+                    <Text style={styles.spectrumLabel}>{t.home.spectrum.low}</Text>
+                  </View>
                 </View>
-                <View style={styles.spectrumLabels}>
-                  <Text style={styles.spectrumLabel}>{t.home.spectrum.high}</Text>
-                  <Text style={styles.spectrumLabel}>{t.home.spectrum.low}</Text>
-                </View>
-              </View>
+              )}
             </View>
 
             {currentState && (
