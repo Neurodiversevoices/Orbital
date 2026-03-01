@@ -166,6 +166,53 @@
   .feature-card h3{font-size:16px;font-weight:600;color:#fff;margin-bottom:8px}
   .feature-card p{font-size:14px;color:rgba(255,255,255,0.5);line-height:1.6}
 
+  /* ---- Feature grid (5-block architecture) ---- */
+  .feature-block{margin-bottom:48px}
+  .feature-block:last-child{margin-bottom:0}
+  .block-label{
+    font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;
+    color:rgba(255,255,255,0.35);margin-bottom:16px;
+  }
+  .feat-grid{
+    display:grid;gap:16px;grid-template-columns:repeat(2,1fr);
+    list-style:none;padding:0;margin:0;
+  }
+  .feat-item{
+    display:flex;flex-direction:column;align-items:center;text-align:center;
+    padding:14px 12px;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:12px;
+    transition:border-color 0.25s;
+    gap:8px;
+  }
+  .feat-item:hover{border-color:rgba(255,255,255,0.12)}
+  .feat-item svg{flex-shrink:0;color:rgba(8,209,224,0.6)}
+  .feat-item span{
+    font-size:14px;font-weight:500;color:rgba(255,255,255,0.85);line-height:1.3;
+  }
+  .guarantee-badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(50,215,75,0.08);
+    border:1px solid rgba(50,215,75,0.2);border-radius:100px;
+    padding:6px 16px;margin-top:12px;
+    font-size:12px;font-weight:600;color:#32D74B;
+    letter-spacing:0.3px;
+  }
+  @media(min-width:640px){
+    .feat-grid{grid-template-columns:repeat(3,1fr);gap:20px}
+    .block-label{font-size:12px}
+    .feat-item span{font-size:15px}
+    .feature-block{margin-bottom:56px}
+  }
+  @media(min-width:1024px){
+    .feat-grid{grid-template-columns:repeat(4,1fr);gap:24px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .feat-item{transition:none}
+    .hero-badge-dot{animation:none}
+  }
+
   /* ---- How it works ---- */
   .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:32px;counter-reset:step}
   .step{position:relative;padding-left:0;text-align:center}
@@ -505,7 +552,7 @@
       <a href="#features">Features</a>
       <a href="#how-it-works">How It Works</a>
       <a href="#pricing">Pricing</a>
-      <a href="#privacy">Privacy</a>
+      <a href="/privacy">Privacy</a>
       <a href="/support">Support</a>
     </div>
   </div>
@@ -570,6 +617,129 @@
     </div>
   </section>
 
+  <!-- Features — 20-Item Grid (5 Blocks) -->
+  <section id="features" aria-labelledby="features-heading">
+    <h2 id="features-heading" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Platform Features</h2>
+    <div class="section-label">Platform</div>
+    <h2>20 reasons this works</h2>
+    <p>From one-tap logging to clinical-grade proof. Everything you need to understand and share your capacity.</p>
+
+    <!-- Block 1: Capture -->
+    <div class="feature-block" data-block="capture">
+      <h3 class="block-label">Capture</h3>
+      <ul class="feat-grid" role="list">
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>One-tap logging</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="9" width="20" height="6" rx="3"/></svg>
+          <span>Continuous spectrum</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          <span>Driver tracking</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Context notes</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Block 2: Intelligence -->
+    <div class="feature-block" data-block="intelligence">
+      <h3 class="block-label">Intelligence</h3>
+      <ul class="feat-grid" role="list">
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span>Pattern detection</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Multi-horizon trends</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span>Driver correlation</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Temporal mapping</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          <span>Stability indexing</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Early warning signals</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Block 3: Proof -->
+    <div class="feature-block" data-block="proof">
+      <h3 class="block-label">Proof</h3>
+      <ul class="feat-grid" role="list">
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          <span>Longitudinal record</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
+          <span>Clinical capacity report</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span>Provider-ready sharing</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Block 4: Together -->
+    <div class="feature-block" data-block="together">
+      <h3 class="block-label">Together</h3>
+      <ul class="feat-grid" role="list">
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          <span>Trusted circles</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Family view</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Read-only admin</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          <span>Institutional demo</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Block 5: Trust -->
+    <div class="feature-block" data-block="trust">
+      <h3 class="block-label">Trust</h3>
+      <ul class="feat-grid" role="list">
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Privacy-first governance</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <span>Zero data sales</span>
+        </li>
+        <li class="feat-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          <span>Works everywhere</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
   <!-- CCI Showcase -->
   <section class="cci-showcase">
     <div class="section-label">Capacity Credential</div>
@@ -593,80 +763,6 @@
         <strong>Portable PDF</strong>
         <span>Download, print, or share on your terms</span>
       </div>
-    </div>
-  </section>
-
-  <!-- Features -->
-  <section id="features">
-    <div class="section-label">Features</div>
-    <h2>Built for the long game</h2>
-    <p>Value compounds over time. The longer you log, the more your data reveals.</p>
-
-    <div class="features">
-      <div class="feature-card">
-        <div class="feature-icon cyan">&#9678;</div>
-        <h3>Signal Logging</h3>
-        <p>Record your capacity in under 30 seconds. Three states, optional tags, no friction. Designed for daily use without daily effort.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon amber">&#9638;</div>
-        <h3>Pattern Discovery</h3>
-        <p>Trends unlock at 7, 14, 30, and 90 signals. See weekly rhythms and capacity patterns emerge from your own data.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon white">&#8644;</div>
-        <h3>Data Export</h3>
-        <p>Export your full dataset as JSON or CSV at any time. Your data is always yours to take with you. No lock-in, ever.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon cyan">&#9711;</div>
-        <h3>Circles</h3>
-        <p>Share your current capacity state with up to 25 trusted people. Bidirectional consent required. Signals expire after 90 minutes.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon red">&#9724;</div>
-        <h3>Capacity Credential</h3>
-        <p>Generate formal quarterly PDF documents synthesizing your capacity patterns for personal records or professional use.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon white">&#9881;</div>
-        <h3>Accessibility-First</h3>
-        <p>Colorblind modes, text scaling, button scaling, haptic control, high contrast, and simple mode. Built for everyone.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Privacy -->
-  <section id="privacy">
-    <div class="section-label">Privacy</div>
-    <h2>Private by default</h2>
-    <p>Your data stays on your device. When you sign in, it syncs encrypted. Nobody else can see your logs. Not even us.</p>
-
-    <div class="privacy-grid">
-      <div class="privacy-item">
-        <div class="privacy-check">&#10003;</div>
-        <p><strong>Local-first storage.</strong> Everything lives on your device unless you choose to sync.</p>
-      </div>
-      <div class="privacy-item">
-        <div class="privacy-check">&#10003;</div>
-        <p><strong>Encrypted sync.</strong> Data encrypted in transit and at rest with row-level access control.</p>
-      </div>
-      <div class="privacy-item">
-        <div class="privacy-check">&#10003;</div>
-        <p><strong>No data sales. Ever.</strong> We never sell, license, or share your data with advertisers or brokers.</p>
-      </div>
-      <div class="privacy-item">
-        <div class="privacy-check">&#10003;</div>
-        <p><strong>Export or delete anytime.</strong> Full data portability. Leave whenever you want with everything you logged.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Circles -->
-  <section>
-    <div class="circles-banner">
-      <h3>Share on your terms</h3>
-      <p>Circles let you share capacity with people you trust — family, close friends, supporters. Every member must explicitly consent. No surprises. No surveillance. Signals expire automatically.</p>
     </div>
   </section>
 
@@ -756,6 +852,7 @@
           <li>Shareable with providers</li>
         </ul>
         <button class="pricing-cta primary" onclick="startCheckout('orbital_cci_90')">Get My CCI — $199</button>
+        <div style="text-align:center"><span class="guarantee-badge">&#x2713; 30-day money-back guarantee</span></div>
         <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:10px">Tap any tier above to choose 30, 60, 90-day, or bundle</p>
       </div>
     </div>
@@ -826,32 +923,6 @@
           <a href="mailto:contact@orbitalhealth.app?subject=Therapist Plan Interest" class="pricing-cta secondary">Start Free Trial</a>
         </div>
 
-      </div>
-    </div>
-  </section>
-
-  <!-- Built for -->
-  <section>
-    <div class="section-label">Philosophy</div>
-    <h2>Built for people who think differently</h2>
-    <p>Designed for neurodivergent individuals, people with chronic conditions, caregivers, and anyone whose capacity fluctuates in ways that standard tools don't capture.</p>
-
-    <div class="features" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
-      <div class="feature-card" style="text-align:center;padding:24px 20px">
-        <h3 style="font-size:14px;margin-bottom:4px">Calm</h3>
-        <p>No notifications. No nudges. No engagement pressure.</p>
-      </div>
-      <div class="feature-card" style="text-align:center;padding:24px 20px">
-        <h3 style="font-size:14px;margin-bottom:4px">Non-Diagnostic</h3>
-        <p>Observations only. No labels, no scores, no clinical claims.</p>
-      </div>
-      <div class="feature-card" style="text-align:center;padding:24px 20px">
-        <h3 style="font-size:14px;margin-bottom:4px">Longitudinal</h3>
-        <p>Value compounds over months and years, not days.</p>
-      </div>
-      <div class="feature-card" style="text-align:center;padding:24px 20px">
-        <h3 style="font-size:14px;margin-bottom:4px">Yours</h3>
-        <p>You record. You own. You decide what to share.</p>
       </div>
     </div>
   </section>
