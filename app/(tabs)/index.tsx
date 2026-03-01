@@ -9,6 +9,8 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Dimensions,
+  AccessibilityActionEvent,
 } from 'react-native';
 import Animated, {
   FadeOut,
@@ -24,6 +26,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useRouter, useLocalSearchParams, Redirect } from 'expo-router';
 import { Settings, Sparkles } from 'lucide-react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 import { SavePulse, CategorySelector, Composer, COMPOSER_HEIGHT } from '../../components';
 import ShaderOrb from '../../components/orb/ShaderOrb';
 import { colors, commonStyles, spacing } from '../../theme';
@@ -39,15 +42,81 @@ import { useSubscription, shouldBypassSubscription } from '../../lib/subscriptio
 // CONSTANTS
 // =============================================================================
 
-const SLIDER_WIDTH = 260;
-const THUMB_SIZE = 24;
 const INITIAL_CAPACITY = 0.82;
+const ORB_SIZE = 280;
+const ORB_HIT_PADDING = 20; // Extra touch forgiveness around orb
+const ORB_HIT_SIZE = ORB_SIZE + ORB_HIT_PADDING * 2; // 320x320
+
+// Drag range: 40% of screen width for full 0→1 traversal
+const DRAG_RANGE = Dimensions.get('window').width * 0.4;
+
+// Three-detent snap positions
+const DETENT_RESOURCED = 1.0;
+const DETENT_STRETCHED = 0.5;
+const DETENT_DEPLETED = 0.0;
+
+// State thresholds (equal thirds)
+const THRESHOLD_RESOURCED = 0.67;
+const THRESHOLD_STRETCHED = 0.33;
+
+// Spring physics for detent settlement
+const SETTLE_SPRING = {
+  damping: 20,
+  stiffness: 180,
+  mass: 1,
+  overshootClamping: true,
+};
 
 const stateColors: Record<CapacityState, string> = {
   resourced: '#00E5FF',
   stretched: '#E8A830',
   depleted: '#F44336',
 };
+
+// Display labels — "ELEVATED" is the visual label for internal 'stretched' state
+const stateLabels: Record<CapacityState, string> = {
+  resourced: 'RESOURCED',
+  stretched: 'ELEVATED',
+  depleted: 'DEPLETED',
+};
+
+// =============================================================================
+// HELPERS
+// =============================================================================
+
+/** Derive CapacityState from a capacity value using equal-thirds thresholds */
+function capacityToState(cap: number): CapacityState {
+  if (cap >= THRESHOLD_RESOURCED) return 'resourced';
+  if (cap >= THRESHOLD_STRETCHED) return 'stretched';
+  return 'depleted';
+}
+
+/** Find nearest detent for a given capacity value */
+function nearestDetent(cap: number): number {
+  'worklet';
+  const detents = [DETENT_DEPLETED, DETENT_STRETCHED, DETENT_RESOURCED];
+  let nearest = detents[0];
+  let minDist = Math.abs(cap - detents[0]);
+  for (let i = 1; i < detents.length; i++) {
+    const d = Math.abs(cap - detents[i]);
+    if (d < minDist) {
+      minDist = d;
+      nearest = detents[i];
+    }
+  }
+  return nearest;
+}
+
+/** Rubberband resistance when dragging past bounds */
+function rubberband(raw: number): number {
+  'worklet';
+  if (raw < 0.0) {
+    return -0.1 * (1 - Math.exp(raw));
+  } else if (raw > 1.0) {
+    return 1.0 + 0.1 * (1 - Math.exp(-(raw - 1.0)));
+  }
+  return raw;
+}
 
 // =============================================================================
 // COMPONENT
@@ -56,7 +125,6 @@ const stateColors: Record<CapacityState, string> = {
 export default function HomeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  // FOUNDER-ONLY: Demo param only works when EXPO_PUBLIC_FOUNDER_DEMO=1
   const forceDemo = FOUNDER_DEMO_ENABLED && params.demo === '1';
   const insets = useSafeAreaInsets();
   const scrollViewRef = useRef<ScrollView>(null);
@@ -82,10 +150,12 @@ export default function HomeScreen() {
   const headerScale = useSharedValue(1);
   const headerOpacity = useSharedValue(1);
   const capacityShared = useSharedValue(INITIAL_CAPACITY);
-  const sliderStartX = useSharedValue(0);
-  const sliderX = useSharedValue(
-    (1 - INITIAL_CAPACITY) * (SLIDER_WIDTH - THUMB_SIZE),
-  );
+  const dragStartCapacity = useSharedValue(INITIAL_CAPACITY);
+  const labelOpacity = useSharedValue(0); // 0 = hidden (no interaction yet), 1 = visible
+  const isDragging = useSharedValue(false);
+
+  // Track previous "zone" for haptic threshold crossing (0, 1, or 2)
+  const prevZone = useSharedValue(-1); // -1 = uninitialized
 
   // ─── Keyboard handling ──────────────────────────────────────────────
   useEffect(() => {
@@ -132,59 +202,88 @@ export default function HomeScreen() {
   }, [forceDemo]);
 
   // ═══════════════════════════════════════════════════════════════════
-  // CAPACITY SLIDER
+  // HAPTIC CALLBACKS (must run on JS thread)
   // ═══════════════════════════════════════════════════════════════════
 
-  const sliderGesture = Gesture.Pan()
+  const fireThresholdHaptic = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  }, []);
+
+  const fireSettleHaptic = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, []);
+
+  // ═══════════════════════════════════════════════════════════════════
+  // DIRECT MANIPULATION GESTURE — Orb is the input
+  // ═══════════════════════════════════════════════════════════════════
+
+  const orbGesture = Gesture.Pan()
+    // Only activate on horizontal movement — let vertical scroll through
+    .activeOffsetX([-10, 10])
+    .failOffsetY([-15, 15])
     .onBegin(() => {
       'worklet';
-      sliderStartX.value = sliderX.value;
+      dragStartCapacity.value = capacityShared.value;
+      isDragging.value = true;
+      labelOpacity.value = withTiming(0, { duration: 150 });
+
+      // Initialize zone tracking
+      const cap = capacityShared.value;
+      if (cap >= THRESHOLD_RESOURCED) prevZone.value = 2;
+      else if (cap >= THRESHOLD_STRETCHED) prevZone.value = 1;
+      else prevZone.value = 0;
     })
     .onUpdate((e) => {
       'worklet';
-      const newX = Math.max(
-        0,
-        Math.min(SLIDER_WIDTH - THUMB_SIZE, sliderStartX.value + e.translationX),
-      );
-      sliderX.value = newX;
-      // Left = 1.0 (resourced), Right = 0.0 (depleted)
-      capacityShared.value = 1 - newX / (SLIDER_WIDTH - THUMB_SIZE);
+      // Drag LEFT = increase capacity, drag RIGHT = decrease capacity
+      const rawCapacity = dragStartCapacity.value - (e.translationX / DRAG_RANGE);
+
+      // Apply rubberband at bounds
+      capacityShared.value = rubberband(rawCapacity);
+
+      // Check for zone crossing → haptic
+      const clamped = Math.max(0, Math.min(1, rawCapacity));
+      let currentZone: number;
+      if (clamped >= THRESHOLD_RESOURCED) currentZone = 2;
+      else if (clamped >= THRESHOLD_STRETCHED) currentZone = 1;
+      else currentZone = 0;
+
+      if (currentZone !== prevZone.value && prevZone.value >= 0) {
+        runOnJS(fireThresholdHaptic)();
+      }
+      prevZone.value = currentZone;
     })
     .onEnd(() => {
       'worklet';
-      const cap = capacityShared.value;
-      const snapped = Math.round(cap * 20) / 20; // snap to 0.05
-      const clamped = Math.max(0, Math.min(1, snapped));
-      capacityShared.value = withSpring(clamped, {
-        damping: 20,
-        stiffness: 150,
-      });
-      sliderX.value = withSpring(
-        (1 - clamped) * (SLIDER_WIDTH - THUMB_SIZE),
-        { damping: 20, stiffness: 150 },
-      );
+      // Clamp back from rubberband and snap to nearest detent
+      const clamped = Math.max(0, Math.min(1, capacityShared.value));
+      const target = nearestDetent(clamped);
+
+      capacityShared.value = withSpring(target, SETTLE_SPRING);
+      isDragging.value = false;
+
+      // Show state label
+      labelOpacity.value = withTiming(1, { duration: 200 });
+
       // Derive discrete state for saving
-      const state: CapacityState =
-        clamped >= 0.7
-          ? 'resourced'
-          : clamped >= 0.4
-            ? 'stretched'
-            : 'depleted';
+      const state = capacityToState(target) as CapacityState;
       runOnJS(setCurrentState)(state);
+      runOnJS(fireSettleHaptic)();
     });
 
-  // Slider animated styles
-  const thumbTranslateStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: sliderX.value }],
+  // ─── State label animated style ───────────────────────────────────
+  const labelAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: labelOpacity.value,
   }));
 
-  const thumbColorStyle = useAnimatedStyle(() => {
-    const bg = interpolateColor(
+  // ─── State label color (driven by capacity) ──────────────────────
+  const labelColorStyle = useAnimatedStyle(() => {
+    const c = interpolateColor(
       capacityShared.value,
-      [0, 0.4, 0.7, 1],
-      ['#F44336', '#E8A830', '#2DD4BF', '#00E5FF'],
+      [0, 0.33, 0.67, 1],
+      ['rgba(244,67,54,0.6)', 'rgba(232,168,48,0.6)', 'rgba(232,168,48,0.6)', 'rgba(0,229,255,0.6)'],
     );
-    return { backgroundColor: bg as string };
+    return { color: c as string };
   });
 
   // ─── Handlers ──────────────────────────────────────────────────────
@@ -211,6 +310,8 @@ export default function HomeScreen() {
           setSelectedCategory(null);
           setNote('');
           setIsSaving(false);
+          // Hide label after save
+          labelOpacity.value = withTiming(0, { duration: 200 });
         }, 600);
       } catch (error) {
         if (__DEV__) console.error('Failed to save:', error);
@@ -218,6 +319,29 @@ export default function HomeScreen() {
       }
     }
   }, [currentState, selectedCategory, note, isSaving, saveEntry, canLogSignal]);
+
+  // ─── Accessibility: increment/decrement by one state ──────────────
+  const handleAccessibilityAction = useCallback((event: AccessibilityActionEvent) => {
+    const action = event.nativeEvent.actionName;
+    const current = capacityShared.value;
+    let target: number;
+
+    if (action === 'increment') {
+      // Step up by 0.5 (one state toward resourced)
+      target = Math.min(1.0, nearestDetent(current) + 0.5);
+    } else if (action === 'decrement') {
+      // Step down by 0.5 (one state toward depleted)
+      target = Math.max(0.0, nearestDetent(current) - 0.5);
+    } else {
+      return;
+    }
+
+    capacityShared.value = withSpring(target, SETTLE_SPRING);
+    labelOpacity.value = withTiming(1, { duration: 200 });
+    const state = capacityToState(target);
+    setCurrentState(state);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, []);
 
   // ─── Loading / Tutorial gates ──────────────────────────────────────
 
@@ -285,50 +409,37 @@ export default function HomeScreen() {
           bounces={!keyboardVisible}
         >
           <View style={styles.content}>
-            {/* ─── ORB — hero element, fully visible ─── */}
-            <View style={styles.orbContainer}>
-              {currentState && (
-                <SavePulse trigger={saveTrigger} state={currentState} />
-              )}
-              <ShaderOrb size={280} capacity={capacityShared} />
-            </View>
+            {/* ─── ORB — hero element + direct manipulation input ─── */}
+            <GestureDetector gesture={orbGesture}>
+              <Animated.View
+                style={styles.orbGestureTarget}
+                accessible
+                accessibilityRole="adjustable"
+                accessibilityLabel="Capacity input. Swipe left for resourced, right for depleted."
+                accessibilityValue={{
+                  min: 0,
+                  max: 100,
+                  now: Math.round((currentState === 'resourced' ? 1.0 : currentState === 'stretched' ? 0.5 : currentState === 'depleted' ? 0.0 : INITIAL_CAPACITY) * 100),
+                }}
+                accessibilityActions={[
+                  { name: 'increment' },
+                  { name: 'decrement' },
+                ]}
+                onAccessibilityAction={handleAccessibilityAction}
+              >
+                {currentState && (
+                  <SavePulse trigger={saveTrigger} state={currentState} />
+                )}
+                <ShaderOrb size={ORB_SIZE} capacity={capacityShared} />
+              </Animated.View>
+            </GestureDetector>
 
-            {/* ─── CAPACITY SLIDER ─── */}
-            <View style={styles.sliderSection}>
-              <GestureDetector gesture={sliderGesture}>
-                <Animated.View style={styles.sliderTouchArea}>
-                  {/* Spectrum track: cyan → teal → amber → crimson */}
-                  <View style={styles.sliderTrack}>
-                    <View
-                      style={[styles.sliderSeg, { backgroundColor: '#00E5FF' }]}
-                    />
-                    <View
-                      style={[styles.sliderSeg, { backgroundColor: '#2DD4BF' }]}
-                    />
-                    <View
-                      style={[styles.sliderSeg, { backgroundColor: '#F5B700' }]}
-                    />
-                    <View
-                      style={[styles.sliderSeg, { backgroundColor: '#F44336' }]}
-                    />
-                  </View>
-                  {/* Draggable thumb */}
-                  <Animated.View
-                    style={[
-                      styles.sliderThumb,
-                      thumbTranslateStyle,
-                      thumbColorStyle,
-                    ]}
-                  >
-                    <View style={styles.sliderThumbInner} />
-                  </Animated.View>
-                </Animated.View>
-              </GestureDetector>
-              <View style={styles.sliderLabels}>
-                <Text style={styles.sliderLabelText}>RESOURCED</Text>
-                <Text style={styles.sliderLabelText}>DEPLETED</Text>
-              </View>
-            </View>
+            {/* ─── STATE LABEL ─── */}
+            <Animated.View style={[styles.stateLabelWrap, labelAnimatedStyle]}>
+              <Animated.Text style={[styles.stateLabel, labelColorStyle]}>
+                {currentState ? stateLabels[currentState] : stateLabels.resourced}
+              </Animated.Text>
+            </Animated.View>
 
             {/* ─── DRIVER TAGS ─── */}
             {currentState && (
@@ -403,64 +514,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: spacing.sm,
   },
-  // ─── Orb ───
-  orbContainer: {
+  // ─── Orb gesture target ───
+  orbGestureTarget: {
+    width: ORB_HIT_SIZE,
+    height: ORB_HIT_SIZE,
     justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  // ─── State label ───
+  stateLabelWrap: {
     alignItems: 'center',
     marginBottom: spacing.lg,
+    minHeight: 20,
   },
-  // ─── Capacity Slider ───
-  sliderSection: {
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-    paddingHorizontal: spacing.xl,
-  },
-  sliderTouchArea: {
-    width: SLIDER_WIDTH,
-    height: 44,
-    justifyContent: 'center',
-  },
-  sliderTrack: {
-    flexDirection: 'row',
-    height: 3,
-    borderRadius: 2,
-    overflow: 'hidden',
-    opacity: 0.45,
-  },
-  sliderSeg: { flex: 1 },
-  sliderThumb: {
-    position: 'absolute',
-    width: THUMB_SIZE,
-    height: THUMB_SIZE,
-    borderRadius: THUMB_SIZE / 2,
-    top: (44 - THUMB_SIZE) / 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  sliderThumbInner: {
-    width: THUMB_SIZE - 8,
-    height: THUMB_SIZE - 8,
-    borderRadius: (THUMB_SIZE - 8) / 2,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.35)',
-  },
-  sliderLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: SLIDER_WIDTH,
-    marginTop: 2,
-  },
-  sliderLabelText: {
-    fontSize: 8,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.3)',
-    letterSpacing: 1.5,
+  stateLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    letterSpacing: 2.4,
+    textTransform: 'uppercase',
   },
   // ─── Category / Tags ───
   categoryContainer: {
