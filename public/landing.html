@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Orbital — Clinical-grade capacity tracking for high-performance professionals</title>
-<meta name="description" content="Clinical-grade capacity tracking for high-performance professionals. Daily check-ins become longitudinal capacity records for care teams. Founded for therapists, coaches, and neurodivergent adults.">
+<title>Orbital — Capacity intelligence for high-performance professionals and their care teams</title>
+<meta name="description" content="Capacity intelligence for high-performance professionals and their care teams. Daily check-ins become longitudinal capacity records for care teams. Founded for therapists, coaches, and neurodivergent adults.">
 <meta name="theme-color" content="#05060A">
 <link rel="icon" href="/favicon.ico">
 <link rel="canonical" href="https://orbitalhealth.app/">
@@ -12,8 +12,8 @@
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://orbitalhealth.app/">
-<meta property="og:title" content="Orbital — Clinical-grade capacity tracking for high-performance professionals">
-<meta property="og:description" content="One daily check-in. Three states. 90 days of data becomes a longitudinal Capacity Clinical Instrument your clients can use with their care team.">
+<meta property="og:title" content="Orbital — Capacity intelligence for high-performance professionals and their care teams">
+<meta property="og:description" content="One daily check-in. Three capacity states. 90 days of signals become a clinical-grade Capacity Clinical Instrument — a longitudinal record that informs clinical decisions.">
 <meta property="og:image" content="https://orbitalhealth.app/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -61,7 +61,7 @@
       "applicationCategory": "HealthApplication",
       "operatingSystem": "iOS, Web",
       "url": "https://orbitalhealth.app",
-      "description": "Clinical-grade capacity tracking for high-performance professionals. Daily check-ins become longitudinal capacity records for care teams.",
+      "description": "Capacity intelligence for high-performance professionals and their care teams. Daily check-ins become longitudinal capacity records for care teams.",
       "offers": [
         {
           "@type": "Offer",
@@ -361,6 +361,8 @@
     max-width: 720px;
     margin: 0 auto 36px;
     text-align: left;
+    position: relative;
+    overflow: hidden;
   }
   .cci-demo-label {
     font-family: var(--font-mono);
@@ -384,12 +386,12 @@
   }
   .cci-tab {
     font-family: var(--font-mono);
-    font-size: 12px; font-weight: 700;
+    font-size: 13px; font-weight: 700;
     color: var(--text-dim);
     background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255,255,255,0.12);
     border-radius: 8px;
-    padding: 8px 20px;
+    padding: 10px 24px;
     cursor: pointer;
     transition: all 0.2s;
   }
@@ -518,7 +520,7 @@
   }
   .cci-wave-chart {
     width: 100%;
-    height: 160px;
+    height: 200px;
   }
   .cci-wave-chart svg {
     width: 100%;
@@ -603,6 +605,84 @@
     text-align: center;
     padding-top: 16px;
     border-top: 1px solid var(--border);
+  }
+  .cci-client-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cci-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    font-family: var(--font-mono);
+    font-size: 48px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.03);
+    pointer-events: none;
+    white-space: nowrap;
+    letter-spacing: 8px;
+    z-index: 1;
+  }
+  .cci-forecast {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .cci-forecast-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 4px;
+  }
+  .cci-forecast-divider {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.1);
+    margin-bottom: 8px;
+  }
+  .cci-forecast-text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+  .cci-forecast-arrow {
+    color: var(--cyan);
+  }
+  .cci-credibility {
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 20px;
+  }
+  .cci-download-link {
+    text-align: center;
+    margin-top: 16px;
+  }
+  .cci-download-link a {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s;
+  }
+  .cci-download-link a:hover {
+    color: var(--cyan);
   }
 
   /* ================================================================
@@ -838,10 +918,20 @@
     .hero { padding: 80px 0 60px; }
     .nav-links a:not(.nav-cta) { display: none; }
     .footer-inner { flex-direction: column; text-align: center; }
+    .container { display: flex; flex-direction: column; }
+    .hero { order: 0; }
+    .social-proof { order: 1; }
+    .cci-showcase { order: 2; }
+    #how-it-works { order: 3; }
+    #pricing { order: 4; }
+    #faq { order: 5; }
+    .cta-bottom { order: 6; }
+    footer { order: 7; }
     .cci-demo { padding: 24px 20px; }
     .cci-score-section { flex-direction: column; gap: 16px; }
     .cci-score-meta { text-align: center; }
     .cci-drivers-grid { grid-template-columns: 1fr; }
+    .cci-watermark { font-size: 32px; }
   }
   @media (max-width: 480px) {
     .hero h1 { font-size: 28px; }
@@ -883,9 +973,9 @@
   <section class="hero">
     <div class="hero-badge"><span class="hero-badge-dot"></span> Founding Cohort &mdash; 100 Spots</div>
 
-    <h1>Clinical-grade capacity tracking for high-performance professionals</h1>
+    <h1>Capacity intelligence for high-performance professionals and their care teams</h1>
 
-    <p class="subtitle">One daily check-in. Three states. 90 days of data becomes a longitudinal Capacity Clinical Instrument your clients can use with their care team.</p>
+    <p class="subtitle">One daily check-in. Three capacity states. 90 days of signals become a clinical-grade Capacity Clinical Instrument — a longitudinal record that informs clinical decisions.</p>
 
     <button class="hero-cta cta-founding" type="button">Claim Founding Access &mdash; $199</button>
 
@@ -938,10 +1028,15 @@
        ================================================================ -->
   <section class="cci-showcase">
     <div class="section-label">Capacity Clinical Instrument</div>
-    <h2>See what your clients' data becomes.</h2>
+    <h2>What your client's care team receives</h2>
     <p class="section-sub" style="margin-left:auto;margin-right:auto;">Three timepoints. One longitudinal story. Tap through a sample Capacity Clinical Instrument.</p>
 
     <div class="cci-demo" id="cci-demo">
+      <div class="cci-watermark">SAMPLE REPORT</div>
+      <div class="cci-client-header">
+        <span>[CLIENT NAME REDACTED]</span>
+        <span>CONFIDENTIAL</span>
+      </div>
       <div class="cci-demo-label">ORBITAL</div>
       <div class="cci-demo-title">Capacity Composite Index</div>
       <div class="cci-demo-period" id="cci-period-text">Q1 2026 &middot; 90-Day Report &middot; Confidential</div>
@@ -956,7 +1051,7 @@
         <div class="cci-score-ring">
           <svg viewBox="0 0 140 140">
             <circle class="ring-bg" cx="70" cy="70" r="58"/>
-            <circle class="ring-fg" id="cci-ring-fg" cx="70" cy="70" r="58" stroke="#00D7FF" stroke-dasharray="364.42" stroke-dashoffset="102.04"/>
+            <circle class="ring-fg" id="cci-ring-fg" cx="70" cy="70" r="58" stroke="#00D7FF" stroke-dasharray="364.42" stroke-dashoffset="364.42"/>
           </svg>
           <div class="cci-score-value">
             <div class="cci-score-num" id="cci-score-num">72</div>
@@ -989,7 +1084,7 @@
       <div class="cci-wave">
         <div class="cci-wave-label">Capacity Wave</div>
         <div class="cci-wave-chart">
-          <svg id="cci-wave-svg" viewBox="0 0 656 150" preserveAspectRatio="none"></svg>
+          <svg id="cci-wave-svg" viewBox="0 0 700 185" preserveAspectRatio="none"></svg>
         </div>
       </div>
 
@@ -1003,10 +1098,19 @@
         <ul class="cci-obs-list" id="cci-obs-list"></ul>
       </div>
 
+      <div class="cci-forecast" id="cci-forecast"></div>
+
       <div class="cci-demo-footer">Generated by Orbital Health Intelligence Inc. &middot; orbitalhealth.app &middot; Confidential</div>
     </div>
 
+    <p class="cci-credibility">Designed with input from licensed clinicians, ADHD coaches, and occupational health specialists.</p>
+
     <button class="cci-cta cta-founding" type="button">Claim Founding Access &mdash; $199</button>
+
+    <div class="cci-download-link">
+      <!-- TODO: Replace with actual PDF link when available -->
+      <a href="mailto:contact@orbitalhealth.app?subject=Request%20Sample%20CCI%20PDF">Download sample CCI report (PDF)</a>
+    </div>
   </section>
 
   <!-- ================================================================
@@ -1225,7 +1329,12 @@ var cciData = {
       'Subject shows declining capacity trend over initial 30-day observation period.',
       'Sensory overload events correlate with 48\u201372hr capacity suppression.',
       'Baseline stability score: 5.1/10 \u2014 below cohort average of 6.1.'
-    ]
+    ],
+    forecast: {
+      label: 'CAPACITY FORECAST',
+      intro: 'Insufficient data for projection. Continue logging to unlock forecasting.',
+      items: ['\u2192 60 more days needed for reliable forecast.']
+    }
   },
   '60': {
     period: '60-Day',
@@ -1245,7 +1354,17 @@ var cciData = {
       'Capacity trend stabilizing after week 5 intervention adjustments.',
       'Sleep quality emerging as primary positive driver \u2014 recovery pattern improving.',
       'Baseline stability score: 6.0/10 \u2014 approaching cohort average of 6.1.'
-    ]
+    ],
+    forecast: {
+      label: 'CAPACITY FORECAST (PRELIMINARY)',
+      intro: 'Early projection based on emerging patterns:',
+      items: [
+        '\u2192 Projected capacity in 4 weeks: 69/100',
+        '\u2192 Risk of capacity drop below 60: MODERATE',
+        '\u2192 Primary risk factor: Sensory load spikes',
+        '\u2192 30 more days of data will improve forecast accuracy.'
+      ]
+    }
   },
   '90': {
     period: '90-Day',
@@ -1265,9 +1384,21 @@ var cciData = {
       'Subject demonstrates consistent capacity recovery following rest intervals.',
       'Sensory overload events correlate with 48\u201372hr capacity suppression.',
       'Baseline stability score: 7.2/10 \u2014 above cohort average of 6.1.'
-    ]
+    ],
+    forecast: {
+      label: 'CAPACITY FORECAST',
+      intro: 'Based on current trajectory and driver patterns:',
+      items: [
+        '\u2192 Projected capacity in 4 weeks: 76/100',
+        '\u2192 Risk of capacity drop below 60: LOW',
+        '\u2192 Highest leverage intervention: Maintain sleep consistency'
+      ]
+    }
   }
 };
+
+var currentCciPeriod = '90';
+var cciRingInitialized = false;
 
 function getCciColor(score) {
   if (score >= 65) return '#00D7FF';
@@ -1293,43 +1424,77 @@ function getTrendColor(trend) {
   }
 }
 
-function renderWaveChart(data, color) {
+function renderWaveChart(data, color, period) {
   var svg = document.getElementById('cci-wave-svg');
-  var w = 656, h = 150;
-  var padT = 10, padB = 10;
-  var plotW = w;
+  var w = 700, h = 185;
+  var padL = 50, padR = 10, padT = 10, padB = 35;
+  var plotW = w - padL - padR;
   var plotH = h - padT - padB;
 
   var html = '';
 
-  // Gradient
-  html += '<defs><linearGradient id="cci-wave-fill" x1="0" y1="0" x2="0" y2="1">';
-  html += '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.12"/>';
-  html += '<stop offset="100%" stop-color="' + color + '" stop-opacity="0.01"/>';
-  html += '</linearGradient></defs>';
+  // Defs: color gradient for line + fill
+  html += '<defs>';
+  html += '<linearGradient id="cci-line-grad" gradientUnits="userSpaceOnUse" x1="0" y1="' + padT + '" x2="0" y2="' + (padT + plotH) + '">';
+  html += '<stop offset="0%" stop-color="#00D7FF"/>';
+  html += '<stop offset="30%" stop-color="#00D7FF"/>';
+  html += '<stop offset="30.7%" stop-color="#F5B700"/>';
+  html += '<stop offset="50%" stop-color="#F5B700"/>';
+  html += '<stop offset="50.7%" stop-color="#FF3B30"/>';
+  html += '<stop offset="100%" stop-color="#FF3B30"/>';
+  html += '</linearGradient>';
+  html += '<linearGradient id="cci-fill-grad" gradientUnits="userSpaceOnUse" x1="0" y1="' + padT + '" x2="0" y2="' + (padT + plotH) + '">';
+  html += '<stop offset="0%" stop-color="#00D7FF" stop-opacity="0.10"/>';
+  html += '<stop offset="30%" stop-color="#00D7FF" stop-opacity="0.10"/>';
+  html += '<stop offset="30.7%" stop-color="#F5B700" stop-opacity="0.08"/>';
+  html += '<stop offset="50%" stop-color="#F5B700" stop-opacity="0.06"/>';
+  html += '<stop offset="50.7%" stop-color="#FF3B30" stop-opacity="0.04"/>';
+  html += '<stop offset="100%" stop-color="#FF3B30" stop-opacity="0.01"/>';
+  html += '</linearGradient>';
+  html += '</defs>';
 
-  // Grid lines at 25, 50, 75
-  [25, 50, 75].forEach(function(val) {
+  // Grid lines + Y-axis tick labels at 0, 25, 50, 75, 100
+  [0, 25, 50, 75, 100].forEach(function(val) {
     var y = padT + plotH - (val / 100 * plotH);
-    html += '<line x1="0" y1="' + y.toFixed(1) + '" x2="' + w + '" y2="' + y.toFixed(1) + '" stroke="rgba(255,255,255,0.06)" stroke-dasharray="4,4"/>';
-    html += '<text x="' + (w - 4) + '" y="' + (y - 4).toFixed(1) + '" fill="rgba(255,255,255,0.15)" font-size="9" font-family="\'Space Mono\', monospace" text-anchor="end">' + val + '</text>';
+    html += '<line x1="' + padL + '" y1="' + y.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + y.toFixed(1) + '" stroke="rgba(255,255,255,0.06)" stroke-dasharray="4,4"/>';
+    html += '<text x="' + (padL - 6) + '" y="' + (y + 3).toFixed(1) + '" fill="rgba(255,255,255,0.2)" font-size="9" font-family="\'Space Mono\', monospace" text-anchor="end">' + val + '</text>';
+  });
+
+  // Y-axis rotated label
+  var midY = padT + plotH / 2;
+  html += '<text x="10" y="' + midY + '" fill="rgba(255,255,255,0.15)" font-size="9" font-family="\'Space Mono\', monospace" text-anchor="middle" transform="rotate(-90, 10, ' + midY + ')">Capacity Score</text>';
+
+  // X-axis labels
+  var xLabels;
+  if (period === '90') {
+    xLabels = [{t: 'Month 1', p: 0}, {t: 'Month 2', p: 0.33}, {t: 'Month 3', p: 0.67}];
+  } else if (period === '60') {
+    xLabels = [{t: 'Week 1', p: 0}, {t: 'Week 4', p: 0.47}, {t: 'Week 8', p: 0.93}];
+  } else {
+    xLabels = [{t: 'Week 1', p: 0}, {t: 'Week 2', p: 0.33}, {t: 'Week 3', p: 0.67}, {t: 'Week 4', p: 1}];
+  }
+  xLabels.forEach(function(label) {
+    var x = padL + label.p * plotW;
+    var anchor = label.p === 0 ? 'start' : label.p >= 0.9 ? 'end' : 'middle';
+    html += '<text x="' + x.toFixed(1) + '" y="' + (padT + plotH + 20) + '" fill="rgba(255,255,255,0.2)" font-size="9" font-family="\'Space Mono\', monospace" text-anchor="' + anchor + '">' + label.t + '</text>';
   });
 
   // Build points
   var points = [];
   data.forEach(function(val, i) {
-    var x = (i / (data.length - 1)) * plotW;
+    var x = padL + (i / (data.length - 1)) * plotW;
     var y = padT + plotH - (val / 100 * plotH);
     points.push(x.toFixed(1) + ',' + y.toFixed(1));
   });
 
   // Fill area
-  var lastX = plotW.toFixed(1);
+  var firstX = padL;
+  var lastX = (padL + plotW).toFixed(1);
   var bottomY = (padT + plotH).toFixed(1);
-  html += '<path d="M' + points.join(' L') + ' L' + lastX + ',' + bottomY + ' L0,' + bottomY + ' Z" fill="url(#cci-wave-fill)"/>';
+  html += '<path d="M' + points.join(' L') + ' L' + lastX + ',' + bottomY + ' L' + firstX + ',' + bottomY + ' Z" fill="url(#cci-fill-grad)"/>';
 
-  // Line
-  html += '<polyline points="' + points.join(' ') + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+  // Line with color gradient
+  html += '<polyline points="' + points.join(' ') + '" fill="none" stroke="url(#cci-line-grad)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
 
   // End dot with glow
   var lastPt = points[points.length - 1].split(',');
@@ -1340,6 +1505,7 @@ function renderWaveChart(data, color) {
 }
 
 function renderCciDemo(period) {
+  currentCciPeriod = period;
   var d = cciData[period];
   var color = getCciColor(d.capacityScore);
 
@@ -1351,13 +1517,15 @@ function renderCciDemo(period) {
   // Period label
   document.getElementById('cci-period-text').textContent = 'Q1 2026 \u00B7 ' + d.period + ' Report \u00B7 Confidential';
 
-  // Score ring
+  // Score ring — only animate if IntersectionObserver has fired
   var circumference = 2 * Math.PI * 58;
-  var offset = circumference * (1 - d.capacityScore / 100);
   var ringFg = document.getElementById('cci-ring-fg');
   ringFg.style.strokeDasharray = circumference;
-  ringFg.style.strokeDashoffset = offset;
   ringFg.setAttribute('stroke', color);
+  if (cciRingInitialized) {
+    ringFg.style.transition = 'stroke-dashoffset 0.6s ease, stroke 0.4s ease';
+    ringFg.style.strokeDashoffset = circumference * (1 - d.capacityScore / 100);
+  }
 
   // Score number
   document.getElementById('cci-score-num').textContent = d.capacityScore;
@@ -1383,8 +1551,8 @@ function renderCciDemo(period) {
   document.getElementById('cci-dist-s-label').textContent = 'Stretched ' + dist.stretched + '%';
   document.getElementById('cci-dist-d-label').textContent = 'Depleted ' + dist.depleted + '%';
 
-  // Wave chart
-  renderWaveChart(d.capacityWave, color);
+  // Wave chart with period for axis labels
+  renderWaveChart(d.capacityWave, color, period);
 
   // Drivers
   var driversHtml = '';
@@ -1403,6 +1571,21 @@ function renderCciDemo(period) {
     obsHtml += '<li>' + obs + '</li>';
   });
   document.getElementById('cci-obs-list').innerHTML = obsHtml;
+
+  // Capacity forecast
+  var fc = d.forecast;
+  var fcHtml = '<div class="cci-forecast-label">' + fc.label + '</div>';
+  fcHtml += '<div class="cci-forecast-divider">\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501</div>';
+  fcHtml += '<div class="cci-forecast-text">';
+  fcHtml += fc.intro;
+  if (fc.items.length > 0) {
+    fcHtml += '<br><br>';
+    fc.items.forEach(function(item) {
+      fcHtml += '<span class="cci-forecast-arrow">' + item + '</span><br>';
+    });
+  }
+  fcHtml += '</div>';
+  document.getElementById('cci-forecast').innerHTML = fcHtml;
 }
 
 // Tab click handlers
@@ -1416,6 +1599,27 @@ document.querySelectorAll('.cci-tab').forEach(function(tab) {
 
 // Initial render — 90-day by default
 renderCciDemo('90');
+
+// Score ring scroll animation — animate from 0 on first viewport entry
+var cciObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting && !cciRingInitialized) {
+      cciRingInitialized = true;
+      var d = cciData[currentCciPeriod];
+      var circumference = 2 * Math.PI * 58;
+      var ringFg = document.getElementById('cci-ring-fg');
+      // Ensure empty state
+      ringFg.style.transition = 'none';
+      ringFg.style.strokeDashoffset = circumference;
+      ringFg.getBoundingClientRect(); // force reflow
+      // Animate to score over 1.5s
+      ringFg.style.transition = 'stroke-dashoffset 1.5s ease-out';
+      ringFg.style.strokeDashoffset = circumference * (1 - d.capacityScore / 100);
+      cciObserver.disconnect();
+    }
+  });
+}, { threshold: 0.3 });
+cciObserver.observe(document.getElementById('cci-demo'));
 
 // =========================================================================
 // CHECKOUT MODAL — wire all .cta-founding buttons
