@@ -357,7 +357,7 @@ export default function HomeScreen() {
               ) : (
                 <GlassOrb state={currentState} onStateChange={handleStateChange} onSave={handleSave} />
               )}
-              {ClinicalGaugeComponent ? (
+              {!WaveOrbComponent && ClinicalGaugeComponent ? (
                 <ClinicalGaugeComponent width={280} height={48} capacity={capacityShared} />
               ) : (
                 <View style={styles.spectrumContainer}>

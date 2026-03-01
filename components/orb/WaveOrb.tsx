@@ -10,6 +10,9 @@
  *
  * No particles. No nodes. No lightning. No pathways. No ticks.
  * The orb is: glass housing + wave + glow. That's it.
+ *
+ * KEY: Individual useDerivedValue hooks for each animated Skia prop.
+ * Skia elements accept SharedValue/DerivedValue directly — never access .value in JSX.
  */
 
 import React, { useMemo, useCallback } from 'react';
@@ -45,9 +48,6 @@ interface RGB { r: number; g: number; b: number }
 function capacityColor(cap: number): RGB {
   'worklet';
   const c = Math.max(0, Math.min(1, cap));
-  // 0.0 = red (255, 59, 48)
-  // 0.5 = amber (245, 183, 0)
-  // 1.0 = cyan (0, 215, 255)
   if (c <= 0.5) {
     const t = c / 0.5;
     return {
@@ -133,27 +133,34 @@ export const WaveOrb: React.FC<WaveOrbProps> = ({
   const diagTL = vec(C.x - HOUSING_R, C.y - HOUSING_R);
   const diagBR = vec(C.x + HOUSING_R, C.y + HOUSING_R);
 
-  // ─── Wave path + all animated colors (ONE useDerivedValue) ─────────
-  const waveData = useDerivedValue(() => {
+  // ─── Individual DerivedValues for animated Skia props ─────────────
+
+  // Ambient glow color (single circle overlay, not gradient)
+  const ambientColor = useDerivedValue(() => {
+    const rgb = capacityColor(capacity.value);
+    return rgbaStr(rgb, 0.05);
+  });
+
+  // Base tint color for orb center
+  const baseTintColor = useDerivedValue(() => {
+    const rgb = capacityColor(capacity.value);
+    return rgbaStr(rgb, 0.06);
+  });
+
+  // Wave path string (animated each frame)
+  const wavePath = useDerivedValue(() => {
     const cap = capacity.value;
     const t = time.value;
-    const rgb = capacityColor(cap);
 
-    // Wave Y position: high capacity = wave sits higher
     const waveY = C.y - (cap - 0.5) * ORB_R * 0.4;
-
-    // Amplitude: low capacity = tighter; high = wider calmer
     const waveAmplitude = ORB_R * 0.15 + (1 - cap) * ORB_R * 0.1;
-
-    // Phase for gentle animation
     const phase = (t * 0.5) % (Math.PI * 2);
 
-    // Build bezier path with 6 segments
     const leftEdge = C.x - ORB_R + 10;
     const rightEdge = C.x + ORB_R - 10;
     const segW = (rightEdge - leftEdge) / 6;
 
-    let pathD = `M ${leftEdge} ${waveY}`;
+    let d = `M ${leftEdge} ${waveY}`;
     for (let i = 0; i < 6; i++) {
       const x1 = leftEdge + segW * i + segW * 0.33;
       const x2 = leftEdge + segW * i + segW * 0.66;
@@ -161,12 +168,10 @@ export const WaveOrb: React.FC<WaveOrbProps> = ({
       const dir = i % 2 === 0 ? -1 : 1;
       const amp = waveAmplitude * dir * (0.7 + 0.3 * Math.sin(phase + i * 0.8));
 
-      // Mid-capacity micro-jitter
       let jitter = 0;
       if (cap >= 0.3 && cap <= 0.7) {
         jitter = Math.sin(t * 2 + i * 3.7) * 0.8;
       }
-      // Low-capacity faster, less smooth
       if (cap < 0.3) {
         jitter = Math.sin(t * 4 + i * 2.1) * 1.5;
       }
@@ -174,41 +179,30 @@ export const WaveOrb: React.FC<WaveOrbProps> = ({
       const y1 = waveY + amp * 0.5 + jitter;
       const y2 = waveY + amp + jitter;
       const y3 = waveY + jitter * 0.3;
-      pathD += ` C ${x1} ${y1}, ${x2} ${y2}, ${x3} ${y3}`;
+      d += ` C ${x1} ${y1}, ${x2} ${y2}, ${x3} ${y3}`;
     }
-
-    // Colors for the 3 passes
-    const glowWide = rgbaStr(rgb, 0.12);
-    const glowMed = rgbaStr(rgb, 0.25);
-
-    // Gradient stops for sharp line: cyan → capacity color → amber/red end
-    const endRgb = capacityColor(Math.max(0, cap - 0.3));
-    const mainColor = rgbaStr(rgb, 0.95);
-    const endColor = rgbaStr(endRgb, 0.85);
-
-    // Ambient glow colors
-    const ambientGlow0 = rgbaStr(rgb, 0.06);
-    const ambientGlow1 = rgbaStr(rgb, 0.02);
-
-    // Glass base tint
-    const baseTint = rgbaStr(rgb, 0.08);
-
-    return {
-      pathD,
-      glowWide,
-      glowMed,
-      mainColor,
-      endColor,
-      leftEdge,
-      rightEdge,
-      waveY,
-      ambientGlow0,
-      ambientGlow1,
-      baseTint,
-    };
+    return d;
   });
 
-  // ─── Breathing scale ──────────────────────────────────────────────
+  // Wave glow color (wide pass)
+  const waveGlowWide = useDerivedValue(() => {
+    const rgb = capacityColor(capacity.value);
+    return rgbaStr(rgb, 0.12);
+  });
+
+  // Wave glow color (medium pass)
+  const waveGlowMed = useDerivedValue(() => {
+    const rgb = capacityColor(capacity.value);
+    return rgbaStr(rgb, 0.25);
+  });
+
+  // Wave main line color
+  const waveMainColor = useDerivedValue(() => {
+    const rgb = capacityColor(capacity.value);
+    return rgbaStr(rgb, 0.90);
+  });
+
+  // Breathing scale transform
   const breatheTransform = useDerivedValue(() => {
     const s = 1 + Math.sin(breathe.value) * 0.004;
     return [{ scale: s }];
@@ -237,7 +231,7 @@ export const WaveOrb: React.FC<WaveOrbProps> = ({
     });
 
   // =================================================================
-  // RENDER
+  // RENDER — all Skia props use DerivedValue directly, never .value
   // =================================================================
   return (
     <GestureHandlerRootView style={styles.root}>
@@ -247,15 +241,9 @@ export const WaveOrb: React.FC<WaveOrbProps> = ({
             <Group transform={breatheTransform} origin={vec(C.x, C.y)}>
 
               {/* ===== LAYER 1: Ambient glow ===== */}
-              <Circle cx={C.x} cy={C.y} r={ORB_R * 1.6}>
-                <Paint>
-                  <RadialGradient
-                    c={vec(C.x, C.y)}
-                    r={ORB_R * 1.6}
-                    colors={[waveData.value.ambientGlow0, waveData.value.ambientGlow1, 'transparent']}
-                    positions={[0, 0.4, 1]}
-                  />
-                </Paint>
+              {/* Soft colored circle behind orb — shifts with capacity */}
+              <Circle cx={C.x} cy={C.y} r={ORB_R * 1.6} color={ambientColor}>
+                <BlurMask blur={40} style="normal" />
               </Circle>
 
               {/* ===== LAYER 2: Housing ring ===== */}
@@ -290,20 +278,12 @@ export const WaveOrb: React.FC<WaveOrbProps> = ({
 
               {/* ===== LAYER 3: Glass sphere ===== */}
 
-              {/* Base fill — dark with faint capacity color center */}
-              <Circle cx={C.x} cy={C.y} r={ORB_R}>
-                <Paint>
-                  <RadialGradient
-                    c={vec(C.x, C.y)}
-                    r={ORB_R}
-                    colors={[
-                      waveData.value.baseTint,
-                      'rgba(10,12,20,0.95)',
-                      'rgba(5,6,10,0.98)',
-                    ]}
-                    positions={[0, 0.6, 1]}
-                  />
-                </Paint>
+              {/* Base fill — very dark sphere */}
+              <Circle cx={C.x} cy={C.y} r={ORB_R} color="rgba(8,10,18,0.98)" />
+
+              {/* Center tint — faint capacity color, animated */}
+              <Circle cx={C.x} cy={C.y} r={ORB_R * 0.6} color={baseTintColor}>
+                <BlurMask blur={30} style="normal" />
               </Circle>
 
               {/* Edge darkening (sphere curvature) */}
@@ -386,46 +366,34 @@ export const WaveOrb: React.FC<WaveOrbProps> = ({
 
                 {/* Pass 1: Wide soft glow */}
                 <Path
-                  path={waveData.value.pathD}
+                  path={wavePath}
                   style="stroke"
                   strokeWidth={12}
                   strokeCap="round"
-                  color={waveData.value.glowWide}
+                  color={waveGlowWide}
                 >
                   <BlurMask blur={8} style="normal" />
                 </Path>
 
                 {/* Pass 2: Medium glow */}
                 <Path
-                  path={waveData.value.pathD}
+                  path={wavePath}
                   style="stroke"
                   strokeWidth={5}
                   strokeCap="round"
-                  color={waveData.value.glowMed}
+                  color={waveGlowMed}
                 >
                   <BlurMask blur={3} style="normal" />
                 </Path>
 
-                {/* Pass 3: Sharp main line with gradient */}
+                {/* Pass 3: Sharp main line */}
                 <Path
-                  path={waveData.value.pathD}
+                  path={wavePath}
                   style="stroke"
                   strokeWidth={2}
                   strokeCap="round"
-                >
-                  <Paint>
-                    <LinearGradient
-                      start={vec(waveData.value.leftEdge, waveData.value.waveY)}
-                      end={vec(waveData.value.rightEdge, waveData.value.waveY)}
-                      colors={[
-                        'rgba(0,215,255,0.9)',
-                        waveData.value.mainColor,
-                        waveData.value.endColor,
-                      ]}
-                      positions={[0, 0.6, 1]}
-                    />
-                  </Paint>
-                </Path>
+                  color={waveMainColor}
+                />
 
               </Group>
 
