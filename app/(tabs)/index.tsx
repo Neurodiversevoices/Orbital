@@ -25,7 +25,15 @@ import { useRouter, useLocalSearchParams, Redirect } from 'expo-router';
 import { Settings, TrendingUp, TrendingDown, Minus, Sparkles } from 'lucide-react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SavePulse, CategorySelector, Composer, COMPOSER_HEIGHT, ModeInsightsPanel, OrgRoleBanner } from '../../components';
-import SkiaOrb from '../../components/orb/SkiaOrb';
+import { GlassOrb } from '../../components/GlassOrb';
+
+// Dynamically load SkiaOrb — falls back to GlassOrb when native Skia module isn't available
+let SkiaOrbComponent: typeof import('../../components/orb/SkiaOrb').default | null = null;
+try {
+  SkiaOrbComponent = require('../../components/orb/SkiaOrb').default;
+} catch {
+  // RNSkiaModule not in this build — GlassOrb will be used instead
+}
 import { colors, commonStyles, spacing } from '../../theme';
 import { CapacityState, Category } from '../../types';
 import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
@@ -310,14 +318,15 @@ export default function HomeScreen() {
 
             <View style={styles.orbContainer}>
               {currentState && <SavePulse trigger={saveTrigger} state={currentState} />}
-              {/* GlassOrb swapped for SkiaOrb — original kept for reference:
-              <GlassOrb state={currentState} onStateChange={handleStateChange} onSave={handleSave} />
-              */}
-              <SkiaOrb size={320} initialCapacity={0.82} onCapacityChange={(cap) => {
-                if (cap >= 0.7) handleStateChange('resourced');
-                else if (cap >= 0.4) handleStateChange('stretched');
-                else handleStateChange('depleted');
-              }} />
+              {SkiaOrbComponent ? (
+                <SkiaOrbComponent size={320} initialCapacity={0.82} onCapacityChange={(cap) => {
+                  if (cap >= 0.7) handleStateChange('resourced');
+                  else if (cap >= 0.4) handleStateChange('stretched');
+                  else handleStateChange('depleted');
+                }} />
+              ) : (
+                <GlassOrb state={currentState} onStateChange={handleStateChange} onSave={handleSave} />
+              )}
               <View style={styles.spectrumContainer}>
                 <View style={styles.spectrumTrack}>
                   <View style={[styles.spectrumEndcap, styles.spectrumEndcapLeft]} />
