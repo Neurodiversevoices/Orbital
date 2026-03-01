@@ -318,7 +318,7 @@ function UnitRow({ unit }: UnitRowProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#05060A',
+    backgroundColor: '#01020A',
   },
   demoBanner: {
     backgroundColor: '#7A9AAA',

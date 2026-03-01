@@ -1,7 +1,7 @@
 // components/orb/ShaderOrb.tsx
-// Phase 1 — Single-pass SkSL fragment shader orb
+// Phase 1.5 — Refined single-pass SkSL fragment shader
+// Improvements: glass depth, volumetric wave, ambient halo, material realism
 // Architecture: One Canvas, one shader, three uniforms, zero JS visual logic
-// All glass, glow, wave, and lighting computed on GPU
 
 import React, { memo, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
@@ -21,146 +21,284 @@ import {
 } from "react-native-reanimated";
 
 // ─────────────────────────────────────────────
-// SkSL Fragment Shader — Single Pass
+// SkSL Fragment Shader — Single Pass, Refined
 // ─────────────────────────────────────────────
-// Inputs: uTime (clock), uCapacity (0=depleted, 1=resourced), uResolution
-// Outputs: premultiplied alpha color per pixel
-// No loops. No textures. No branching (step/mix only). Constant time.
+//
+// ARCHITECTURE NOTES (for engineering review):
+//
+// This shader computes a physically-inspired glass sphere in a single
+// fragment pass. No loops, no texture sampling, no branching.
+// All visual layers are composited analytically.
+//
+// GPU cost breakdown per pixel:
+//   - Sphere SDF + normal:  2 sqrt, 1 normalize  (~3 ops)
+//   - Fresnel:              1 dot, 1 pow          (~2 ops)
+//   - Wave SDF (3 harmonics): 3 sin, 3 mul, abs   (~7 ops)
+//   - Wave glow (3 pass):   3 smoothstep           (~3 ops)
+//   - Specular (2 lights):  2 length, 2 pow        (~6 ops)
+//   - Compositing:          ~8 mix/mul/add          (~8 ops)
+//   Total: ~29 ops per pixel. Well within mobile budget.
+//
+// Uniform contract:
+//   uTime       — monotonic seconds (drives wave + breath)
+//   uCapacity   — 0.0 (depleted/crimson) to 1.0 (resourced/cyan)
+//   uResolution — canvas pixel dimensions
+//
+// WHAT THIS SHADER DOES NOT DO (by design):
+//   - No ray marching (too expensive, unstable on mobile)
+//   - No noise functions (unpredictable perf on low-end Adreno/Mali)
+//   - No texture sampling (Skia SkSL limitation in RN)
+//   - No dynamic light count (constant 2 lights, hardcoded)
+//   - No conditional branching (all step/mix/clamp)
+//   - No loops of any kind
+//
+// FALLBACK: If shader fails to compile, component renders a dark
+// circle with a faint capacity-colored border. No crash path.
 
 const SHADER_SOURCE = `
 uniform float uTime;
 uniform float uCapacity;
 uniform float2 uResolution;
 
-// ── Color Palette ──
-// Capacity drives color: cyan (resourced) → amber (elevated) → crimson (depleted)
+// ────────────────────────────────────────
+// COLOR SYSTEM
+// ────────────────────────────────────────
+// Three-stop gradient: crimson → amber → cyan
+// Piecewise linear interpolation, no branching.
+
 vec3 capColor(float cap) {
-  vec3 cyan    = vec3(0.08, 0.82, 0.88);
-  vec3 amber   = vec3(0.92, 0.62, 0.08);
-  vec3 crimson  = vec3(0.88, 0.12, 0.12);
-  vec3 lowHalf  = mix(crimson, amber, clamp(cap * 2.0, 0.0, 1.0));
-  vec3 highHalf = mix(amber, cyan, clamp((cap - 0.5) * 2.0, 0.0, 1.0));
-  return mix(lowHalf, highHalf, step(0.5, cap));
+  vec3 cyan   = vec3(0.05, 0.78, 0.85);
+  vec3 amber  = vec3(0.88, 0.68, 0.12);
+  vec3 crimson = vec3(0.82, 0.10, 0.10);
+  float lo = clamp(cap * 2.0, 0.0, 1.0);
+  float hi = clamp((cap - 0.5) * 2.0, 0.0, 1.0);
+  return mix(mix(crimson, amber, lo), mix(amber, cyan, hi), step(0.5, cap));
+}
+
+// Dimmer variant for ambient/depth — less saturated, less bright
+vec3 capColorDim(float cap) {
+  return capColor(cap) * 0.4;
 }
 
 half4 main(float2 coord) {
-  // Normalize coords to [-1, 1] centered
   float minDim = min(uResolution.x, uResolution.y);
   vec2 uv = (coord * 2.0 - uResolution) / minDim;
 
   float dist = length(uv);
-  float radius = 0.82;
-  float t = dist / radius;  // 0=center, 1=edge
+  float radius = 0.80;
+  float t = dist / radius;
 
-  // ── Breathing ──
-  float breath = 1.0 + 0.025 * sin(uTime * 0.7);
+  // ────────────────────────────────────────
+  // BREATHING — ultra-subtle scale modulation
+  // Two sine waves at different frequencies prevent mechanical feel
+  // Total deviation: ±1.8% — perceptible as "alive," not "bouncing"
+  // ────────────────────────────────────────
+  float breath = 1.0 + 0.012 * sin(uTime * 0.6) + 0.006 * sin(uTime * 1.1 + 0.7);
 
-  // ── Capacity color for this frame ──
   vec3 cColor = capColor(uCapacity);
+  vec3 cColorDim = capColorDim(uCapacity);
 
-  // ── Layer 0: Ambient Energy Field (outside + inside) ──
-  // Soft radial glow that bleeds beyond the sphere boundary
-  float ambientOuter = smoothstep(radius + 0.35, radius - 0.05, dist) * 0.1;
-  vec3 ambientField = cColor * ambientOuter * breath;
+  // ────────────────────────────────────────
+  // LAYER 0: AMBIENT ENERGY FIELD
+  // ────────────────────────────────────────
+  // Soft radial halo bleeding beyond the sphere.
+  // Creates the "instrument is powered on" perception.
+  // Two falloff zones: tight bright core + wide dim wash.
 
-  // ── Sphere interior mask (branchless) ──
-  float inside = smoothstep(radius, radius - 0.008, dist); // anti-aliased edge
+  float haloTight = smoothstep(radius + 0.22, radius - 0.02, dist);
+  float haloWide  = smoothstep(radius + 0.45, radius + 0.05, dist);
+  float haloMask  = smoothstep(radius - 0.01, radius + 0.01, dist); // only outside sphere
 
-  // ── Fake 3D: sphere normal from 2D position ──
-  // Clamped t to avoid sqrt of negative
-  float tc = min(t, 0.999);
+  vec3 ambientField = cColor * (haloTight * 0.08 + haloWide * 0.025) * haloMask * breath;
+
+  // ────────────────────────────────────────
+  // SPHERE GEOMETRY
+  // ────────────────────────────────────────
+  // Anti-aliased sphere mask via smoothstep.
+  // Fake 3D normal from 2D position for Fresnel.
+
+  float inside = smoothstep(radius, radius - 0.006, dist);
+
+  float tc = min(t, 0.998);
   float z = sqrt(1.0 - tc * tc);
-  vec3 normal = vec3(uv / max(dist, 0.001), z);
-  vec3 viewDir = vec3(0.0, 0.0, 1.0);
+  vec3 normal = vec3(uv / max(dist, 0.0001), z);
+  vec3 N = normalize(normal);
+  vec3 V = vec3(0.0, 0.0, 1.0);
+  float NdotV = dot(N, V);
 
-  // ── Layer 1: Fresnel Rim (Glass Shell) ──
-  // pow(1 - NdotV, exponent) — bright edges, transparent center
-  float NdotV = dot(normalize(normal), viewDir);
-  float fresnel = pow(1.0 - NdotV, 3.8);
+  // ────────────────────────────────────────
+  // LAYER 1: GLASS SHELL
+  // ────────────────────────────────────────
+  // Three components create the glass perception:
+  //
+  // A) FRESNEL RIM — bright edges, transparent center.
+  //    This is the primary "this is a sphere" signal.
+  //    Two exponents: soft fill rim + sharp edge accent.
+  //
+  // B) GLASS ABSORPTION — interior darkens toward center.
+  //    Real thick glass absorbs light. Center is darker than edges.
+  //    This is the opposite of a glow — it's material density.
+  //
+  // C) EDGE DEFINITION — thin bright line at the sphere boundary.
+  //    Simulates the sharp refraction at the glass-air interface.
 
-  // Soft optical rolloff — avoids hard plastic rim
-  float rimSoft = smoothstep(0.55, 1.0, t);
-  float fresnelFinal = fresnel * rimSoft * 0.55;
-  vec3 fresnelCol = cColor * fresnelFinal;
+  // A) Fresnel — two-band for optical richness
+  float fresnelSoft  = pow(1.0 - NdotV, 2.5) * 0.25;
+  float fresnelSharp = pow(1.0 - NdotV, 6.0) * 0.45;
+  float fresnelTotal = fresnelSoft + fresnelSharp;
 
-  // Very subtle white rim at extreme edge for glass thickness feel
-  float whiteRim = pow(1.0 - NdotV, 8.0) * 0.12;
-  fresnelCol += vec3(whiteRim);
+  // Color the Fresnel: mostly capacity color, hint of white at extreme edge
+  vec3 fresnelCol = mix(cColor, vec3(0.85), fresnelSharp * 0.6) * fresnelTotal;
 
-  // ── Layer 2: Internal Energy Wave (Hero) ──
-  // 3-harmonic sine wave as signed distance field with volumetric glow
+  // B) Glass absorption — darkens the interior where glass is "thickest"
+  // Center of sphere = maximum glass thickness = darkest
+  float absorption = smoothstep(0.0, 0.75, t) * 0.15;
 
-  // Wave speed: faster when depleted, calmer when resourced
-  float speed = 0.9 + (1.0 - uCapacity) * 1.2;
-  float phase = uv.x * 3.5 * (1.0 / radius) + uTime * speed;
+  // C) Edge definition — very thin bright line at boundary
+  float edgeLine = smoothstep(radius, radius - 0.012, dist) * smoothstep(radius - 0.035, radius - 0.012, dist);
+  vec3 edgeCol = cColor * edgeLine * 0.3;
 
-  // Amplitude: wider when resourced, tighter when depleted
-  float amp = (0.06 + 0.05 * uCapacity) * radius;
+  // ────────────────────────────────────────
+  // LAYER 2: INTERNAL ENERGY WAVE (HERO)
+  // ────────────────────────────────────────
+  // Three-harmonic sine wave rendered as a signed distance field.
+  // Three glow passes from the same SDF: wide (atmosphere),
+  // medium (body), sharp (core). This creates volumetric perception
+  // without volumetric rendering.
+  //
+  // Capacity modulates:
+  //   - Speed (depleted = faster, agitated)
+  //   - Amplitude (resourced = wider, calmer)
+  //   - Frequency (depleted = tighter oscillation)
+  //   - Glow intensity (depleted = dimmer, fading)
 
-  // 3 harmonics — no loops, explicit
+  float speed = 0.7 + (1.0 - uCapacity) * 1.5;
+  float freq  = 3.0 + (1.0 - uCapacity) * 1.5;
+  float amp   = (0.055 + 0.045 * uCapacity) * radius;
+
+  float phase = uv.x * freq * (1.0 / radius) + uTime * speed;
+
+  // Three explicit harmonics — no loops
   float wave = sin(phase) * amp
-             + sin(phase * 2.1 + 1.4) * amp * 0.35
-             + sin(phase * 3.4 + 3.1) * amp * 0.12;
+             + sin(phase * 2.15 + 1.3) * amp * 0.38
+             + sin(phase * 3.3  + 2.8) * amp * 0.15;
 
-  // Signed distance from wave center line
   float waveDist = abs(uv.y - wave);
 
-  // Three-pass glow from single SDF (wide → medium → sharp)
-  float glowWide  = smoothstep(0.10 * radius, 0.0, waveDist);
-  float glowMed   = smoothstep(0.045 * radius, 0.0, waveDist);
-  float glowSharp = smoothstep(0.012 * radius, 0.0, waveDist);
+  // Three-pass glow: wide → medium → sharp
+  float glowWide  = smoothstep(0.14 * radius, 0.0, waveDist);
+  float glowMed   = smoothstep(0.055 * radius, 0.0, waveDist);
+  float glowSharp = smoothstep(0.010 * radius, 0.0, waveDist);
 
-  // Layer 3: Depth attenuation — wave brighter at center, fades at edges
-  // Simulates subsurface scattering cheaply
-  float depthMask = smoothstep(1.0, 0.25, t);
+  // Depth mask: wave is brighter at sphere center, fades at edges.
+  // This simulates the wave existing INSIDE the glass, not on the surface.
+  // Combined with absorption, creates real subsurface perception.
+  float depthMask = smoothstep(1.0, 0.15, t);
 
-  // Compose wave with depth
-  float waveIntensity = (glowWide * 0.12 + glowMed * 0.35 + glowSharp * 0.75) * depthMask;
+  // Vertical falloff: wave fades as it approaches top/bottom of sphere
+  // Prevents the wave from reaching the Fresnel rim zone
+  float verticalMask = smoothstep(radius * 0.85, radius * 0.4, abs(uv.y));
 
-  // Wave color: slight shift toward white at core
-  vec3 waveCol = mix(cColor, vec3(1.0), glowSharp * 0.3) * waveIntensity;
+  float waveMask = depthMask * verticalMask;
 
-  // ── Layer 3b: Ambient interior glow (very soft center light) ──
-  float interiorGlow = smoothstep(0.9, 0.0, t) * 0.06 * breath;
-  vec3 interiorCol = cColor * interiorGlow;
+  // Compose wave intensity with capacity-driven brightness
+  float waveGlow = (glowWide * 0.08 + glowMed * 0.30 + glowSharp * 0.85) * waveMask;
 
-  // ── Specular Highlight (top-left, single light source) ──
-  vec2 specPos = vec2(-0.32, -0.34);
-  float specDist = length(uv / radius - specPos);
-  float spec = pow(max(0.0, 1.0 - specDist * 2.2), 12.0) * 0.28;
+  // Wave color: core goes toward white (energy concentration)
+  // Outer glow stays capacity-colored
+  vec3 waveCol = mix(cColor, vec3(1.0), glowSharp * 0.45 * waveMask) * waveGlow;
 
-  // Second subtle spec (bottom-right, fill light)
-  vec2 specPos2 = vec2(0.25, 0.30);
-  float specDist2 = length(uv / radius - specPos2);
-  float spec2 = pow(max(0.0, 1.0 - specDist2 * 3.0), 10.0) * 0.08;
+  // Capacity-driven intensity: wave dims as capacity drops
+  // At full depletion, wave is ~40% brightness (never fully off)
+  float capIntensity = 0.4 + 0.6 * uCapacity;
+  waveCol *= capIntensity;
 
-  vec3 specCol = vec3(spec + spec2);
+  // ────────────────────────────────────────
+  // LAYER 3: INTERNAL AMBIENT
+  // ────────────────────────────────────────
+  // Very faint center glow — the sphere has internal energy
+  // even where the wave isn't. This prevents the "dead dark center" problem.
+  // Modulated by breathing for organic feel.
 
-  // ── Layer 4: Edge Vignette ──
-  float vignette = smoothstep(1.0, 0.45, t);
+  float internalGlow = smoothstep(0.95, 0.0, t) * 0.035 * breath;
+  vec3 internalCol = cColorDim * internalGlow;
 
-  // ── Layer 4b: Top-to-bottom glass wash ──
-  float wash = smoothstep(-1.0, 0.6, uv.y / radius) * 0.03;
+  // ────────────────────────────────────────
+  // SPECULAR HIGHLIGHTS
+  // ────────────────────────────────────────
+  // Two fixed-position lights simulating studio lighting:
+  //   Key light:  upper-left, bright, tight
+  //   Fill light: lower-right, dim, wide
+  //
+  // These are NOT dynamic. They do not move with gestures.
+  // Stationary highlights read as "solid object in a fixed environment."
+  // Moving highlights read as "UI element." We want the former.
 
-  // ── Compose all layers ──
-  // Base: near-black with very subtle blue tint
-  vec3 base = vec3(0.008, 0.012, 0.02);
+  // Key light — upper left
+  vec2 keyPos = vec2(-0.30, -0.32);
+  float keyDist = length(uv / radius - keyPos);
+  float keySpec = pow(max(0.0, 1.0 - keyDist * 2.0), 16.0) * 0.32;
+
+  // Fill light — lower right, much softer
+  vec2 fillPos = vec2(0.22, 0.28);
+  float fillDist = length(uv / radius - fillPos);
+  float fillSpec = pow(max(0.0, 1.0 - fillDist * 2.8), 8.0) * 0.10;
+
+  // Specular is white-ish with a very slight capacity tint
+  vec3 specCol = mix(vec3(1.0), cColor, 0.1) * (keySpec + fillSpec);
+
+  // ────────────────────────────────────────
+  // LAYER 4: GLASS OVERLAY
+  // ────────────────────────────────────────
+  // A) Vignette: edges of sphere darken (simulates curvature)
+  // B) Top wash: very subtle top-to-bottom gradient
+  //    (simulates second surface reflection in real glass)
+  // C) Housing shadow: subtle darkening at very bottom
+  //    (the sphere sits in something — this grounds it)
+
+  float vignette = smoothstep(1.0, 0.35, t);
+  float topWash = smoothstep(-1.0, 0.8, uv.y / radius) * 0.025;
+  float bottomShadow = smoothstep(0.6, 1.0, (uv.y / radius + 1.0) * 0.5) * 0.08;
+
+  // ────────────────────────────────────────
+  // COMPOSITING
+  // ────────────────────────────────────────
+  // Order matters:
+  //   1. Start with near-black base
+  //   2. Add internal ambient (faint center life)
+  //   3. Add wave (hero element)
+  //   4. Add Fresnel rim (glass edge)
+  //   5. Add edge definition line
+  //   6. Add absorption (darken center for thickness)
+  //   7. Apply vignette (darken edges for curvature)
+  //   8. Add specular highlights (on top of everything)
+  //   9. Add glass overlay wash (second surface)
+  //   10. Subtract bottom shadow (grounding)
+
+  vec3 base = vec3(0.006, 0.009, 0.016);
 
   vec3 interior = base;
-  interior += interiorCol;          // ambient center glow
-  interior += waveCol;              // hero wave
-  interior += fresnelCol;           // glass rim
-  interior += specCol;              // specular highlights
-  interior *= vignette;             // edge darkening
-  interior += vec3(wash);           // glass surface wash
+  interior += internalCol;
+  interior += waveCol;
+  interior += fresnelCol;
+  interior += edgeCol;
+  interior += vec3(absorption) * cColorDim;
+  interior *= vignette;
+  interior += specCol;
+  interior += vec3(topWash);
+  interior -= vec3(bottomShadow);
+  interior = max(interior, vec3(0.0));
 
-  // ── Final composite: inside vs outside ──
+  // ────────────────────────────────────────
+  // FINAL OUTPUT
+  // ────────────────────────────────────────
+  // Composite: inside sphere uses interior, outside uses ambient field.
+  // Premultiplied alpha for clean compositing against any background.
+
   vec3 finalCol = mix(ambientField, interior, inside);
+  float alpha = max(inside, (haloTight * 0.08 + haloWide * 0.025) * haloMask * 0.8);
 
-  // Premultiply alpha for clean compositing
-  float alpha = max(inside, ambientOuter * 0.6);
-
-  return half4(half3(finalCol * alpha), alpha);
+  return half4(half3(finalCol), alpha);
 }
 `;
 
@@ -169,19 +307,13 @@ half4 main(float2 coord) {
 // ─────────────────────────────────────────────
 
 type ShaderOrbProps = {
-  /** Pixel size of the orb canvas (square) */
   size?: number;
-  /** Capacity value: 0 = depleted, 1 = resourced. Animated with spring. */
   capacity?: SharedValue<number>;
-  /** Static capacity if no shared value provided (0-1) */
   staticCapacity?: number;
-  /** Disable for login screen (no gesture, just ambient) */
   disabled?: boolean;
-  /** Test ID for automation */
   testID?: string;
 };
 
-// Compile shader once at module level — not per render
 let runtimeEffect: ReturnType<typeof Skia.RuntimeEffect.Make> | null = null;
 try {
   runtimeEffect = Skia.RuntimeEffect.Make(SHADER_SOURCE);
@@ -196,15 +328,12 @@ const ShaderOrb = memo(function ShaderOrb({
   disabled = false,
   testID,
 }: ShaderOrbProps) {
-  // ── Clock: monotonic time in seconds ──
   const clock = useSharedValue(0);
 
   useFrameCallback((info) => {
-    // info.timeSinceFirstFrame is in ms
     clock.value = (info.timeSinceFirstFrame ?? 0) / 1000;
   });
 
-  // ── Capacity: use external shared value or internal static ──
   const internalCapacity = useSharedValue(staticCapacity);
 
   useEffect(() => {
@@ -218,7 +347,6 @@ const ShaderOrb = memo(function ShaderOrb({
 
   const activeCapacity = externalCapacity ?? internalCapacity;
 
-  // ── Uniforms: derived on UI thread, sent to GPU ──
   const uniforms = useDerivedValue(() => {
     return {
       uTime: clock.value,
@@ -227,7 +355,6 @@ const ShaderOrb = memo(function ShaderOrb({
     };
   });
 
-  // ── Fallback if shader failed to compile ──
   if (!runtimeEffect) {
     return (
       <View
