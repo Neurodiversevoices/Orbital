@@ -258,8 +258,17 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     // Skip the normal auth gate entirely so it doesn't fight the redirect.
     if (isDevAutoLoginEnabled()) return;
 
-    // DEV ONLY: skip auth gate so we can see screens past login in the simulator.
-    if (__DEV__) return;
+    // ──────────────────────────────────────────────────────────────────────
+    // TEMPORARY DEV BYPASS: Skip auth gate and force home screen.
+    // Remove this block to restore normal auth flow.
+    // ──────────────────────────────────────────────────────────────────────
+    if (__DEV__) {
+      const inAuthGroup = segments[0] === 'auth';
+      if (inAuthGroup) {
+        router.replace('/(tabs)');
+      }
+      return;
+    }
 
     if (auth.isLoading) return;
 
