@@ -1,6 +1,8 @@
 /**
- * ClinicalGauge.tsx — Precision Capacity Meter
- * Sealed clinical gauge with needle, glass cover, engraved endpoints.
+ * ClinicalGauge.tsx — Sealed Instrument Capacity Meter
+ *
+ * Housing body with inner recess, color scale strip, precision ticks,
+ * needle with cast shadow, glass cover with highlight line.
  *
  * Every shape has at most ONE Paint child. Colors on element props where possible.
  */
@@ -25,6 +27,7 @@ import {
   GAUGE_GLASS_OPACITY,
   GAUGE_TICK_COUNT,
   GAUGE_MAJOR_TICK_INTERVAL,
+  GAUGE_RECESS_DEPTH,
 } from './orbConstants';
 import { capacityToSkiaColor } from './orbColors';
 
@@ -40,9 +43,9 @@ export const ClinicalGauge: React.FC<ClinicalGaugeProps> = ({
   capacity,
 }) => {
   const canvasW = width + 40;
-  const canvasH = height + 24;
+  const canvasH = height + 28;
   const gX = 20;
-  const gY = 8;
+  const gY = 10;
   const gW = width;
   const gH = height;
   const cornerR = 6;
@@ -69,43 +72,71 @@ export const ClinicalGauge: React.FC<ClinicalGaugeProps> = ({
   const needleX = useDerivedValue(() => gX + capacity.value * gW);
   const needleColor = useDerivedValue(() => capacityToSkiaColor(capacity.value, 1.0));
 
-  const needleShadowP1 = useDerivedValue(() => vec(needleX.value + 1, gY + 4));
-  const needleShadowP2 = useDerivedValue(() => vec(needleX.value + 1, gY + gH - 4));
-  const needleP1 = useDerivedValue(() => vec(needleX.value, gY + 3));
-  const needleP2 = useDerivedValue(() => vec(needleX.value, gY + gH - 3));
+  const needleShadowP1 = useDerivedValue(() => vec(needleX.value + 1.5, gY + 3));
+  const needleShadowP2 = useDerivedValue(() => vec(needleX.value + 1.5, gY + gH - 3));
+  const needleP1 = useDerivedValue(() => vec(needleX.value, gY + 2));
+  const needleP2 = useDerivedValue(() => vec(needleX.value, gY + gH - 2));
 
   return (
     <Canvas style={{ width: canvasW, height: canvasH }}>
-      {/* Housing fill */}
+      {/* Outer drop shadow */}
       <RoundedRect
-        x={gX - 2} y={gY - 2}
-        width={gW + 4} height={gH + 4}
-        r={cornerR + 2}
+        x={gX - 4} y={gY - 3}
+        width={gW + 8} height={gH + 8}
+        r={cornerR + 4}
+        color="rgba(0,0,0,0.35)"
+      >
+        <BlurMask blur={8} style="normal" />
+      </RoundedRect>
+
+      {/* Housing body */}
+      <RoundedRect
+        x={gX - 3} y={gY - 3}
+        width={gW + 6} height={gH + 6}
+        r={cornerR + 3}
         color="#0D0E12"
       />
 
-      {/* Bevel — stroke with gradient (single Paint child) */}
+      {/* Housing bevel — gradient stroke */}
       <RoundedRect
-        x={gX - 2} y={gY - 2}
-        width={gW + 4} height={gH + 4}
-        r={cornerR + 2}
+        x={gX - 3} y={gY - 3}
+        width={gW + 6} height={gH + 6}
+        r={cornerR + 3}
         style="stroke"
         strokeWidth={1}
       >
         <Paint>
           <LinearGradient
-            start={vec(gX, gY - 2)}
-            end={vec(gX, gY + gH + 2)}
-            colors={['rgba(255,255,255,0.04)', 'rgba(0,0,0,0.2)']}
+            start={vec(gX, gY - 3)}
+            end={vec(gX, gY + gH + 3)}
+            colors={['rgba(255,255,255,0.05)', 'rgba(0,0,0,0.3)']}
           />
         </Paint>
       </RoundedRect>
 
+      {/* Inner recess background */}
+      <RoundedRect
+        x={gX - 1} y={gY - 1}
+        width={gW + 2} height={gH + 2}
+        r={cornerR + 1}
+        color="#060710"
+      />
+
+      {/* Recess inner shadow */}
+      <RoundedRect
+        x={gX - 1} y={gY - 1}
+        width={gW + 2} height={gH + 2}
+        r={cornerR + 1}
+        color="rgba(0,0,0,0.5)"
+      >
+        <BlurMask blur={GAUGE_RECESS_DEPTH} style="inner" />
+      </RoundedRect>
+
       {/* Scale background */}
-      <RoundedRect x={gX} y={gY} width={gW} height={gH} r={cornerR} color="#0A0B0F" />
+      <RoundedRect x={gX} y={gY} width={gW} height={gH} r={cornerR} color="#08090D" />
 
       {/* Color gradient strip */}
-      <RoundedRect x={gX + 4} y={gY + gH * 0.35} width={gW - 8} height={gH * 0.12} r={2}>
+      <RoundedRect x={gX + 4} y={gY + gH * 0.30} width={gW - 8} height={gH * 0.14} r={2}>
         <Paint>
           <LinearGradient
             start={vec(gX + 4, 0)}
@@ -120,26 +151,26 @@ export const ClinicalGauge: React.FC<ClinicalGaugeProps> = ({
       {ticks.map((tick, i) => (
         <Line
           key={`gt-${i}`}
-          p1={vec(tick.x, gY + gH * 0.55)}
-          p2={vec(tick.x, gY + gH * (tick.isMajor ? 0.75 : 0.65))}
+          p1={vec(tick.x, gY + gH * 0.52)}
+          p2={vec(tick.x, gY + gH * (tick.isMajor ? 0.78 : 0.66))}
           style="stroke"
           strokeWidth={tick.isMajor ? 1 : 0.5}
-          color={`rgba(255,255,255,${tick.isMajor ? 0.12 : 0.05})`}
+          color={`rgba(255,255,255,${tick.isMajor ? 0.14 : 0.05})`}
         />
       ))}
 
-      {/* Needle shadow — color on Line, BlurMask as single child */}
+      {/* Needle shadow — soft, offset */}
       <Line
         p1={needleShadowP1}
         p2={needleShadowP2}
         style="stroke"
-        strokeWidth={GAUGE_NEEDLE_WIDTH + 2}
-        color="rgba(0,0,0,0.4)"
+        strokeWidth={GAUGE_NEEDLE_WIDTH + 3}
+        color="rgba(0,0,0,0.5)"
       >
         <BlurMask blur={GAUGE_NEEDLE_SHADOW_BLUR} style="normal" />
       </Line>
 
-      {/* Needle — animated color on Line prop */}
+      {/* Needle — animated color */}
       <Line
         p1={needleP1}
         p2={needleP2}
@@ -149,10 +180,13 @@ export const ClinicalGauge: React.FC<ClinicalGaugeProps> = ({
         color={needleColor}
       />
 
-      {/* Needle cap */}
-      <Circle cx={needleX} cy={gY + 3} r={2} color="rgba(255,255,255,0.15)" />
+      {/* Needle cap — top */}
+      <Circle cx={needleX} cy={gY + 2} r={2.5} color="rgba(255,255,255,0.18)" />
 
-      {/* Glass cover — gradient (single Paint child) */}
+      {/* Needle cap — bottom */}
+      <Circle cx={needleX} cy={gY + gH - 2} r={1.5} color="rgba(255,255,255,0.08)" />
+
+      {/* Glass cover — stronger gradient */}
       <RoundedRect x={gX} y={gY} width={gW} height={gH} r={cornerR}>
         <Paint>
           <LinearGradient
@@ -161,27 +195,39 @@ export const ClinicalGauge: React.FC<ClinicalGaugeProps> = ({
             colors={[
               `rgba(255,255,255,${GAUGE_GLASS_OPACITY})`,
               'transparent',
-              `rgba(255,255,255,${GAUGE_GLASS_OPACITY * 0.3})`,
+              'transparent',
+              `rgba(255,255,255,${(GAUGE_GLASS_OPACITY * 0.4).toFixed(3)})`,
             ]}
-            positions={[0, 0.4, 1]}
+            positions={[0, 0.3, 0.7, 1]}
           />
         </Paint>
       </RoundedRect>
 
-      {/* Engraved endpoints */}
+      {/* Glass highlight line — top edge */}
       <Line
-        p1={vec(gX, gY + gH + 6)}
-        p2={vec(gX + 30, gY + gH + 6)}
+        p1={vec(gX + 8, gY + 1)}
+        p2={vec(gX + gW - 8, gY + 1)}
         style="stroke"
         strokeWidth={0.5}
-        color="rgba(0,255,200,0.15)"
+        color="rgba(255,255,255,0.06)"
       />
+
+      {/* Engraved endpoint — left (green/low) */}
       <Line
-        p1={vec(gX + gW - 30, gY + gH + 6)}
-        p2={vec(gX + gW, gY + gH + 6)}
+        p1={vec(gX, gY + gH + 8)}
+        p2={vec(gX + 28, gY + gH + 8)}
         style="stroke"
         strokeWidth={0.5}
-        color="rgba(255,60,60,0.15)"
+        color="rgba(0,255,200,0.18)"
+      />
+
+      {/* Engraved endpoint — right (red/high) */}
+      <Line
+        p1={vec(gX + gW - 28, gY + gH + 8)}
+        p2={vec(gX + gW, gY + gH + 8)}
+        style="stroke"
+        strokeWidth={0.5}
+        color="rgba(255,60,60,0.18)"
       />
     </Canvas>
   );

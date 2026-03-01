@@ -1,6 +1,10 @@
 /**
  * DeepFieldLayer.tsx — L1: Viscous Medium / Deep Field
- * Particles, neural pathways, lightning — all with viscous damped motion.
+ *
+ * Suspended particulate medium with three depth planes:
+ *   Deep  — small, dim, heavily blurred (background)
+ *   Mid   — medium particles, moderate blur, pathway connections
+ *   Fore  — large, bright, sharp (foreground)
  *
  * Architecture: ONE useDerivedValue computes all geometry per frame.
  * Individual derived values extract path strings. Zero hooks in loops.
@@ -21,11 +25,14 @@ import {
 } from 'react-native-reanimated';
 import {
   ORB_RADIUS,
-  NODE_COUNT,
+  NODE_COUNT_DEEP,
+  NODE_COUNT_MID,
+  NODE_COUNT_FORE,
   PATHWAY_COUNT,
   LIGHTNING_LAYERS,
-  FIELD_BLUR_SIGMA,
-  MEDIUM_OPACITY,
+  FIELD_BLUR_DEEP,
+  FIELD_BLUR_MID,
+  HAZE_OPACITY,
 } from '../orbConstants';
 import { capacityToSkiaColor } from '../orbColors';
 
@@ -39,35 +46,41 @@ interface Node {
   speed: number;
 }
 
-function generateNodes(count: number, orbRadius: number): Node[] {
+function generateNodes(
+  count: number,
+  orbRadius: number,
+  sizeMin: number,
+  sizeMax: number,
+  seed: number,
+): Node[] {
   const nodes: Node[] = [];
   for (let i = 0; i < count; i++) {
-    const seed = Math.sin(i * 127.1 + i * 311.7) * 43758.5453;
-    const frac = seed - Math.floor(seed);
+    const s = Math.sin((i + seed) * 127.1 + (i + seed) * 311.7) * 43758.5453;
+    const frac = s - Math.floor(s);
     nodes.push({
-      baseAngle: (i / count) * Math.PI * 2 + frac * 0.5,
-      baseRadius: frac * orbRadius * 0.85,
-      size: 1.5 + frac * 3,
+      baseAngle: (i / count) * Math.PI * 2 + frac * 0.8,
+      baseRadius: (0.1 + frac * 0.85) * orbRadius,
+      size: sizeMin + frac * (sizeMax - sizeMin),
       depth: frac,
-      speed: 0.0002 + frac * 0.0003,
+      speed: 0.0001 + frac * 0.00025,
     });
   }
   return nodes;
 }
 
 interface Pathway {
-  startNode: number;
-  endNode: number;
+  startIdx: number;
+  endIdx: number;
   controlOffset: number;
 }
 
-function generatePathways(count: number, nodeCount: number): Pathway[] {
+function generatePathways(count: number, totalNodes: number): Pathway[] {
   const pathways: Pathway[] = [];
   for (let i = 0; i < count; i++) {
     pathways.push({
-      startNode: i * 7 % nodeCount,
-      endNode: (i * 13 + 5) % nodeCount,
-      controlOffset: 20 + (i % 3) * 15,
+      startIdx: (i * 7) % totalNodes,
+      endIdx: (i * 13 + 5) % totalNodes,
+      controlOffset: 15 + (i % 3) * 12,
     });
   }
   return pathways;
@@ -92,10 +105,13 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
   const scale = size / (ORB_RADIUS * 2 + 48);
   const orbR = ORB_RADIUS * scale;
 
-  const nodes = useMemo(() => generateNodes(NODE_COUNT, orbR), [orbR]);
-  const pathways = useMemo(() => generatePathways(PATHWAY_COUNT, NODE_COUNT), []);
+  // Static seeds per depth layer
+  const deepNodes = useMemo(() => generateNodes(NODE_COUNT_DEEP, orbR, 1, 2.5, 0), [orbR]);
+  const midNodes = useMemo(() => generateNodes(NODE_COUNT_MID, orbR, 1.5, 4, 1000), [orbR]);
+  const foreNodes = useMemo(() => generateNodes(NODE_COUNT_FORE, orbR, 3, 6, 2000), [orbR]);
+  const pathways = useMemo(() => generatePathways(PATHWAY_COUNT, NODE_COUNT_MID), []);
 
-  // Circular clip path (SVG string) — not rectangular
+  // Circular clip path (SVG string)
   const circleClipPath = useMemo(() => {
     const r = orbR;
     return `M ${center - r} ${center} a ${r} ${r} 0 1 0 ${r * 2} 0 a ${r} ${r} 0 1 0 ${-r * 2} 0`;
@@ -113,112 +129,163 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
     const px = parallaxX.value;
     const py = parallaxY.value;
 
-    // 1. Compute node positions + build circle paths
-    const positions: Array<{ x: number; y: number }> = [];
-    const nodeParts: string[] = [];
-    for (let i = 0; i < nodes.length; i++) {
-      const node = nodes[i];
-      const angle = node.baseAngle + t * node.speed * (0.3 + cap * 0.7);
-      const r = node.baseRadius * (0.3 + cap * 0.7);
+    // 1. Deep layer particles (small, dim)
+    const deepParts: string[] = [];
+    for (let i = 0; i < deepNodes.length; i++) {
+      const node = deepNodes[i];
+      const angle = node.baseAngle + t * node.speed * (0.2 + cap * 0.6);
+      const r = node.baseRadius * (0.2 + cap * 0.8);
+      let x = center + Math.cos(angle) * r;
+      let y = center + Math.sin(angle) * r;
+      x += px * node.depth * 0.15;
+      y += py * node.depth * 0.15;
+      const nr = node.size * scale;
+      deepParts.push(
+        `M ${x - nr} ${y} a ${nr} ${nr} 0 1 0 ${nr * 2} 0 a ${nr} ${nr} 0 1 0 ${-nr * 2} 0`,
+      );
+    }
+
+    // 2. Mid layer particles + positions for pathways
+    const midPositions: Array<{ x: number; y: number }> = [];
+    const midParts: string[] = [];
+    for (let i = 0; i < midNodes.length; i++) {
+      const node = midNodes[i];
+      const angle = node.baseAngle + t * node.speed * (0.2 + cap * 0.6);
+      const r = node.baseRadius * (0.2 + cap * 0.8);
       let x = center + Math.cos(angle) * r;
       let y = center + Math.sin(angle) * r;
       x += px * node.depth * 0.3;
       y += py * node.depth * 0.3;
-      positions.push({ x, y });
-      // SVG circle arc: move to left edge, sweep full circle
+      midPositions.push({ x, y });
       const nr = node.size * scale;
-      nodeParts.push(
-        `M ${x - nr} ${y} a ${nr} ${nr} 0 1 0 ${nr * 2} 0 a ${nr} ${nr} 0 1 0 ${-nr * 2} 0`
+      midParts.push(
+        `M ${x - nr} ${y} a ${nr} ${nr} 0 1 0 ${nr * 2} 0 a ${nr} ${nr} 0 1 0 ${-nr * 2} 0`,
       );
     }
 
-    // 2. Build pathway Q-curves from positions
+    // 3. Foreground particles (large, bright)
+    const foreParts: string[] = [];
+    for (let i = 0; i < foreNodes.length; i++) {
+      const node = foreNodes[i];
+      const angle = node.baseAngle + t * node.speed * (0.2 + cap * 0.6);
+      const r = node.baseRadius * (0.2 + cap * 0.8);
+      let x = center + Math.cos(angle) * r;
+      let y = center + Math.sin(angle) * r;
+      x += px * node.depth * 0.5;
+      y += py * node.depth * 0.5;
+      const nr = node.size * scale;
+      foreParts.push(
+        `M ${x - nr} ${y} a ${nr} ${nr} 0 1 0 ${nr * 2} 0 a ${nr} ${nr} 0 1 0 ${-nr * 2} 0`,
+      );
+    }
+
+    // 4. Pathways (connect mid-layer nodes)
     const pathwayParts: string[] = [];
     for (let i = 0; i < pathways.length; i++) {
       const pw = pathways[i];
-      const s = positions[pw.startNode];
-      const e = positions[pw.endNode];
+      const s = midPositions[pw.startIdx];
+      const e = midPositions[pw.endIdx];
       if (!s || !e) continue;
       const mx = (s.x + e.x) / 2;
       const my = (s.y + e.y) / 2;
-      const os = pw.controlOffset * scale * (0.5 + cap * 0.5);
+      const os = pw.controlOffset * scale * (0.4 + cap * 0.6);
       const dx = e.x - s.x;
       const dy = e.y - s.y;
       const len = Math.sqrt(dx * dx + dy * dy) || 1;
-      const cx = mx + (-dy / len) * os;
-      const cy = my + (dx / len) * os;
-      pathwayParts.push(`M ${s.x} ${s.y} Q ${cx} ${cy} ${e.x} ${e.y}`);
+      const cx2 = mx + (-dy / len) * os;
+      const cy2 = my + (dx / len) * os;
+      pathwayParts.push(`M ${s.x} ${s.y} Q ${cx2} ${cy2} ${e.x} ${e.y}`);
     }
 
-    // 3. Build lightning bolts
+    // 5. Lightning bolts
     const lightningParts: string[] = [];
     for (let i = 0; i < LIGHTNING_LAYERS; i++) {
-      const angle = (i / LIGHTNING_LAYERS) * Math.PI * 2 + t * 0.1;
-      const len = orbR * (0.3 + cap * 0.5);
+      const angle = (i / LIGHTNING_LAYERS) * Math.PI * 2 + t * 0.08;
+      const boltLen = orbR * (0.25 + cap * 0.5);
       let d = `M ${center} ${center}`;
-      for (let s = 1; s <= 6; s++) {
-        const progress = s / 6;
-        const jx = Math.sin(t * 3 + i * 17 + s * 31) * 8 * scale;
-        const jy = Math.cos(t * 2.7 + i * 23 + s * 37) * 8 * scale;
-        const x = center + Math.cos(angle) * len * progress + jx;
-        const y = center + Math.sin(angle) * len * progress + jy;
-        d += ` L ${x} ${y}`;
+      for (let seg = 1; seg <= 6; seg++) {
+        const progress = seg / 6;
+        const jx = Math.sin(t * 2.5 + i * 17 + seg * 31) * 6 * scale;
+        const jy = Math.cos(t * 2.2 + i * 23 + seg * 37) * 6 * scale;
+        const bx = center + Math.cos(angle) * boltLen * progress + jx;
+        const by = center + Math.sin(angle) * boltLen * progress + jy;
+        d += ` L ${bx} ${by}`;
       }
       lightningParts.push(d);
     }
 
+    // Colors — alpha scales with capacity
+    const deepAlpha = (0.06 + cap * 0.14).toFixed(3);
+    const midAlpha = (0.10 + cap * 0.25).toFixed(3);
+    const foreAlpha = (0.15 + cap * 0.35).toFixed(3);
+    const pathwayAlpha = (0.02 + cap * 0.05).toFixed(3);
+    const lightningAlpha = (0.01 + cap * 0.05).toFixed(3);
+
     return {
-      nodesPath: nodeParts.join(' '),
+      deepPath: deepParts.join(' '),
+      midPath: midParts.join(' '),
+      forePath: foreParts.join(' '),
       pathwaysPath: pathwayParts.join(' '),
       lightningPath: lightningParts.join(' '),
-      nodeColor: `rgba(255,255,255,${(0.15 + cap * 0.35).toFixed(3)})`,
-      pathwayColor: `rgba(255,255,255,${(0.03 + cap * 0.06).toFixed(3)})`,
-      lightningColor: `rgba(255,255,255,${(0.02 + cap * 0.06).toFixed(3)})`,
-      orbColorStr: capacityToSkiaColor(cap, MEDIUM_OPACITY),
-      haloColorStr: capacityToSkiaColor(cap, 0.15),
+      deepColor: `rgba(255,255,255,${deepAlpha})`,
+      midColor: `rgba(255,255,255,${midAlpha})`,
+      foreColor: `rgba(255,255,255,${foreAlpha})`,
+      pathwayColor: `rgba(255,255,255,${pathwayAlpha})`,
+      lightningColor: `rgba(255,255,255,${lightningAlpha})`,
+      hazeColor: capacityToSkiaColor(cap, HAZE_OPACITY + cap * 0.04),
     };
   });
 
   // ── Extract individual values (all top-level, zero hooks in loops) ──
-  const nodesPath = useDerivedValue(() => frame.value.nodesPath);
+  const deepPath = useDerivedValue(() => frame.value.deepPath);
+  const midPath = useDerivedValue(() => frame.value.midPath);
+  const forePath = useDerivedValue(() => frame.value.forePath);
   const pathwaysPath = useDerivedValue(() => frame.value.pathwaysPath);
   const lightningPath = useDerivedValue(() => frame.value.lightningPath);
-  const nodeColor = useDerivedValue(() => frame.value.nodeColor);
+  const deepColor = useDerivedValue(() => frame.value.deepColor);
+  const midColor = useDerivedValue(() => frame.value.midColor);
+  const foreColor = useDerivedValue(() => frame.value.foreColor);
   const pathwayColor = useDerivedValue(() => frame.value.pathwayColor);
   const lightningColor = useDerivedValue(() => frame.value.lightningColor);
-  const orbColor = useDerivedValue(() => frame.value.orbColorStr);
-  const haloColor = useDerivedValue(() => frame.value.haloColorStr);
+  const hazeColor = useDerivedValue(() => frame.value.hazeColor);
 
   return (
     <Group clip={circleClipPath}>
-      {/* Background haze */}
-      <Circle cx={center} cy={center} r={orbR} color={haloColor}>
-        <BlurMask blur={orbR * 0.3} style="normal" />
+      {/* Ambient medium glow — subtle, NOT a solid fill */}
+      <Circle cx={center} cy={center} r={orbR * 0.7} color={hazeColor}>
+        <BlurMask blur={orbR * 0.35} style="normal" />
       </Circle>
 
-      {/* Orb body */}
-      <Circle cx={center} cy={center} r={orbR * 0.95} color={orbColor} />
+      {/* Deep layer — small, dim, heavily blurred soft discs */}
+      <Path path={deepPath} color={deepColor}>
+        <BlurMask blur={FIELD_BLUR_DEEP * scale} style="normal" />
+      </Path>
 
-      {/* Neural pathways — single combined path */}
+      {/* Neural pathways — connect mid-layer nodes */}
       <Path
         path={pathwaysPath}
         style="stroke"
-        strokeWidth={1 * scale}
+        strokeWidth={0.8 * scale}
         strokeCap="round"
         color={pathwayColor}
       />
 
-      {/* Lightning — single combined path */}
+      {/* Mid layer — moderate particles, softer blur */}
+      <Path path={midPath} color={midColor}>
+        <BlurMask blur={FIELD_BLUR_MID * scale} style="normal" />
+      </Path>
+
+      {/* Lightning — visible at higher capacity */}
       <Path
         path={lightningPath}
         style="stroke"
-        strokeWidth={1.5 * scale}
+        strokeWidth={1 * scale}
         strokeCap="round"
         color={lightningColor}
       />
 
-      {/* Particle nodes — single combined path of circle arcs */}
-      <Path path={nodesPath} color={nodeColor} />
+      {/* Foreground layer — larger, brighter, sharp */}
+      <Path path={forePath} color={foreColor} />
     </Group>
   );
 };

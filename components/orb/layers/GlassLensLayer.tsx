@@ -1,6 +1,15 @@
 /**
  * GlassLensLayer.tsx — L2: Precision Glass Lens
- * Gradient-based specular, vignette, and rim light for glass lens effect.
+ *
+ * Pure gradient approach (no RuntimeShader):
+ *  - Inner edge darkening
+ *  - Strong vignette
+ *  - Dual specular arcs (primary + secondary)
+ *  - Rim compression band
+ *  - Fresnel ring
+ *  - Glass edge ring
+ *
+ * Every shape: at most ONE Paint child.
  */
 
 import React from 'react';
@@ -16,6 +25,8 @@ import { type SharedValue } from 'react-native-reanimated';
 import {
   ORB_RADIUS,
   GLASS_SPECULAR_OPACITY,
+  GLASS_VIGNETTE_OPACITY,
+  FRESNEL_OPACITY,
 } from '../orbConstants';
 
 interface GlassLensLayerProps {
@@ -30,42 +41,114 @@ export const GlassLensLayer: React.FC<GlassLensLayerProps> = ({ size }) => {
 
   return (
     <Group>
-      {/* Vignette */}
+      {/* Inner edge darkening — shadow ring inside orb boundary */}
       <Circle cx={center} cy={center} r={orbR}>
         <Paint>
           <RadialGradient
             c={vec(center, center)}
             r={orbR}
-            colors={['transparent', 'transparent', 'rgba(0,0,0,0.15)', 'rgba(0,0,0,0.35)']}
-            positions={[0, 0.5, 0.8, 1.0]}
+            colors={[
+              'transparent',
+              'transparent',
+              'rgba(0,0,0,0.08)',
+              'rgba(0,0,0,0.25)',
+            ]}
+            positions={[0, 0.65, 0.85, 1.0]}
           />
         </Paint>
       </Circle>
 
-      {/* Primary specular */}
-      <Circle cx={center - orbR * 0.25} cy={center - orbR * 0.3} r={orbR * 0.35}>
+      {/* Vignette — strong darkening toward edges */}
+      <Circle cx={center} cy={center} r={orbR}>
         <Paint>
           <RadialGradient
-            c={vec(center - orbR * 0.25, center - orbR * 0.3)}
-            r={orbR * 0.35}
-            colors={[`rgba(255,255,255,${GLASS_SPECULAR_OPACITY})`, 'transparent']}
+            c={vec(center, center)}
+            r={orbR}
+            colors={[
+              'transparent',
+              'transparent',
+              `rgba(0,0,0,${(GLASS_VIGNETTE_OPACITY * 0.5).toFixed(2)})`,
+              `rgba(0,0,0,${GLASS_VIGNETTE_OPACITY.toFixed(2)})`,
+            ]}
+            positions={[0, 0.45, 0.78, 1.0]}
           />
         </Paint>
       </Circle>
 
-      {/* Secondary rim light */}
-      <Circle cx={center + orbR * 0.4} cy={center + orbR * 0.35} r={orbR * 0.15}>
+      {/* Rim compression — narrow dark band near edge for curvature depth */}
+      <Circle cx={center} cy={center} r={orbR}>
         <Paint>
           <RadialGradient
-            c={vec(center + orbR * 0.4, center + orbR * 0.35)}
-            r={orbR * 0.15}
-            colors={['rgba(255,255,255,0.03)', 'transparent']}
+            c={vec(center, center)}
+            r={orbR}
+            colors={['transparent', 'transparent', 'rgba(0,0,0,0.12)', 'transparent']}
+            positions={[0, 0.82, 0.92, 1.0]}
           />
         </Paint>
       </Circle>
 
-      {/* Glass edge ring */}
-      <Circle cx={center} cy={center} r={orbR - 1 * scale} style="stroke" strokeWidth={2 * scale}>
+      {/* Primary specular arc — upper-left highlight */}
+      <Circle cx={center - orbR * 0.22} cy={center - orbR * 0.28} r={orbR * 0.38}>
+        <Paint>
+          <RadialGradient
+            c={vec(center - orbR * 0.22, center - orbR * 0.28)}
+            r={orbR * 0.38}
+            colors={[
+              `rgba(255,255,255,${GLASS_SPECULAR_OPACITY})`,
+              `rgba(255,255,255,${(GLASS_SPECULAR_OPACITY * 0.4).toFixed(3)})`,
+              'transparent',
+            ]}
+            positions={[0, 0.35, 1.0]}
+          />
+        </Paint>
+      </Circle>
+
+      {/* Secondary specular arc — lower-right, dimmer */}
+      <Circle cx={center + orbR * 0.35} cy={center + orbR * 0.32} r={orbR * 0.18}>
+        <Paint>
+          <RadialGradient
+            c={vec(center + orbR * 0.35, center + orbR * 0.32)}
+            r={orbR * 0.18}
+            colors={[
+              'rgba(255,255,255,0.04)',
+              'rgba(255,255,255,0.015)',
+              'transparent',
+            ]}
+            positions={[0, 0.4, 1.0]}
+          />
+        </Paint>
+      </Circle>
+
+      {/* Fresnel ring — bright thin ring at very edge */}
+      <Circle
+        cx={center}
+        cy={center}
+        r={orbR - 0.5 * scale}
+        style="stroke"
+        strokeWidth={1 * scale}
+      >
+        <Paint>
+          <LinearGradient
+            start={vec(center - orbR, center - orbR)}
+            end={vec(center + orbR, center + orbR)}
+            colors={[
+              `rgba(255,255,255,${FRESNEL_OPACITY})`,
+              'transparent',
+              `rgba(255,255,255,${(FRESNEL_OPACITY * 0.5).toFixed(3)})`,
+            ]}
+            positions={[0, 0.5, 1]}
+          />
+        </Paint>
+      </Circle>
+
+      {/* Glass edge ring — structural boundary */}
+      <Circle
+        cx={center}
+        cy={center}
+        r={orbR - 1.5 * scale}
+        style="stroke"
+        strokeWidth={1.5 * scale}
+      >
         <Paint>
           <LinearGradient
             start={vec(center - orbR, center - orbR)}
