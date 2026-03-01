@@ -1,5 +1,8 @@
 /**
  * HousingLayer.tsx — L0: Machined Instrument Housing
+ *
+ * Each visual effect uses a SINGLE shape with at most one Paint child.
+ * Shadows are separate shapes drawn behind the housing ring.
  */
 
 import React from 'react';
@@ -34,29 +37,37 @@ export const HousingLayer: React.FC<HousingLayerProps> = ({ size }) => {
 
   return (
     <Group>
-      {/* Deep drop shadow */}
-      <Circle cx={center} cy={center + 2 * scale} r={outerR + 4 * scale}>
-        <Paint>
-          <BlurMask blur={12 * scale} style="normal" />
-        </Paint>
-        <Paint color="rgba(0, 0, 0, 0.5)" />
+      {/* Deep drop shadow — single shape: color on Circle, BlurMask as child */}
+      <Circle
+        cx={center}
+        cy={center + 2 * scale}
+        r={outerR + 4 * scale}
+        color="rgba(0, 0, 0, 0.5)"
+      >
+        <BlurMask blur={12 * scale} style="normal" />
       </Circle>
 
-      {/* Subtle highlight shadow */}
-      <Circle cx={center} cy={center - 1 * scale} r={outerR + 2 * scale}>
-        <Paint>
-          <BlurMask blur={4 * scale} style="normal" />
-        </Paint>
-        <Paint color="rgba(255, 255, 255, 0.015)" />
+      {/* Subtle highlight — single shape */}
+      <Circle
+        cx={center}
+        cy={center - 1 * scale}
+        r={outerR + 2 * scale}
+        color="rgba(255, 255, 255, 0.015)"
+      >
+        <BlurMask blur={4 * scale} style="normal" />
       </Circle>
 
-      {/* Main housing ring */}
-      <Circle cx={center} cy={center} r={outerR}>
-        <Paint color={HOUSING_BASE} />
-      </Circle>
+      {/* Main housing ring — solid fill */}
+      <Circle cx={center} cy={center} r={outerR} color={HOUSING_BASE} />
 
-      {/* Bevel lighting */}
-      <Circle cx={center} cy={center} r={outerR} style="stroke" strokeWidth={1.5 * scale}>
+      {/* Bevel lighting — single stroke with gradient */}
+      <Circle
+        cx={center}
+        cy={center}
+        r={outerR}
+        style="stroke"
+        strokeWidth={1.5 * scale}
+      >
         <Paint>
           <LinearGradient
             start={vec(center - outerR, center - outerR)}
@@ -68,12 +79,23 @@ export const HousingLayer: React.FC<HousingLayerProps> = ({ size }) => {
       </Circle>
 
       {/* Inner highlight ring */}
-      <Circle cx={center} cy={center} r={outerR - 2 * scale} style="stroke" strokeWidth={0.5 * scale}>
-        <Paint color="rgba(255, 255, 255, 0.03)" />
-      </Circle>
+      <Circle
+        cx={center}
+        cy={center}
+        r={outerR - 2 * scale}
+        style="stroke"
+        strokeWidth={0.5 * scale}
+        color="rgba(255, 255, 255, 0.03)"
+      />
 
-      {/* Recessed inner edge */}
-      <Circle cx={center} cy={center} r={innerR} style="stroke" strokeWidth={3 * scale}>
+      {/* Recessed inner edge — stroke with gradient */}
+      <Circle
+        cx={center}
+        cy={center}
+        r={innerR}
+        style="stroke"
+        strokeWidth={3 * scale}
+      >
         <Paint>
           <LinearGradient
             start={vec(center - innerR, center - innerR)}
@@ -84,12 +106,14 @@ export const HousingLayer: React.FC<HousingLayerProps> = ({ size }) => {
         </Paint>
       </Circle>
 
-      {/* Inner shadow for depth */}
-      <Circle cx={center} cy={center + 1 * scale} r={orbR + 1 * scale}>
-        <Paint>
-          <BlurMask blur={6 * scale} style="inner" />
-        </Paint>
-        <Paint color="rgba(0, 0, 0, 0.3)" />
+      {/* Inner shadow for depth — color on Circle, BlurMask child */}
+      <Circle
+        cx={center}
+        cy={center + 1 * scale}
+        r={orbR + 1 * scale}
+        color="rgba(0, 0, 0, 0.3)"
+      >
+        <BlurMask blur={6 * scale} style="inner" />
       </Circle>
     </Group>
   );

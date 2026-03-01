@@ -1,5 +1,8 @@
 /**
  * SurfaceLayer.tsx — L3: Calibration Engravings & Micro Texture
+ *
+ * Static tick marks, arcs, and crosshair. Each element has color on the
+ * element prop (not nested Paint children).
  */
 
 import React, { useMemo } from 'react';
@@ -7,7 +10,6 @@ import {
   Circle,
   Group,
   Path,
-  Paint,
   Line,
   vec,
 } from '@shopify/react-native-skia';
@@ -76,6 +78,7 @@ export const SurfaceLayer: React.FC<SurfaceLayerProps> = ({
 
   return (
     <Group transform={transform}>
+      {/* Tick marks — color on Line prop */}
       {ticks.map((tick, i) => (
         <Line
           key={`t-${i}`}
@@ -83,26 +86,38 @@ export const SurfaceLayer: React.FC<SurfaceLayerProps> = ({
           p2={vec(tick.x2, tick.y2)}
           style="stroke"
           strokeWidth={(tick.isMajor ? 1.0 : 0.5) * scale}
-        >
-          <Paint color={`rgba(255,255,255,${tick.isMajor ? MAJOR_TICK_OPACITY : TICK_OPACITY})`} />
-        </Line>
+          color={`rgba(255,255,255,${tick.isMajor ? MAJOR_TICK_OPACITY : TICK_OPACITY})`}
+        />
       ))}
 
+      {/* Calibration arcs — color on Path prop */}
       {calibrationArcs.map((arcPath, i) => (
-        <Path key={`a-${i}`} path={arcPath} style="stroke" strokeWidth={0.5 * scale} strokeCap="round">
-          <Paint color={ENGRAVING_COLOR} />
-        </Path>
+        <Path
+          key={`a-${i}`}
+          path={arcPath}
+          style="stroke"
+          strokeWidth={0.5 * scale}
+          strokeCap="round"
+          color={ENGRAVING_COLOR}
+        />
       ))}
 
-      <Line p1={vec(center - 6 * scale, center)} p2={vec(center + 6 * scale, center)} style="stroke" strokeWidth={0.3 * scale}>
-        <Paint color="rgba(255,255,255,0.03)" />
-      </Line>
-      <Line p1={vec(center, center - 6 * scale)} p2={vec(center, center + 6 * scale)} style="stroke" strokeWidth={0.3 * scale}>
-        <Paint color="rgba(255,255,255,0.03)" />
-      </Line>
-      <Circle cx={center} cy={center} r={1.5 * scale}>
-        <Paint color="rgba(255,255,255,0.04)" />
-      </Circle>
+      {/* Crosshair — color on Line prop */}
+      <Line
+        p1={vec(center - 6 * scale, center)}
+        p2={vec(center + 6 * scale, center)}
+        style="stroke"
+        strokeWidth={0.3 * scale}
+        color="rgba(255,255,255,0.03)"
+      />
+      <Line
+        p1={vec(center, center - 6 * scale)}
+        p2={vec(center, center + 6 * scale)}
+        style="stroke"
+        strokeWidth={0.3 * scale}
+        color="rgba(255,255,255,0.03)"
+      />
+      <Circle cx={center} cy={center} r={1.5 * scale} color="rgba(255,255,255,0.04)" />
     </Group>
   );
 };
