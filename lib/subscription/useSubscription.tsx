@@ -37,7 +37,11 @@ import {
   capturePaymentError,
   isUserCancellation,
 } from '../observability';
-import { initAttribution, trackPurchaseAttribution } from '../attribution';
+// ATT attribution deferred to post-v1 (no NSUserTrackingUsageDescription in v1 binary)
+// import { initAttribution, trackPurchaseAttribution } from '../attribution';
+import type { AttributionEvent } from '../attribution';
+const initAttribution = async () => {};
+const trackPurchaseAttribution = (_event: AttributionEvent) => {};
 
 // Dynamic import for RevenueCat to handle platform differences
 let PurchasesMobile: typeof import('react-native-purchases').default | null = null;

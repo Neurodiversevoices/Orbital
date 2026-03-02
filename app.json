@@ -18,17 +18,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "46",
+      "buildNumber": "50",
       "appleTeamId": "2KM3QL4UMV",
       "icon": "./assets/icon.png",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false,
-        "NSUserTrackingUsageDescription": "This identifier will be used to measure advertising effectiveness.",
-        "SKAdNetworkItems": [
-          {
-            "SKAdNetworkIdentifier": "cstr6suwn9.skadnetwork"
-          }
-        ]
+        "LSApplicationCategoryType": "public.app-category.healthcare-fitness",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {

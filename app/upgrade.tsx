@@ -827,7 +827,12 @@ export default function UpgradeScreen() {
           )}
 
           <Text style={styles.footerText}>
-            Subscriptions auto-renew unless cancelled. Annual plans are recommended.
+            Payment will be charged to your Apple ID account at confirmation of purchase.
+            Subscriptions automatically renew unless auto-renew is turned off at least
+            24 hours before the end of the current billing period. Your account will be
+            charged for renewal within 24 hours prior to the end of the current period.
+            You can manage and cancel your subscriptions by going to your App Store
+            account settings after purchase.
           </Text>
 
           <View style={styles.footerLinks}>
