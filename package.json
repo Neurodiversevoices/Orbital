@@ -23,7 +23,9 @@
     "cci:export": "node scripts/cci-export-pdf.js",
     "cci:verify": "node scripts/cci-verify-golden.js",
     "cci:render": "cd output && node render_ultra.js",
-    "bundle:export": "npx tsx scripts/bundle-cci-export-pdf.ts"
+    "bundle:export": "npx tsx scripts/bundle-cci-export-pdf.ts",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.4.2",

@@ -4,8 +4,8 @@
     {
       "name": "expo-dev",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["expo", "start", "--clear"],
-      "port": 8081
+      "runtimeArgs": ["expo", "start", "--clear", "--port", "8082"],
+      "port": 8082
     }
   ]
 }

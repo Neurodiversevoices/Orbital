@@ -111,8 +111,7 @@ export default function LegalScreen() {
             </Text>
             <Text style={styles.disclaimerTextSecondary}>
               The Clinical Capacity Instrument (CCI-Q4) is informational and designed to
-              support documentation and record review; it does not guarantee reimbursement
-              or clinical outcomes.
+              support documentation and record review.
             </Text>
           </View>
         </View>

@@ -252,7 +252,7 @@ function CirclesCCIBrief() {
             {' '}over time — reflecting how much emotional, cognitive, sensory, and social load the group can tolerate before regulation begins to degrade.
           </Text>
           <Text style={styles.circleCCINote}>
-            This report summarizes patterns, not individuals. No diagnoses. No symptom scoring
+            This report summarizes patterns, not individuals. No diagnoses. No signal scoring
           </Text>
         </View>
 
@@ -336,7 +336,7 @@ function CirclesCCIBrief() {
 
         {/* Disclaimer */}
         <Text style={styles.gridDisclaimer}>
-          Not a diagnostic tool. Not a symptom severity scale.
+          Not a diagnostic tool. Not a signal severity scale.
         </Text>
       </View>
 

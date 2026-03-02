@@ -279,10 +279,9 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
             Pro users pay {formatPrice(CCI_PRICING.sixtyDay)} (save {formatPrice(CCI_PRICING.ninetyDay - CCI_PRICING.sixtyDay)})
           </Text>
         )}
-        {/* CPT 90885 Reimbursement Notice — PATCH 1 */}
+        {/* Clinical Capacity Index Notice */}
         <Text style={styles.cciCptNotice}>
-          Supports clinical documentation and record review (e.g., CPT 90885 review).
-          Reimbursement is not guaranteed and varies by payer.
+          Clinical Capacity Index — supports documentation and record review.
         </Text>
       </View>
 

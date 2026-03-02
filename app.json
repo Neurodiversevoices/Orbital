@@ -22,6 +22,7 @@
       "appleTeamId": "2KM3QL4UMV",
       "icon": "./assets/icon.png",
       "infoPlist": {
+        "LSApplicationCategoryType": "public.app-category.healthcare-fitness",
         "ITSAppUsesNonExemptEncryption": false,
         "NSUserTrackingUsageDescription": "This identifier will be used to measure advertising effectiveness.",
         "SKAdNetworkItems": [

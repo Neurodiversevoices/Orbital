@@ -477,7 +477,7 @@ export const RWE_FORMAT_INFO: Record<RWEExportFormat, {
   cdisc_sdtm: {
     name: 'CDISC SDTM',
     description: 'Study Data Tabulation Model format for regulatory submissions',
-    useCase: 'FDA submissions, clinical trial integration',
+    useCase: 'Regulatory submissions, clinical trial integration',
   },
   fhir_r4: {
     name: 'FHIR R4',

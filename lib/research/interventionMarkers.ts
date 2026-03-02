@@ -36,20 +36,20 @@ export const INTERVENTION_CATEGORY_LABELS: Record<InterventionCategory, {
     description: 'Change in medication dosage',
     examples: ['Increased dose', 'Reduced dose', 'Changed timing'],
   },
-  therapy_start: {
-    label: 'Started Therapy',
-    description: 'Beginning therapeutic support',
-    examples: ['Started counseling', 'Began coaching', 'Started group therapy'],
+  intervention_start: {
+    label: 'Started Intervention',
+    description: 'Beginning a new support intervention',
+    examples: ['Started counseling', 'Began coaching', 'Started group support'],
   },
-  therapy_end: {
-    label: 'Ended Therapy',
-    description: 'Concluding therapeutic engagement',
-    examples: ['Completed program', 'Graduated from therapy'],
+  intervention_end: {
+    label: 'Ended Intervention',
+    description: 'Concluding an intervention engagement',
+    examples: ['Completed program', 'Graduated from program'],
   },
-  therapy_change: {
-    label: 'Therapy Change',
-    description: 'Modification to therapeutic approach',
-    examples: ['Changed therapist', 'New approach', 'Adjusted frequency'],
+  intervention_change: {
+    label: 'Intervention Change',
+    description: 'Modification to intervention approach',
+    examples: ['Changed provider', 'New approach', 'Adjusted frequency'],
   },
   lifestyle_change: {
     label: 'Lifestyle Change',
@@ -234,9 +234,9 @@ export async function getUserMarkerStats(userId: string): Promise<{
     medication_start: 0,
     medication_stop: 0,
     dose_change: 0,
-    therapy_start: 0,
-    therapy_end: 0,
-    therapy_change: 0,
+    intervention_start: 0,
+    intervention_end: 0,
+    intervention_change: 0,
     lifestyle_change: 0,
     environmental_change: 0,
     support_change: 0,

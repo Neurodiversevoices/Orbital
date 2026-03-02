@@ -493,7 +493,7 @@ function generateLegacyCCIArtifactHTML(
     <div class="capacity-definition-title">What "Capacity" Means in This Report</div>
     <div class="capacity-definition-body">
       <p>Capacity refers to a person's day-to-day functional bandwidth — the amount of emotional, cognitive, sensory, and social load they can manage before regulation begins to degrade.</p>
-      <p class="capacity-definition-emphasis">Capacity is not a diagnosis, not a symptom checklist, and not a performance score.</p>
+      <p class="capacity-definition-emphasis">Capacity is not a diagnosis, not a signal checklist, and not a performance score.</p>
       <p>Changes in capacity often present clinically as:</p>
       <ul class="capacity-definition-list">
         <li>increased emotional reactivity</li>
@@ -656,7 +656,7 @@ function generateLegacyCCIArtifactHTML(
   <div class="footer-section">
     <div class="provider-title">Provider Utility Statement</div>
     <div class="provider-body">
-      This artifact is an objective summary of patient-generated capacity signals. <em>It is provided to assist clinical documentation of functional status and does NOT constitute a diagnosis.</em> Inclusion of this record in a medical file serves as evidence of data review, not endorsement of subjective claims. Designed to support clinical documentation and record review (e.g., CPT 90885).
+      This artifact is an objective summary of user-generated capacity signals. <em>It is provided to assist clinical documentation of functional status and does NOT constitute a diagnosis.</em> Inclusion of this record in a medical file serves as evidence of data review, not endorsement of subjective claims. Capacity Summary Report — supports documentation and record review.
     </div>
 
     <!-- HOW TO USE THIS REPORT -->
@@ -1309,7 +1309,7 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
     <div class="legal-block">
       <div class="legal-title">Confidential &amp; Proprietary Notice</div>
       <div class="legal-body">
-        This Circle Capacity Instrument and all underlying methodologies, algorithms, data structures, and presentation formats constitute proprietary intellectual property of Orbital Health Intelligence, Inc. This is NOT a diagnostic tool. Not a symptom severity scale. For coordination purposes only.
+        This Circle Capacity Instrument and all underlying methodologies, algorithms, data structures, and presentation formats constitute proprietary intellectual property of Orbital Health Intelligence, Inc. This is NOT a diagnostic tool. Not a signal severity scale. For coordination purposes only.
       </div>
       <div class="legal-rights">© 2026 Orbital Health Intelligence, Inc. All Rights Reserved.</div>
     </div>
@@ -1394,7 +1394,7 @@ export function createCCIArtifactJSON(
       confidential: true,
       copyright: '© 2026 Orbital Health Intelligence, Inc. All Rights Reserved.',
       disclaimer:
-        'This artifact is an objective summary of patient-generated capacity signals. ' +
+        'This artifact is an objective summary of user-generated capacity signals. ' +
         'It does NOT constitute a diagnosis. Designed to support clinical documentation.',
     },
     signature: {

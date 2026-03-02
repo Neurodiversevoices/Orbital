@@ -444,7 +444,7 @@ export function generateBundleCCIArtifactHTML(
       <div class="legal-title">Confidential &amp; Proprietary Notice</div>
       <div class="legal-body">
         This Bundle Capacity Instrument contains ANONYMIZED aggregate data only. Individual seat holders are NOT identified.
-        This is NOT a diagnostic tool. Not a symptom severity scale. For coordination purposes only.
+        This is NOT a diagnostic tool. Not a signal severity scale. For coordination purposes only.
       </div>
       <div class="legal-rights">© 2026 Orbital Health Intelligence, Inc. All Rights Reserved.</div>
     </div>
@@ -481,7 +481,7 @@ ${needsPagination ? `
       <div class="legal-title">Confidential &amp; Proprietary Notice</div>
       <div class="legal-body">
         This Bundle Capacity Instrument contains ANONYMIZED aggregate data only. Individual seat holders are NOT identified.
-        This is NOT a diagnostic tool. Not a symptom severity scale. For coordination purposes only.
+        This is NOT a diagnostic tool. Not a signal severity scale. For coordination purposes only.
       </div>
       <div class="legal-rights">© 2026 Orbital Health Intelligence, Inc. All Rights Reserved.</div>
     </div>

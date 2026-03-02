@@ -279,11 +279,10 @@ export default function CCIInstrumentScreen() {
             </View>
           )}
 
-          {/* CPT 90885 Reimbursement Notice — PATCH 1 */}
+          {/* Clinical Capacity Index Notice */}
           <View style={styles.cptNotice}>
             <Text style={styles.cptNoticeText}>
-              Supports clinical documentation and record review (e.g., CPT 90885 review).
-              Reimbursement is not guaranteed and varies by payer.
+              Clinical Capacity Index — supports documentation and record review.
             </Text>
           </View>
 
