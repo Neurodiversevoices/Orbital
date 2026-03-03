@@ -4,7 +4,6 @@
  * Pure gradient approach (no RuntimeShader):
  *  - Inner edge darkening
  *  - Strong vignette
- *  - Dual specular arcs (primary + secondary)
  *  - Rim compression band
  *  - Fresnel ring
  *  - Glass edge ring
@@ -24,7 +23,6 @@ import {
 import { type SharedValue } from 'react-native-reanimated';
 import {
   ORB_RADIUS,
-  GLASS_SPECULAR_OPACITY,
   GLASS_VIGNETTE_OPACITY,
   FRESNEL_OPACITY,
 } from '../orbConstants';
@@ -83,38 +81,6 @@ export const GlassLensLayer: React.FC<GlassLensLayerProps> = ({ size }) => {
             r={orbR}
             colors={['transparent', 'transparent', 'rgba(0,0,0,0.12)', 'transparent']}
             positions={[0, 0.82, 0.92, 1.0]}
-          />
-        </Paint>
-      </Circle>
-
-      {/* Primary specular arc — upper-left highlight */}
-      <Circle cx={center - orbR * 0.22} cy={center - orbR * 0.28} r={orbR * 0.38}>
-        <Paint>
-          <RadialGradient
-            c={vec(center - orbR * 0.22, center - orbR * 0.28)}
-            r={orbR * 0.38}
-            colors={[
-              `rgba(255,255,255,${GLASS_SPECULAR_OPACITY})`,
-              `rgba(255,255,255,${(GLASS_SPECULAR_OPACITY * 0.4).toFixed(3)})`,
-              'transparent',
-            ]}
-            positions={[0, 0.35, 1.0]}
-          />
-        </Paint>
-      </Circle>
-
-      {/* Secondary specular arc — lower-right, dimmer */}
-      <Circle cx={center + orbR * 0.35} cy={center + orbR * 0.32} r={orbR * 0.18}>
-        <Paint>
-          <RadialGradient
-            c={vec(center + orbR * 0.35, center + orbR * 0.32)}
-            r={orbR * 0.18}
-            colors={[
-              'rgba(255,255,255,0.04)',
-              'rgba(255,255,255,0.015)',
-              'transparent',
-            ]}
-            positions={[0, 0.4, 1.0]}
           />
         </Paint>
       </Circle>
