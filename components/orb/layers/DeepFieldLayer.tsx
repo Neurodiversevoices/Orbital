@@ -270,7 +270,7 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
     const wR = center + halfChord;
 
     const SEGS = 40; // extra segments for smooth high-frequency harmonics
-    const amp = 5 * scale;
+    const amp = 10 * scale;
     const primaryParts: string[] = [];
     const echoParts: string[] = [];
 
@@ -297,10 +297,10 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
       path: primaryParts.join(' '),
       echoPath: echoParts.join(' '),
       // Volumetric glow — graduated alpha for vertical masking
-      wideGlowColor: capacityToSkiaColor(cap, 0.15),  // widest, dimmest
-      midGlowColor: capacityToSkiaColor(cap, 0.25),   // medium band
-      primaryColor: capacityToSkiaColor(cap, 0.6),     // crisp horizon
-      echoColor: capacityToSkiaColor(cap, 0.15),       // dim trail
+      wideGlowColor: capacityToSkiaColor(cap, 0.35),  // widest, dimmest
+      midGlowColor: capacityToSkiaColor(cap, 0.45),   // medium band
+      primaryColor: capacityToSkiaColor(cap, 0.85),    // crisp horizon
+      echoColor: capacityToSkiaColor(cap, 0.30),       // dim trail
     };
   });
 
@@ -336,6 +336,18 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
       <Path path={midPath} color={midColor}>
         <BlurMask blur={FIELD_BLUR_MID * scale} style="normal" />
       </Path>
+
+      {/* Lightning — visible at higher capacity */}
+      <Path
+        path={lightningPath}
+        style="stroke"
+        strokeWidth={1 * scale}
+        strokeCap="round"
+        color={lightningColor}
+      />
+
+      {/* Foreground layer — larger, brighter, sharp */}
+      <Path path={forePath} color={foreColor} />
 
       {/* Wave — wide soft glow band (vertical masking: dimmest, widest) */}
       <Path
@@ -376,18 +388,6 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
         strokeCap="round"
         color={waveEchoColor}
       />
-
-      {/* Lightning — visible at higher capacity */}
-      <Path
-        path={lightningPath}
-        style="stroke"
-        strokeWidth={1 * scale}
-        strokeCap="round"
-        color={lightningColor}
-      />
-
-      {/* Foreground layer — larger, brighter, sharp */}
-      <Path path={forePath} color={foreColor} />
     </Group>
   );
 };
