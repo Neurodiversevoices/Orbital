@@ -29,10 +29,8 @@ import { GlassOrb } from '../../components/GlassOrb';
 
 // Dynamically load ClinicalOrb — falls back to GlassOrb when native Skia module isn't available
 let ClinicalOrbComponent: typeof import('../../components/orb/ClinicalOrb').default | null = null;
-let ClinicalGaugeComponent: typeof import('../../components/orb/ClinicalGauge').default | null = null;
 try {
   ClinicalOrbComponent = require('../../components/orb/ClinicalOrb').default;
-  ClinicalGaugeComponent = require('../../components/orb/ClinicalGauge').default;
 } catch {
   // RNSkiaModule not in this build — GlassOrb will be used instead
 }
@@ -136,24 +134,6 @@ export default function HomeScreen() {
       seedDemo();
     }
   }, [forceDemo]);
-
-  const SPECTRUM_WIDTH = 160;
-  const tickPosition = useSharedValue(0.5);
-
-  useEffect(() => {
-    if (currentState === 'resourced') {
-      tickPosition.value = withSpring(0, { damping: 20, stiffness: 120 });
-    } else if (currentState === 'stretched') {
-      tickPosition.value = withSpring(0.5, { damping: 20, stiffness: 120 });
-    } else if (currentState === 'depleted') {
-      tickPosition.value = withSpring(1, { damping: 20, stiffness: 120 });
-    }
-  }, [currentState]);
-
-  const tickStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: tickPosition.value * SPECTRUM_WIDTH - SPECTRUM_WIDTH / 2 }],
-    opacity: tickPosition.value >= 0 ? 1 : 0,
-  }));
 
   const signalData = useMemo(() => {
     const now = Date.now();
@@ -340,26 +320,6 @@ export default function HomeScreen() {
               ) : (
                 <GlassOrb state={currentState} onStateChange={handleStateChange} onSave={handleSave} />
               )}
-              {ClinicalGaugeComponent ? (
-                <ClinicalGaugeComponent width={280} height={48} capacity={capacityShared} />
-              ) : (
-                <View style={styles.spectrumContainer}>
-                  <View style={styles.spectrumTrack}>
-                    <View style={[styles.spectrumEndcap, styles.spectrumEndcapLeft]} />
-                    <View style={styles.spectrumBar}>
-                      <View style={[styles.spectrumSegment, { backgroundColor: '#00E5FF' }]} />
-                      <View style={[styles.spectrumSegment, { backgroundColor: '#E8A830' }]} />
-                      <View style={[styles.spectrumSegment, { backgroundColor: '#F44336' }]} />
-                    </View>
-                    <View style={[styles.spectrumEndcap, styles.spectrumEndcapRight]} />
-                    {currentState && <Animated.View style={[styles.spectrumTick, tickStyle]} />}
-                  </View>
-                  <View style={styles.spectrumLabels}>
-                    <Text style={styles.spectrumLabel}>{t.home.spectrum.high}</Text>
-                    <Text style={styles.spectrumLabel}>{t.home.spectrum.low}</Text>
-                  </View>
-                </View>
-              )}
             </View>
 
             {currentState && (
@@ -440,16 +400,6 @@ const styles = StyleSheet.create({
   signalDivider: { width: 1, height: 28, backgroundColor: 'rgba(255,255,255,0.08)' },
   instruction: { fontSize: 14, fontWeight: '400', color: 'rgba(255, 255, 255, 0.5)', letterSpacing: 0.5, marginBottom: spacing.sm, textAlign: 'center' },
   orbContainer: { justifyContent: 'center', alignItems: 'center', zIndex: 1 },
-  spectrumContainer: { alignItems: 'center', marginTop: spacing.sm },
-  spectrumTrack: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
-  spectrumBar: { flexDirection: 'row', width: 160, height: 1.5, overflow: 'hidden' },
-  spectrumSegment: { flex: 1, height: '100%' },
-  spectrumEndcap: { width: 1.5, height: 6, backgroundColor: 'rgba(255,255,255,0.5)' },
-  spectrumEndcapLeft: { marginRight: -1 },
-  spectrumEndcapRight: { marginLeft: -1 },
-  spectrumTick: { position: 'absolute', width: 1.5, height: 7, backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 0.5, top: -3, left: '50%', marginLeft: -0.75 },
-  spectrumLabels: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 180 },
-  spectrumLabel: { fontSize: 7, fontWeight: '600', color: 'rgba(255,255,255,0.3)', letterSpacing: 0.5 },
   categoryContainer: { marginTop: spacing.md, zIndex: 10 },
   // Signal limit banner styles
   limitBanner: {
