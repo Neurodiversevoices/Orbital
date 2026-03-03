@@ -15,9 +15,7 @@ import {
   Circle,
   Group,
   Path,
-  Line,
   BlurMask,
-  vec,
 } from '@shopify/react-native-skia';
 import {
   useDerivedValue,
@@ -318,15 +316,6 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
       <Path path={midPath} color={midColor}>
         <BlurMask blur={FIELD_BLUR_MID * scale} style="normal" />
       </Path>
-
-      {/* DEBUG — bright red line at center — REMOVE after confirming rendering */}
-      <Line
-        p1={vec(center - orbR * 0.7, center)}
-        p2={vec(center + orbR * 0.7, center)}
-        style="stroke"
-        strokeWidth={3}
-        color="rgba(255,0,0,1)"
-      />
 
       {/* Wave glow — soft blurred band at capacity horizon level */}
       <Path
