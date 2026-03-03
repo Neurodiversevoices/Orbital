@@ -15,7 +15,9 @@ import {
   Circle,
   Group,
   Path,
+  Line,
   BlurMask,
+  vec,
 } from '@shopify/react-native-skia';
 import {
   useDerivedValue,
@@ -221,56 +223,17 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
     const pathwayAlpha = (0.02 + cap * 0.05).toFixed(3);
     const lightningAlpha = (0.01 + cap * 0.05).toFixed(3);
 
-    // 6. Wave/horizon line — horizontal animated wave representing capacity level
-    //    Y-position: capacity 1.0 → near top (resourced/cyan)
-    //                capacity 0.0 → near bottom (depleted/crimson)
-    const WAVE_SEGS = 32;
-    const waveAmp = 4 * scale;
-    // Map capacity to Y: 1.0 → top, 0.0 → bottom (inverted)
-    const waveBaseY = center + orbR * 0.8 * (1 - cap * 2);
-    const clampedWY = Math.max(center - orbR * 0.92, Math.min(center + orbR * 0.92, waveBaseY));
-    // Horizontal chord at wave Y-level
-    const wDy = clampedWY - center;
-    const halfChord = Math.sqrt(Math.max(0, orbR * orbR - wDy * wDy));
-    const wLeftX = center - halfChord;
-    const wRightX = center + halfChord;
-
-    const waveParts: string[] = [];
-    const waveEchoParts: string[] = [];
-    for (let i = 0; i <= WAVE_SEGS; i++) {
-      const prog = i / WAVE_SEGS;
-      const wx = wLeftX + prog * (wRightX - wLeftX);
-      // Taper amplitude at edges for natural circular boundary
-      const edgeFade = Math.sin(prog * Math.PI);
-      const sineOff = Math.sin(prog * Math.PI * 3 + t * 1.2) * waveAmp * edgeFade;
-      const echoOff = Math.sin(prog * Math.PI * 2.5 + t * 0.9 + 0.8) * waveAmp * 0.5 * edgeFade;
-      const wy = clampedWY + sineOff;
-      const ey = clampedWY + 4 * scale + echoOff;
-      const cmd = i === 0 ? 'M' : 'L';
-      waveParts.push(`${cmd} ${wx} ${wy}`);
-      waveEchoParts.push(`${cmd} ${wx} ${ey}`);
-    }
-
-    const waveAlpha = 0.15 + cap * 0.25;
-    const waveGlowAlpha = 0.06 + cap * 0.10;
-    const waveEchoAlpha = 0.04 + cap * 0.08;
-
     return {
       deepPath: deepParts.join(' '),
       midPath: midParts.join(' '),
       forePath: foreParts.join(' '),
       pathwaysPath: pathwayParts.join(' '),
       lightningPath: lightningParts.join(' '),
-      wavePath: waveParts.join(' '),
-      waveEchoPath: waveEchoParts.join(' '),
       deepColor: `rgba(255,255,255,${deepAlpha})`,
       midColor: `rgba(255,255,255,${midAlpha})`,
       foreColor: `rgba(255,255,255,${foreAlpha})`,
       pathwayColor: `rgba(255,255,255,${pathwayAlpha})`,
       lightningColor: `rgba(255,255,255,${lightningAlpha})`,
-      waveColor: capacityToSkiaColor(cap, waveAlpha),
-      waveGlowColor: capacityToSkiaColor(cap, waveGlowAlpha),
-      waveEchoColor: capacityToSkiaColor(cap, waveEchoAlpha),
       hazeColor: capacityToSkiaColor(cap, HAZE_OPACITY + cap * 0.04),
     };
   });
@@ -286,12 +249,49 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
   const foreColor = useDerivedValue(() => frame.value.foreColor);
   const pathwayColor = useDerivedValue(() => frame.value.pathwayColor);
   const lightningColor = useDerivedValue(() => frame.value.lightningColor);
-  const wavePath = useDerivedValue(() => frame.value.wavePath);
-  const waveEchoPath = useDerivedValue(() => frame.value.waveEchoPath);
-  const waveColor = useDerivedValue(() => frame.value.waveColor);
-  const waveGlowColor = useDerivedValue(() => frame.value.waveGlowColor);
-  const waveEchoColor = useDerivedValue(() => frame.value.waveEchoColor);
   const hazeColor = useDerivedValue(() => frame.value.hazeColor);
+
+  // ── Wave/horizon line — standalone derived value (independent of frame) ──
+  // Separated so it can't corrupt existing particle rendering.
+  // Reads capacity + time directly, not via frame object.
+  const waveFrame = useDerivedValue(() => {
+    const cap = capacity.value;
+    const t = time.value;
+
+    // Y-position: capacity 1.0 → near top (resourced/cyan)
+    //             capacity 0.0 → near bottom (depleted/crimson)
+    const waveBaseY = center + orbR * 0.8 * (1 - cap * 2);
+    const clampedWY = Math.max(
+      center - orbR * 0.92,
+      Math.min(center + orbR * 0.92, waveBaseY),
+    );
+    // Horizontal chord width at wave Y-level
+    const wDy = clampedWY - center;
+    const halfChord = Math.sqrt(Math.max(0, orbR * orbR - wDy * wDy));
+    const wL = center - halfChord;
+    const wR = center + halfChord;
+
+    const SEGS = 32;
+    const amp = 4 * scale;
+    const parts: string[] = [];
+    for (let i = 0; i <= SEGS; i++) {
+      const p = i / SEGS;
+      const x = wL + p * (wR - wL);
+      const fade = Math.sin(p * Math.PI); // taper at edges
+      const y = clampedWY + Math.sin(p * Math.PI * 3 + t * 1.2) * amp * fade;
+      parts.push(i === 0 ? `M ${x} ${y}` : `L ${x} ${y}`);
+    }
+
+    return {
+      path: parts.join(' '),
+      color: capacityToSkiaColor(cap, 0.5),     // high alpha — clearly visible
+      glowColor: capacityToSkiaColor(cap, 0.2),
+    };
+  });
+
+  const wavePath = useDerivedValue(() => waveFrame.value.path);
+  const waveColor = useDerivedValue(() => waveFrame.value.color);
+  const waveGlowColor = useDerivedValue(() => waveFrame.value.glowColor);
 
   return (
     <Group clip={circleClipPath}>
@@ -319,31 +319,31 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
         <BlurMask blur={FIELD_BLUR_MID * scale} style="normal" />
       </Path>
 
+      {/* DEBUG — bright red line at center — REMOVE after confirming rendering */}
+      <Line
+        p1={vec(center - orbR * 0.7, center)}
+        p2={vec(center + orbR * 0.7, center)}
+        style="stroke"
+        strokeWidth={3}
+        color="rgba(255,0,0,1)"
+      />
+
       {/* Wave glow — soft blurred band at capacity horizon level */}
       <Path
         path={wavePath}
         style="stroke"
-        strokeWidth={10 * scale}
+        strokeWidth={12 * scale}
         strokeCap="round"
         color={waveGlowColor}
       >
-        <BlurMask blur={6 * scale} style="normal" />
+        <BlurMask blur={8 * scale} style="normal" />
       </Path>
-
-      {/* Wave echo — dim secondary wave for depth */}
-      <Path
-        path={waveEchoPath}
-        style="stroke"
-        strokeWidth={0.8 * scale}
-        strokeCap="round"
-        color={waveEchoColor}
-      />
 
       {/* Wave line — primary animated horizon line */}
       <Path
         path={wavePath}
         style="stroke"
-        strokeWidth={1.5 * scale}
+        strokeWidth={2 * scale}
         strokeCap="round"
         color={waveColor}
       />
