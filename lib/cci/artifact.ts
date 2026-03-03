@@ -654,7 +654,7 @@ export function generateCCIArtifactHTML(
   <div class="footer-section">
     <div class="provider-title">Provider Utility Statement</div>
     <div class="provider-body">
-      This artifact is an objective summary of patient-generated capacity signals. <em>It is provided to assist clinical documentation of functional status and does NOT constitute a diagnosis.</em> Inclusion of this record in a medical file serves as evidence of data review, not endorsement of subjective claims. Designed to support clinical documentation and record review (e.g., CPT 90885).
+      This artifact is an objective summary of patient-generated capacity signals. <em>It is provided to assist clinical documentation of functional status and does NOT constitute a diagnosis.</em> Inclusion of this record in a medical file serves as evidence of data review, not endorsement of subjective claims. Designed to support clinical documentation and provider-compatible record review.
     </div>
 
     <!-- HOW TO USE THIS REPORT -->
