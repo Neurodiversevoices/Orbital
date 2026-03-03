@@ -8,7 +8,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const DASHBOARD = path.join(__dirname, '..', 'dist', 'dashboard.html');
+const DIST = path.join(__dirname, '..', 'dist');
+const DASHBOARD = path.join(DIST, 'dashboard.html');
+const RESET_PW = path.join(DIST, 'reset-password.html');
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -16,9 +18,30 @@ const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 if (!supabaseUrl || !supabaseKey) {
   console.warn(
     '[inject-dashboard-config] WARNING: EXPO_PUBLIC_SUPABASE_URL or ' +
-    'EXPO_PUBLIC_SUPABASE_ANON_KEY is not set. dashboard.html will show ' +
+    'EXPO_PUBLIC_SUPABASE_ANON_KEY is not set. Static pages will show ' +
     '"Supabase not configured".'
   );
+}
+
+function injectSupabaseConfig(filePath) {
+  if (!fs.existsSync(filePath)) {
+    console.warn(`[inject-dashboard-config] SKIP: ${path.basename(filePath)} not found in dist/.`);
+    return;
+  }
+
+  let html = fs.readFileSync(filePath, 'utf8');
+
+  html = html.replace(
+    /<meta name="supabase-url" content="[^"]*">/,
+    `<meta name="supabase-url" content="${supabaseUrl}">`
+  );
+  html = html.replace(
+    /<meta name="supabase-anon-key" content="[^"]*">/,
+    `<meta name="supabase-anon-key" content="${supabaseKey}">`
+  );
+
+  fs.writeFileSync(filePath, html, 'utf8');
+  console.log(`[inject-dashboard-config] Supabase config injected into ${path.basename(filePath)}`);
 }
 
 if (!fs.existsSync(DASHBOARD)) {
@@ -26,16 +49,5 @@ if (!fs.existsSync(DASHBOARD)) {
   process.exit(1);
 }
 
-let html = fs.readFileSync(DASHBOARD, 'utf8');
-
-html = html.replace(
-  /<meta name="supabase-url" content="[^"]*">/,
-  `<meta name="supabase-url" content="${supabaseUrl}">`
-);
-html = html.replace(
-  /<meta name="supabase-anon-key" content="[^"]*">/,
-  `<meta name="supabase-anon-key" content="${supabaseKey}">`
-);
-
-fs.writeFileSync(DASHBOARD, html, 'utf8');
-console.log('[inject-dashboard-config] Supabase config injected into dist/dashboard.html');
+injectSupabaseConfig(DASHBOARD);
+injectSupabaseConfig(RESET_PW);

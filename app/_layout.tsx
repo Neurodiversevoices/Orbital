@@ -349,6 +349,9 @@ function RootLayout() {
       if (url === 'orbital://log' || url.startsWith('orbital://log')) {
         router.replace('/');
       }
+      if (url.startsWith('orbital://reset-password')) {
+        router.replace('/reset-password');
+      }
     };
 
     const subscription = Linking.addEventListener('url', handleDeepLink);
@@ -356,6 +359,9 @@ function RootLayout() {
     Linking.getInitialURL().then((url) => {
       if (url && (url === 'orbital://log' || url.startsWith('orbital://log'))) {
         router.replace('/');
+      }
+      if (url && url.startsWith('orbital://reset-password')) {
+        router.replace('/reset-password');
       }
     });
 
