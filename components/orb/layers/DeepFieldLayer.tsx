@@ -1,12 +1,14 @@
 /**
  * DeepFieldLayer.tsx — L1: Viscous Medium / Deep Field
  *
- * Suspended particulate medium with three depth planes:
- *   Deep  — small, dim, heavily blurred (background)
- *   Mid   — medium particles, moderate blur, pathway connections
- *   Fore  — large, bright, sharp (foreground)
+ * Interior field layer with:
+ *   Neural pathways — quadratic curves connecting invisible anchor nodes
+ *   Lightning bolts — jittered radial lines from center
+ *   Wave/horizon   — three-harmonic organic wave with volumetric glow
+ *   Ambient haze   — soft blurred glow disc
  *
- * Architecture: ONE useDerivedValue computes all geometry per frame.
+ * Architecture: ONE useDerivedValue computes pathways + lightning per frame.
+ * Standalone waveFrame derived value computes wave independently.
  * Individual derived values extract path strings. Zero hooks in loops.
  */
 
@@ -25,13 +27,9 @@ import {
 } from 'react-native-reanimated';
 import {
   ORB_RADIUS,
-  NODE_COUNT_DEEP,
   NODE_COUNT_MID,
-  NODE_COUNT_FORE,
   PATHWAY_COUNT,
   LIGHTNING_LAYERS,
-  FIELD_BLUR_DEEP,
-  FIELD_BLUR_MID,
   HAZE_OPACITY,
 } from '../orbConstants';
 import { capacityToSkiaColor } from '../orbColors';
@@ -106,9 +104,8 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
   const orbR = ORB_RADIUS * scale;
 
   // Static seeds per depth layer
-  const deepNodes = useMemo(() => generateNodes(NODE_COUNT_DEEP, orbR, 1, 2.5, 0), [orbR]);
+  // Mid-layer nodes retained — pathways use their positions as endpoints
   const midNodes = useMemo(() => generateNodes(NODE_COUNT_MID, orbR, 1.5, 4, 1000), [orbR]);
-  const foreNodes = useMemo(() => generateNodes(NODE_COUNT_FORE, orbR, 3, 6, 2000), [orbR]);
   const pathways = useMemo(() => generatePathways(PATHWAY_COUNT, NODE_COUNT_MID), []);
 
   // Circular clip path (SVG string)
@@ -129,25 +126,8 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
     const px = parallaxX.value;
     const py = parallaxY.value;
 
-    // 1. Deep layer particles (small, dim)
-    const deepParts: string[] = [];
-    for (let i = 0; i < deepNodes.length; i++) {
-      const node = deepNodes[i];
-      const angle = node.baseAngle + t * node.speed * (0.2 + cap * 0.6);
-      const r = node.baseRadius * (0.2 + cap * 0.8);
-      let x = center + Math.cos(angle) * r;
-      let y = center + Math.sin(angle) * r;
-      x += px * node.depth * 0.15;
-      y += py * node.depth * 0.15;
-      const nr = node.size * scale;
-      deepParts.push(
-        `M ${x - nr} ${y} a ${nr} ${nr} 0 1 0 ${nr * 2} 0 a ${nr} ${nr} 0 1 0 ${-nr * 2} 0`,
-      );
-    }
-
-    // 2. Mid layer particles + positions for pathways
+    // 1. Mid-layer positions (needed as pathway endpoints)
     const midPositions: Array<{ x: number; y: number }> = [];
-    const midParts: string[] = [];
     for (let i = 0; i < midNodes.length; i++) {
       const node = midNodes[i];
       const angle = node.baseAngle + t * node.speed * (0.2 + cap * 0.6);
@@ -157,29 +137,9 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
       x += px * node.depth * 0.3;
       y += py * node.depth * 0.3;
       midPositions.push({ x, y });
-      const nr = node.size * scale;
-      midParts.push(
-        `M ${x - nr} ${y} a ${nr} ${nr} 0 1 0 ${nr * 2} 0 a ${nr} ${nr} 0 1 0 ${-nr * 2} 0`,
-      );
     }
 
-    // 3. Foreground particles (large, bright)
-    const foreParts: string[] = [];
-    for (let i = 0; i < foreNodes.length; i++) {
-      const node = foreNodes[i];
-      const angle = node.baseAngle + t * node.speed * (0.2 + cap * 0.6);
-      const r = node.baseRadius * (0.2 + cap * 0.8);
-      let x = center + Math.cos(angle) * r;
-      let y = center + Math.sin(angle) * r;
-      x += px * node.depth * 0.5;
-      y += py * node.depth * 0.5;
-      const nr = node.size * scale;
-      foreParts.push(
-        `M ${x - nr} ${y} a ${nr} ${nr} 0 1 0 ${nr * 2} 0 a ${nr} ${nr} 0 1 0 ${-nr * 2} 0`,
-      );
-    }
-
-    // 4. Pathways (connect mid-layer nodes)
+    // 2. Pathways (connect mid-layer node positions)
     const pathwayParts: string[] = [];
     for (let i = 0; i < pathways.length; i++) {
       const pw = pathways[i];
@@ -197,7 +157,7 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
       pathwayParts.push(`M ${s.x} ${s.y} Q ${cx2} ${cy2} ${e.x} ${e.y}`);
     }
 
-    // 5. Lightning bolts
+    // 3. Lightning bolts
     const lightningParts: string[] = [];
     for (let i = 0; i < LIGHTNING_LAYERS; i++) {
       const angle = (i / LIGHTNING_LAYERS) * Math.PI * 2 + t * 0.08;
@@ -215,21 +175,12 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
     }
 
     // Colors — alpha scales with capacity
-    const deepAlpha = (0.06 + cap * 0.14).toFixed(3);
-    const midAlpha = (0.10 + cap * 0.25).toFixed(3);
-    const foreAlpha = (0.15 + cap * 0.35).toFixed(3);
     const pathwayAlpha = (0.02 + cap * 0.05).toFixed(3);
     const lightningAlpha = (0.01 + cap * 0.05).toFixed(3);
 
     return {
-      deepPath: deepParts.join(' '),
-      midPath: midParts.join(' '),
-      forePath: foreParts.join(' '),
       pathwaysPath: pathwayParts.join(' '),
       lightningPath: lightningParts.join(' '),
-      deepColor: `rgba(255,255,255,${deepAlpha})`,
-      midColor: `rgba(255,255,255,${midAlpha})`,
-      foreColor: `rgba(255,255,255,${foreAlpha})`,
       pathwayColor: `rgba(255,255,255,${pathwayAlpha})`,
       lightningColor: `rgba(255,255,255,${lightningAlpha})`,
       hazeColor: capacityToSkiaColor(cap, HAZE_OPACITY + cap * 0.04),
@@ -237,14 +188,8 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
   });
 
   // ── Extract individual values (all top-level, zero hooks in loops) ──
-  const deepPath = useDerivedValue(() => frame.value.deepPath);
-  const midPath = useDerivedValue(() => frame.value.midPath);
-  const forePath = useDerivedValue(() => frame.value.forePath);
   const pathwaysPath = useDerivedValue(() => frame.value.pathwaysPath);
   const lightningPath = useDerivedValue(() => frame.value.lightningPath);
-  const deepColor = useDerivedValue(() => frame.value.deepColor);
-  const midColor = useDerivedValue(() => frame.value.midColor);
-  const foreColor = useDerivedValue(() => frame.value.foreColor);
   const pathwayColor = useDerivedValue(() => frame.value.pathwayColor);
   const lightningColor = useDerivedValue(() => frame.value.lightningColor);
   const hazeColor = useDerivedValue(() => frame.value.hazeColor);
@@ -318,11 +263,6 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
         <BlurMask blur={orbR * 0.35} style="normal" />
       </Circle>
 
-      {/* Deep layer — small, dim, heavily blurred soft discs */}
-      <Path path={deepPath} color={deepColor}>
-        <BlurMask blur={FIELD_BLUR_DEEP * scale} style="normal" />
-      </Path>
-
       {/* Neural pathways — connect mid-layer nodes */}
       <Path
         path={pathwaysPath}
@@ -332,11 +272,6 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
         color={pathwayColor}
       />
 
-      {/* Mid layer — moderate particles, softer blur */}
-      <Path path={midPath} color={midColor}>
-        <BlurMask blur={FIELD_BLUR_MID * scale} style="normal" />
-      </Path>
-
       {/* Lightning — visible at higher capacity */}
       <Path
         path={lightningPath}
@@ -345,9 +280,6 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
         strokeCap="round"
         color={lightningColor}
       />
-
-      {/* Foreground layer — larger, brighter, sharp */}
-      <Path path={forePath} color={foreColor} />
 
       {/* Wave — wide soft glow band (vertical masking: dimmest, widest) */}
       <Path
