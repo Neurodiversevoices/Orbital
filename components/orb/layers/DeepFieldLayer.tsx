@@ -250,7 +250,7 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
   const hazeColor = useDerivedValue(() => frame.value.hazeColor);
 
   // ── Wave/horizon line — standalone derived value (independent of frame) ──
-  // Separated so it can't corrupt existing particle rendering.
+  // Three-harmonic organic wave with volumetric glow and echo.
   // Reads capacity + time directly, not via frame object.
   const waveFrame = useDerivedValue(() => {
     const cap = capacity.value;
@@ -269,27 +269,47 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
     const wL = center - halfChord;
     const wR = center + halfChord;
 
-    const SEGS = 32;
-    const amp = 4 * scale;
-    const parts: string[] = [];
+    const SEGS = 40; // extra segments for smooth high-frequency harmonics
+    const amp = 5 * scale;
+    const primaryParts: string[] = [];
+    const echoParts: string[] = [];
+
     for (let i = 0; i <= SEGS; i++) {
       const p = i / SEGS;
       const x = wL + p * (wR - wL);
-      const fade = Math.sin(p * Math.PI); // taper at edges
-      const y = clampedWY + Math.sin(p * Math.PI * 3 + t * 1.2) * amp * fade;
-      parts.push(i === 0 ? `M ${x} ${y}` : `L ${x} ${y}`);
+      const fade = Math.sin(p * Math.PI); // edge taper at circular boundary
+
+      // Three harmonics — organic, fluid motion
+      const h1 = Math.sin(p * Math.PI * 2.5 + t * 1.2);          // primary
+      const h2 = Math.sin(p * Math.PI * 5.0 + t * 0.8) * 0.3;    // secondary
+      const h3 = Math.sin(p * Math.PI * 8.0 + t * 2.0) * 0.12;   // tertiary
+      const displacement = (h1 + h2 + h3) * amp * fade;
+
+      const y = clampedWY + displacement;
+      const echoY = y + 3 * scale; // echo trail 3px below primary
+
+      const cmd = i === 0 ? 'M' : 'L';
+      primaryParts.push(`${cmd} ${x} ${y}`);
+      echoParts.push(`${cmd} ${x} ${echoY}`);
     }
 
     return {
-      path: parts.join(' '),
-      color: capacityToSkiaColor(cap, 0.5),     // high alpha — clearly visible
-      glowColor: capacityToSkiaColor(cap, 0.2),
+      path: primaryParts.join(' '),
+      echoPath: echoParts.join(' '),
+      // Volumetric glow — graduated alpha for vertical masking
+      wideGlowColor: capacityToSkiaColor(cap, 0.15),  // widest, dimmest
+      midGlowColor: capacityToSkiaColor(cap, 0.25),   // medium band
+      primaryColor: capacityToSkiaColor(cap, 0.6),     // crisp horizon
+      echoColor: capacityToSkiaColor(cap, 0.15),       // dim trail
     };
   });
 
   const wavePath = useDerivedValue(() => waveFrame.value.path);
-  const waveColor = useDerivedValue(() => waveFrame.value.color);
-  const waveGlowColor = useDerivedValue(() => waveFrame.value.glowColor);
+  const waveEchoPath = useDerivedValue(() => waveFrame.value.echoPath);
+  const waveWideGlowColor = useDerivedValue(() => waveFrame.value.wideGlowColor);
+  const waveMidGlowColor = useDerivedValue(() => waveFrame.value.midGlowColor);
+  const wavePrimaryColor = useDerivedValue(() => waveFrame.value.primaryColor);
+  const waveEchoColor = useDerivedValue(() => waveFrame.value.echoColor);
 
   return (
     <Group clip={circleClipPath}>
@@ -317,24 +337,44 @@ export const DeepFieldLayer: React.FC<DeepFieldLayerProps> = ({
         <BlurMask blur={FIELD_BLUR_MID * scale} style="normal" />
       </Path>
 
-      {/* Wave glow — soft blurred band at capacity horizon level */}
+      {/* Wave — wide soft glow band (vertical masking: dimmest, widest) */}
       <Path
         path={wavePath}
         style="stroke"
-        strokeWidth={12 * scale}
+        strokeWidth={10 * scale}
         strokeCap="round"
-        color={waveGlowColor}
+        color={waveWideGlowColor}
       >
         <BlurMask blur={8 * scale} style="normal" />
       </Path>
 
-      {/* Wave line — primary animated horizon line */}
+      {/* Wave — medium glow band (vertical masking: mid-brightness) */}
+      <Path
+        path={wavePath}
+        style="stroke"
+        strokeWidth={4 * scale}
+        strokeCap="round"
+        color={waveMidGlowColor}
+      >
+        <BlurMask blur={3 * scale} style="normal" />
+      </Path>
+
+      {/* Wave — crisp primary horizon line (brightest) */}
       <Path
         path={wavePath}
         style="stroke"
         strokeWidth={2 * scale}
         strokeCap="round"
-        color={waveColor}
+        color={wavePrimaryColor}
+      />
+
+      {/* Wave — dim echo trail 3px below */}
+      <Path
+        path={waveEchoPath}
+        style="stroke"
+        strokeWidth={1 * scale}
+        strokeCap="round"
+        color={waveEchoColor}
       />
 
       {/* Lightning — visible at higher capacity */}
