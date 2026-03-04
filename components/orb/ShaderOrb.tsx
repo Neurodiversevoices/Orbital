@@ -1,6 +1,6 @@
 // components/orb/ShaderOrb.tsx
-// Phase 1.5 — Refined single-pass SkSL fragment shader
-// Improvements: glass depth, volumetric wave, ambient halo, material realism
+// Phase 2 — FBM noise cloudfield, energy streaks, reflection plane
+// Replaces: 3-harmonic volumetric wave with domain-warped fractal noise
 // Architecture: One Canvas, one shader, three uniforms, zero JS visual logic
 
 import React, { memo, useEffect } from "react";
@@ -21,36 +21,51 @@ import {
 } from "react-native-reanimated";
 
 // ─────────────────────────────────────────────
-// SkSL Fragment Shader — Single Pass, Refined
+// SkSL Fragment Shader — Phase 2: Cloudfield
 // ─────────────────────────────────────────────
 //
 // ARCHITECTURE NOTES (for engineering review):
 //
-// This shader computes a physically-inspired glass sphere in a single
-// fragment pass. No loops, no texture sampling, no branching.
-// All visual layers are composited analytically.
+// This shader computes a procedurally-lit glass sphere with an internal
+// fractal noise cloudfield in a single fragment pass. No loops, no texture
+// sampling, no branching.
 //
 // GPU cost breakdown per pixel:
-//   - Sphere SDF + normal:  2 sqrt, 1 normalize  (~3 ops)
-//   - Fresnel:              1 dot, 1 pow          (~2 ops)
-//   - Wave SDF (3 harmonics): 3 sin, 3 mul, abs   (~7 ops)
-//   - Wave glow (3 pass):   3 smoothstep           (~3 ops)
-//   - Specular (2 lights):  2 length, 2 pow        (~6 ops)
-//   - Compositing:          ~8 mix/mul/add          (~8 ops)
-//   Total: ~29 ops per pixel. Well within mobile budget.
+//   - Hash / value noise:     ~25 ops per call (4 hash + interpolation)
+//   - FBM 3-octave:           ~75 ops (3 x vnoise)
+//   - FBM 2-octave (x2 warp): ~100 ops (4 x vnoise)
+//   - Energy streak (1 vnoise): ~30 ops
+//   - Sphere SDF + normal:    ~5 ops
+//   - Fresnel + glass:        ~8 ops
+//   - Specular (2 lights):    ~6 ops
+//   - Reflection plane:       ~5 ops
+//   - Compositing:            ~10 ops
+//   Total: ~265 ops per pixel. Mobile-safe at 280x280 canvas.
 //
-// Uniform contract:
-//   uTime       — monotonic seconds (drives wave + breath)
+// Uniform contract (UNCHANGED from Phase 1.5):
+//   uTime       — monotonic seconds (drives drift + breath)
 //   uCapacity   — 0.0 (depleted/crimson) to 1.0 (resourced/cyan)
 //   uResolution — canvas pixel dimensions
 //
+// WHAT CHANGED FROM PHASE 1.5:
+//   + Hash-based value noise (Dave Hoskins)
+//   + 3-octave FBM with domain warping -> cloudfield
+//   + Cloud density/turbulence wired to capacity
+//   + Energy streaks (sine-warped diagonal bands)
+//   + Reflection plane beneath sphere
+//   + Halo picks up cloud color for organic bleed
+//   + Breathing rate modulated by capacity state
+//   + All smoothstep calls corrected to edge0 < edge1
+//   + All sqrt/normalize clamp-protected
+//   - 3-harmonic sine wave (removed)
+//
 // WHAT THIS SHADER DOES NOT DO (by design):
 //   - No ray marching (too expensive, unstable on mobile)
-//   - No noise functions (unpredictable perf on low-end Adreno/Mali)
 //   - No texture sampling (Skia SkSL limitation in RN)
 //   - No dynamic light count (constant 2 lights, hardcoded)
 //   - No conditional branching (all step/mix/clamp)
-//   - No loops of any kind
+//   - No loops of any kind (FBM fully unrolled)
+//   - No floor(time) quantization
 //
 // FALLBACK: If shader fails to compile, component renders a dark
 // circle with a faint capacity-colored border. No crash path.
@@ -63,7 +78,7 @@ uniform float2 uResolution;
 // ────────────────────────────────────────
 // COLOR SYSTEM
 // ────────────────────────────────────────
-// Three-stop gradient: crimson → amber → cyan
+// Three-stop gradient: crimson -> amber -> cyan
 // Piecewise linear interpolation, no branching.
 
 vec3 capColor(float cap) {
@@ -75,211 +90,242 @@ vec3 capColor(float cap) {
   return mix(mix(crimson, amber, lo), mix(amber, cyan, hi), step(0.5, cap));
 }
 
-// Dimmer variant for ambient/depth — less saturated, less bright
 vec3 capColorDim(float cap) {
   return capColor(cap) * 0.4;
+}
+
+// ────────────────────────────────────────
+// HASH-BASED VALUE NOISE
+// ────────────────────────────────────────
+// Dave Hoskins hash into quintic Hermite value noise.
+// No texture sampler required. All ops are ALU.
+
+float hash21(vec2 p) {
+  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
+}
+
+float vnoise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+  float a = hash21(i);
+  float b = hash21(i + vec2(1.0, 0.0));
+  float c = hash21(i + vec2(0.0, 1.0));
+  float d = hash21(i + vec2(1.0, 1.0));
+  return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+}
+
+// ────────────────────────────────────────
+// FRACTAL BROWNIAN MOTION
+// ────────────────────────────────────────
+// Fully unrolled — no loops, no break/continue.
+// Octave offset decorrelates consecutive evaluations.
+
+float fbm3(vec2 p) {
+  float v = 0.0; float a = 0.5;
+  v += a * vnoise(p); p = p * 2.01 + vec2(1.7, 9.2); a *= 0.5;
+  v += a * vnoise(p); p = p * 2.01 + vec2(1.7, 9.2); a *= 0.5;
+  v += a * vnoise(p);
+  return v;
+}
+
+float fbm2(vec2 p) {
+  float v = 0.0; float a = 0.5;
+  v += a * vnoise(p); p = p * 2.01 + vec2(1.7, 9.2); a *= 0.5;
+  v += a * vnoise(p);
+  return v;
 }
 
 half4 main(float2 coord) {
   float minDim = min(uResolution.x, uResolution.y);
   vec2 uv = (coord * 2.0 - uResolution) / minDim;
-
   float dist = length(uv);
   float radius = 0.80;
   float t = dist / radius;
 
   // ────────────────────────────────────────
-  // BREATHING — ultra-subtle scale modulation
-  // Two sine waves at different frequencies prevent mechanical feel
-  // Total deviation: ±1.8% — perceptible as "alive," not "bouncing"
+  // BREATHING — capacity-modulated rate
   // ────────────────────────────────────────
-  float breath = 1.0 + 0.012 * sin(uTime * 0.6) + 0.006 * sin(uTime * 1.1 + 0.7);
+  // Slower when resourced (0.4 Hz base), faster when depleted (1.2 Hz).
+  // Two offset sines prevent mechanical feel.
+  // Total deviation: +/-1.8% — perceptible as alive, not bouncing.
+
+  float breathRate = 0.4 + (1.0 - uCapacity) * 0.8;
+  float breath = 1.0 + 0.012 * sin(uTime * breathRate)
+                     + 0.006 * sin(uTime * breathRate * 1.83 + 0.7);
 
   vec3 cColor = capColor(uCapacity);
   vec3 cColorDim = capColorDim(uCapacity);
 
   // ────────────────────────────────────────
-  // LAYER 0: AMBIENT ENERGY FIELD
+  // GLOBAL CLOUD COMPUTATION
+  // ────────────────────────────────────────
+  // Domain-warped 3-octave fbm sampled in sphere-relative space.
+  // Computed once, shared across halo enhancement + interior.
+  //
+  // Capacity wires:
+  //   depleted  -> dense, turbulent, faster drift
+  //   resourced -> sparse, calm, slower drift
+
+  float cloudSpeed = 0.10 + (1.0 - uCapacity) * 0.15;
+  float cloudTurb  = 0.3 + (1.0 - uCapacity) * 0.7;
+  float cloudScale = 2.5 + cloudTurb * 0.5;
+
+  vec2 cloudUV = uv * cloudScale / radius
+               + vec2(uTime * cloudSpeed, uTime * cloudSpeed * 0.7);
+
+  float wx = fbm2(cloudUV + vec2(3.1, 7.4)) * cloudTurb;
+  float wy = fbm2(cloudUV + vec2(6.7, 1.2)) * cloudTurb;
+  float cloudRaw = fbm3(cloudUV + vec2(wx, wy));
+
+  // ────────────────────────────────────────
+  // LAYER 0: AMBIENT ENERGY FIELD (ENHANCED HALO)
   // ────────────────────────────────────────
   // Soft radial halo bleeding beyond the sphere.
-  // Creates the "instrument is powered on" perception.
-  // Two falloff zones: tight bright core + wide dim wash.
+  // Enhanced: picks up dominant cloud color for organic bleed.
 
-  float haloTight = smoothstep(radius + 0.22, radius - 0.02, dist);
-  float haloWide  = smoothstep(radius + 0.45, radius + 0.05, dist);
-  float haloMask  = smoothstep(radius - 0.01, radius + 0.01, dist); // only outside sphere
+  float haloTight = 1.0 - smoothstep(radius - 0.02, radius + 0.22, dist);
+  float haloWide  = 1.0 - smoothstep(radius + 0.05, radius + 0.45, dist);
+  float haloMask  = smoothstep(radius - 0.01, radius + 0.01, dist);
 
-  vec3 ambientField = cColor * (haloTight * 0.08 + haloWide * 0.025) * haloMask * breath;
+  float haloShift = cloudRaw * 0.25;
+  vec3 haloColor = capColor(clamp(uCapacity - haloShift, 0.0, 1.0));
+  vec3 ambientField = haloColor * (haloTight * 0.08 + haloWide * 0.025)
+                    * haloMask * breath;
 
   // ────────────────────────────────────────
   // SPHERE GEOMETRY
   // ────────────────────────────────────────
-  // Anti-aliased sphere mask via smoothstep.
-  // Fake 3D normal from 2D position for Fresnel.
+  // Anti-aliased sphere mask. Fake 3D normal for Fresnel.
 
-  float inside = smoothstep(radius, radius - 0.006, dist);
+  float inside = 1.0 - smoothstep(radius - 0.006, radius, dist);
 
   float tc = min(t, 0.998);
-  float z = sqrt(1.0 - tc * tc);
+  float z = sqrt(max(1.0 - tc * tc, 0.0001));
   vec3 normal = vec3(uv / max(dist, 0.0001), z);
-  vec3 N = normalize(normal);
+  float normLen = max(length(normal), 0.0001);
+  vec3 N = normal / normLen;
   vec3 V = vec3(0.0, 0.0, 1.0);
   float NdotV = dot(N, V);
 
   // ────────────────────────────────────────
   // LAYER 1: GLASS SHELL
   // ────────────────────────────────────────
-  // Three components create the glass perception:
-  //
-  // A) FRESNEL RIM — bright edges, transparent center.
-  //    This is the primary "this is a sphere" signal.
-  //    Two exponents: soft fill rim + sharp edge accent.
-  //
-  // B) GLASS ABSORPTION — interior darkens toward center.
-  //    Real thick glass absorbs light. Center is darker than edges.
-  //    This is the opposite of a glow — it's material density.
-  //
-  // C) EDGE DEFINITION — thin bright line at the sphere boundary.
-  //    Simulates the sharp refraction at the glass-air interface.
+  // Fresnel rim + absorption + edge line = glass perception.
 
-  // A) Fresnel — two-band for optical richness
   float fresnelSoft  = pow(1.0 - NdotV, 2.5) * 0.25;
   float fresnelSharp = pow(1.0 - NdotV, 6.0) * 0.45;
   float fresnelTotal = fresnelSoft + fresnelSharp;
-
-  // Color the Fresnel: mostly capacity color, hint of white at extreme edge
   vec3 fresnelCol = mix(cColor, vec3(0.85), fresnelSharp * 0.6) * fresnelTotal;
 
-  // B) Glass absorption — darkens the interior where glass is "thickest"
-  // Center of sphere = maximum glass thickness = darkest
   float absorption = smoothstep(0.0, 0.75, t) * 0.15;
 
-  // C) Edge definition — very thin bright line at boundary
-  float edgeLine = smoothstep(radius, radius - 0.012, dist) * smoothstep(radius - 0.035, radius - 0.012, dist);
+  float edgeLine = (1.0 - smoothstep(radius - 0.012, radius, dist))
+                 * smoothstep(radius - 0.035, radius - 0.012, dist);
   vec3 edgeCol = cColor * edgeLine * 0.3;
 
   // ────────────────────────────────────────
-  // LAYER 2: INTERNAL ENERGY WAVE (HERO)
+  // LAYER 2: FBM NOISE CLOUDFIELD (HERO)
   // ────────────────────────────────────────
-  // Three-harmonic sine wave rendered as a signed distance field.
-  // Three glow passes from the same SDF: wide (atmosphere),
-  // medium (body), sharp (core). This creates volumetric perception
-  // without volumetric rendering.
+  // Domain-warped fractal noise creates evolving cloud formations
+  // inside the glass sphere. Replaces the 3-harmonic sine wave.
   //
-  // Capacity modulates:
-  //   - Speed (depleted = faster, agitated)
-  //   - Amplitude (resourced = wider, calmer)
-  //   - Frequency (depleted = tighter oscillation)
-  //   - Glow intensity (depleted = dimmer, fading)
+  // Capacity wires:
+  //   depleted  -> dense clouds, low threshold, turbulent
+  //   resourced -> sparse clouds, high threshold, calm
 
-  float speed = 0.7 + (1.0 - uCapacity) * 1.5;
-  float freq  = 3.0 + (1.0 - uCapacity) * 1.5;
-  float amp   = (0.055 + 0.045 * uCapacity) * radius;
+  float cloudThreshold = 0.25 + uCapacity * 0.30;
+  float cloudVal = smoothstep(cloudThreshold - 0.12, cloudThreshold + 0.12, cloudRaw);
 
-  float phase = uv.x * freq * (1.0 / radius) + uTime * speed;
+  float depthMask    = 1.0 - smoothstep(0.15, 1.0, t);
+  float verticalMask = 1.0 - smoothstep(radius * 0.4, radius * 0.85, abs(uv.y));
+  float cloudMask = depthMask * verticalMask;
 
-  // Three explicit harmonics — no loops
-  float wave = sin(phase) * amp
-             + sin(phase * 2.15 + 1.3) * amp * 0.38
-             + sin(phase * 3.3  + 2.8) * amp * 0.15;
+  // Three-pass glow: wide, medium, sharp (volumetric perception)
+  float cloudGlowWide  = cloudVal * 0.10;
+  float cloudGlowMed   = smoothstep(0.3, 0.7, cloudVal) * 0.30;
+  float cloudGlowSharp = smoothstep(0.65, 0.95, cloudVal) * 0.60;
+  float cloudGlow = (cloudGlowWide + cloudGlowMed + cloudGlowSharp) * cloudMask;
 
-  float waveDist = abs(uv.y - wave);
+  // Core whitens (energy concentration), outer stays capacity-colored
+  vec3 cloudCol = mix(cColor, vec3(1.0), cloudGlowSharp * 0.5 * cloudMask) * cloudGlow;
 
-  // Three-pass glow: wide → medium → sharp
-  float glowWide  = smoothstep(0.14 * radius, 0.0, waveDist);
-  float glowMed   = smoothstep(0.055 * radius, 0.0, waveDist);
-  float glowSharp = smoothstep(0.010 * radius, 0.0, waveDist);
-
-  // Depth mask: wave is brighter at sphere center, fades at edges.
-  // This simulates the wave existing INSIDE the glass, not on the surface.
-  // Combined with absorption, creates real subsurface perception.
-  float depthMask = smoothstep(1.0, 0.15, t);
-
-  // Vertical falloff: wave fades as it approaches top/bottom of sphere
-  // Prevents the wave from reaching the Fresnel rim zone
-  float verticalMask = smoothstep(radius * 0.85, radius * 0.4, abs(uv.y));
-
-  float waveMask = depthMask * verticalMask;
-
-  // Compose wave intensity with capacity-driven brightness
-  float waveGlow = (glowWide * 0.08 + glowMed * 0.30 + glowSharp * 0.85) * waveMask;
-
-  // Wave color: core goes toward white (energy concentration)
-  // Outer glow stays capacity-colored
-  vec3 waveCol = mix(cColor, vec3(1.0), glowSharp * 0.45 * waveMask) * waveGlow;
-
-  // Capacity-driven intensity: wave dims as capacity drops
-  // At full depletion, wave is ~40% brightness (never fully off)
+  // Capacity brightness: dims at depletion (never fully off)
   float capIntensity = 0.4 + 0.6 * uCapacity;
-  waveCol *= capIntensity;
+  cloudCol *= capIntensity;
+
+  // ────────────────────────────────────────
+  // ENERGY STREAKS
+  // ────────────────────────────────────────
+  // Sine-warped diagonal cyan bands. Visible when resourced,
+  // dim/absent when depleted. Signals energy flowing.
+
+  float streakVis = uCapacity * uCapacity * 0.35;
+  float streakDiag = (uv.x * 0.7 + uv.y * 1.3) * 5.0 / radius;
+  float streakWarp = vnoise(uv * 3.0 + vec2(uTime * 0.2, uTime * 0.15)) * 0.6;
+  float streak = sin(streakDiag + uTime * 0.5 + streakWarp);
+  streak = smoothstep(0.55, 1.0, streak);
+
+  float streakGlow = streak * streakVis * depthMask * verticalMask;
+  vec3 streakCol = vec3(0.05, 0.78, 0.85) * streakGlow;
 
   // ────────────────────────────────────────
   // LAYER 3: INTERNAL AMBIENT
   // ────────────────────────────────────────
-  // Very faint center glow — the sphere has internal energy
-  // even where the wave isn't. This prevents the "dead dark center" problem.
-  // Modulated by breathing for organic feel.
+  // Faint center glow prevents dead dark center at any capacity.
 
-  float internalGlow = smoothstep(0.95, 0.0, t) * 0.035 * breath;
+  float internalGlow = (1.0 - smoothstep(0.0, 0.95, t)) * 0.035 * breath;
   vec3 internalCol = cColorDim * internalGlow;
 
   // ────────────────────────────────────────
   // SPECULAR HIGHLIGHTS
   // ────────────────────────────────────────
-  // Two fixed-position lights simulating studio lighting:
-  //   Key light:  upper-left, bright, tight
-  //   Fill light: lower-right, dim, wide
-  //
-  // These are NOT dynamic. They do not move with gestures.
-  // Stationary highlights read as "solid object in a fixed environment."
-  // Moving highlights read as "UI element." We want the former.
+  // Two fixed-position lights: key (upper-left) + fill (lower-right).
 
-  // Key light — upper left
   vec2 keyPos = vec2(-0.30, -0.32);
   float keyDist = length(uv / radius - keyPos);
   float keySpec = pow(max(0.0, 1.0 - keyDist * 2.0), 16.0) * 0.32;
 
-  // Fill light — lower right, much softer
   vec2 fillPos = vec2(0.22, 0.28);
   float fillDist = length(uv / radius - fillPos);
   float fillSpec = pow(max(0.0, 1.0 - fillDist * 2.8), 8.0) * 0.10;
 
-  // Specular is white-ish with a very slight capacity tint
   vec3 specCol = mix(vec3(1.0), cColor, 0.1) * (keySpec + fillSpec);
 
   // ────────────────────────────────────────
   // LAYER 4: GLASS OVERLAY
   // ────────────────────────────────────────
-  // A) Vignette: edges of sphere darken (simulates curvature)
-  // B) Top wash: very subtle top-to-bottom gradient
-  //    (simulates second surface reflection in real glass)
-  // C) Housing shadow: subtle darkening at very bottom
-  //    (the sphere sits in something — this grounds it)
 
-  float vignette = smoothstep(1.0, 0.35, t);
+  float vignette = 1.0 - smoothstep(0.35, 1.0, t);
   float topWash = smoothstep(-1.0, 0.8, uv.y / radius) * 0.025;
   float bottomShadow = smoothstep(0.6, 1.0, (uv.y / radius + 1.0) * 0.5) * 0.08;
 
   // ────────────────────────────────────────
+  // REFLECTION PLANE
+  // ────────────────────────────────────────
+  // Subtle mirrored surface below the sphere.
+  // Faded capacity-colored glow that grounds the orb.
+
+  float reflGap = radius + 0.03;
+  float reflBelow = smoothstep(reflGap, reflGap + 0.01, uv.y);
+  vec2 reflUV = vec2(uv.x, 2.0 * reflGap - uv.y);
+  float reflSphereDist = length(reflUV);
+  float reflShape = 1.0 - smoothstep(0.0, radius * 1.1, reflSphereDist);
+  float reflFade = 1.0 - smoothstep(0.0, 0.40, uv.y - reflGap);
+  vec3 reflCol = cColor * reflShape * reflFade * reflBelow * 0.08 * breath;
+
+  // ────────────────────────────────────────
   // COMPOSITING
   // ────────────────────────────────────────
-  // Order matters:
-  //   1. Start with near-black base
-  //   2. Add internal ambient (faint center life)
-  //   3. Add wave (hero element)
-  //   4. Add Fresnel rim (glass edge)
-  //   5. Add edge definition line
-  //   6. Add absorption (darken center for thickness)
-  //   7. Apply vignette (darken edges for curvature)
-  //   8. Add specular highlights (on top of everything)
-  //   9. Add glass overlay wash (second surface)
-  //   10. Subtract bottom shadow (grounding)
 
   vec3 base = vec3(0.006, 0.009, 0.016);
 
   vec3 interior = base;
   interior += internalCol;
-  interior += waveCol;
+  interior += cloudCol;
+  interior += streakCol;
   interior += fresnelCol;
   interior += edgeCol;
   interior += vec3(absorption) * cColorDim;
@@ -292,11 +338,12 @@ half4 main(float2 coord) {
   // ────────────────────────────────────────
   // FINAL OUTPUT
   // ────────────────────────────────────────
-  // Composite: inside sphere uses interior, outside uses ambient field.
-  // Premultiplied alpha for clean compositing against any background.
+  // Inside: interior layers. Outside: ambient field + reflection.
 
-  vec3 finalCol = mix(ambientField, interior, inside);
-  float alpha = max(inside, (haloTight * 0.08 + haloWide * 0.025) * haloMask * 0.8);
+  vec3 finalCol = mix(ambientField + reflCol, interior, inside);
+  float haloAlpha = (haloTight * 0.08 + haloWide * 0.025) * haloMask * 0.8;
+  float reflAlpha = reflBelow * reflShape * reflFade * 0.08;
+  float alpha = max(inside, max(haloAlpha, reflAlpha));
 
   return half4(half3(finalCol), alpha);
 }
