@@ -17,6 +17,8 @@ export { OrgRoleBanner } from './OrgRoleBanner';
 export { EmptyState } from './EmptyState';
 export { WeeklyCapacityRecord } from './WeeklyCapacityRecord';
 export { BlurredPatternTease } from './BlurredPatternTease';
+export { CCIClinicalArtifact } from './CCIClinicalArtifact';
+export type { CCIClinicalArtifactProps } from './CCIClinicalArtifact';
 
 // Legal components
 export {
