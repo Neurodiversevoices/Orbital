@@ -19,6 +19,8 @@ import Animated, {
   withSpring,
   withTiming,
   useSharedValue,
+  useFrameCallback,
+  useAnimatedReaction,
   interpolateColor,
   runOnJS,
 } from 'react-native-reanimated';
@@ -29,6 +31,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import * as Haptics from 'expo-haptics';
 import { SavePulse, CategorySelector, Composer, COMPOSER_HEIGHT } from '../../components';
 import ShaderOrb from '../../components/orb/ShaderOrb';
+import ShaderTherm from '../../components/orb/ShaderTherm';
 import { colors, commonStyles, spacing } from '../../theme';
 import { CapacityState, Category } from '../../types';
 import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
@@ -158,6 +161,68 @@ export default function HomeScreen() {
   // Track previous "zone" for haptic threshold crossing (0, 1, or 2)
   const prevZone = useSharedValue(-1); // -1 = uninitialized
 
+  // ─── Orb↔Therm mode switching ─────────────────────────────────────
+  const orbClock = useSharedValue(0);
+  const mode = useSharedValue(0.0); // 0.0 = orb, 1.0 = therm
+  const crossfadeOrb = useSharedValue(1.0);
+  const crossfadeTherm = useSharedValue(0.0);
+  const modeDragStart = useSharedValue(0.0);
+  const lastModeHapticTime = useSharedValue(0);
+
+  // ═══════════════════════════════════════════════════════════════════
+  // HAPTIC CALLBACKS (must run on JS thread, defined before animated reactions)
+  // ═══════════════════════════════════════════════════════════════════
+
+  const fireThresholdHaptic = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  }, []);
+
+  const fireSettleHaptic = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, []);
+
+  const fireModeHaptic = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  }, []);
+
+  // ─── Lifted clock — single render loop for Orb + Therm ─────────────
+  useFrameCallback((info) => {
+    orbClock.value = (info.timeSinceFirstFrame ?? 0) / 1000;
+  });
+
+  // ─── Crossfade derivation — driven by mode ────────────────────────
+  useAnimatedReaction(
+    () => mode.value,
+    (modeVal) => {
+      crossfadeOrb.value = 1.0 - modeVal;
+      crossfadeTherm.value = modeVal;
+    },
+  );
+
+  // ─── Mode haptic — fires at 0.75 crossing, 200ms cooldown ────────
+  useAnimatedReaction(
+    () => mode.value,
+    (current, previous) => {
+      if (previous === null || previous === undefined) return;
+
+      const crossedUp = previous < 0.75 && current >= 0.75;
+      const crossedDown = previous >= 0.75 && current < 0.75;
+
+      if (crossedUp || crossedDown) {
+        // Suppress during settle (abs(mode - target) < 0.005)
+        const target = current > 0.5 ? 1.0 : 0.0;
+        if (Math.abs(current - target) < 0.005) return;
+
+        // 200ms cooldown via orbClock (seconds)
+        const now = orbClock.value;
+        if (now - lastModeHapticTime.value > 0.2) {
+          lastModeHapticTime.value = now;
+          runOnJS(fireModeHaptic)();
+        }
+      }
+    },
+  );
+
   // ─── Keyboard handling ──────────────────────────────────────────────
   useEffect(() => {
     const keyboardWillShow = Keyboard.addListener(
@@ -201,18 +266,6 @@ export default function HomeScreen() {
       seedDemo();
     }
   }, [forceDemo]);
-
-  // ═══════════════════════════════════════════════════════════════════
-  // HAPTIC CALLBACKS (must run on JS thread)
-  // ═══════════════════════════════════════════════════════════════════
-
-  const fireThresholdHaptic = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-  }, []);
-
-  const fireSettleHaptic = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }, []);
 
   // ═══════════════════════════════════════════════════════════════════
   // DIRECT MANIPULATION GESTURE — Orb is the input
@@ -271,6 +324,40 @@ export default function HomeScreen() {
       runOnJS(setCurrentState)(state);
       runOnJS(fireSettleHaptic)();
     });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // MODE SWITCH GESTURE — vertical drag toggles Orb↔Therm
+  // ═══════════════════════════════════════════════════════════════════
+
+  const MODE_DRAG_DISTANCE = 150; // pixels for full 0→1 traversal
+
+  const modeGesture = Gesture.Pan()
+    .activeOffsetY([-20, 20])
+    .failOffsetX([-15, 15])
+    .onBegin(() => {
+      'worklet';
+      modeDragStart.value = mode.value;
+    })
+    .onUpdate((e) => {
+      'worklet';
+      // Drag UP (negative translationY) → therm (1.0)
+      // Drag DOWN (positive translationY) → orb (0.0)
+      const raw = modeDragStart.value - (e.translationY / MODE_DRAG_DISTANCE);
+      mode.value = Math.max(0, Math.min(1, raw));
+    })
+    .onEnd(() => {
+      'worklet';
+      const target = mode.value > 0.5 ? 1.0 : 0.0;
+      mode.value = withSpring(target, {
+        damping: 20,
+        stiffness: 180,
+        mass: 1,
+        overshootClamping: true,
+      });
+    });
+
+  // Compose: horizontal = capacity, vertical = mode switch
+  const composedGesture = Gesture.Race(orbGesture, modeGesture);
 
   // ─── State label animated style ───────────────────────────────────
   const labelAnimatedStyle = useAnimatedStyle(() => ({
@@ -411,12 +498,12 @@ export default function HomeScreen() {
         >
           <View style={styles.content}>
             {/* ─── ORB — hero element + direct manipulation input ─── */}
-            <GestureDetector gesture={orbGesture}>
+            <GestureDetector gesture={composedGesture}>
               <Animated.View
                 style={styles.orbGestureTarget}
                 accessible
                 accessibilityRole="adjustable"
-                accessibilityLabel="Capacity input. Swipe left for resourced, right for depleted."
+                accessibilityLabel="Capacity input. Swipe left for resourced, right for depleted. Swipe up for thermometer view."
                 accessibilityValue={{
                   min: 0,
                   max: 100,
@@ -431,7 +518,22 @@ export default function HomeScreen() {
                 {currentState && (
                   <SavePulse trigger={saveTrigger} state={currentState} />
                 )}
-                <ShaderOrb size={ORB_SIZE} capacity={capacityShared} />
+                <View style={styles.instrumentContainer}>
+                  <ShaderOrb
+                    size={ORB_SIZE}
+                    capacity={capacityShared}
+                    externalClock={orbClock}
+                    uCrossfade={crossfadeOrb}
+                  />
+                  <View style={styles.thermOverlay}>
+                    <ShaderTherm
+                      size={ORB_SIZE}
+                      capacity={capacityShared}
+                      externalClock={orbClock}
+                      uCrossfade={crossfadeTherm}
+                    />
+                  </View>
+                </View>
               </Animated.View>
             </GestureDetector>
 
@@ -522,6 +624,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
+  },
+  // ─── Instrument container (Orb + Therm stacked) ───
+  instrumentContainer: {
+    width: ORB_SIZE,
+    height: ORB_SIZE,
+  },
+  thermOverlay: {
+    position: 'absolute' as const,
+    top: 0,
+    left: 0,
   },
   // ─── State label ───
   stateLabelWrap: {

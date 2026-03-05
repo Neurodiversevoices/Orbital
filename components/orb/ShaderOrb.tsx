@@ -42,10 +42,11 @@ import {
 //   - Compositing:            ~10 ops
 //   Total: ~265 ops per pixel. Mobile-safe at 280x280 canvas.
 //
-// Uniform contract (UNCHANGED from Phase 1.5):
+// Uniform contract:
 //   uTime       — monotonic seconds (drives drift + breath)
 //   uCapacity   — 0.0 (depleted/crimson) to 1.0 (resourced/cyan)
 //   uResolution — canvas pixel dimensions
+//   uCrossfade  — 0.0 (invisible) to 1.0 (fully visible), multiplies final alpha
 //
 // WHAT CHANGED FROM PHASE 1.5:
 //   + Hash-based value noise (Dave Hoskins)
@@ -74,6 +75,7 @@ const SHADER_SOURCE = `
 uniform float uTime;
 uniform float uCapacity;
 uniform float2 uResolution;
+uniform float uCrossfade;
 
 // ────────────────────────────────────────
 // COLOR SYSTEM
@@ -345,7 +347,7 @@ half4 main(float2 coord) {
   float reflAlpha = reflBelow * reflShape * reflFade * 0.08;
   float alpha = max(inside, max(haloAlpha, reflAlpha));
 
-  return half4(half3(finalCol), alpha);
+  return half4(half3(finalCol), alpha * uCrossfade);
 }
 `;
 
@@ -359,6 +361,8 @@ type ShaderOrbProps = {
   staticCapacity?: number;
   disabled?: boolean;
   testID?: string;
+  externalClock?: SharedValue<number>;
+  uCrossfade?: SharedValue<number>;
 };
 
 let runtimeEffect: ReturnType<typeof Skia.RuntimeEffect.Make> | null = null;
@@ -374,11 +378,15 @@ const ShaderOrb = memo(function ShaderOrb({
   staticCapacity = 1.0,
   disabled = false,
   testID,
+  externalClock,
+  uCrossfade: externalCrossfade,
 }: ShaderOrbProps) {
   const clock = useSharedValue(0);
 
   useFrameCallback((info) => {
-    clock.value = (info.timeSinceFirstFrame ?? 0) / 1000;
+    if (!externalClock) {
+      clock.value = (info.timeSinceFirstFrame ?? 0) / 1000;
+    }
   });
 
   const internalCapacity = useSharedValue(staticCapacity);
@@ -393,12 +401,16 @@ const ShaderOrb = memo(function ShaderOrb({
   }, [staticCapacity]);
 
   const activeCapacity = externalCapacity ?? internalCapacity;
+  const activeClock = externalClock ?? clock;
+  const defaultCrossfade = useSharedValue(1.0);
+  const activeCrossfade = externalCrossfade ?? defaultCrossfade;
 
   const uniforms = useDerivedValue(() => {
     return {
-      uTime: clock.value,
+      uTime: activeClock.value,
       uCapacity: activeCapacity.value,
       uResolution: vec(size, size),
+      uCrossfade: activeCrossfade.value,
     };
   });
 
