@@ -16,7 +16,6 @@ export default function TabLayout() {
       if (auth.isAuthenticated) {
         const isComplete = await isProfileSetupComplete();
         if (!isComplete) {
-          // Redirect to profile setup
           router.replace('/profile-setup');
           return;
         }
@@ -27,7 +26,6 @@ export default function TabLayout() {
     checkProfileSetup();
   }, [auth.isAuthenticated, router]);
 
-  // Don't render tabs while checking setup
   if (checkingSetup && auth.isAuthenticated) {
     return null;
   }
@@ -38,14 +36,15 @@ export default function TabLayout() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: colors.background,
-          borderTopColor: colors.cardBorder,
+          borderTopColor: 'rgba(255, 255, 255, 0.08)',
           borderTopWidth: 1,
           height: 60,
           paddingBottom: 8,
           paddingTop: 8,
         },
         tabBarActiveTintColor: colors.accent,
-        tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.4)',
+        // Ghost tabs: inactive at 30% opacity
+        tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.3)',
         tabBarShowLabel: false,
       }}
     >
