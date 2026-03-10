@@ -89,6 +89,30 @@ Same as H2 — `deleteAccount()` clears cloud data via RPC but leaves all local 
 
 ---
 
+### H5. Experiments Storage — All Functions Lack try/catch Around JSON.parse
+**Domain:** Crash & Stability
+**File:** `lib/experiments/storage.ts:20-159`
+
+Every function in this module (`getExperiments`, `createExperiment`, `updateExperiment`, `getExperimentDays`, `recordExperimentDay`, etc.) performs `AsyncStorage.getItem()` followed by `JSON.parse()` with **zero error handling**. If AsyncStorage returns corrupted data, `JSON.parse()` throws and crashes the app. Called from `app/experiment/index.tsx`, `app/experiment/[id].tsx`, and `app/experiment/new.tsx` — a corrupted storage key crashes any navigation to experiment screens.
+
+---
+
+### H6. Locale Provider Missing .catch() — Can White-Screen the App
+**Domain:** Crash & Stability
+**File:** `lib/hooks/useLocale.tsx:43-55`
+
+`AsyncStorage.getItem(LOCALE_KEY).then(...)` has no `.catch()` handler. If AsyncStorage rejects, this produces an unhandled promise rejection. The `LocaleProvider` wraps the **entire app tree** in `_layout.tsx`, so a crash here prevents the entire app from rendering (white screen). `setLocale` at line 54 also has no try/catch.
+
+---
+
+### H7. Safe Mode Recovery Functions Can Throw
+**Domain:** Crash & Stability
+**File:** `lib/safeMode.ts:153-190`
+
+`exitSafeMode()` and `forceSafeMode()` call `AsyncStorage.removeItem()`/`setItem()` without try/catch. If storage fails during safe mode exit, the app crashes — precisely when the user is trying to recover from a crash state. Defeats the purpose of safe mode.
+
+---
+
 ## MEDIUM — Technical Debt (Fix After Approval)
 
 ### M1. Unguarded console.log Statements in Production Code
@@ -132,11 +156,11 @@ These won't be visible to reviewers at runtime but indicate features that may no
 
 ---
 
-### M4. `app/circles/_api.ts` and `_ui.tsx` Have No Default Export
+### M4. 12+ Route Files Not Declared in Root Stack
 **Domain:** Crash & Stability
-**Files:** `app/circles/_api.ts`, `app/circles/_ui.tsx`
+**Files:** `app/circle-settings.tsx`, `app/cci.tsx`, `app/cci-report.tsx`, `app/b2b-addons.tsx`, `app/executive-engagement.tsx`, `app/health.tsx`, `app/operator-admin.tsx`, `app/profile.tsx`, `app/redeem.tsx`, `app/security-controls.tsx`, `app/sentinel-brief.tsx`, `app/device-preview.tsx`
 
-These files in the `app/` directory lack `export default`. Expo Router treats files starting with `_` as non-route utility files, so this is **by design** and will not crash. However, if the Expo Router version changes behavior around underscore-prefixed files, these could surface as warnings.
+These route files exist but are not declared as `<Stack.Screen>` entries in `app/_layout.tsx`. Expo Router still routes to them via file-based routing, but they use default `screenOptions` instead of explicit presentation/animation config. Not a crash risk, but screens may appear inconsistently (e.g., not as modals when expected).
 
 ---
 
@@ -204,7 +228,7 @@ No client-side lockout, delay, or attempt counter on sign-in failures. While Sup
 | Severity | Count | IDs |
 |----------|-------|-----|
 | CRITICAL | 3 | C1, C2, C3 |
-| HIGH | 4 | H1, H2, H3, H4 |
+| HIGH | 7 | H1, H2, H3, H4, H5, H6, H7 |
 | MEDIUM | 9 | M1–M9 |
 
 ### Recommended Fix Order Before Resubmission
@@ -212,4 +236,7 @@ No client-side lockout, delay, or attempt counter on sign-in failures. While Sup
 2. **C2**: Merge `claude/fix-apple-review-build-59-6Lzpd` for nonce fix
 3. **H1**: Add privacy policy link to auth screen
 4. **H2 + H3**: Clear AsyncStorage on signOut and deleteAccount
-5. **H4**: Fix ClinicalOrbV10 derived value subscription (if this orb variant ships)
+5. **H6**: Add `.catch()` to LocaleProvider AsyncStorage call (white-screen risk)
+6. **H5**: Wrap `lib/experiments/storage.ts` in try/catch
+7. **H7**: Add try/catch to safeMode recovery functions
+8. **H4**: Fix ClinicalOrbV10 derived value subscription (if this orb variant ships)
