@@ -18,7 +18,7 @@
  * ============================================================================
  *
  * Multi-key operations use AsyncStorage.multiSet/multiRemove for atomicity.
- * This prevents partial writes that could corrupt state.
+ * This avoids partial writes that could corrupt state.
  *
  * ============================================================================
  */
@@ -185,7 +185,7 @@ export async function setLocalUser(user: CircleUser): Promise<void> {
 
 /**
  * Initialize local user if not exists.
- * Uses cryptographically secure ID generation.
+ * Uses cryptographically strong ID generation.
  */
 export async function ensureLocalUser(displayHint?: string): Promise<CircleUser> {
   let user = await getLocalUser();

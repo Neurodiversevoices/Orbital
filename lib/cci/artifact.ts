@@ -491,8 +491,8 @@ export function generateCCIArtifactHTML(
     <div class="capacity-definition-title">What "Capacity" Means in This Report</div>
     <div class="capacity-definition-body">
       <p>Capacity refers to a person's day-to-day functional bandwidth — the amount of emotional, cognitive, sensory, and social load they can manage before regulation begins to degrade.</p>
-      <p class="capacity-definition-emphasis">Capacity is not a diagnosis, not a symptom checklist, and not a performance score.</p>
-      <p>Changes in capacity often present clinically as:</p>
+      <p class="capacity-definition-emphasis">Capacity is not a clinical evaluation, not a signal checklist, and not a performance score.</p>
+      <p>Changes in capacity often present as:</p>
       <ul class="capacity-definition-list">
         <li>increased emotional reactivity</li>
         <li>cognitive fatigue or brain fog</li>
@@ -654,14 +654,14 @@ export function generateCCIArtifactHTML(
   <div class="footer-section">
     <div class="provider-title">Provider Utility Statement</div>
     <div class="provider-body">
-      This artifact is an objective summary of patient-generated capacity signals. <em>It is provided to assist clinical documentation of functional status and does NOT constitute a diagnosis.</em> Inclusion of this record in a medical file serves as evidence of data review, not endorsement of subjective claims. Designed to support clinical documentation and provider-compatible record review.
+      This artifact is an objective summary of user-generated capacity signals. <em>It is provided to assist clinical documentation of functional status and does NOT constitute a professional evaluation.</em> Inclusion of this record in a provider file serves as evidence of data review, not endorsement of subjective claims. Capacity Summary Report — supports documentation and record review.
     </div>
 
     <!-- HOW TO USE THIS REPORT -->
     <div class="capacity-definition" style="margin-top: 10px; margin-bottom: 10px;">
       <div class="capacity-definition-title">How to Use This Report</div>
       <div class="capacity-definition-body">
-        <p>This report is intended to support therapeutic conversation, reflection, and pattern recognition.</p>
+        <p>This report is intended to support reflective conversation, reflection, and pattern recognition.</p>
         <p>It may be useful for:</p>
         <ul class="capacity-definition-list">
           <li>identifying periods of overload</li>
@@ -736,14 +736,10 @@ export function createCCIArtifact(
  * Uses the exact timestamp/hash from the golden master PDF
  */
 export function getGoldenMasterHTML(): string {
-  console.log('[INDIVIDUAL-ARTIFACT-TRACE] getGoldenMasterHTML() CALLED');
-  console.log('[INDIVIDUAL-ARTIFACT-TRACE] This is the INDIVIDUAL CCI artifact (not Bundle, not Circle)');
-  const html = generateCCIArtifactHTML({
+  const html = generateLegacyCCIArtifactHTML({
     generatedAt: '2026-01-10 14:02:41 UTC',
     integrityHash: 'sha256:8f43c9d11e7a2b8f...a72b5f1d2',
   });
-  console.log('[INDIVIDUAL-ARTIFACT-TRACE] Generated HTML length:', html.length);
-  console.log('[INDIVIDUAL-ARTIFACT-TRACE] HTML contains "BUNDLE":', html.includes('BUNDLE'));
   return html;
 }
 
@@ -1066,8 +1062,8 @@ export function createCCIArtifactJSON(
       confidential: true,
       copyright: '© 2026 Orbital Health Intelligence, Inc. All Rights Reserved.',
       disclaimer:
-        'This artifact is an objective summary of patient-generated capacity signals. ' +
-        'It does NOT constitute a diagnosis. Designed to support clinical documentation.',
+        'This artifact is an objective summary of user-generated capacity signals. ' +
+        'It does NOT constitute a professional evaluation. Designed to support clinical documentation.',
     },
     signature: {
       algorithm: 'sha256',

@@ -44,7 +44,7 @@ export function GlassOrb({ state, onStateChange, onSave }: GlassOrbProps) {
   const isDragging = useSharedValue(false);
 
   // Use refs to hold stable references to callbacks for worklets
-  // This prevents stale closure issues in production builds
+  // This blocks stale closure issues in production builds
   const onStateChangeRef = useRef(onStateChange);
   const onSaveRef = useRef(onSave);
 
@@ -84,15 +84,14 @@ export function GlassOrb({ state, onStateChange, onSave }: GlassOrbProps) {
     return 'stretched';
   };
 
-  // Stable callbacks that safely access refs - prevents worklet crashes
+  // Stable callbacks that safely access refs - blocks worklet crashes
   const updateState = useCallback((s: CapacityState) => {
     try {
       if (onStateChangeRef.current) {
         onStateChangeRef.current(s);
       }
     } catch (e) {
-      // Silent catch - prevents crash in production
-      console.warn('[GlassOrb] updateState error:', e);
+      // Silent catch - blocks crash in production
     }
   }, []);
 
@@ -102,12 +101,11 @@ export function GlassOrb({ state, onStateChange, onSave }: GlassOrbProps) {
         onSaveRef.current();
       }
     } catch (e) {
-      // Silent catch - prevents crash in production
-      console.warn('[GlassOrb] triggerSave error:', e);
+      // Silent catch - blocks crash in production
     }
   }, []);
 
-  // Memoize gestures to prevent recreation on every render
+  // Memoize gestures to avoid recreation on every render
   const panGesture = useMemo(() => Gesture.Pan()
     .minDistance(5)
     .onBegin(() => {

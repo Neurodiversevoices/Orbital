@@ -12,8 +12,6 @@ import {
   StyleSheet,
   Pressable,
   ScrollView,
-  Alert,
-  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,7 +20,6 @@ import {
   Users,
   UserCheck,
   ExternalLink,
-  LogOut,
   Shield,
 } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -47,35 +44,6 @@ export default function CircleSettingsScreen() {
       setEntitlements(null);
     }
     setIsLoading(false);
-  };
-
-  const handleLeaveCircle = () => {
-    const message = 'Are you sure you want to leave this Circle? You will lose access to shared capacity insights.';
-
-    if (Platform.OS === 'web') {
-      if (window.confirm(message)) {
-        // TODO: Implement actual leave circle logic
-        window.alert('You have left the Circle.');
-        router.back();
-      }
-    } else {
-      Alert.alert(
-        'Leave Circle',
-        message,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Leave',
-            style: 'destructive',
-            onPress: () => {
-              // TODO: Implement actual leave circle logic
-              Alert.alert('Done', 'You have left the Circle.');
-              router.back();
-            },
-          },
-        ]
-      );
-    }
   };
 
   const handleViewCircle = () => {
@@ -171,22 +139,6 @@ export default function CircleSettingsScreen() {
               <View style={styles.actionContent}>
                 <Text style={styles.actionLabel}>Privacy & Permissions</Text>
                 <Text style={styles.actionSublabel}>What Circle members can see</Text>
-              </View>
-            </Pressable>
-          </View>
-        </Animated.View>
-
-        {/* Leave Circle */}
-        <Animated.View entering={FadeInDown.delay(200).duration(400)}>
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>MEMBERSHIP</Text>
-            <Pressable style={styles.dangerRow} onPress={handleLeaveCircle}>
-              <View style={styles.dangerIconContainer}>
-                <LogOut color="#F44336" size={18} />
-              </View>
-              <View style={styles.actionContent}>
-                <Text style={styles.dangerLabel}>Leave Circle</Text>
-                <Text style={styles.dangerSublabel}>Remove yourself from this Circle</Text>
               </View>
             </Pressable>
           </View>

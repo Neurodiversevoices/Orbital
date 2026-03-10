@@ -125,7 +125,6 @@ export default function DataExitScreen() {
       });
       setHasExported(true);
     } catch (error) {
-      console.error('Export failed:', error);
     }
     setIsProcessing(false);
   }, [logs]);
@@ -145,7 +144,6 @@ export default function DataExitScreen() {
       });
       setHasExported(true);
     } catch (error) {
-      console.error('Export failed:', error);
     }
     setIsProcessing(false);
   }, [logs]);

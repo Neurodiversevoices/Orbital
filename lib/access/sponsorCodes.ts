@@ -10,7 +10,7 @@
  * Security Model:
  * - Codes are generated server-side with a secret key
  * - App validates signature locally using embedded public verification
- * - Nonces prevent replay attacks (stored locally)
+ * - Nonces blocks replay attacks (stored locally)
  * - Expiration is enforced at validation time
  */
 
@@ -30,14 +30,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // For now, we use a deterministic verification that can be computed
 // from the code structure itself. The real security comes from:
 // 1. Server-side code generation
-// 2. Nonce tracking to prevent replay
+// 2. Nonce tracking to blocks replay
 // 3. Expiration enforcement
 const VERIFICATION_SALT = 'orbital-sponsor-v1';
 
 // Code format: XXXX-XXXX-XXXX-XXXX (16 chars, groups of 4)
 const CODE_PATTERN = /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
 
-// Maximum age for a code to be valid (prevent old leaked codes)
+// Maximum age for a code to be valid (block old leaked codes)
 const MAX_CODE_AGE_DAYS = 90;
 
 // =============================================================================
@@ -254,7 +254,7 @@ export async function validateSponsorCode(code: string): Promise<SponsorCodeVali
   const tierChar = normalized[0];
   const tier: 'core' | 'pro' = tierChar === 'P' ? 'pro' : 'core';
 
-  // Extract nonce for replay prevention
+  // Extract nonce for replay mitigation
   const nonce = normalized.substring(7, 12);
 
   // Check if already redeemed

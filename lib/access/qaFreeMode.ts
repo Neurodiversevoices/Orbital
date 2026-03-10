@@ -84,7 +84,6 @@ export async function enableQAFreeMode(): Promise<void> {
 
   // Log for audit
   if (__DEV__) {
-    console.log('[QA Free Mode] ENABLED — Session now in true Free tier');
   }
 }
 
@@ -97,7 +96,6 @@ export async function disableQAFreeMode(): Promise<void> {
 
   // Log for audit
   if (__DEV__) {
-    console.log('[QA Free Mode] DISABLED — Normal entitlements restored');
   }
 }
 

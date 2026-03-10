@@ -61,7 +61,7 @@ export interface SponsorCodePayload {
   d: number;
   /** Issued timestamp (Unix seconds) */
   i: number;
-  /** Nonce to prevent replay (first 8 chars of UUID) */
+  /** Nonce to blocks replay (first 8 chars of UUID) */
   n: string;
   /** Optional issuer hint (org name prefix) */
   o?: string;

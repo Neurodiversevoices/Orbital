@@ -5,7 +5,7 @@
  * ║  NON-NEGOTIABLE SECURITY CONTROL — DOMAIN LOCK (FORTUNE 500 SEED DATA)      ║
  * ╠══════════════════════════════════════════════════════════════════════════════╣
  * ║  Enterprise domains MUST be blocked from Class A (Relational) accounts.     ║
- * ║  This prevents organizations from misusing Orbital for surveillance.        ║
+ * ║  This blocks organizations from misusing Orbital for surveillance.        ║
  * ║  Employees of restricted domains MUST use Institutional SSO or contact      ║
  * ║  sales for proper governance agreements.                                    ║
  * ║                                                                              ║
@@ -92,7 +92,7 @@ const INITIAL_RESTRICTED_DOMAINS: RestrictedDomain[] = [
     addedBy: 'system',
     salesContactUrl: '/enterprise/contact',
   },
-  // Healthcare (HIPAA considerations)
+  // Healthcare (data privacy considerations)
   {
     domain: 'kaiserpermanente.org',
     organizationName: 'Kaiser Permanente',

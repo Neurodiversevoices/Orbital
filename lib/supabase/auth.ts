@@ -12,6 +12,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { Session, User, AuthError } from '@supabase/supabase-js';
 import * as Crypto from 'expo-crypto';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // Lazy-load AppleAuthentication only on iOS (crashes on web)
 const AppleAuthentication = Platform.OS === 'ios'
   ? require('expo-apple-authentication')
@@ -403,12 +404,13 @@ export function useAuth(): AuthContext {
     }
   }, []);
 
-  // Sign out
+  // Sign out — clears cloud session and all local data
   const signOut = useCallback(async () => {
     if (!isSupabaseConfigured()) return;
 
     const supabase = getSupabase();
     await supabase.auth.signOut();
+    await AsyncStorage.clear();
   }, []);
 
   // Reset password
@@ -463,7 +465,7 @@ export function useAuth(): AuthContext {
     }
   }, []);
 
-  // Delete account (GDPR compliance)
+  // Delete account (GDPR compliance) — deletes all data + auth.users row
   const deleteAccount = useCallback(async () => {
     if (!isSupabaseConfigured() || !state.user) {
       return { success: false, error: 'Not authenticated' };
@@ -472,18 +474,25 @@ export function useAuth(): AuthContext {
     try {
       const supabase = getSupabase();
 
-      // First, delete user data using our RPC function
-      const { error: dataError } = await supabase.rpc('delete_user_data', {
-        p_user_id: state.user.id,
+      // Call the delete-user edge function which:
+      // 1. Deletes user data from all 15 tables
+      // 2. Deletes the auth.users row via admin API
+      const { data, error: fnError } = await supabase.functions.invoke('delete-user', {
+        body: {},
       });
 
-      if (dataError) {
-        return { success: false, error: dataError.message };
+      if (fnError) {
+        return { success: false, error: fnError.message };
       }
 
-      // Note: Actually deleting the auth user requires admin privileges
-      // or a separate edge function. For now, we just sign out.
-      // The user data has been deleted/anonymized.
+      if (data && !data.success) {
+        return { success: false, error: data.error || 'Account deletion failed' };
+      }
+
+      // Clear all local data
+      await AsyncStorage.clear();
+
+      // Sign out locally (session is already invalidated server-side)
       await supabase.auth.signOut();
 
       return { success: true };

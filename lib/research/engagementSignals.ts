@@ -68,7 +68,7 @@ export function assertEngagementAccessContext(context: EngagementAccessContext):
 
 /**
  * INTERNAL FLAG: Set to true only in research export flows.
- * This flag is checked by UI components to prevent accidental display.
+ * This flag is checked by UI components to blocks accidental display.
  */
 export const ENGAGEMENT_DATA_IS_INTERNAL_ONLY = true as const;
 

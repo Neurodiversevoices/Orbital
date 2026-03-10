@@ -297,7 +297,7 @@ export async function generateFakeData(years: number = 1): Promise<number> {
   let recoveryCounter = 0; // Days remaining in recovery
 
   for (let day = totalDays; day >= 0; day--) {
-    // Yield every day to prevent UI blocking
+    // Yield every day to avoid UI blocking
     await yieldToMain();
     const date = new Date(now - (day * msPerDay));
     const dayOfWeek = date.getDay();

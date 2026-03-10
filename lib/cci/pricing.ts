@@ -290,7 +290,7 @@ export async function resolveCCIPricing(
       : !allCircleMembersPro
         ? 'All Circle members must have Pro'
         : undefined,
-    purchased: false, // TODO: Track Circle CCI purchase state
+    purchased: entitlements.hasCircleCCIPurchased,
   };
 
   // Build Bundle tier
@@ -308,7 +308,7 @@ export async function resolveCCIPricing(
       : !allBundleSeatsPro
         ? 'All Bundle seats must be Pro-entitled'
         : undefined,
-    purchased: false, // TODO: Track Bundle CCI purchase state
+    purchased: entitlements.hasBundleCCIPurchased,
   };
 
   // Collect all tiers

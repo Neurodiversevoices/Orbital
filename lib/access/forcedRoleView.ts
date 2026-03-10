@@ -100,7 +100,6 @@ export async function initializeForcedRoleView(): Promise<ForcedRole> {
     initialized = true;
 
     if (__DEV__ && forcedRole === 'free') {
-      console.log('[FORCED ROLE VIEW] Active: FREE USER — All elevated access suppressed');
     }
 
     return forcedRole;
@@ -150,16 +149,6 @@ export async function enableFreeUserView(): Promise<void> {
   await AsyncStorage.setItem(FORCED_ROLE_KEY, 'free');
 
   if (__DEV__) {
-    console.log('[FORCED ROLE VIEW] ENABLED — FREE USER VIEW');
-    console.log('  → All Pro access: BLOCKED');
-    console.log('  → All Circles access: BLOCKED');
-    console.log('  → All Family access: BLOCKED');
-    console.log('  → All Institutional modes: BLOCKED');
-    console.log('  → All Sentinel Org views: BLOCKED');
-    console.log('  → All CCI issuance: BLOCKED');
-    console.log('  → All admin privileges: BLOCKED');
-    console.log('  → Organization tab: HIDDEN');
-    console.log('  → Briefings (Org/Global): HIDDEN');
   }
 }
 
@@ -171,7 +160,6 @@ export async function disableFreeUserView(): Promise<void> {
   await AsyncStorage.setItem(FORCED_ROLE_KEY, 'actual');
 
   if (__DEV__) {
-    console.log('[FORCED ROLE VIEW] DISABLED — Normal entitlements restored');
   }
 }
 

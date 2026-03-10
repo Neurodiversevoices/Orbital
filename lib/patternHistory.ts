@@ -7,7 +7,7 @@
  *
  * Purpose of retention:
  * - Product improvement and analytics
- * - Safety and fraud prevention
+ * - Safety and fraud mitigation
  * - Pattern quality and model training
  * - Research (with consent)
  *

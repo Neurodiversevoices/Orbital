@@ -626,7 +626,7 @@ export default function PatternsScreen() {
                 <View style={styles.pageHeader}>
                   <Text style={styles.pageTitle}>Your Capacity Patterns</Text>
                   <Text style={styles.pageSubtitle}>
-                    How your capacity has changed over time. This is not a diagnosis.
+                    How your capacity has changed over time. This is not a professional evaluation.
                   </Text>
                 </View>
 
