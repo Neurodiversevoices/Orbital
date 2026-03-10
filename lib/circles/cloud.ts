@@ -179,7 +179,7 @@ export async function cloudCreateInvite(
 
   const supabase = getSupabase();
 
-  // Generate secure token
+  // Generate protected token
   const token = `inv_${crypto.randomUUID().replace(/-/g, '')}`;
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 

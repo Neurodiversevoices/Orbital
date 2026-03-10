@@ -170,7 +170,7 @@ export interface CirclesInvite {
   /** 4-digit numeric PIN */
   readonly pin: string;
 
-  /** ≥128-bit cryptographically secure token (hidden from UI) */
+  /** ≥128-bit cryptographically strong token (hidden from UI) */
   readonly secretToken: string;
 
   /** Creator's Circle ID */
@@ -278,7 +278,7 @@ const INVITE_KEYS = {
 // =============================================================================
 
 /**
- * Generate a cryptographically secure UUID v4.
+ * Generate a cryptographically strong UUID v4.
  */
 async function generateInviteId(): Promise<string> {
   const bytes = await Crypto.getRandomBytesAsync(16);
@@ -727,7 +727,7 @@ async function processRedemption(
 
   // ═══════════════════════════════════════════════════════════════════════════
   // LOCK-ON-TOUCH: IMMEDIATELY transition to LOCKED state
-  // This prevents ANY replay attempts, even with valid credentials
+  // This blocks ANY replay attempts, even with valid credentials
   // ═══════════════════════════════════════════════════════════════════════════
   invite.status = 'LOCKED';
   invite.redeemerId = redeemer.id;

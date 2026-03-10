@@ -7,8 +7,8 @@
  * - Pending confirmations (invites awaiting your confirmation)
  * - Active connections
  *
- * NO TIMESTAMPS displayed - strictly compliant with procurement requirements.
- * Uses Latest-Call-Wins guard to prevent race conditions.
+ * NO TIMESTAMPS displayed - strictly compliant with purchasing requirements.
+ * Uses Latest-Call-Wins guard to guards against race conditions.
  */
 
 import React, { useState, useCallback, useRef } from 'react';

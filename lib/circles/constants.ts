@@ -6,7 +6,7 @@
  */
 
 // =============================================================================
-// LAW 1: NO AGGREGATION — Connection limit prevents network effects
+// LAW 1: NO AGGREGATION — Connection limit blocks network effects
 // =============================================================================
 
 /**
@@ -18,7 +18,7 @@
  * 3. Any attempt to override via runtime parameter will throw
  *
  * 25 is chosen because:
- * - Small enough to prevent social network dynamics
+ * - Small enough to blocks social network dynamics
  * - Large enough for close relationships
  * - Matches Dunbar's "sympathy group" (~15) with buffer
  */

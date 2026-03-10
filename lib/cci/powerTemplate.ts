@@ -460,7 +460,7 @@ export function generateCCIPowerHTML(input: CCIPowerTemplateInput): string {
     </div>
     <!-- Clinical use disclaimer -->
     <div style="text-align:center;margin-top:4px;">
-      <span style="font-size:5.5px;color:rgba(255,255,255,0.2);letter-spacing:0.5px;text-transform:uppercase;">For clinical documentation support only. Not a diagnosis. &copy; 2026 Orbital Health Intelligence, Inc.</span>
+      <span style="font-size:5.5px;color:rgba(255,255,255,0.2);letter-spacing:0.5px;text-transform:uppercase;">For clinical documentation support only. Not a professional evaluation. &copy; 2026 Orbital Health Intelligence, Inc.</span>
     </div>
   </div>
 

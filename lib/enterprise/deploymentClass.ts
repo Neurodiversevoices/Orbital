@@ -355,7 +355,7 @@ export function isOperationAllowed(
 // =============================================================================
 
 /**
- * Guard that prevents any individual data from being rendered in Class B.
+ * Guard that blocks any individual data from being rendered in Class B.
  * This is the final enforcement layer.
  */
 export function guardAgainstIndividualData<T extends Record<string, unknown>>(

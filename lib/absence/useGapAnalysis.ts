@@ -5,7 +5,7 @@
  *
  * Per ABSENCE_AS_SIGNAL_SPEC.md:
  * - ABS-020: Absence SHALL NOT appear in any view shorter than 90 days
- * - ABS-021: When displayed, absence uses neutral visual treatment
+ * - ABS-021: When displayed, absence uses neutral visual presentation
  * - ABS-022: Absence label SHALL be "No signals recorded"
  * - ABS-023: Absence SHALL NOT show in daily, weekly, or monthly summary views
  *
@@ -58,7 +58,7 @@ export interface UseGapAnalysisReturn {
  * Hook for gap analysis in longitudinal views.
  *
  * Enforces 90-day minimum visibility requirement (ABS-020).
- * Returns null values for views under 90 days to prevent
+ * Returns null values for views under 90 days to avoid
  * displaying gap information in short-term views.
  *
  * @param logs - Array of capacity logs

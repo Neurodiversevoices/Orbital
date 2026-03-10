@@ -47,6 +47,8 @@ export interface UserEntitlements {
 
   // CCI
   hasCCIPurchased: boolean;
+  hasCircleCCIPurchased: boolean;
+  hasBundleCCIPurchased: boolean;
   cciPrice: number;
 
   // Raw entitlements list
@@ -152,6 +154,8 @@ export async function getUserEntitlements(): Promise<UserEntitlements> {
   const hasBundle20 = entitlements.includes(ENTITLEMENTS.BUNDLE_20);
   const hasAdminAddOn = entitlements.includes(ENTITLEMENTS.ADMIN_ADDON);
   const hasCCIPurchased = entitlements.includes(ENTITLEMENTS.CCI_PURCHASED);
+  const hasCircleCCIPurchased = entitlements.includes(ENTITLEMENTS.CCI_CIRCLE_PURCHASED);
+  const hasBundleCCIPurchased = entitlements.includes(ENTITLEMENTS.CCI_BUNDLE_PURCHASED);
 
   // Determine bundle size
   let bundleSize: 10 | 15 | 20 | null = null;
@@ -173,6 +177,8 @@ export async function getUserEntitlements(): Promise<UserEntitlements> {
     bundleSize,
     hasAdminAddOn,
     hasCCIPurchased,
+    hasCircleCCIPurchased,
+    hasBundleCCIPurchased,
     cciPrice: isPro ? CCI_PRICING.sixtyDay : CCI_PRICING.ninetyDay,
     rawEntitlements: entitlements,
   };

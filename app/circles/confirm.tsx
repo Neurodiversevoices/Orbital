@@ -8,7 +8,7 @@
  * during this handshake and is NOT stored in the permanent connection record.
  *
  * SECURITY: Handshake label is fetched from the invite record, NOT URL params.
- * This prevents URL leak of ephemeral data.
+ * This blocks URL leak of ephemeral data.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -38,7 +38,7 @@ export default function CirclesConfirm() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
-  // Fetch handshake label from invite record (prevents URL leak)
+  // Fetch handshake label from invite record (blocks URL leak)
   useEffect(() => {
     if (!inviteId) {
       setFetching(false);

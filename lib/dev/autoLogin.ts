@@ -60,15 +60,10 @@ export async function performDevAutoLogin(): Promise<boolean> {
   if (!DEV_AUTO_LOGIN_ENABLED) return false;
 
   if (!DEV_EMAIL || !DEV_PASSWORD) {
-    console.warn(
-      '[DevAutoLogin] EXPO_PUBLIC_DEV_EMAIL and EXPO_PUBLIC_DEV_PASSWORD must be set. ' +
-      'Add them to your .env file.'
-    );
     return false;
   }
 
   if (!isSupabaseConfigured()) {
-    console.warn('[DevAutoLogin] Supabase not configured — skipping auto-login.');
     return false;
   }
 
@@ -85,7 +80,6 @@ export async function performDevAutoLogin(): Promise<boolean> {
         attestation_text: 'DEV_AUTO_LOGIN bypass',
       };
       await AsyncStorage.setItem(AGE_VERIFICATION_KEY, JSON.stringify(ageRecord));
-      console.log('[DevAutoLogin] Age gate auto-completed');
     }
 
     // Step 2: Auto-mark tutorial as seen
@@ -97,26 +91,21 @@ export async function performDevAutoLogin(): Promise<boolean> {
     // Check if already signed in
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
-      console.log('[DevAutoLogin] Already signed in as', session.user.email);
       return true;
     }
 
     // Sign in
-    console.log('[DevAutoLogin] Signing in as', DEV_EMAIL, '...');
     const { error } = await supabase.auth.signInWithPassword({
       email: DEV_EMAIL,
       password: DEV_PASSWORD,
     });
 
     if (error) {
-      console.error('[DevAutoLogin] Sign-in failed:', error.message);
       return false;
     }
 
-    console.log('[DevAutoLogin] ✅ Auto-login successful');
     return true;
   } catch (err) {
-    console.error('[DevAutoLogin] Unexpected error:', err);
     return false;
   }
 }

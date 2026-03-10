@@ -75,7 +75,6 @@ export default function DevChartExportPage() {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       } catch (err) {
-        console.error('Copy failed:', err);
       }
     }
   };

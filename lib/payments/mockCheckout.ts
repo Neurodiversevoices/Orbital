@@ -350,13 +350,10 @@ async function grantEntitlement(entitlementId: string, purchaseId?: string): Pro
         });
 
       if (error) {
-        console.error('[grantEntitlement] Supabase error:', error);
         throw new Error('Failed to grant entitlement');
       }
-      console.log('[grantEntitlement] Granted via Supabase:', entitlementId);
       return;
     } catch (e) {
-      console.error('[grantEntitlement] Supabase failed, falling back to AsyncStorage:', e);
     }
   }
 
@@ -368,7 +365,6 @@ async function grantEntitlement(entitlementId: string, purchaseId?: string): Pro
       entitlements.push(entitlementId);
     }
     await AsyncStorage.setItem(STORAGE_KEYS.GRANTED_ENTITLEMENTS, JSON.stringify(entitlements));
-    console.log('[grantEntitlement] Granted via AsyncStorage:', entitlementId);
   } catch {
     throw new Error('Failed to grant entitlement');
   }
@@ -397,10 +393,8 @@ export async function getGrantedEntitlements(): Promise<string[]> {
 
       if (!error && data) {
         entitlements = data.map(row => row.entitlement_id);
-        console.log('[getGrantedEntitlements] From Supabase:', entitlements);
       }
     } catch (e) {
-      console.error('[getGrantedEntitlements] Supabase failed:', e);
     }
   }
 
@@ -410,7 +404,6 @@ export async function getGrantedEntitlements(): Promise<string[]> {
       const existing = await AsyncStorage.getItem(STORAGE_KEYS.GRANTED_ENTITLEMENTS);
       entitlements = existing ? JSON.parse(existing) : [];
       if (entitlements.length > 0) {
-        console.log('[getGrantedEntitlements] From AsyncStorage:', entitlements);
       }
     } catch {
       entitlements = [];
@@ -467,11 +460,9 @@ async function recordPurchaseIntent(intent: PurchaseIntent): Promise<void> {
         });
 
       if (!error) {
-        console.log('[recordPurchaseIntent] Recorded in Supabase');
         return;
       }
     } catch (e) {
-      console.error('[recordPurchaseIntent] Supabase failed:', e);
     }
   }
 
@@ -513,7 +504,6 @@ async function updatePurchaseStatus(
         return;
       }
     } catch (e) {
-      console.error('[updatePurchaseStatus] Supabase failed:', e);
     }
   }
 
@@ -693,7 +683,6 @@ export async function getPurchaseHistory(): Promise<PurchaseIntent[]> {
         }));
       }
     } catch (e) {
-      console.error('[getPurchaseHistory] Supabase failed:', e);
     }
   }
 

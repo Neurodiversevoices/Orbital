@@ -71,7 +71,6 @@ export async function enqueueLog(
   // ==========================================================================
   if (isDemoLogId(clientLogId)) {
     if (__DEV__) {
-      console.warn('[Outbox] BLOCKED: Demo log cannot be synced to cloud:', clientLogId);
     }
     return ''; // Return empty string, log is NOT enqueued
   }
@@ -115,7 +114,6 @@ export async function enqueueDelete(clientLogId: string): Promise<string> {
   // Demo logs were never synced, so no delete operation needed
   if (isDemoLogId(clientLogId)) {
     if (__DEV__) {
-      console.warn('[Outbox] BLOCKED: Demo log delete (never synced):', clientLogId);
     }
     return '';
   }

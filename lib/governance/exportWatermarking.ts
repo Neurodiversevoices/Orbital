@@ -25,7 +25,7 @@ function generateExportId(): string {
 }
 
 const WATERMARK_DISCLAIMERS = {
-  en: 'NON-DIAGNOSTIC | READ-ONLY | This export contains self-reported capacity data and does not constitute clinical evaluation or diagnosis.',
+  en: 'NON-DIAGNOSTIC | READ-ONLY | This export contains self-reported capacity data and does not constitute clinical evaluation or professional evaluation.',
   es: 'SIN VALOR DIAGNÓSTICO | SOLO LECTURA | Esta exportación contiene datos de capacidad autorreportados y no constituye evaluación clínica ni diagnóstico.',
 };
 

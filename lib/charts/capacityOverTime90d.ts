@@ -184,7 +184,6 @@ export function renderCCI90DayToSVG(
   // Validate data
   const validation = validateCCIData(data);
   if (!validation.valid) {
-    console.warn('CCI chart data validation failed:', validation.errors);
   }
 
   const bands = generateBackgroundBands();
@@ -290,7 +289,6 @@ export interface CCI90DayChartProps {
 export function generateChartProps(data: CCI90DayChartData): CCI90DayChartProps {
   const validation = validateCCIData(data);
   if (!validation.valid) {
-    console.warn('CCI chart data validation failed:', validation.errors);
   }
 
   return {
@@ -453,7 +451,6 @@ export function createCircleCCIData(
   members: Array<{ id: string; label: string; values: number[] }>
 ): CCI90DayChartData {
   if (members.length !== 5) {
-    console.warn(`Circle CCI expects 5 members, got ${members.length}`);
   }
 
   return {

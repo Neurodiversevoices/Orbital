@@ -552,7 +552,7 @@ function generateHTML(data: ClinicalBriefData): string {
   <div class="disclaimer">
     <strong>Important Notice</strong>
     This document is a Patient-Reported Outcome Measure (PROM). It represents subjective self-reported data
-    and is not a medical diagnosis, clinical assessment, or treatment recommendation. The patterns shown
+    and is not a clinical evaluation, professional assessment, or care recommendation. The patterns shown
     reflect correlations in user-reported signals and should not be interpreted as causal relationships.
     Always consult qualified healthcare providers for medical advice.
   </div>

@@ -1,20 +1,21 @@
 /**
- * CCI-Q4 Artifact Generator
+ * CCI Artifact Generator
  *
- * GOLDEN MASTER LOCKED: This file reproduces the EXACT HTML/CSS/SVG
- * from output/cci_ultra.html which generated the golden master PDF.
+ * Two templates:
+ * 1. generateCCIArtifactHTML() — NEW dark-theme Power PDF template
+ * 2. generateLegacyCCIArtifactHTML() — Original golden master (preserved for getGoldenMasterHTML)
  *
- * DO NOT MODIFY VISUAL OUTPUT.
- * DO NOT REFACTOR STYLES.
- * DO NOT "IMPROVE" LAYOUT.
- *
- * Only dynamic fields: timestamp, hash (same position/style).
+ * The golden master template is LOCKED and unchanged.
+ * The new Power PDF template is used by the CCI generation pipeline.
  */
 
 import { CCIArtifact, CCIArtifactJSON, CCIIssuanceMetadata } from './types';
 import { FABRICATED_HISTORIES, DEMO_CIRCLE_MEMBERS, getCapacityState } from './demoData';
-import { renderSummaryChartSVG } from './summaryChart';
-import { CCIFormattedStrings } from './dynamic/types';
+import { renderSummaryChartSVG, CAPACITY_COLORS } from './summaryChart';
+import { CCIFormattedStrings, CCIDynamicData } from './dynamic/types';
+import { CCIProjectionResult } from './dynamic/projection';
+import { CCINarrativeResult } from './dynamic/narrative';
+import { CCIFunctionalImpact, SeverityLevel, SEVERITY_COLORS } from './dynamic/impact';
 
 /**
  * Golden master display constants — exact values matching locked output.
@@ -32,12 +33,13 @@ const GOLDEN_CONSTANTS: Omit<CCIFormattedStrings, 'chartSVG' | 'chartXLabels'> =
 };
 
 /**
- * Generate CCI artifact HTML
+ * Generate LEGACY CCI artifact HTML (golden master, LOCKED).
  *
  * Returns the EXACT HTML that matches the golden master PDF.
  * Only timestamp and hash fields are dynamic.
+ * Used by getGoldenMasterHTML() and createCCIArtifact().
  */
-export function generateCCIArtifactHTML(
+function generateLegacyCCIArtifactHTML(
   metadata?: Partial<CCIIssuanceMetadata>,
   dynamicData?: CCIFormattedStrings | null,
 ): string {
@@ -491,8 +493,8 @@ export function generateCCIArtifactHTML(
     <div class="capacity-definition-title">What "Capacity" Means in This Report</div>
     <div class="capacity-definition-body">
       <p>Capacity refers to a person's day-to-day functional bandwidth — the amount of emotional, cognitive, sensory, and social load they can manage before regulation begins to degrade.</p>
-      <p class="capacity-definition-emphasis">Capacity is not a diagnosis, not a symptom checklist, and not a performance score.</p>
-      <p>Changes in capacity often present clinically as:</p>
+      <p class="capacity-definition-emphasis">Capacity is not a clinical evaluation, not a signal checklist, and not a performance score.</p>
+      <p>Changes in capacity often present as:</p>
       <ul class="capacity-definition-list">
         <li>increased emotional reactivity</li>
         <li>cognitive fatigue or brain fog</li>
@@ -654,14 +656,14 @@ export function generateCCIArtifactHTML(
   <div class="footer-section">
     <div class="provider-title">Provider Utility Statement</div>
     <div class="provider-body">
-      This artifact is an objective summary of patient-generated capacity signals. <em>It is provided to assist clinical documentation of functional status and does NOT constitute a diagnosis.</em> Inclusion of this record in a medical file serves as evidence of data review, not endorsement of subjective claims. Designed to support clinical documentation and provider-compatible record review.
+      This artifact is an objective summary of user-generated capacity signals. <em>It is provided to assist clinical documentation of functional status and does NOT constitute a professional evaluation.</em> Inclusion of this record in a provider file serves as evidence of data review, not endorsement of subjective claims. Capacity Summary Report — supports documentation and record review.
     </div>
 
     <!-- HOW TO USE THIS REPORT -->
     <div class="capacity-definition" style="margin-top: 10px; margin-bottom: 10px;">
       <div class="capacity-definition-title">How to Use This Report</div>
       <div class="capacity-definition-body">
-        <p>This report is intended to support therapeutic conversation, reflection, and pattern recognition.</p>
+        <p>This report is intended to support reflective conversation, reflection, and pattern recognition.</p>
         <p>It may be useful for:</p>
         <ul class="capacity-definition-list">
           <li>identifying periods of overload</li>
@@ -683,6 +685,332 @@ export function generateCCIArtifactHTML(
   </div>
 </div>
 
+</body>
+</html>`;
+}
+
+// =============================================================================
+// NEW CCI POWER PDF — DARK THEME PREMIUM TEMPLATE
+// =============================================================================
+
+/**
+ * Build inline SVG wave chart for the CCI Power PDF.
+ */
+function _buildWaveChartSVG(values: number[], labels: [string, string, string]): string {
+  const w = 528, h = 160;
+  const pL = 40, pR = 20, pT = 12, pB = 28;
+  const gW = w - pL - pR, gH = h - pT - pB;
+  const bandH = gH / 3;
+
+  const toY = (v: number) => pT + gH - (Math.max(0, Math.min(100, v)) / 100) * gH;
+  const xs = values.map((_: number, i: number) => pL + (i / Math.max(values.length - 1, 1)) * gW);
+  const pts = values.map((v: number, i: number) => ({ x: xs[i], y: toY(v), v }));
+
+  // Bezier curve
+  let curve = `M ${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[Math.min(pts.length - 1, i + 2)];
+    const dx = p2.x - p1.x;
+    curve += ` C ${(p1.x + dx * 0.3).toFixed(1)},${(p1.y + (p2.y - p0.y) * 0.15).toFixed(1)} ${(p2.x - dx * 0.3).toFixed(1)},${(p2.y - (p3.y - p1.y) * 0.15).toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+  }
+
+  const area = `${curve} L ${pts[pts.length - 1].x.toFixed(1)},${(pT + gH).toFixed(1)} L ${pts[0].x.toFixed(1)},${(pT + gH).toFixed(1)} Z`;
+
+  const nodes = pts.map(p => {
+    const c = p.v >= 70 ? '#00E5FF' : p.v >= 50 ? '#E8A830' : '#F44336';
+    return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5" fill="#080C16"/>
+      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" fill="${c}"/>
+      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="1.2" fill="white" fill-opacity="0.9"/>`;
+  }).join('');
+
+  const lxs = [pL + gW * 0.15, pL + gW * 0.5, pL + gW * 0.85];
+  const xlabels = labels.map((l: string, i: number) =>
+    `<text x="${lxs[i].toFixed(1)}" y="${(h - 4).toFixed(1)}" font-size="8" fill="rgba(255,255,255,0.5)" font-family="Inter,sans-serif" font-weight="500" text-anchor="middle">${l}</text>`
+  ).join('');
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <defs>
+      <linearGradient id="cciFillGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#00E5FF" stop-opacity="0.12"/>
+        <stop offset="50%" stop-color="#E8A830" stop-opacity="0.06"/>
+        <stop offset="100%" stop-color="#F44336" stop-opacity="0.12"/>
+      </linearGradient>
+      <linearGradient id="cciStrokeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#00E5FF"/>
+        <stop offset="50%" stop-color="#E8A830"/>
+        <stop offset="100%" stop-color="#F44336"/>
+      </linearGradient>
+    </defs>
+    <rect x="${pL}" y="${pT}" width="${gW}" height="${bandH}" fill="#00E5FF" fill-opacity="0.04"/>
+    <rect x="${pL}" y="${pT + bandH}" width="${gW}" height="${bandH}" fill="#E8A830" fill-opacity="0.03"/>
+    <rect x="${pL}" y="${pT + 2 * bandH}" width="${gW}" height="${bandH}" fill="#F44336" fill-opacity="0.04"/>
+    <line x1="${pL}" y1="${pT + bandH}" x2="${pL + gW}" y2="${pT + bandH}" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="3 3"/>
+    <line x1="${pL}" y1="${pT + 2 * bandH}" x2="${pL + gW}" y2="${pT + 2 * bandH}" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="3 3"/>
+    <line x1="${pL}" y1="${pT}" x2="${pL}" y2="${pT + gH}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <path d="${area}" fill="url(#cciFillGrad)"/>
+    <path d="${curve}" stroke="#080C16" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="${curve}" stroke="url(#cciStrokeGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    ${nodes}
+    ${xlabels}
+  </svg>`;
+}
+
+/**
+ * Generate CCI Power PDF HTML — dark-theme premium template.
+ *
+ * Layout (612×792px US Letter, #080C16 dark background):
+ * 1. Header: "ORBITAL" + "Capacity Composite Index" + period + Confidential
+ * 2. Score ring (SVG) + state distribution bar + top capacity drivers (2x2)
+ * 3. Capacity wave chart (SVG with color gradient)
+ * 4. Clinical observations (bullet points from narrative)
+ * 5. Capacity forecast + functional impact grid (severity pills)
+ * 6. Footer: Orbital branding + non-diagnostic disclaimer
+ */
+export function generateCCIArtifactHTML(
+  metadata: CCIIssuanceMetadata,
+  dynamicData: CCIDynamicData,
+  projection: CCIProjectionResult | null,
+  narrative: CCINarrativeResult,
+  impact: CCIFunctionalImpact,
+  driverStats?: { sensory: number; demand: number; social: number },
+): string {
+  // --- Derived values ---
+  const { resourced, stretched, depleted, total } = dynamicData.overallDistribution;
+  const score = total > 0 ? Math.round((resourced * 100 + stretched * 50 + depleted * 0) / total) : 50;
+  const rPct = total > 0 ? Math.round((resourced / total) * 100) : 0;
+  const sPct = total > 0 ? Math.round((stretched / total) * 100) : 0;
+  const dPct = total > 0 ? Math.round((depleted / total) * 100) : 0;
+
+  // Ring
+  const ringColor = score >= 70 ? '#00E5FF' : score >= 50 ? '#E8A830' : '#F44336';
+  const circ = 2 * Math.PI * 52;
+  const dashOffset = circ * (1 - score / 100);
+
+  // Period display
+  const fmtDate = (s: string) => {
+    const d = new Date(s + 'T00:00:00');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  };
+  const period = `${fmtDate(dynamicData.observationStart)} \u2013 ${fmtDate(dynamicData.observationEnd)}`;
+  const windowLabel = dynamicData.windowStatus === 'closed' ? 'Closed' : 'Open';
+
+  // Wave chart
+  const waveChart = _buildWaveChartSVG(dynamicData.chartValues, dynamicData.chartXLabels);
+
+  // Observations (split narrative into bullet points)
+  const observations = narrative.summary
+    .split(/\.\s+/)
+    .filter((s: string) => s.trim().length > 5)
+    .map((s: string) => s.trim().endsWith('.') ? s.trim() : s.trim() + '.');
+
+  // Drivers
+  const sensory = driverStats?.sensory ?? 0;
+  const demand = driverStats?.demand ?? 0;
+  const social = driverStats?.social ?? 0;
+
+  // Forecast
+  const projectedScore = projection
+    ? projection.projectedPoints[Math.min(41, projection.projectedPoints.length - 1)]
+    : null;
+  const riskLevel: SeverityLevel = projection?.weeksToCritical != null
+    ? (projection.weeksToCritical < 4 ? 'HIGH' : projection.weeksToCritical < 8 ? 'ELEVATED' : 'MODERATE')
+    : 'LOW';
+  const topIntervention = impact.interventionTargets.length > 0
+    ? impact.interventionTargets[0].label
+    : 'None identified';
+
+  // Severity pill helper
+  const pill = (sev: SeverityLevel) => {
+    const c = SEVERITY_COLORS[sev];
+    return `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:7px;font-weight:700;letter-spacing:0.5px;color:${c};background:${c}20;border:1px solid ${c}40;">${sev}</span>`;
+  };
+
+  // Driver card helper
+  const driverCard = (label: string, pct: number, color: string) => {
+    const arrow = pct >= 50 ? '\u2191' : pct >= 25 ? '\u2192' : '\u2193';
+    return `
+      <div style="padding:8px 10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:4px;">
+        <div style="font-size:7px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${label}</div>
+        <div style="display:flex;align-items:baseline;gap:4px;">
+          <span style="font-size:16px;font-weight:700;color:${color};font-family:'JetBrains Mono',monospace;">${pct}%</span>
+          <span style="font-size:12px;color:rgba(255,255,255,0.4);">${arrow}</span>
+        </div>
+      </div>`;
+  };
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capacity Composite Index</title>
+  <style>
+    @page { size: 612px 792px; margin: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 612px; height: 792px; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 10px; line-height: 1.5;
+      color: rgba(255,255,255,0.85);
+      background: #080C16;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page {
+      width: 612px; height: 792px;
+      padding: 24px 28px 18px 28px;
+      background: #080C16;
+      position: relative;
+      display: flex; flex-direction: column;
+    }
+    .mono { font-family: 'JetBrains Mono', 'Consolas', monospace; }
+    @media print {
+      .page, body, svg rect, svg circle, svg path, svg line, svg text {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
+    <div>
+      <div style="font-size:7px;font-weight:700;color:#00E5FF;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;">ORBITAL</div>
+      <div style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.95);letter-spacing:0.3px;">Capacity Composite Index</div>
+      <div style="font-size:8px;color:rgba(255,255,255,0.4);margin-top:3px;">${period} &middot; ${windowLabel}</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:7px;font-weight:700;color:rgba(244,67,54,0.6);letter-spacing:1px;text-transform:uppercase;">Confidential</div>
+      <div style="font-size:7px;color:rgba(255,255,255,0.3);margin-top:2px;">Patient ID</div>
+      <div class="mono" style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.6);">${dynamicData.patientId}</div>
+    </div>
+  </div>
+
+  <!-- SCORE RING + DISTRIBUTION + DRIVERS -->
+  <div style="display:flex;gap:16px;margin-bottom:14px;">
+    <!-- Score Ring -->
+    <div style="width:130px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+      <svg width="120" height="120" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+        <circle cx="60" cy="60" r="52" fill="none" stroke="${ringColor}" stroke-width="8"
+          stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${dashOffset.toFixed(2)}"
+          stroke-linecap="round" transform="rotate(-90 60 60)"/>
+        <text x="60" y="55" text-anchor="middle" font-size="28" font-weight="700" fill="${ringColor}" font-family="Inter,sans-serif">${score}</text>
+        <text x="60" y="72" text-anchor="middle" font-size="8" font-weight="600" fill="rgba(255,255,255,0.35)" font-family="Inter,sans-serif" letter-spacing="1">CAPACITY</text>
+      </svg>
+    </div>
+
+    <!-- Distribution + Drivers -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
+      <!-- State Distribution Bar -->
+      <div>
+        <div style="font-size:7px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">State Distribution</div>
+        <div style="height:10px;display:flex;border-radius:5px;overflow:hidden;margin-bottom:4px;">
+          <div style="width:${rPct}%;background:#00E5FF;"></div>
+          <div style="width:${sPct}%;background:#E8A830;"></div>
+          <div style="width:${dPct}%;background:#F44336;"></div>
+        </div>
+        <div style="display:flex;gap:12px;font-size:7px;">
+          <span style="color:#00E5FF;">\u25CF Resourced ${rPct}%</span>
+          <span style="color:#E8A830;">\u25CF Stretched ${sPct}%</span>
+          <span style="color:#F44336;">\u25CF Depleted ${dPct}%</span>
+        </div>
+      </div>
+
+      <!-- Top Capacity Drivers (2x2 Grid) -->
+      <div>
+        <div style="font-size:7px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Top Capacity Drivers</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          ${driverCard('Sensory', sensory, '#00E5FF')}
+          ${driverCard('Demand', demand, '#E8A830')}
+          ${driverCard('Social', social, '#F44336')}
+          <div style="padding:8px 10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.04);border-radius:4px;">
+            <div style="font-size:7px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Signals</div>
+            <div style="font-size:16px;font-weight:700;color:rgba(255,255,255,0.5);font-family:'JetBrains Mono',monospace;">${dynamicData.totalSignals}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAPACITY WAVE CHART -->
+  <div style="margin-bottom:12px;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.06);border-radius:4px;padding:10px 12px 6px 12px;">
+    <div style="font-size:7px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">
+      Capacity Trend <span style="font-weight:400;color:rgba(255,255,255,0.25);margin-left:6px;">Non-Diagnostic</span>
+    </div>
+    ${waveChart}
+  </div>
+
+  <!-- CLINICAL OBSERVATIONS -->
+  <div style="margin-bottom:12px;padding:10px 14px;border-left:3px solid #00E5FF;background:rgba(0,229,255,0.03);border-radius:0 4px 4px 0;">
+    <div style="font-size:7px;font-weight:600;color:#00E5FF;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Clinical Observations</div>
+    ${observations.map((obs: string) => `
+      <div style="font-size:8px;line-height:1.6;color:rgba(255,255,255,0.65);margin-bottom:3px;padding-left:12px;position:relative;">
+        <span style="position:absolute;left:1px;top:0;color:rgba(255,255,255,0.3);">&#8226;</span>${obs}
+      </div>
+    `).join('')}
+  </div>
+
+  <!-- FORECAST + FUNCTIONAL IMPACT -->
+  <div style="display:flex;gap:10px;margin-bottom:auto;">
+    <!-- Capacity Forecast -->
+    <div style="width:180px;flex-shrink:0;padding:10px;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.06);border-radius:4px;">
+      <div style="font-size:7px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Capacity Forecast</div>
+      ${projection ? `
+        <div style="margin-bottom:6px;">
+          <div style="font-size:7px;color:rgba(255,255,255,0.4);margin-bottom:2px;">Projected Score (6 wk)</div>
+          <div class="mono" style="font-size:18px;font-weight:700;color:${projectedScore != null && projectedScore >= 70 ? '#00E5FF' : projectedScore != null && projectedScore >= 50 ? '#E8A830' : '#F44336'};">${projectedScore}</div>
+        </div>
+        <div style="margin-bottom:6px;">
+          <div style="font-size:7px;color:rgba(255,255,255,0.4);margin-bottom:2px;">Risk Level</div>
+          ${pill(riskLevel)}
+        </div>
+        <div>
+          <div style="font-size:7px;color:rgba(255,255,255,0.4);margin-bottom:2px;">Rate</div>
+          <div class="mono" style="font-size:10px;color:rgba(255,255,255,0.6);">${projection.trendRate} pts/wk</div>
+        </div>
+      ` : `
+        <div style="font-size:8px;color:rgba(255,255,255,0.4);font-style:italic;">No significant decline detected. Capacity trajectory is flat or upward.</div>
+      `}
+      <div style="margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);">
+        <div style="font-size:7px;color:rgba(255,255,255,0.4);margin-bottom:2px;">Highest Leverage</div>
+        <div style="font-size:8px;font-weight:600;color:rgba(255,255,255,0.7);">${topIntervention}</div>
+      </div>
+    </div>
+
+    <!-- Functional Impact Grid -->
+    <div style="flex:1;padding:10px;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.06);border-radius:4px;">
+      <div style="font-size:7px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Functional Impact</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        ${impact.items.map(item => `
+          <div style="padding:6px 8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:3px;">
+            <div style="font-size:7px;font-weight:600;color:rgba(255,255,255,0.6);margin-bottom:4px;">${item.domain}</div>
+            ${pill(item.severity)}
+            <div style="font-size:6px;color:rgba(255,255,255,0.35);margin-top:3px;line-height:1.4;">${item.descriptor}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <span style="font-size:7px;color:rgba(255,255,255,0.3);">Generated by Orbital Health Intelligence Inc. &middot; orbitalhealth.app &middot; Confidential</span>
+      <span class="mono" style="font-size:6px;color:rgba(255,255,255,0.2);">${metadata.integrityHash}</span>
+    </div>
+    <div style="text-align:center;">
+      <span style="font-size:5.5px;color:rgba(255,255,255,0.2);letter-spacing:0.5px;text-transform:uppercase;">This is NOT a diagnostic instrument. For clinical documentation support only. Not a substitute for professional judgment. &copy; 2026 Orbital Health Intelligence, Inc.</span>
+    </div>
+  </div>
+
+</div>
 </body>
 </html>`;
 }
@@ -727,7 +1055,7 @@ export function createCCIArtifact(
     id: `cci-q4-${Date.now()}`,
     version: 'Q4-2025',
     metadata: fullMetadata,
-    html: generateCCIArtifactHTML(fullMetadata, dynamicData),
+    html: generateLegacyCCIArtifactHTML(fullMetadata, dynamicData),
   };
 }
 
@@ -736,14 +1064,10 @@ export function createCCIArtifact(
  * Uses the exact timestamp/hash from the golden master PDF
  */
 export function getGoldenMasterHTML(): string {
-  console.log('[INDIVIDUAL-ARTIFACT-TRACE] getGoldenMasterHTML() CALLED');
-  console.log('[INDIVIDUAL-ARTIFACT-TRACE] This is the INDIVIDUAL CCI artifact (not Bundle, not Circle)');
-  const html = generateCCIArtifactHTML({
+  const html = generateLegacyCCIArtifactHTML({
     generatedAt: '2026-01-10 14:02:41 UTC',
     integrityHash: 'sha256:8f43c9d11e7a2b8f...a72b5f1d2',
   });
-  console.log('[INDIVIDUAL-ARTIFACT-TRACE] Generated HTML length:', html.length);
-  console.log('[INDIVIDUAL-ARTIFACT-TRACE] HTML contains "BUNDLE":', html.includes('BUNDLE'));
   return html;
 }
 
@@ -981,7 +1305,7 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
     <div class="legal-block">
       <div class="legal-title">Confidential &amp; Proprietary Notice</div>
       <div class="legal-body">
-        This Circle Capacity Instrument and all underlying methodologies, algorithms, data structures, and presentation formats constitute proprietary intellectual property of Orbital Health Intelligence, Inc. This is NOT a diagnostic tool. Not a symptom severity scale. For coordination purposes only.
+        This Circle Capacity Instrument and all underlying methodologies, algorithms, data structures, and presentation formats constitute proprietary intellectual property of Orbital Health Intelligence, Inc. This is NOT a diagnostic tool. Not a signal severity scale. For coordination purposes only.
       </div>
       <div class="legal-rights">© 2026 Orbital Health Intelligence, Inc. All Rights Reserved.</div>
     </div>
@@ -1066,8 +1390,8 @@ export function createCCIArtifactJSON(
       confidential: true,
       copyright: '© 2026 Orbital Health Intelligence, Inc. All Rights Reserved.',
       disclaimer:
-        'This artifact is an objective summary of patient-generated capacity signals. ' +
-        'It does NOT constitute a diagnosis. Designed to support clinical documentation.',
+        'This artifact is an objective summary of user-generated capacity signals. ' +
+        'It does NOT constitute a professional evaluation. Designed to support clinical documentation.',
     },
     signature: {
       algorithm: 'sha256',

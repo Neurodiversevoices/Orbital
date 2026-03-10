@@ -89,9 +89,7 @@ export async function computeBaseline(
 
   if (uniqueDays.size < MIN_DAYS_REQUIRED) {
     if (__DEV__) {
-      console.log(
-        `[computeBaseline] Only ${uniqueDays.size} unique days (need ${MIN_DAYS_REQUIRED}). Returning null.`,
-      );
+      // Insufficient data for baseline computation
     }
     return null;
   }
@@ -249,16 +247,7 @@ export async function computeBaseline(
   }
 
   if (__DEV__) {
-    console.log('[computeBaseline] Baseline computed:', {
-      logCount,
-      uniqueDays: uniqueDays.size,
-      baselineCapacity,
-      variabilityIndex,
-      sensoryTolerance,
-      cognitiveResilience,
-      recoveryPattern,
-      confidenceScore,
-    });
+    // Baseline computed successfully
   }
 
   return baseline;

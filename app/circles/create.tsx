@@ -160,7 +160,7 @@ export default function CirclesCreateInvite() {
               <MonoBox text={`${invite.displayCode}  +  PIN ${invite.pin}`} />
               <View style={{ marginTop: 10 }}>
                 <Muted>
-                  Give this to your peer verbally or via secure message. They will
+                  Give this to your peer verbally or via protected message. They will
                   need both the code AND the PIN.
                 </Muted>
               </View>
@@ -169,7 +169,7 @@ export default function CirclesCreateInvite() {
             <Card>
               <Label>QR Deep-Link</Label>
               <Muted>
-                For QR scanning (more secure). Encode this deep-link in a QR code:
+                For QR scanning (safer method). Encode this deep-link in a QR code:
               </Muted>
               <MonoBox text={invite.qrDeepLink} />
             </Card>
