@@ -198,7 +198,6 @@ let thermEffect: ReturnType<typeof Skia.RuntimeEffect.Make> | null = null;
 try {
   thermEffect = Skia.RuntimeEffect.Make(THERM_SHADER_SOURCE);
 } catch (e) {
-  console.error("[ShaderTherm] Shader compilation failed:", e);
 }
 
 const ShaderTherm = memo(function ShaderTherm({

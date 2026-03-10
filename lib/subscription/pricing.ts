@@ -126,6 +126,8 @@ export const ENTITLEMENTS = {
 
   // CCI Entitlements
   CCI_PURCHASED: 'cci_purchased', // User has purchased CCI issuance
+  CCI_CIRCLE_PURCHASED: 'cci_circle_purchased', // Circle CCI purchased
+  CCI_BUNDLE_PURCHASED: 'cci_bundle_purchased', // Bundle CCI purchased
 
   // Legacy entitlements (keep for migration / PRICING_TIERS compatibility)
   INDIVIDUAL: 'individual_access',

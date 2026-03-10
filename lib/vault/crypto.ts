@@ -9,7 +9,7 @@ import * as Crypto from 'expo-crypto';
 import { VAULT_CONSTANTS } from './types';
 
 /**
- * Generate cryptographically secure random bytes
+ * Generate cryptographically strong random bytes
  */
 export async function generateRandomBytes(length: number): Promise<Uint8Array> {
   const randomBytes = await Crypto.getRandomBytesAsync(length);

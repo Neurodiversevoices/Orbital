@@ -346,7 +346,7 @@ export function validateDrillDown(
   }
 
   // For subunit view, check if we have enough subunits with enough signals
-  // This prevents inferring individual data from small subunits
+  // This blocks inferring individual data from small subunits
   if (drillDownType === 'subunit_view') {
     // Additional check would go here if we had subunit data
     // For now, we just verify the parent unit

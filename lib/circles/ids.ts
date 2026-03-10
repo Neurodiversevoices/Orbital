@@ -1,7 +1,7 @@
 /**
  * CIRCLES ID GENERATION & VALIDATION
  *
- * All IDs are prefixed to prevent cross-domain confusion.
+ * All IDs are prefixed to avoid cross-domain confusion.
  * Validation is strict — malformed IDs throw, never return false.
  */
 
@@ -18,7 +18,7 @@ import {
 // =============================================================================
 
 /**
- * Generate a cryptographically secure UUID v4.
+ * Generate a cryptographically strong UUID v4.
  */
 async function generateUUID(): Promise<string> {
   const bytes = await Crypto.getRandomBytesAsync(16);

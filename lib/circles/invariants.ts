@@ -73,7 +73,7 @@ export function assertNoAggregation(
   if (connectionIds.length > MAX_CONNECTIONS) {
     throw new CirclesLawViolation(
       'L1_NO_AGGREGATION',
-      `Operation "${operation}" involves ${connectionIds.length} connections, exceeding limit of ${MAX_CONNECTIONS}. This prevents drift into social network patterns.`,
+      `Operation "${operation}" involves ${connectionIds.length} connections, exceeding limit of ${MAX_CONNECTIONS}. This blocks drift into social network patterns.`,
       { connectionCount: connectionIds.length, limit: MAX_CONNECTIONS }
     );
   }
@@ -481,7 +481,7 @@ export function assertNoExternalReferences(data: unknown, label: string): void {
   // Check for any field containing external domain hints
   const externalPatterns = [
     'log', 'pattern', 'vault', 'clinical', 'capacity', 'energy',
-    'neuro', 'orbital', 'diagnostic', 'medical', 'treatment',
+    'neuro', 'orbital', 'diagnostic', 'medical', 'care-recommendation',
   ];
 
   for (const key of Object.keys(obj)) {

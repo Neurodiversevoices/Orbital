@@ -292,7 +292,7 @@ export const QCR_DEMO_SNAPSHOT: QuarterlyCapacityReport = {
     utilityStatement:
       'This report is provided as a supplementary resource to support clinical dialogue. ' +
       'It reflects client-reported observations and computed pattern metrics. ' +
-      'This document does not constitute a diagnosis, treatment recommendation, or clinical assessment.',
+      'This document does not constitute a professional evaluation, care recommendation, or clinical assessment.',
     liabilityDisclaimer:
       'IMPORTANT: This report is generated from self-reported data and algorithmic analysis. ' +
       'It is not a substitute for professional clinical judgment. Healthcare providers should ' +

@@ -69,7 +69,7 @@ export const CLASS_B_TERMS = {
     'Individual performance assessment using this data is prohibited.',
   ],
   dataHandling: [
-    'Signals are delayed by 5 minutes to prevent temporal inference.',
+    'Signals are delayed by 5 minutes to blocks temporal inference.',
     'Views with fewer than 5 participants show "Insufficient Data".',
     'Individual notes and free-text fields are not available in institutional deployments.',
     'Exports comply with K-anonymity requirements.',

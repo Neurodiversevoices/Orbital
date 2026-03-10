@@ -273,7 +273,7 @@ export function buildCCIV1HTML(data: CCIV1Data): string {
       <!-- Section 6: Governance Footer -->
       <div class="footer">
         <div class="footer-text">
-          This instrument is generated from self-reported capacity check-ins and does not constitute a clinical diagnosis, treatment recommendation, or medical device output. Excluded from Clinical Decision Support requirements under 21st Century Cures Act §3060(a). Provider interpretation required.
+          This instrument is generated from self-reported capacity check-ins and does not constitute a clinical evaluation, care recommendation, or regulated health instrument output. Excluded from Clinical Decision Support requirements under 21st Century Cures Act §3060(a). Provider interpretation required.
         </div>
         <div style="margin-top:6px;display:flex;justify-content:space-between;" class="footer-text">
           <span>ORBITAL HEALTH • ${data.instrumentVersion}</span>

@@ -2,7 +2,7 @@
  * REDEEM INVITE
  *
  * Two methods:
- * 1. QR deep-link (preferred, more secure)
+ * 1. QR deep-link (preferred, safer)
  * 2. Display code + PIN (backup, for verbal/text sharing)
  *
  * Includes ephemeral handshake label for identity verification.

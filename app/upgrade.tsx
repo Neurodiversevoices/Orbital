@@ -236,7 +236,7 @@ const CCI_CONFIRMATION_TEXT =
 
 // Issuance confirmation checkboxes (PATCH D)
 const CCI_PERMANENT_RECORD_TEXT = 'I understand this creates a permanent record.';
-const CCI_NOT_DIAGNOSIS_TEXT = 'I understand this is documentation, not diagnosis.';
+const CCI_NOT_DIAGNOSIS_TEXT = 'I understand this is documentation, not a professional evaluation.';
 
 interface CCICardProps {
   isPro: boolean;
@@ -413,13 +413,11 @@ export default function UpgradeScreen() {
       return;
     }
 
-    console.log('[PURCHASE] Starting purchase:', productId, productName);
     setIsPurchasing(true);
 
     await handleMockPurchase(
       productId,
       () => {
-        console.log('[PURCHASE] Success:', productName);
         if (Platform.OS === 'web') {
           window.alert(`Success! ${productName} has been activated.`);
           loadEntitlements();
@@ -433,7 +431,6 @@ export default function UpgradeScreen() {
         setIsPurchasing(false);
       },
       (error) => {
-        console.log('[PURCHASE] Failed:', error);
         if (Platform.OS === 'web') {
           window.alert(`Purchase Failed: ${error}`);
         } else {

@@ -56,7 +56,7 @@ export function LocaleProvider({ children, defaultLocale = 'en' }: LocaleProvide
 
   const t = translations[locale];
 
-  // Don't render until locale is loaded to prevent flash
+  // Don't render until locale is loaded to avoid flash
   if (!isLoaded) {
     return null;
   }

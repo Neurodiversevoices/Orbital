@@ -35,7 +35,7 @@ interface ParticipantMapping {
   cohortParticipantId: string;
   createdAt: number;
   // Note: This mapping is stored separately and access-controlled
-  // In production, this would be in a separate secure database
+  // In production, this would be in a separate protected database
 }
 
 async function getParticipantMappings(): Promise<ParticipantMapping[]> {
@@ -484,7 +484,7 @@ export async function exportCohortManifest(cohortId: string): Promise<{
 
   const statistics = await getCohortStatistics(cohortId);
 
-  // Remove createdBy to prevent identification
+  // Remove createdBy to blocks identification
   const { createdBy, ...cohortWithoutCreator } = cohort;
 
   return {

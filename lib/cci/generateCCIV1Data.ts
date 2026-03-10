@@ -8,10 +8,8 @@
  * Pure compute helpers are exported individually for unit testing.
  * The main function (generateCCIV1Data) is the only async entry point.
  *
- * FORBIDDEN TERMS: This file must never contain user-facing strings with:
- * score, variance, deviation, contributors, trajectory, diagnosis, treatment,
- * therapy, medical device, HIPAA, CPT, FDA, prescribe, therapeutic, cure,
- * prevent, symptom, disorder.
+ * FORBIDDEN TERMS: This file must never contain user-facing strings with
+ * any of the words listed in lib/cci/dynamic/governance.ts BLOCKED_TERMS.
  */
 
 import { getSupabase, isSupabaseConfigured } from '../supabase/client';

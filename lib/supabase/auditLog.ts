@@ -36,7 +36,6 @@ async function insertAuditEvent(params: {
   });
 
   if (error && __DEV__) {
-    console.error('[auditLog] Insert failed:', error);
   }
 }
 

@@ -117,8 +117,8 @@ export function VegaSentinelChart({
         actions: false,
         renderer: 'svg',
         tooltip: false,
-      }).catch(console.error);
-    });
+      });
+    }).catch(() => {});
   }, [spec]);
 
   const stateText = getSystemStateText(systemState);

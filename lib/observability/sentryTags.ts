@@ -243,11 +243,9 @@ export async function withPaymentTracking<T>(
  */
 export function __DEV_testSentryAlerts(): void {
   if (!__DEV__) {
-    console.warn('[Sentry Test] This function should only be called in development');
     return;
   }
 
-  console.log('[Sentry Test] Sending test events...');
 
   // Test 1: Generic error (should appear in Issues, but NOT trigger payment alert)
   Sentry.captureException(new Error('TEST: Generic error - verify this appears in Sentry Issues'));
@@ -270,8 +268,4 @@ export function __DEV_testSentryAlerts(): void {
   // Test 3: Warning (should be DROPPED by beforeSend)
   Sentry.captureMessage('TEST: Warning level - should NOT appear in Sentry', 'warning');
 
-  console.log('[Sentry Test] Test events sent. Check Sentry dashboard:');
-  console.log('  - Generic error: Should appear in Issues');
-  console.log('  - Payment error: Should appear AND trigger payment alert');
-  console.log('  - Warning: Should NOT appear (filtered by beforeSend)');
 }

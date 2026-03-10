@@ -221,7 +221,6 @@ export async function purgeUnderageLocalState(): Promise<string[]> {
     if (orbitalKeys.length > 0) {
       await AsyncStorage.multiRemove(orbitalKeys);
       if (__DEV__) {
-        console.log('[AgeVerification] Purged underage local state:', orbitalKeys);
       }
     }
 
@@ -229,7 +228,6 @@ export async function purgeUnderageLocalState(): Promise<string[]> {
   } catch (error) {
     // Fail silently but log in dev
     if (__DEV__) {
-      console.error('[AgeVerification] Failed to purge underage state:', error);
     }
     return [];
   }

@@ -440,30 +440,23 @@ export function circlesRunSelfTest(): SelfTestReport {
  * Throws if any tests fail.
  */
 export function runCirclesSelfTestWithLogging(): void {
-  console.log('[Circles SelfTest] Running Six Laws verification...\n');
 
   const report = circlesRunSelfTest();
 
   for (const result of report.results) {
     const status = result.passed ? '\u2713' : '\u2717';
-    console.log(`  ${status} ${result.name}`);
     if (!result.passed && result.error) {
-      console.log(`      Error: ${result.error}`);
     }
   }
 
-  console.log(`\n[Circles SelfTest] Results: ${report.passedTests}/${report.totalTests} passed (${report.duration}ms)`);
 
   if (!report.passed) {
     const failedTests = report.results.filter((r) => !r.passed);
-    console.error('\nFailed tests:');
     for (const t of failedTests) {
-      console.error(`  - ${t.name}: ${t.error}`);
     }
     throw new Error(`[Circles SelfTest] ${report.failedTests} tests failed`);
   }
 
-  console.log('[Circles SelfTest] All Six Laws verified \u2713\n');
 }
 
 /**

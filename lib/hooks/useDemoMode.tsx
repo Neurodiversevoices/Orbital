@@ -32,14 +32,13 @@ export const FOUNDER_DEMO_ENABLED = process.env.EXPO_PUBLIC_FOUNDER_DEMO === '1'
 
 /**
  * HARD EXECUTION GUARD — Engine-level protection
- * Call at top of every demo function to prevent execution in production.
+ * Call at top of every demo function to block execution in production.
  * Throws if demo functions are called without FOUNDER_DEMO_ENABLED=true.
  */
 function assertFounderDemo(operation: string): void {
   if (!FOUNDER_DEMO_ENABLED) {
     const error = new Error(`[DemoMode] BLOCKED: ${operation} called without FOUNDER_DEMO_ENABLED`);
     if (__DEV__) {
-      console.error(error.message);
     }
     throw error;
   }
@@ -440,7 +439,6 @@ async function generatePremiumDemoData(duration: DemoDuration = '10y'): Promise<
     const newestLog = logs[0];
     const oldestDaysAgo = Math.round((now - oldestLog.timestamp) / 86400000);
     const newestDaysAgo = Math.round((now - newestLog.timestamp) / 86400000);
-    console.log(`[DemoData] Generated ${logs.length} logs spanning ${oldestDaysAgo}d to ${newestDaysAgo}d ago (totalDays=${totalDays})`);
   }
 
   // Create one fake shared recipient (for demo purposes)
@@ -567,7 +565,6 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
     // HARD GUARD: Block in production
     assertFounderDemo('enableDemoMode');
 
-    console.log('[DemoMode] enableDemoMode called with duration:', duration);
 
     setIsLoading(true);
     try {
@@ -577,17 +574,7 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
       // Generate demo data
       const { logs, recipients, shares, audit } = await generatePremiumDemoData(duration);
 
-      // Log the timestamp range
-      if (logs.length > 0) {
-        const now = Date.now();
-        const oldest = logs[logs.length - 1];
-        const newest = logs[0];
-        console.log('[DemoMode] enableDemoMode generated data range:', {
-          count: logs.length,
-          oldestDaysAgo: Math.round((now - oldest.timestamp) / 86400000),
-          newestDaysAgo: Math.round((now - newest.timestamp) / 86400000),
-        });
-      }
+      // Timestamp range logging removed for production
 
       // Save demo data to main storage keys (so existing hooks work)
       await AsyncStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(logs));
@@ -599,9 +586,7 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
       await AsyncStorage.setItem(STORAGE_KEYS.DEMO_MODE_ENABLED, 'true');
       setIsDemoMode(true);
 
-      console.log('[DemoMode] Enabled with', logs.length, 'demo entries - SAVED');
     } catch (error) {
-      console.error('[DemoMode] Failed to enable:', error);
     }
     setIsLoading(false);
   }, [backupRealData]);
@@ -629,10 +614,8 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
     // HARD GUARD: Block in production
     assertFounderDemo('reseedDemoData');
 
-    console.log('[DemoMode] reseedDemoData called with duration:', duration, 'isDemoMode:', isDemoMode);
 
     if (!isDemoMode) {
-      console.log('[DemoMode] Skipping reseed - not in demo mode');
       return;
     }
 
@@ -640,30 +623,17 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
     try {
       // Generate new demo data with different seed
       const seed = Date.now() % 100000;
-      console.log('[DemoMode] Reseeding with seed:', seed);
       rng.reset(seed);
       const { logs, recipients, shares, audit } = await generatePremiumDemoData(duration);
 
-      // Log the timestamp range of generated data
-      if (logs.length > 0) {
-        const now = Date.now();
-        const oldest = logs[logs.length - 1];
-        const newest = logs[0];
-        console.log('[DemoMode] Generated data range:', {
-          count: logs.length,
-          oldestDaysAgo: Math.round((now - oldest.timestamp) / 86400000),
-          newestDaysAgo: Math.round((now - newest.timestamp) / 86400000),
-        });
-      }
+      // Timestamp range logging removed for production
 
       await AsyncStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(logs));
       await AsyncStorage.setItem(STORAGE_KEYS.RECIPIENTS, JSON.stringify(recipients));
       await AsyncStorage.setItem(STORAGE_KEYS.SHARES, JSON.stringify(shares));
       await AsyncStorage.setItem(STORAGE_KEYS.AUDIT_LOG, JSON.stringify(audit));
 
-      console.log('[DemoMode] Reseeded with', logs.length, 'entries - SAVED TO STORAGE');
     } catch (error) {
-      console.error('[DemoMode] Failed to reseed:', error);
     }
     setIsLoading(false);
   }, [isDemoMode]);

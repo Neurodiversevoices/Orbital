@@ -127,7 +127,6 @@ export default function AuditScreen() {
         title: 'Orbital Audit Log',
       });
     } catch (error) {
-      console.error('Export failed:', error);
     }
   }, [entries]);
 

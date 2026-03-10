@@ -65,14 +65,12 @@ export function CCI90DayChart({
   title,
 }: CCI90DayChartProps) {
   // DEBUG: Verify component is rendering
-  console.log('[CCI90DayChart] Rendering with data:', data?.series?.length, 'series');
 
   // Generate all chart props from the unified spec
   let props;
   try {
     props = generateChartProps(data);
   } catch (err) {
-    console.error('[CCI90DayChart] generateChartProps error:', err);
     return (
       <View style={styles.container}>
         <Text style={{ color: 'red', padding: 20 }}>Chart Error: {String(err)}</Text>
@@ -257,12 +255,7 @@ export function IndividualCCIChart({
   showDisclaimer,
   title,
 }: IndividualCCIChartProps) {
-  // Validate 90 days of data
-  if (values.length !== CCI_DAYS) {
-    console.warn(
-      `IndividualCCIChart expects ${CCI_DAYS} values, got ${values.length}`
-    );
-  }
+  // Validate 90 days of data — silently clamp if mismatched
 
   const data: CCI90DayChartData = {
     series: [
@@ -312,7 +305,6 @@ export function CircleCCIChart({
 }: CircleCCIChartProps) {
   // Validate 5 members
   if (members.length !== 5) {
-    console.warn(`CircleCCIChart expects 5 members, got ${members.length}`);
   }
 
   const data: CCI90DayChartData = {

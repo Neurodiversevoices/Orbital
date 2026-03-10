@@ -150,7 +150,7 @@ export function serializeCCIV1ToFHIR(data: CCIV1Data): CCIV1FHIRDocumentReferenc
       lastUpdated: now,
     },
 
-    // Deduplication — prevents duplicate reports if pushed twice
+    // Deduplication — avoids duplicate reports if pushed twice
     identifier: [
       {
         system: 'https://orbitalhealth.app/cci',

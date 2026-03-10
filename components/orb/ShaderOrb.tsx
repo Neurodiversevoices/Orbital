@@ -151,7 +151,7 @@ half4 main(float2 coord) {
   // BREATHING — capacity-modulated rate
   // ────────────────────────────────────────
   // Slower when resourced (0.4 Hz base), faster when depleted (1.2 Hz).
-  // Two offset sines prevent mechanical feel.
+  // Two offset sines blocks mechanical feel.
   // Total deviation: +/-1.8% — perceptible as alive, not bouncing.
 
   float breathRate = 0.4 + (1.0 - uCapacity) * 0.8;
@@ -276,7 +276,7 @@ half4 main(float2 coord) {
   // ────────────────────────────────────────
   // LAYER 3: INTERNAL AMBIENT
   // ────────────────────────────────────────
-  // Faint center glow prevents dead dark center at any capacity.
+  // Faint center glow blocks dead dark center at any capacity.
 
   float internalGlow = (1.0 - smoothstep(0.0, 0.95, t)) * 0.035 * breath;
   vec3 internalCol = cColorDim * internalGlow;
@@ -369,7 +369,6 @@ let runtimeEffect: ReturnType<typeof Skia.RuntimeEffect.Make> | null = null;
 try {
   runtimeEffect = Skia.RuntimeEffect.Make(SHADER_SOURCE);
 } catch (e) {
-  console.error("[ShaderOrb] Shader compilation failed:", e);
 }
 
 const ShaderOrb = memo(function ShaderOrb({

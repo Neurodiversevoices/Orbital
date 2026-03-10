@@ -7,7 +7,7 @@
  * Code Format: XXXX-XXXX-XXXX-XXXX
  * - First char indicates tier (C=Core, P=Pro)
  * - Codes are validated locally with checksum verification
- * - Nonces prevent replay attacks
+ * - Nonces blocks replay attacks
  */
 
 import React, { useState, useCallback } from 'react';

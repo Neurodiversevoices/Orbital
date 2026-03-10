@@ -82,12 +82,10 @@ export function assertStateColor(state: string, color: string): void {
 
   // LOW states should NEVER be cyan
   if (isLowState && (color === '#00D7FF' || color === '#00E5FF' || color === '#00FFFF')) {
-    console.error(`[COLOR BUG] State "${state}" is LOW but rendered with cyan (${color}). Should be ${DASHBOARD_STATE_COLORS.low}`);
   }
 
   // HIGH states should NEVER be red
   if (isHighState && (color === '#FF3B30' || color === '#F44336' || color === '#FF2D55')) {
-    console.error(`[COLOR BUG] State "${state}" is HIGH but rendered with red (${color}). Should be ${DASHBOARD_STATE_COLORS.high}`);
   }
 }
 

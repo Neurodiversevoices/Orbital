@@ -165,7 +165,6 @@ export default function SchoolZoneScreen() {
         lastSummaryGeneratedAt: Date.now(),
       });
     } catch (error) {
-      console.error('Share failed:', error);
     }
   }, [summaryCard]);
 
