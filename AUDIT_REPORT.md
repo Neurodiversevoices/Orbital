@@ -113,23 +113,50 @@ Every function in this module (`getExperiments`, `createExperiment`, `updateExpe
 
 ---
 
-## MEDIUM — Technical Debt (Fix After Approval)
-
-### M1. Unguarded console.log Statements in Production Code
+### H8. ~100+ Unguarded console.log Statements Ship to Production
 **Domain:** Dead Code & Routes
-**Files:** Multiple
+**Files:** 30+ files across `app/`, `lib/`, `components/`
 
-These files contain `console.log/warn/error` without `__DEV__` guards:
-- `lib/circles/selfTest.ts` — 7 console calls (self-test runner)
-- `lib/attribution/appleSearchAds.ts:184` — logs purchase events
-- `lib/hooks/useAppTenure.ts:47` — console.error on load failure
-- `lib/hooks/useDemoMode.tsx` — 12+ console.log calls for demo data generation
+Apple reviewers running with Console.app attached will see extensive debug output. Key offenders:
 
-While not crash risks, Apple reviewers running the app may see debug output in Console.app. The `useDemoMode` calls are particularly verbose.
+**App screens (reviewer-visible):**
+- `app/cci.tsx:82-154` — 6 `[CCI]` debug traces
+- `app/(tabs)/brief.tsx:438` — `[BUNDLE-NAV-TRACE]` logs
+- `app/upgrade.tsx:416-436` — `[PURCHASE]` flow logs
+- `app/settings.tsx:150-156` — button press logs
+- `app/why-orbital.tsx` — 8 unguarded statements
+- `app/auth/callback.tsx` — 5 unguarded logs
+
+**Library code:**
+- `lib/hooks/useDemoMode.tsx` — 12+ verbose demo data logs
+- `lib/cci/artifact.ts:1067` — `[INDIVIDUAL-ARTIFACT-TRACE]` logs
+- `lib/cci/bundleArtifact.ts:508` — `[BUNDLE-ARTIFACT-TRACE]` logs
+- `lib/payments/mockCheckout.ts` — ~15 statements
+- `lib/access/forcedRoleView.ts` — ~13 statements
+- `lib/circles/selfTest.ts` — 8 statements
+- `components/orb/ShaderOrb.tsx:372`, `ShaderTherm.tsx:201` — shader compile errors
 
 ---
 
-### M2. Forbidden Medical Terms in User-Visible Text
+### H9. Circle "Leave" Button Is a No-Op
+**Domain:** Dead Code & Routes
+**File:** `app/circle-settings.tsx:57,71`
+
+The Leave Circle button exists in the UI but the handler contains `// TODO: Implement actual leave circle logic`. A reviewer tapping this will see nothing happen.
+
+---
+
+### H10. CCI Purchase State Hardcoded to false
+**Domain:** Dead Code & Routes
+**File:** `lib/cci/pricing.ts:293,311`
+
+`purchased: false` is hardcoded for both Circle CCI and Bundle CCI purchase states (`// TODO: Track Circle/Bundle CCI purchase state`). CCI purchase state is never actually tracked — always returns unpurchased regardless of actual payment.
+
+---
+
+## MEDIUM — Technical Debt (Fix After Approval)
+
+### M1. Forbidden Medical Terms in User-Visible Text (Defensive)
 **Domain:** Apple Compliance
 **Files:** Multiple legal/disclaimer screens
 
@@ -148,7 +175,6 @@ All uses are **defensive** ("Orbital is NOT a medical device", "does not constit
 **Domain:** Dead Code & Routes
 **Files:**
 
-- `lib/cci/pricing.ts:293,311` — `purchased: false, // TODO: Track Circle/Bundle CCI purchase state`
 - `lib/entitlements/index.ts:166-169,280` — `// TODO: Track actual family members/circle members/verify circle membership`
 - `lib/patternHistory.ts:14` — `// TODO: COMPLIANCE NOTE` about GDPR data retention
 
@@ -204,6 +230,30 @@ No client-side lockout, delay, or attempt counter on sign-in failures. While Sup
 
 ---
 
+### M10. 11 Dead Orb/Component Files Ship in Bundle
+**Domain:** Dead Code & Routes
+**Files:** `components/orb/ClinicalOrb.tsx`, `ClinicalOrbV10.tsx`, `WaveOrb.tsx`, `SkiaOrb.tsx`, `ClinicalGauge.tsx`, `ClinicalGaugeV10.tsx`, `layers/DeepFieldLayer.tsx`, `layers/HousingLayer.tsx`, `layers/GlassLensLayer.tsx`, `layers/SurfaceLayer.tsx`, `SentinelChart_original.tsx`
+
+None of these are imported by any route or active component. Only `ShaderOrb` and `ShaderTherm` are used. Dead code increases bundle size.
+
+---
+
+### M11. 7+ Orphan Routes — Registered But Unreachable
+**Domain:** Dead Code & Routes
+**Files:** `app/export.tsx`, `app/sharing.tsx`, `app/profile.tsx`, `app/enterprise-dashboard.tsx`, `app/health.tsx`, `app/cci-report.tsx`, `app/redeem.tsx`
+
+These routes exist and some are registered in `_layout.tsx`, but no `router.push()` or `href` navigates to them from anywhere in the app. Also, all 5 QSB sub-routes (`qsb/capacity-index.tsx`, etc.) exist but nothing navigates into `/qsb/*`.
+
+---
+
+### M12. 9 Unused Component Exports in Barrel
+**Domain:** Dead Code & Routes
+**File:** `components/index.ts` and standalone files
+
+Exported but never imported by any `app/` route: `CCIClinicalArtifact`, `EmptyState`, `TagSelector`, `NoteInput`, `ModeInsightsPanel`, `StateDots`, `CCI90DayChart`, `PoisonPillConsentGate`, `CapacityIntelligenceInterstitial`.
+
+---
+
 ## PASS — No Issues Found
 
 | Domain | Check | Status |
@@ -228,15 +278,18 @@ No client-side lockout, delay, or attempt counter on sign-in failures. While Sup
 | Severity | Count | IDs |
 |----------|-------|-----|
 | CRITICAL | 3 | C1, C2, C3 |
-| HIGH | 7 | H1, H2, H3, H4, H5, H6, H7 |
-| MEDIUM | 9 | M1–M9 |
+| HIGH | 10 | H1–H10 |
+| MEDIUM | 12 | M1–M12 |
 
 ### Recommended Fix Order Before Resubmission
 1. **C1 + C3**: Implement full account deletion (Edge Function + expanded RPC)
 2. **C2**: Merge `claude/fix-apple-review-build-59-6Lzpd` for nonce fix
 3. **H1**: Add privacy policy link to auth screen
 4. **H2 + H3**: Clear AsyncStorage on signOut and deleteAccount
-5. **H6**: Add `.catch()` to LocaleProvider AsyncStorage call (white-screen risk)
-6. **H5**: Wrap `lib/experiments/storage.ts` in try/catch
-7. **H7**: Add try/catch to safeMode recovery functions
-8. **H4**: Fix ClinicalOrbV10 derived value subscription (if this orb variant ships)
+5. **H9**: Fix or remove circle leave button (reviewer will find it)
+6. **H10**: Wire up CCI purchase state tracking (or hide the UI)
+7. **H8**: Guard console statements with `__DEV__` (100+ in production)
+8. **H6**: Add `.catch()` to LocaleProvider AsyncStorage call (white-screen risk)
+9. **H5**: Wrap `lib/experiments/storage.ts` in try/catch
+10. **H7**: Add try/catch to safeMode recovery functions
+11. **H4**: Fix ClinicalOrbV10 derived value subscription (if this orb variant ships)
