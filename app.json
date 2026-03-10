@@ -18,7 +18,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.erparris.orbital",
+<<<<<<< HEAD
       "buildNumber": "58",
+=======
+      "buildNumber": "59",
+>>>>>>> 79d066c (fix(apple-review): demo account upsert + Apple Sign-In nonce/OIDC fix (build 59))
       "appleTeamId": "2KM3QL4UMV",
       "icon": "./assets/icon.png",
       "infoPlist": {
