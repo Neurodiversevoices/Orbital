@@ -42,6 +42,7 @@
       }
     },
     "plugins": [
+      "./plugins/withAppIcon",
       "expo-router",
       "expo-apple-authentication",
       [
