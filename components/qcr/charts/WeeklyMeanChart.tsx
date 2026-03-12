@@ -38,16 +38,6 @@ export function WeeklyMeanChart({
 }: WeeklyMeanChartProps) {
   const dims: ChartDimensions = { ...DEFAULT_CHART_DIMENSIONS, ...customDimensions };
 
-  // DOCTRINE: State-First Rendering - show skeleton until data resolved
-  if (isLoading) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>{title}</Text>
-        <ChartSkeleton dimensions={dims} variant="bar" />
-      </View>
-    );
-  }
-
   const { width, height, paddingLeft, paddingRight, paddingTop, paddingBottom } = dims;
 
   const chartWidth = width - paddingLeft - paddingRight;
@@ -119,6 +109,16 @@ export function WeeklyMeanChart({
       x: getXPosition(i),
     }));
   }, [sortedData, chartWidth]);
+
+  // DOCTRINE: State-First Rendering - show skeleton until data resolved
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>{title}</Text>
+        <ChartSkeleton dimensions={dims} variant="bar" />
+      </View>
+    );
+  }
 
   if (sortedData.length === 0) {
     return (

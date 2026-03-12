@@ -221,26 +221,12 @@ export default function OperatorAdminScreen() {
   const [timeWindow, setTimeWindow] = useState<TimeWindow>('30d');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Founder-only guard
-  if (!FOUNDER_DEMO_ENABLED) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.blockedContainer}>
-          <AlertTriangle size={48} color="#F44336" />
-          <Text style={styles.blockedTitle}>Access Denied</Text>
-          <Text style={styles.blockedText}>
-            This screen is only available in founder mode.
-          </Text>
-          <Pressable style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backButtonText}>Go Back</Text>
-          </Pressable>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   // Simulate loading
   useEffect(() => {
+    if (!FOUNDER_DEMO_ENABLED) {
+      return;
+    }
+
     const timer = setTimeout(() => setIsLoading(false), 800);
     return () => clearTimeout(timer);
   }, [timeWindow]);
@@ -260,6 +246,24 @@ export default function OperatorAdminScreen() {
     };
     return { totalParticipants, stateBreakdown };
   }, [cohortData]);
+
+  // Founder-only guard
+  if (!FOUNDER_DEMO_ENABLED) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.blockedContainer}>
+          <AlertTriangle size={48} color="#F44336" />
+          <Text style={styles.blockedTitle}>Access Denied</Text>
+          <Text style={styles.blockedText}>
+            This screen is only available in founder mode.
+          </Text>
+          <Pressable style={styles.backButton} onPress={() => router.back()}>
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const handleTimeWindowChange = (window: TimeWindow) => {
     setIsLoading(true);
