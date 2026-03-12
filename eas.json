@@ -56,11 +56,9 @@
   "submit": {
     "production": {
       "ios": {
-        "ascAppId": "6757295146",
-        "ascApiKeyId": "W566R39FPF",
+        "ascApiKeyId": "K5FGNKXMAZ",
         "ascApiKeyIssuerId": "a6c8bd6a-8f60-4aed-a0a6-d129cb2aaf7a",
-        "ascApiKeyPath": "./keys/AuthKey_W566R39FPF.p8",
-        "appleTeamId": "2KM3QL4UMV"
+        "ascApiKeyPath": "./keys/AuthKey_K5FGNKXMAZ.p8"
       },
       "android": {
         "serviceAccountKeyPath": "./keys/google-play-service-account.json",
