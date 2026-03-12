@@ -3,7 +3,7 @@
  *
  * Client-side PDF generation for Quarterly Capacity Report.
  * Uses expo-print for HTML-to-PDF conversion.
- * Institutional artifact — suitable for EHR attachment, procurement workflows.
+ * Institutional artifact — suitable for EHR attachment, purchasing workflows.
  *
  * Pricing: $149/quarter (institutional tier)
  */

@@ -56,7 +56,7 @@ export const DEFAULT_PROTOCOL_TEMPLATES: Omit<ProtocolTemplate, 'id' | 'createdA
     type: 'rwe_study',
     title: 'Real-World Capacity Response Study',
     version: '1.0.0',
-    description: 'Study of capacity trajectories around self-reported life interventions (medication changes, therapy, lifestyle modifications).',
+    description: 'Study of capacity trajectories around self-reported life interventions (medication changes, professional support, lifestyle modifications).',
     primaryEndpoints: [
       'Pre/post capacity trajectory comparison',
       'Time to capacity stabilization after intervention',
@@ -79,9 +79,9 @@ export const DEFAULT_PROTOCOL_TEMPLATES: Omit<ProtocolTemplate, 'id' | 'createdA
       'Pre/post trajectory windows',
     ],
     irbLanguage: {
-      studyPurpose: 'This study examines how self-reported capacity patterns change around major life events or interventions that you have chosen to record. No claims about treatment effectiveness will be made.',
+      studyPurpose: 'This study examines how self-reported capacity patterns change around major life events or interventions that you have chosen to record. No claims about intervention effectiveness will be made.',
       participantRights: 'Your participation is entirely voluntary. You control which intervention markers are shared with research. You may mark any marker as private to exclude it from research.',
-      dataHandling: 'Intervention categories (e.g., "started therapy") are included, but specific details (e.g., therapist name, medication name) are never shared. All data is de-identified.',
+      dataHandling: 'Intervention categories (e.g., "started professional support") are included, but specific details (e.g., provider name, medication name) are never shared. All data is de-identified.',
       risksBenefits: 'Risks: Minimal. Reflecting on interventions may cause mild emotional response. Benefits: Contributing to understanding of how people experience changes around life events.',
       withdrawalProcess: 'Withdraw through app settings at any time. Mark individual markers as private to exclude specific events.',
     },
@@ -114,7 +114,7 @@ export const DEFAULT_PROTOCOL_TEMPLATES: Omit<ProtocolTemplate, 'id' | 'createdA
     ],
     irbLanguage: {
       studyPurpose: 'This registry collects de-identified capacity data to enable future research studies. Your contribution helps build a valuable resource for understanding functional capacity across populations.',
-      participantRights: 'Voluntary participation. Your data contributes to a shared research resource. You may withdraw, preventing future data contribution.',
+      participantRights: 'Voluntary participation. Your data contributes to a shared research resource. You may withdraw, blocking future data contribution.',
       dataHandling: 'Only bucketed demographic data (age range, region) is collected. No precise ages, locations, or identifying information is included.',
       risksBenefits: 'Risks: Minimal. Benefits: Contributing to long-term research infrastructure. No direct benefit to participants.',
       withdrawalProcess: 'Withdraw through app settings. Previously contributed registry data cannot be removed but will not be updated.',

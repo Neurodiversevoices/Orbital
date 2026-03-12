@@ -133,7 +133,7 @@ const ADD_ONS: AddOnDefinition[] = [
     title: 'Compliance / Vendor Risk Pack',
     subtitle: 'Deal-unblocker, margin accelerator',
     demoLabel: 'Governance Sample (DEMO)',
-    sampleAlert: 'Sample audit language and surveillance-prevention summary available (DEMO)',
+    sampleAlert: 'Sample audit language and surveillance-mitigation summary available (DEMO)',
     mustNotShow: ['Actual contracts', 'Editable documents', 'Pricing'],
     cta: 'Contact Orbital \u00B7 Governance Review',
     ctaUrl: CONTACT_URLS.compliance,

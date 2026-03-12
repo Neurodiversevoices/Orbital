@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Pressable, Text, Alert, Modal, ScrollView } from 'react-native';
+import { View, StyleSheet, Pressable, Text, Alert, Modal, ScrollView, Platform, Linking } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   withSpring,
@@ -32,6 +32,7 @@ import {
   TrendingUp,
   Phone,
   Activity,
+  CreditCard,
 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, commonStyles, spacing, borderRadius } from '../theme';
@@ -145,13 +146,10 @@ export default function SettingsScreen() {
   const handleGenerateData = useCallback(async () => {
     // Alert.alert doesn't work on web, just run directly
     setIsProcessing(true);
-    console.log('[Orbital] Generate button pressed');
     try {
       await generateFakeData(0.5);
       await refresh();
-      console.log('[Orbital] Generation complete');
     } catch (error) {
-      console.error('[Orbital] Generation failed:', error);
     } finally {
       setIsProcessing(false);
     }
@@ -483,6 +481,21 @@ export default function SettingsScreen() {
             label="Account"
             sublabel="Display name, sessions, and identity"
             onPress={() => router.push('/account')}
+            disabled={isProcessing}
+          />
+          <SettingsRow
+            icon={CreditCard}
+            label="Manage Subscription"
+            sublabel="View or cancel your subscription"
+            onPress={() => {
+              if (Platform.OS === 'ios') {
+                Linking.openURL('https://apps.apple.com/account/subscriptions');
+              } else if (Platform.OS === 'android') {
+                Linking.openURL('https://play.google.com/store/account/subscriptions');
+              } else {
+                Linking.openURL('https://orbitalhealth.app/account');
+              }
+            }}
             disabled={isProcessing}
           />
           {hasCircle && (

@@ -243,7 +243,7 @@ export const CirclesAPI = {
 
   /**
    * Get a single pending confirmation by invite ID.
-   * SECURITY: Fetches label from invite record, NOT URL params (prevents URL leak).
+   * SECURITY: Fetches label from invite record, NOT URL params (blocks URL leak).
    */
   async getPendingConfirmation(inviteId: string): Promise<PendingConfirmation | null> {
     const invites = await getInvitesAwaitingConfirmation();

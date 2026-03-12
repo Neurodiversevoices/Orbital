@@ -196,7 +196,7 @@ function AgeGateForm({ onVerified, onBlocked }: AgeGateFormProps) {
 
             {/* Privacy Note */}
             <Text style={styles.privacyNote}>
-              Your year of birth is stored securely and used only for age verification.
+              Your year of birth is stored safely and used only for age verification.
               We do not collect your full date of birth.
             </Text>
           </View>

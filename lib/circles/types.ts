@@ -206,7 +206,7 @@ export const VALID_CONNECTION_STATUSES: readonly ConnectionStatus[] = [
  * - Requires TWO-STEP HANDSHAKE (invite + accept)
  * - Either party can revoke INSTANTLY
  * - Revocation invalidates sharing in BOTH directions
- * - Blocked status prevents future invites
+ * - Blocked status blocks future invites
  */
 export interface CircleConnection {
   /** Unique connection ID (prefixed with conn_) */

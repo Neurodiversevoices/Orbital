@@ -394,7 +394,7 @@ export const DEFAULT_CONTRACT_TEMPLATES: Omit<ContractTemplate, 'id' | 'createdA
   {
     type: 'baa',
     version: '1.0.0',
-    title: 'Business Associate Agreement (HIPAA)',
+    title: 'Business Associate Agreement (Healthcare Data Privacy)',
     isActive: true,
     locale: 'en',
   },

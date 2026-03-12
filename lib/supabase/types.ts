@@ -23,6 +23,9 @@ export interface Database {
           deleted_at: string | null;
           local_id: string | null;
           synced_at: string;
+          capacity_value: number | null;
+          driver_data: Record<string, number> | null;
+          confidence_flags: Record<string, unknown>;
         };
         Insert: {
           id?: string;
@@ -36,6 +39,9 @@ export interface Database {
           deleted_at?: string | null;
           local_id?: string | null;
           synced_at?: string;
+          capacity_value?: number | null;
+          driver_data?: Record<string, number> | null;
+          confidence_flags?: Record<string, unknown>;
         };
         Update: {
           id?: string;
@@ -49,6 +55,9 @@ export interface Database {
           deleted_at?: string | null;
           local_id?: string | null;
           synced_at?: string;
+          capacity_value?: number | null;
+          driver_data?: Record<string, number> | null;
+          confidence_flags?: Record<string, unknown>;
         };
         Relationships: [];
       };
@@ -240,7 +249,11 @@ export interface Database {
           entitlement_id: string;
           source: string;
           purchase_id: string | null;
+          granted_at: string;
+          expires_at: string | null;
+          metadata: Record<string, unknown> | null;
           created_at: string;
+          updated_at: string;
         };
         Insert: {
           id?: string;
@@ -248,7 +261,11 @@ export interface Database {
           entitlement_id: string;
           source?: string;
           purchase_id?: string | null;
+          granted_at?: string;
+          expires_at?: string | null;
+          metadata?: Record<string, unknown> | null;
           created_at?: string;
+          updated_at?: string;
         };
         Update: {
           id?: string;
@@ -256,7 +273,11 @@ export interface Database {
           entitlement_id?: string;
           source?: string;
           purchase_id?: string | null;
+          granted_at?: string;
+          expires_at?: string | null;
+          metadata?: Record<string, unknown> | null;
           created_at?: string;
+          updated_at?: string;
         };
         Relationships: [];
       };
@@ -470,6 +491,96 @@ export interface Database {
         };
         Relationships: [];
       };
+      capacity_baselines: {
+        Row: {
+          id: string;
+          user_id: string;
+          computed_at: string;
+          data_window_start: string;
+          data_window_end: string;
+          log_count: number;
+          baseline_capacity: number | null;
+          variability_index: number | null;
+          sensory_tolerance: number | null;
+          cognitive_resilience: number | null;
+          recovery_pattern: Record<string, unknown>;
+          dominant_drivers: Record<string, unknown>;
+          confidence_score: number | null;
+          version: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          computed_at?: string;
+          data_window_start: string;
+          data_window_end: string;
+          log_count: number;
+          baseline_capacity?: number | null;
+          variability_index?: number | null;
+          sensory_tolerance?: number | null;
+          cognitive_resilience?: number | null;
+          recovery_pattern?: Record<string, unknown>;
+          dominant_drivers?: Record<string, unknown>;
+          confidence_score?: number | null;
+          version?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          computed_at?: string;
+          data_window_start?: string;
+          data_window_end?: string;
+          log_count?: number;
+          baseline_capacity?: number | null;
+          variability_index?: number | null;
+          sensory_tolerance?: number | null;
+          cognitive_resilience?: number | null;
+          recovery_pattern?: Record<string, unknown>;
+          dominant_drivers?: Record<string, unknown>;
+          confidence_score?: number | null;
+          version?: string;
+        };
+        Relationships: [];
+      };
+      proof_events: {
+        Row: {
+          id: string;
+          user_id: string;
+          title: string;
+          event_type: string;
+          event_date: string;
+          tracking_start: string;
+          tracking_end: string | null;
+          status: string;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          title: string;
+          event_type: string;
+          event_date: string;
+          tracking_start?: string;
+          tracking_end?: string | null;
+          status?: string;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          title?: string;
+          event_type?: string;
+          event_date?: string;
+          tracking_start?: string;
+          tracking_end?: string | null;
+          status?: string;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -517,6 +628,8 @@ export type OrgMembership = Database['public']['Tables']['org_memberships']['Row
 export type OrgAggregateSnapshot = Database['public']['Tables']['org_aggregate_snapshots']['Row'];
 export type AuditEvent = Database['public']['Tables']['audit_events']['Row'];
 export type UserPreferences = Database['public']['Tables']['user_preferences']['Row'];
+export type ProofEvent = Database['public']['Tables']['proof_events']['Row'];
+export type CapacityBaseline = Database['public']['Tables']['capacity_baselines']['Row'];
 
 // Sync types
 export interface SyncStatus {
@@ -535,4 +648,6 @@ export interface LocalCapacityLog {
   isDemo: boolean;
   syncedAt: Date | null;
   cloudId: string | null;
+  capacity_value?: number | null;
+  driver_data?: Record<string, number> | null;
 }

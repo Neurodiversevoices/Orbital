@@ -37,6 +37,8 @@ export interface CloudLogUpsert {
   drivers: string[];
   note: string | null;
   source_device_id: string | null;
+  capacity_value?: number | null;
+  driver_data?: Record<string, number> | null;
 }
 
 // =============================================================================

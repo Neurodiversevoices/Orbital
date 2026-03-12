@@ -1,7 +1,7 @@
 /**
  * SECURITY CONTROLS
  *
- * Procurement-safe explanation of Circles security implementation.
+ * Purchasing-safe explanation of Circles safety implementation.
  * Readable by non-technical stakeholders without exposing internal codes.
  *
  * This is a static documentation page with no network calls.
@@ -44,7 +44,7 @@ export default function SecurityControlsScreen() {
             obligations, or retained individual records.
           </Text>
           <Text style={styles.overviewEmphasis}>
-            Circles is architected to prevent the creation of institutional
+            Circles is architected to block the creation of institutional
             knowledge of individual distress.
           </Text>
         </View>
@@ -74,11 +74,11 @@ export default function SecurityControlsScreen() {
           </Text>
           <View style={styles.bullets}>
             <Text style={styles.bullet}>Invites are immediately locked after successful use</Text>
-            <Text style={styles.bullet}>Reuse, replay, or race-condition abuse is structurally prevented</Text>
+            <Text style={styles.bullet}>Reuse, replay, or race-condition abuse is structurally blocked</Text>
             <Text style={styles.bullet}>Even valid credentials cannot be reused after redemption</Text>
           </View>
           <Text style={styles.sectionNote}>
-            This prevents unauthorized access even if an invite is shared or intercepted.
+            This blocks unauthorized access even if an invite is shared or intercepted.
           </Text>
         </View>
 
@@ -91,10 +91,10 @@ export default function SecurityControlsScreen() {
           <View style={styles.bullets}>
             <Text style={styles.bullet}>URLs contain no sensitive information</Text>
             <Text style={styles.bullet}>No contextual labels or metadata appear in browser history</Text>
-            <Text style={styles.bullet}>All descriptive data is retrieved securely at runtime</Text>
+            <Text style={styles.bullet}>All descriptive data is retrieved safely at runtime</Text>
           </View>
           <Text style={styles.sectionNote}>
-            This prevents accidental disclosure through screenshots, logs, or link sharing.
+            This blocks accidental disclosure through screenshots, logs, or link sharing.
           </Text>
         </View>
 

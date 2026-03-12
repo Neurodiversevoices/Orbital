@@ -71,7 +71,7 @@ export default function AboutScreen() {
             <Text style={styles.sectionTitle}>What Orbital Is NOT</Text>
           </View>
           <View style={styles.bulletList}>
-            <BulletPoint text="Not a medical device or diagnostic tool" warning />
+            <BulletPoint text="Not a regulated health instrument or evaluative tool" warning />
             <BulletPoint text="Not a substitute for professional medical advice" warning />
             <BulletPoint text="Not a wellness or productivity app" warning />
             <BulletPoint text="Not a streak-based gamification system" warning />
@@ -188,8 +188,8 @@ export default function AboutScreen() {
         <View style={styles.disclaimerCard}>
           <ShieldCheck color="rgba(255,255,255,0.4)" size={24} />
           <Text style={styles.disclaimerText}>
-            Orbital records self-reported functional capacity. It is not a medical
-            device and does not provide diagnosis, treatment recommendations, or
+            Orbital records self-reported functional capacity. It is not a regulated
+            health instrument and does not provide professional evaluation, care recommendations, or
             clinical decision support.
           </Text>
         </View>

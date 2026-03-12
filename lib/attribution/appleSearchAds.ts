@@ -181,6 +181,5 @@ export function trackPurchaseAttribution(event: AttributionEvent): void {
   });
 
   if (__DEV__) {
-    console.log('[Attribution] Purchase event:', event.type, event.productId);
   }
 }

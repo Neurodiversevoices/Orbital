@@ -74,7 +74,7 @@ export const RESEARCH_CONSENT_LANGUAGE: Record<ResearchConsentScope, {
   },
   intervention_markers: {
     title: 'Intervention Marker Sharing',
-    description: 'Allow intervention markers you create (medication changes, therapy starts, etc.) to be included in research analysis.',
+    description: 'Allow intervention markers you create (medication changes, professional support starts, etc.) to be included in research analysis.',
     dataUsed: [
       'Intervention categories (not specific medications)',
       'Timing of interventions',
@@ -104,7 +104,7 @@ export const RESEARCH_CONSENT_LANGUAGE: Record<ResearchConsentScope, {
       'No direct identifiers ever shared',
     ],
     retention: 'As determined by individual study protocols.',
-    withdrawal: 'Withdraw to prevent future data sharing. Cannot recall data already shared.',
+    withdrawal: 'Withdraw to blocks future data sharing. Cannot recall data already shared.',
   },
 };
 

@@ -279,7 +279,6 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
             Pro users pay {formatPrice(CCI_PRICING.sixtyDay)} (save {formatPrice(CCI_PRICING.ninetyDay - CCI_PRICING.sixtyDay)})
           </Text>
         )}
-        {/* CPT 90885 Reimbursement Notice — PATCH 1 */}
         <Text style={styles.cciCptNotice}>
           Supports clinical documentation and record review in a manner compatible with standard clinical review billing codes.
           Reimbursement is not guaranteed and varies by payer.
@@ -414,13 +413,11 @@ export default function UpgradeScreen() {
       return;
     }
 
-    console.log('[PURCHASE] Starting purchase:', productId, productName);
     setIsPurchasing(true);
 
     await handleMockPurchase(
       productId,
       () => {
-        console.log('[PURCHASE] Success:', productName);
         if (Platform.OS === 'web') {
           window.alert(`Success! ${productName} has been activated.`);
           loadEntitlements();
@@ -434,7 +431,6 @@ export default function UpgradeScreen() {
         setIsPurchasing(false);
       },
       (error) => {
-        console.log('[PURCHASE] Failed:', error);
         if (Platform.OS === 'web') {
           window.alert(`Purchase Failed: ${error}`);
         } else {
@@ -827,7 +823,12 @@ export default function UpgradeScreen() {
           )}
 
           <Text style={styles.footerText}>
-            Subscriptions auto-renew unless cancelled. Annual plans are recommended.
+            Payment will be charged to your Apple ID account at confirmation of purchase.
+            Subscriptions automatically renew unless auto-renew is turned off at least
+            24 hours before the end of the current billing period. Your account will be
+            charged for renewal within 24 hours prior to the end of the current period.
+            You can manage and cancel your subscriptions by going to your App Store
+            account settings after purchase.
           </Text>
 
           <View style={styles.footerLinks}>

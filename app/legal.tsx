@@ -107,12 +107,11 @@ export default function LegalScreen() {
           <AlertTriangle color="rgba(255,255,255,0.3)" size={20} />
           <View style={styles.disclaimerContent}>
             <Text style={styles.disclaimerText}>
-              Orbital does not provide medical advice, diagnosis, or treatment.
+              Orbital does not provide clinical advice, professional evaluation, or care recommendations.
             </Text>
             <Text style={styles.disclaimerTextSecondary}>
               The Clinical Capacity Instrument (CCI-Q4) is informational and designed to
-              support documentation and record review; it does not guarantee reimbursement
-              or clinical outcomes.
+              support documentation and provider-compatible record review.
             </Text>
           </View>
         </View>

@@ -308,9 +308,7 @@ export async function activateInstitutionalTier(
   const BLOCKED_TIERS: InstitutionalTier[] = ['pilot', 'enterprise'];
   if (BLOCKED_TIERS.includes(tier)) {
     if (__DEV__) {
-      console.warn(
-        `[GOVERNANCE] Institutional tier "${tier}" cannot be activated in-app. Contact Orbital sales.`
-      );
+      // Blocked tier - governance blocks self-activation
     }
     // Return current config unchanged - do not activate
     return getInstitutionalConfig();

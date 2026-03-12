@@ -104,6 +104,8 @@ async function pushToCloud(logs: LocalCapacityLog[]): Promise<{ synced: string[]
       note: log.note,
       is_demo: log.isDemo,
       local_id: log.localId,
+      capacity_value: log.capacity_value ?? null,
+      driver_data: log.driver_data ?? null,
     }));
 
     const { data, error } = await (supabase as any)

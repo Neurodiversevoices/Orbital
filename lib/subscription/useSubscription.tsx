@@ -21,7 +21,7 @@ import React, {
   useCallback,
   ReactNode,
 } from 'react';
-import { Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import {
   SubscriptionState,
   DEFAULT_SUBSCRIPTION_STATE,
@@ -37,7 +37,11 @@ import {
   capturePaymentError,
   isUserCancellation,
 } from '../observability';
-import { initAttribution, trackPurchaseAttribution } from '../attribution';
+// ATT attribution deferred to post-v1 (no NSUserTrackingUsageDescription in v1 binary)
+// import { initAttribution, trackPurchaseAttribution } from '../attribution';
+import type { AttributionEvent } from '../attribution';
+const initAttribution = async () => {};
+const trackPurchaseAttribution = (_event: AttributionEvent) => {};
 
 // Dynamic import for RevenueCat to handle platform differences
 let PurchasesMobile: typeof import('react-native-purchases').default | null = null;
@@ -344,7 +348,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       return false;
     } catch (error: any) {
       // User cancelled is NOT an error - do not report to Sentry
-      if (isUserCancellation(error)) {
+      if (error?.code === 'userCancelled' || error?.userCancelled === true || isUserCancellation(error)) {
         clearPaymentScope();
         return false;
       }
@@ -360,13 +364,18 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         },
       });
 
-      if (__DEV__) console.error('[Subscription] Purchase failed:', error);
+      console.error('[IAP] Purchase failed:', error);
+      Alert.alert(
+        'Purchase Unavailable',
+        'Something went wrong. Please try again or contact support.',
+        [{ text: 'OK' }]
+      );
       setState(prev => ({
         ...prev,
         error: error.message || 'Purchase failed',
       }));
       clearPaymentScope();
-      return false;
+      throw error;
     }
   }, [state.isAvailable]);
 

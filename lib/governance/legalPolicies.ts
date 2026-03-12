@@ -202,7 +202,7 @@ By accessing or using Orbital, you agree to be bound by these Terms of Service.
 Orbital is a capacity tracking tool that records self-reported functional capacity data. It is designed for personal insight and optional sharing with trusted parties.
 
 3. NON-DIAGNOSTIC NATURE
-Orbital does not provide medical advice, diagnosis, or treatment. The data recorded is self-reported and should not be used as a substitute for professional medical consultation.
+Orbital does not provide clinical advice, professional evaluation, or care recommendations. The data recorded is self-reported and should not be used as a substitute for professional clinical consultation.
 
 4. DATA OWNERSHIP
 You retain ownership of your data. We process data only as necessary to provide the service.
@@ -419,13 +419,13 @@ Contacte support@orbitalhealth.app para consultas de reembolso.`,
 
 IMPORTANT: READ CAREFULLY
 
-Orbital is NOT a medical device, diagnostic tool, or clinical assessment instrument.
+Orbital is NOT a regulated health instrument, evaluative tool, or clinical assessment instrument.
 
 1. SELF-REPORTED DATA
-All data in Orbital is self-reported by the user. It reflects subjective perception of functional capacity, not objective medical measurements.
+All data in Orbital is self-reported by the user. It reflects subjective perception of functional capacity, not objective clinical measurements.
 
 2. NOT MEDICAL ADVICE
-Nothing in Orbital constitutes medical advice, diagnosis, or treatment recommendation. Do not use Orbital data to make medical decisions.
+Nothing in Orbital constitutes clinical advice, professional evaluation, or care recommendations. Do not use Orbital data to make clinical decisions.
 
 3. PROFESSIONAL CONSULTATION
 If you have health concerns, consult a qualified healthcare professional. Orbital data may be shared with healthcare providers as supplementary information only.
@@ -434,7 +434,7 @@ If you have health concerns, consult a qualified healthcare professional. Orbita
 We make no warranties regarding the accuracy, completeness, or clinical validity of capacity assessments derived from Orbital data.
 
 5. LIMITATION
-Orbital is designed for personal insight and optional sharing. It should not replace professional evaluation or treatment.
+Orbital is designed for personal insight and optional sharing. It should not replace professional evaluation or professional guidance.
 
 By using Orbital, you acknowledge understanding and acceptance of this disclaimer.`,
 
@@ -479,7 +479,7 @@ Data processing activities are subject to the data protection laws of the config
 4. REGULATORY COMPLIANCE
 For institutional deployments, additional regulatory frameworks may apply:
 - FERPA for educational institutions
-- HIPAA-adjacent practices for healthcare contexts
+- Healthcare data privacy adjacent practices for healthcare contexts
 - Industry-specific requirements as applicable
 
 5. CROSS-BORDER TRANSFERS
@@ -501,7 +501,7 @@ Las actividades de procesamiento de datos están sujetas a las leyes de protecci
 4. CUMPLIMIENTO REGULATORIO
 Para implementaciones institucionales, pueden aplicar marcos regulatorios adicionales:
 - FERPA para instituciones educativas
-- Prácticas adyacentes a HIPAA para contextos de atención médica
+- Prácticas adyacentes a estándares de privacidad de datos de salud para contextos de atención médica
 - Requisitos específicos de la industria según corresponda
 
 5. TRANSFERENCIAS TRANSFRONTERIZAS

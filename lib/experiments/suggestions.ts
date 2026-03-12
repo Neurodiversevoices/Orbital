@@ -240,7 +240,7 @@ function patternToSuggestion(pattern: PatternDetection): ExperimentSuggestion {
       ],
     },
     consecutive_depletion: {
-      question: "Extended periods of low capacity have occurred. Would you like to explore prevention?",
+      question: "Extended periods of low capacity have occurred. Would you like to explore mitigation?",
       hypotheses: [
         "Add a recovery day after 2 low days",
         "Reduce commitments when capacity drops",

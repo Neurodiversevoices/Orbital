@@ -79,9 +79,6 @@ export default function CCIInstrumentScreen() {
   const rawType = params.type;
   const cciType = normalizeCCIType(rawType);
 
-  console.log('[CCI] Raw params.type:', rawType);
-  console.log('[CCI] Normalized cciType:', cciType);
-
   const [isExporting, setIsExporting] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
@@ -100,10 +97,7 @@ export default function CCIInstrumentScreen() {
   };
 
   const bundleSeatCount = parseBundleSeats(params.seats);
-  console.log('[CCI] Bundle seats from URL:', bundleSeatCount, '(raw:', params.seats, ')');
   // =======================================================
-
-  console.log('[CCI] isCircle:', isCircle, '| isBundle:', isBundle, '| seats:', bundleSeatCount);
 
   // Gate: Web always accessible; native requires founder demo
   // Get the golden master HTML (exact match to PDF)
@@ -113,8 +107,6 @@ export default function CCIInstrumentScreen() {
     : isBundle
     ? getBundleGoldenMasterHTML(bundleSeatCount)
     : getGoldenMasterHTML();
-
-  console.log('[CCI] Rendering artifact:', isCircle ? 'Circle' : isBundle ? 'Bundle' : 'Individual');
 
   // View instrument in new window (web only)
   const handleViewInstrument = useCallback(() => {
@@ -278,7 +270,6 @@ export default function CCIInstrumentScreen() {
             </View>
           )}
 
-          {/* CPT 90885 Reimbursement Notice — PATCH 1 */}
           <View style={styles.cptNotice}>
             <Text style={styles.cptNoticeText}>
               Supports clinical documentation and record review in a manner compatible with standard clinical review billing codes.

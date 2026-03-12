@@ -56,32 +56,25 @@ export default function WhyOrbitalScreen() {
   const dismiss = useCallback(async () => {
     // Prevent double-navigation
     if (hasNavigatedRef.current) {
-      console.log('[WhyOrbital] Already navigating, ignoring');
       return;
     }
     hasNavigatedRef.current = true;
 
-    console.log('[WhyOrbital] Dismissing screen');
 
     // Mark as seen FIRST (persist to storage)
     try {
       await markWhyOrbitalSeen();
-      console.log('[WhyOrbital] Marked as seen');
     } catch (e) {
-      console.error('[WhyOrbital] Failed to mark as seen:', e);
       // Continue anyway - don't trap user
     }
 
     // Navigate to home - use replace since we may have replaced here
     try {
       router.replace('/');
-      console.log('[WhyOrbital] Navigated to home');
     } catch (e) {
-      console.error('[WhyOrbital] Navigation failed, trying back:', e);
       try {
         router.back();
       } catch (e2) {
-        console.error('[WhyOrbital] Back also failed:', e2);
         // Last resort - navigate to root
         router.navigate('/');
       }
@@ -91,7 +84,6 @@ export default function WhyOrbitalScreen() {
   // Auto-dismiss timeout fallback (30 seconds)
   useEffect(() => {
     const timeout = setTimeout(() => {
-      console.log('[WhyOrbital] Auto-dismiss timeout triggered');
       dismiss();
     }, 30000);
 

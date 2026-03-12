@@ -79,7 +79,6 @@ export default function ProfileSetupScreen() {
       // Navigate to home
       router.replace('/(tabs)');
     } catch (error) {
-      console.error('Profile setup error:', error);
     } finally {
       setIsSubmitting(false);
     }

@@ -30,6 +30,8 @@ import {
 import { colors, commonStyles, spacing } from '../theme';
 import { useEnergyLogs } from '../lib/hooks/useEnergyLogs';
 import { useLocale } from '../lib/hooks/useLocale';
+import { useAuth } from '../lib/supabase/auth';
+import { deleteUserData } from '../lib/supabase/sync';
 
 type ExitStep = 'overview' | 'export' | 'confirm' | 'complete';
 
@@ -103,6 +105,7 @@ export default function DataExitScreen() {
   const router = useRouter();
   const { t } = useLocale();
   const { logs, clearAll, refresh } = useEnergyLogs();
+  const { deleteAccount } = useAuth();
   const [step, setStep] = useState<ExitStep>('overview');
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasExported, setHasExported] = useState(false);
@@ -122,7 +125,6 @@ export default function DataExitScreen() {
       });
       setHasExported(true);
     } catch (error) {
-      console.error('Export failed:', error);
     }
     setIsProcessing(false);
   }, [logs]);
@@ -142,7 +144,6 @@ export default function DataExitScreen() {
       });
       setHasExported(true);
     } catch (error) {
-      console.error('Export failed:', error);
     }
     setIsProcessing(false);
   }, [logs]);
@@ -164,8 +165,21 @@ export default function DataExitScreen() {
             // Generate certificate before deletion
             const certificate = generateDeletionCertificate(logCount, deletionDate);
 
-            // Perform deletion
+            // Delete cloud data first, then local
+            try {
+              await deleteUserData();
+            } catch (e) {
+              if (__DEV__) console.error('[DataExit] Cloud deletion failed:', e);
+            }
             await clearAll();
+
+            // Delete the user account (signs out automatically)
+            try {
+              await deleteAccount();
+            } catch (e) {
+              if (__DEV__) console.error('[DataExit] Account deletion failed:', e);
+            }
+
             await refresh();
 
             setDeletionCertificate(certificate);
@@ -175,7 +189,7 @@ export default function DataExitScreen() {
         },
       ]
     );
-  }, [logs.length, clearAll, refresh]);
+  }, [logs.length, clearAll, refresh, deleteAccount]);
 
   const handleShareCertificate = useCallback(async () => {
     if (!deletionCertificate) return;
