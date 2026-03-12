@@ -236,7 +236,7 @@ const CCI_CONFIRMATION_TEXT =
 
 // Issuance confirmation checkboxes (PATCH D)
 const CCI_PERMANENT_RECORD_TEXT = 'I understand this creates a permanent record.';
-const CCI_NOT_DIAGNOSIS_TEXT = 'I understand this is documentation, not diagnosis.';
+const CCI_NOT_DIAGNOSIS_TEXT = 'I understand this is documentation, not a diagnosis.';
 
 interface CCICardProps {
   isPro: boolean;
@@ -281,7 +281,7 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
         )}
         {/* CPT 90885 Reimbursement Notice — PATCH 1 */}
         <Text style={styles.cciCptNotice}>
-          Supports clinical documentation and record review (e.g., CPT 90885 review).
+          Supports clinical documentation and record review in a manner compatible with standard clinical review billing codes.
           Reimbursement is not guaranteed and varies by payer.
         </Text>
       </View>

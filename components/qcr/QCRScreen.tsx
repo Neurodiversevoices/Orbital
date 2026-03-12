@@ -364,8 +364,7 @@ export function QCRScreen({ report, onClose, onExport }: QCRScreenProps) {
             })}
           </Text>
           <Text style={styles.footerDisclaimer}>
-            This report is for informational purposes only and does not constitute
-            medical diagnosis or treatment recommendation.
+            This report is for informational purposes only and is not a clinical assessment or care recommendation.
           </Text>
         </Animated.View>
       </ScrollView>

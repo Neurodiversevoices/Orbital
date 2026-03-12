@@ -281,7 +281,7 @@ export default function CCIInstrumentScreen() {
           {/* CPT 90885 Reimbursement Notice — PATCH 1 */}
           <View style={styles.cptNotice}>
             <Text style={styles.cptNoticeText}>
-              Supports clinical documentation and record review (e.g., CPT 90885 review).
+              Supports clinical documentation and record review in a manner compatible with standard clinical review billing codes.
               Reimbursement is not guaranteed and varies by payer.
             </Text>
           </View>
