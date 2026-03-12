@@ -217,7 +217,7 @@ export function useCapacitySync(): CapacitySyncContext {
   });
 
   const syncInProgress = useRef(false);
-  const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const syncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Load local logs on mount
   useEffect(() => {

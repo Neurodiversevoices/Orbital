@@ -34,7 +34,7 @@ let serviceState: SensoryAlertServiceState = {
   lastAlertTime: 0,
 };
 
-let monitoringInterval: NodeJS.Timeout | null = null;
+let monitoringInterval: ReturnType<typeof setInterval> | null = null;
 
 export async function startSensoryMonitoring(): Promise<boolean> {
   const config = await getSensoryConfig();

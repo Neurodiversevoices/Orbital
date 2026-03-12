@@ -50,7 +50,7 @@ export function Composer({
   const insets = useSafeAreaInsets();
   const inputRef = useRef<TextInput>(null);
   const scale = useSharedValue(1);
-  const autosaveTimer = useRef<NodeJS.Timeout | null>(null);
+  const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Load draft on mount
   useEffect(() => {

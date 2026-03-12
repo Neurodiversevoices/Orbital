@@ -82,28 +82,8 @@ export default function CCIInstrumentScreen() {
   console.log('[CCI] Raw params.type:', rawType);
   console.log('[CCI] Normalized cciType:', cciType);
 
-  // FAIL CLOSED: Invalid type specified — hard error, no fallback
-  if (cciType === 'invalid') {
-    console.error('[CCI] HARD ERROR: Invalid CCI type "' + rawType + '" — refusing to render');
-    return (
-      <SafeAreaView style={commonStyles.screen}>
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorIcon}>⛔</Text>
-          <Text style={styles.errorTitle}>Invalid CCI Type</Text>
-          <Text style={styles.errorMessage}>
-            Requested type "{rawType}" is not recognized.
-          </Text>
-          <Text style={styles.errorHint}>
-            Valid types: circle, bundle, individual
-          </Text>
-          <Pressable onPress={() => router.back()} style={styles.backButton}>
-            <Text style={styles.backButtonText}>Go Back</Text>
-          </Pressable>
-        </View>
-      </SafeAreaView>
-    );
-  }
-  // ===================================================
+  const [isExporting, setIsExporting] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const isCircle = cciType === 'circle';
   const isBundle = cciType === 'bundle';
@@ -125,24 +105,7 @@ export default function CCIInstrumentScreen() {
 
   console.log('[CCI] isCircle:', isCircle, '| isBundle:', isBundle, '| seats:', bundleSeatCount);
 
-  const [isViewing, setIsViewing] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
-
   // Gate: Web always accessible; native requires founder demo
-  if (!CCI_ACCESSIBLE) {
-    return (
-      <SafeAreaView style={commonStyles.screen}>
-        <View style={styles.gatedContainer}>
-          <Text style={styles.gatedText}>CCI Issuance not available</Text>
-          <Pressable onPress={() => router.back()} style={styles.backButton}>
-            <Text style={styles.backButtonText}>Go Back</Text>
-          </Pressable>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   // Get the golden master HTML (exact match to PDF)
   // NO SILENT FALLBACK: cciType is already validated, use explicit branches
   const artifactHTML = isCircle
@@ -162,7 +125,6 @@ export default function CCIInstrumentScreen() {
         newWindow.document.close();
       }
     }
-    setIsViewing(true);
   }, [artifactHTML]);
 
   // Download HTML file (web only)
@@ -198,6 +160,43 @@ export default function CCIInstrumentScreen() {
       }
     }
   }, [artifactHTML]);
+
+  // FAIL CLOSED: Invalid type specified — hard error, no fallback
+  if (cciType === 'invalid') {
+    console.error('[CCI] HARD ERROR: Invalid CCI type "' + rawType + '" — refusing to render');
+    return (
+      <SafeAreaView style={commonStyles.screen}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorIcon}>⛔</Text>
+          <Text style={styles.errorTitle}>Invalid CCI Type</Text>
+          <Text style={styles.errorMessage}>
+            Requested type "{rawType}" is not recognized.
+          </Text>
+          <Text style={styles.errorHint}>
+            Valid types: circle, bundle, individual
+          </Text>
+          <Pressable onPress={() => router.back()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
+  // ===================================================
+
+  // Gate: Web always accessible; native requires founder demo
+  if (!CCI_ACCESSIBLE) {
+    return (
+      <SafeAreaView style={commonStyles.screen}>
+        <View style={styles.gatedContainer}>
+          <Text style={styles.gatedText}>CCI Issuance not available</Text>
+          <Pressable onPress={() => router.back()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={commonStyles.screen} testID="bundle-cci-ready" data-testid="bundle-cci-ready">

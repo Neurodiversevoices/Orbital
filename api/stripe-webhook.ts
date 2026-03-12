@@ -28,7 +28,7 @@ import { createClient } from '@supabase/supabase-js';
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) throw new Error('STRIPE_SECRET_KEY not configured');
-  return new Stripe(key, { apiVersion: '2025-01-27.acacia' });
+  return new Stripe(key, { apiVersion: '2026-01-28.clover' });
 }
 
 function getSupabaseAdmin() {
@@ -271,6 +271,13 @@ async function handleSubscriptionDeleted(
 async function handlePaymentFailed(
   invoice: Stripe.Invoice,
 ): Promise<void> {
+  const invoiceWithSubscriptionDetails = invoice as Stripe.Invoice & {
+    subscription_details?: {
+      metadata?: {
+        supabase_user_id?: string;
+      };
+    };
+  };
   const customerId = typeof invoice.customer === 'string'
     ? invoice.customer
     : invoice.customer?.id;
@@ -280,7 +287,7 @@ async function handlePaymentFailed(
   );
 
   // Record in purchase_history for audit trail
-  const userId = invoice.subscription_details?.metadata?.supabase_user_id
+  const userId = invoiceWithSubscriptionDetails.subscription_details?.metadata?.supabase_user_id
     || invoice.metadata?.supabase_user_id;
 
   if (userId) {

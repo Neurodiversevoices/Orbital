@@ -73,7 +73,7 @@ export function useCloudSync(): UseCloudSyncReturn {
   const auth = useAuth();
   const [status, setStatus] = useState<CloudSyncStatus>(DEFAULT_CLOUD_SYNC_STATUS);
   const syncInProgress = useRef(false);
-  const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const syncIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isConfigured = isSupabaseConfigured();
 

@@ -44,11 +44,6 @@ export default function DevChartExportPage() {
   const [copied, setCopied] = useState(false);
   const [exportMode, setExportMode] = useState<'qcr' | 'app'>('qcr');
 
-  // Gate: Only render for founder demo mode
-  if (!FOUNDER_DEMO_ENABLED) {
-    return null;
-  }
-
   // Get days for selected range
   const selectedDays = TIME_RANGE_OPTIONS.find((r) => r.value === selectedRange)?.days || 90;
 
@@ -94,6 +89,11 @@ export default function DevChartExportPage() {
       URL.revokeObjectURL(url);
     }
   };
+
+  // Gate: Only render for founder demo mode (hooks above still run consistently)
+  if (!FOUNDER_DEMO_ENABLED) {
+    return null;
+  }
 
   return (
     <SafeAreaView style={commonStyles.screen}>

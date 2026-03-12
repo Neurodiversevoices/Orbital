@@ -45,6 +45,7 @@
       }
     },
     "plugins": [
+      "./plugins/fix-bundle-phase",
       "expo-router",
       "expo-apple-authentication",
       [
