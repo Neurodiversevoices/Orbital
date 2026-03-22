@@ -1,3 +1,10 @@
+# STOP — Run preflight first
+Before building, run ALL checks in:
+.cursor/skills/app-store-submission.md
+
+No exceptions. Every rejection so far was
+caught by this checklist too late.
+
 # Release Runbook
 
 ## Prerequisites

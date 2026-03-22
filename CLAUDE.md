@@ -35,3 +35,15 @@ proof_events, capacity_baselines
 - lib/supabase/types.ts — All database types
 - lib/supabase/sync.ts — Sync engine
 - lib/supabase/auth.ts — Auth helpers
+
+## App Store Submission
+- Always read .cursor/skills/app-store-submission.md
+  before any submission-related task
+- Never submit without running all 7 preflight checks
+- PrivacyInfo.xcprivacy must always exist
+- buildNumber must increment on every submission
+- Current bundle ID: com.erparris.orbital
+- Review credentials: review@orbital.health / Review2026!
+- Supabase project: tenfwzjccqfecctxdbpi
+- Last rejection: Guideline 2.1(a) Sign in with Apple
+  Root cause: OIDC issuer mismatch — FIXED in build 73

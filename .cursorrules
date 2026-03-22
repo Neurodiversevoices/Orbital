@@ -1,0 +1,62 @@
+# Orbital Health - Cursor Rules
+
+## PRE-SUBMISSION RULE
+Before ANY task that touches auth, IAP, 
+app.json, or PrivacyInfo — automatically 
+run the checklist in .cursor/skills/app-store-submission.md
+and report results before making changes.
+
+## SILENT FAILURE RULE  
+Never allow .catch(() => {}) anywhere in 
+auth or IAP flows. Every catch must either:
+- Show Alert.alert to user, OR
+- Log with __DEV__ guard only
+
+## FORBIDDEN TERMS RULE
+Before every build touching user-visible strings,
+run: grep -r "diagnosis\|treatment\|therapy\|medical device\|HIPAA\|CPT\|FDA" app/ components/
+Zero tolerance. Fix before proceeding.
+
+## PRIVACYINFO RULE
+ios/Orbital/PrivacyInfo.xcprivacy must never 
+be deleted. If git status shows it as deleted,
+restore immediately before any other work.
+
+## BUILD NUMBER RULE
+Before every eas build, confirm buildNumber 
+in app.json is higher than last submitted build.
+Current approved build: none yet.
+Last submitted: 73.
+Next build must be: 74 or higher.
+
+## Stack
+- Expo SDK 54, Reanimated 4.1.x, worklets 0.5.1, router v6
+- @shopify/react-native-skia for orb shader
+- TypeScript strict mode
+- Supabase backend
+
+## Conventions
+- Be concise. No filler.
+- Default to TypeScript. No JavaScript files.
+- Functional components with hooks. No class components.
+- All JS calls from worklets must use runOnJS
+- Never add dependencies without asking first
+- Use ReturnType<typeof setTimeout> for timer types
+- Gate console.log behind __DEV__
+- Run npx tsc --noEmit after every code change
+
+## Commit messages
+type: description — fix:, feat:, chore:
+
+## Shortcuts
+- "ship it" → submit skill
+- "check it" → preflight skill
+- "clean it" → refactor skill on file being viewed
+
+## Forbidden terms in user-visible strings
+diagnosis, treatment, therapy, medical device, HIPAA, CPT, FDA
+
+## Git
+- Never create branches. Commit to current branch.
+- Never push without being told.
+- Never force push.
