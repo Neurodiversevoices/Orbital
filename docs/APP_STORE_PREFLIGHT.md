@@ -194,6 +194,58 @@ grep -A30 '"production"' eas.json | head -40
 - **Avoid** custom `cache.paths` that include **`ios/Pods`** (very large; **Save cache** step can fail and mark the whole job `ERRORED` even when **Xcode archive succeeded**).
 - **If** EAS fails with: *Unknown error. See logs of the **Save cache** build phase* — production profile should **omit** the custom `cache` block and set **`EAS_USE_CACHE=0`** in `build.production.env` so the build can finish and submit. (Tradeoff: slower installs; reliable pipeline.)
 
+### 12. APP ICON — withAppIcon + single universal 1024 (no regression)
+
+**Config plugin order:** In `app.json` → `expo.plugins`, **`./plugins/withAppIcon` must be the first entry** (runs before other plugins touch native projects).
+
+**Asset catalog:** Confirm the iOS App Icon set is the **modern single-size** format (Xcode 15+):
+
+```bash
+cat ios/Orbital/Images.xcassets/AppIcon.appiconset/Contents.json
+```
+
+- Expect **exactly one** `images[]` entry with `"idiom": "universal"`, `"platform": "ios"`, `"size": "1024x1024"`, and a matching `filename` PNG in the same folder.
+- `assets/AppIcon.png` should exist (1024×1024 source; `withAppIcon` validates in iOS/EAS contexts).
+
+If `Contents.json` is missing or uses legacy multi-size entries, run `npx expo prebuild --platform ios` on a clean tree **or** hand-fix `Contents.json` to the universal entry above, then re-open in Xcode to verify.
+
+### 13. APP STORE SCREENSHOTS — Maestro → `fastlane/screenshots/en-US/` → ASC
+
+**Supported pipeline (this repo):** We do **not** use UI-test `fastlane snapshot` (no `SnapshotHelper` / UITest target). Real device/simulator UI is captured with **Maestro**, then uploaded with **deliver** / `upload_to_app_store`.
+
+**1) Simulator / device reachable (smoke):**
+```bash
+REVIEW_EMAIL='review@orbital.health' REVIEW_PASSWORD='Review2026!' \
+  ~/.maestro/bin/maestro test maestro/tests/smoke_test.yaml
+```
+
+**2) Capture PNGs into `fastlane/screenshots/en-US/` (flattened, not Finder previews):**
+```bash
+bundle exec fastlane screenshots
+# runs scripts/app-store-screenshots.sh — Maestro with --test-output-dir + flatten
+```
+
+**3) Upload to App Store Connect (metadata skipped, binary skipped):**
+```bash
+bundle exec fastlane deliver_screenshots
+# same as upload_to_app_store with force:true, skip_metadata, screenshots only
+```
+
+**4) CLI equivalent (non-interactive needs `--force`):**
+```bash
+bundle exec fastlane deliver run \
+  --api_key_path ./keys/AuthKey_K5FGNKXMAZ.p8 \
+  --app_identifier com.erparris.orbital \
+  --screenshots_path fastlane/screenshots \
+  --skip_binary_upload \
+  --skip_metadata \
+  --force
+```
+
+**Snapfile / `fastlane snapshot`:** `fastlane/Snapfile` lists simulators by **exact Apple name** (e.g. `iPhone 17 Pro Max`). If snapshot fails with “Device not in list”, run `xcrun simctl list devices available` and update `devices` to match. **`bundle exec fastlane snapshot` still requires** adding **SnapshotHelper** and a UI test target — use **`bundle exec fastlane screenshots`** instead unless you intentionally add UI tests.
+
+**ASC API key access:** The App Store Connect API key (`.p8`) must have **App Manager** or **Admin** access for **screenshot** uploads. If deliver loops with *“The API key in use does not allow this request”*, fix the key in **App Store Connect → Users and Access → Keys** (create a new key with App Manager, update `keys/AuthKey_*.p8` + `key_id` / `issuer_id` in `fastlane/Fastfile` `orbital_asc_api_key`).
+
 ---
 
 ## REVIEWER SIMULATION (Manual — Do This Yourself)
@@ -261,7 +313,7 @@ xcodebuild -version
 
 ## RUN ORDER
 
-Claude Code should run checks **1–11** in sequence. If any check fails, stop and report. Do not proceed to submission with failures.
+Claude Code should run checks **1–13** in sequence. If any check fails, stop and report. Do not proceed to submission with failures.
 
 After all automated checks pass, YOU do the manual reviewer simulation (**Reviewer simulation** section below; demo account checklist is §10).
 

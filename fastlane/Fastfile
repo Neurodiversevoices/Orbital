@@ -1,4 +1,5 @@
 require "fileutils"
+require "shellwords"
 
 error do |lane, exception|
   error_message = <<~MSG
@@ -19,6 +20,15 @@ end
 
 default_platform(:ios)
 
+# App Store Connect API key (same as eas.json submit.production.ios)
+def orbital_asc_api_key
+  app_store_connect_api_key(
+    key_id: "K5FGNKXMAZ",
+    issuer_id: "a6c8bd6a-8f60-4aed-a0a6-d129cb2aaf7a",
+    key_filepath: File.expand_path("../keys/AuthKey_K5FGNKXMAZ.p8", File.dirname(__FILE__))
+  )
+end
+
 platform :ios do
 
   desc "Typecheck + repo sanity before release"
@@ -27,7 +37,7 @@ platform :ios do
   end
 
   desc "Run Maestro smoke tests (blocks release on failure)"
-  lane :run_tests do
+  lane :maestro_smoke do
     UI.message("Running Maestro smoke tests...")
     sh("mkdir -p ./fastlane/logs")
     sh(
@@ -107,11 +117,12 @@ platform :ios do
   lane :upload_metadata do
     upload_to_app_store(
       app_identifier: "com.erparris.orbital",
+      api_key: orbital_asc_api_key,
+      force: true,
       skip_binary_upload: true,
       skip_metadata: false,
       skip_screenshots: true,
-      metadata_path: "./fastlane/metadata",
-      api_key_path: "./AuthKey_ZPZ64LP864.p8"
+      metadata_path: "./fastlane/metadata"
     )
   end
 
@@ -127,7 +138,7 @@ platform :ios do
   desc "Single-command iOS release (local / CI)"
   lane :release_ios do
     pre_submit_checks
-    run_tests
+    maestro_smoke
     check_performance
     crash_detection
     validate_iap
@@ -141,28 +152,24 @@ platform :ios do
     post_release_check
   end
 
-  desc "Capture screenshots from simulator"
+  desc "Capture App Store screenshots (Maestro smoke test → fastlane/screenshots/en-US)"
+  desc "Note: `fastlane snapshot` (UI test) is not configured; this lane is the supported pipeline."
   lane :screenshots do
-    capture_screenshots(
-      workspace: "./ios/Orbital.xcworkspace",
-      scheme: "Orbital",
-      devices: ["iPhone 16 Pro Max"],
-      languages: ["en-US"],
-      output_directory: "./fastlane/screenshots",
-      clear_previous_screenshots: true,
-      override_status_bar: true
-    )
+    script = File.expand_path("../scripts/app-store-screenshots.sh", __dir__)
+    FileUtils.chmod(0o755, script)
+    sh(Shellwords.join(["/bin/bash", script]))
   end
 
   desc "Upload screenshots to App Store Connect"
   lane :upload_screenshots do
     upload_to_app_store(
       app_identifier: "com.erparris.orbital",
+      api_key: orbital_asc_api_key,
+      force: true,
       skip_binary_upload: true,
       skip_metadata: true,
       skip_screenshots: false,
-      screenshots_path: "./fastlane/screenshots",
-      api_key_path: "./AuthKey_ZPZ64LP864.p8"
+      screenshots_path: "./fastlane/screenshots"
     )
   end
 
@@ -188,11 +195,25 @@ platform :ios do
   lane :submit do
     upload_to_app_store(
       app_identifier: "com.erparris.orbital",
+      api_key: orbital_asc_api_key,
       ipa: "./build/Orbital.ipa",
       submit_for_review: true,
       automatic_release: false,
       skip_screenshots: true,
       skip_metadata: true
+    )
+  end
+
+  desc "Upload screenshots only (same as: deliver run --skip_binary_upload --skip_metadata --force)"
+  lane :deliver_screenshots do
+    upload_to_app_store(
+      app_identifier: "com.erparris.orbital",
+      api_key: orbital_asc_api_key,
+      force: true,
+      skip_binary_upload: true,
+      skip_metadata: true,
+      skip_screenshots: false,
+      screenshots_path: "./fastlane/screenshots"
     )
   end
 

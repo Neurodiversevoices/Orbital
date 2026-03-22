@@ -40,6 +40,17 @@ eas.json production: do not use custom cache.paths that include ios/Pods
 (Save cache phase can fail after a successful archive). If Save cache errors,
 use EAS_USE_CACHE=0 in production env and remove the custom cache block.
 
+## APP ICON RULE
+app.json expo.plugins: ./plugins/withAppIcon must stay FIRST. iOS AppIcon.appiconset
+must use one universal 1024 entry (idiom universal, platform ios). See
+docs/APP_STORE_PREFLIGHT.md §12.
+
+## APP STORE SCREENSHOTS RULE
+Use Maestro + bundle exec fastlane screenshots → fastlane/screenshots/en-US/,
+then bundle exec fastlane deliver_screenshots (not raw fastlane snapshot unless
+UITests exist). ASC API key must be App Manager for screenshot upload.
+See docs/APP_STORE_PREFLIGHT.md §13.
+
 ## Stack
 - Expo SDK 54, Reanimated 4.1.x, worklets 0.5.1, router v6
 - @shopify/react-native-skia for orb shader

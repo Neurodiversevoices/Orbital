@@ -81,6 +81,9 @@ keys/
 fastlane/logs/*.txt
 fastlane/logs/*.xml
 fastlane/logs/*.html
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/fastlane/
 
 # Maestro local smoke screenshots (repo root)
 smoke_*.png

@@ -1,7 +1,6 @@
+# Must match `xcrun simctl list devices available` on the host (Xcode updates rename simulators).
 devices([
-  "iPhone 16 Pro Max",
-  "iPhone 15 Pro Max",
-  "iPhone 14 Pro Max"
+  "iPhone 17 Pro Max"
 ])
 languages(["en-US"])
 output_directory("./fastlane/screenshots")
