@@ -10,8 +10,7 @@
         "key": "orbital-ios-{{ checksum \"package-lock.json\" }}",
         "paths": [
           "node_modules",
-          ".expo",
-          "ios/Pods"
+          ".expo"
         ]
       },
       "ios": {
