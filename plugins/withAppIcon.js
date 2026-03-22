@@ -10,6 +10,9 @@ const path = require('path');
 
 /** @type {(config: import('@expo/config').ExpoConfig) => import('@expo/config').ExpoConfig} */
 module.exports = function withAppIcon(config) {
+  // Web / Vercel (expo export:web) has no ios/ tree; EAS sets EAS_BUILD when native builds need this check.
+  if (config.platform !== 'ios' && !process.env.EAS_BUILD) return config;
+
   const projectRoot =
     // Expo CLI attaches _internal.projectRoot when running config plugins
     (config._internal && config._internal.projectRoot) || process.cwd();
