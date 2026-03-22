@@ -179,7 +179,8 @@ export default function AuthScreen() {
     setIsSubmitting(false);
     if (result.success) {
       onSuccess();
-    } else if (result.error) {
+    } else if (result.error && result.error !== 'cancelled') {
+      // Apple failures use Alert in auth; only surface banner for string errors
       setError(result.error);
     }
   };

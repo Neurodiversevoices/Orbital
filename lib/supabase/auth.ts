@@ -9,7 +9,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { Session, User, AuthError } from '@supabase/supabase-js';
 import * as Crypto from 'expo-crypto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -324,8 +324,7 @@ export function useAuth(): AuthContext {
   }, []);
 
   // Sign in with Apple (iOS only)
-  // Uses nonce to bind the Apple identity token to the Supabase session.
-  // Raw nonce → Apple, SHA-256 hash of raw nonce → Supabase signInWithIdToken.
+  // Nonce: SHA-256(raw) → Apple signInAsync; raw → Supabase signInWithIdToken (Supabase validates hash).
   const signInWithApple = useCallback(async () => {
     if (!isSupabaseConfigured()) {
       return { success: false, error: 'Cloud sync not configured' };
@@ -338,30 +337,29 @@ export function useAuth(): AuthContext {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // Generate a cryptographic nonce for replay protection
       const rawNonce = Crypto.randomUUID();
       const hashedNonce = await Crypto.digestStringAsync(
         Crypto.CryptoDigestAlgorithm.SHA256,
         rawNonce,
       );
 
-      // Request Apple credential with the hashed nonce
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
-          AppleAuthentication.AppleAuthenticationScope.EMAIL,
           AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
         ],
         nonce: hashedNonce,
       });
 
-      // Apple returns identityToken for OAuth
       if (!credential.identityToken) {
-        setState(prev => ({ ...prev, isLoading: false, error: 'No identity token from Apple' }));
-        return { success: false, error: 'No identity token from Apple' };
+        setState(prev => ({ ...prev, isLoading: false, error: null }));
+        Alert.alert(
+          'Sign In Failed',
+          'Apple did not return a sign-in token. Please try again or use email.',
+        );
+        return { success: false };
       }
 
-      // Sign in to Supabase with Apple OAuth token
-      // Pass the raw nonce — Supabase hashes it internally for validation
       const supabase = getSupabase();
       const { error } = await supabase.auth.signInWithIdToken({
         provider: 'apple',
@@ -370,22 +368,26 @@ export function useAuth(): AuthContext {
       });
 
       if (error) {
-        // Surface OIDC issuer mismatch clearly for debugging
-        const msg = error.message.includes('issuer')
-          ? `Apple OIDC issuer mismatch: ${error.message}. Check Supabase Apple provider config accepts both https://appleid.apple.com and https://account.apple.com`
-          : error.message;
-        setState(prev => ({ ...prev, isLoading: false, error: msg }));
-        return { success: false, error: msg };
+        setState(prev => ({ ...prev, isLoading: false, error: null }));
+        const isIssuer = error.message.includes('issuer') || error.message.includes('appleid.apple.com');
+        Alert.alert(
+          'Sign In Failed',
+          isIssuer
+            ? 'Sign in with Apple could not be verified. Please try again in a moment or use email sign-in.'
+            : 'Apple Sign In could not complete. Please try again or use email.',
+        );
+        if (__DEV__) {
+          console.warn('[Auth] Apple signInWithIdToken:', error.message);
+        }
+        return { success: false };
       }
 
       setState(prev => ({ ...prev, isLoading: false }));
       return { success: true };
     } catch (e: unknown) {
-      // Surface ASAuthorizationError codes for debugging
       const err = e as { code?: string; message?: string };
-      const code = err.code || '';
+      const code = String(err.code || '');
 
-      // User cancelled (ASAuthorizationError.canceled = 1001, or expo wrapper)
       if (
         code === 'ERR_REQUEST_CANCELED' ||
         code === '1001' ||
@@ -395,12 +397,24 @@ export function useAuth(): AuthContext {
         return { success: false, error: 'cancelled' };
       }
 
-      // Build a descriptive error with the ASAuthorization error code
-      const message = code
-        ? `Apple Sign-In failed (ASAuthorizationError ${code}): ${err.message || 'unknown'}`
-        : (err.message || 'Apple Sign-In failed');
-      setState(prev => ({ ...prev, isLoading: false, error: message }));
-      return { success: false, error: message };
+      setState(prev => ({ ...prev, isLoading: false, error: null }));
+
+      if (code === 'ERR_REQUEST_FAILED') {
+        Alert.alert(
+          'Sign In Failed',
+          'Apple Sign In is unavailable. Please try again or use email.',
+        );
+        return { success: false };
+      }
+
+      Alert.alert(
+        'Sign In Error',
+        'Something went wrong. Please try again.',
+      );
+      if (__DEV__) {
+        console.warn('[Auth] Apple Sign-In:', code, err.message);
+      }
+      return { success: false };
     }
   }, []);
 
