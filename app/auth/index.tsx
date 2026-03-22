@@ -56,7 +56,9 @@ async function migrateLocalLogs(): Promise<void> {
       await enqueueLog(log.id, localToCloudUpsert(log, deviceId));
     }
     // Best-effort push — does not block navigation
-    pushToCloud().catch(() => {});
+    pushToCloud().catch((e) => {
+      if (__DEV__) console.warn('[Auth] migrateLocalLogs push failed:', e);
+    });
   } catch (e) {
     if (__DEV__) console.error('[Auth] Local log migration failed:', e);
   }

@@ -54,6 +54,13 @@ const REVENUECAT_API_KEY_IOS = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY || '';
 const REVENUECAT_API_KEY_ANDROID = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY || '';
 const REVENUECAT_API_KEY_WEB = process.env.EXPO_PUBLIC_REVENUECAT_WEB_KEY || '';
 
+function alertPurchasesTemporarilyUnavailable() {
+  Alert.alert(
+    'Unavailable',
+    'Purchases are temporarily unavailable. Please try again.',
+  );
+}
+
 interface SubscriptionContextType extends SubscriptionState {
   /** Purchase the Pro subscription */
   purchase: (productId?: string) => Promise<boolean>;
@@ -250,6 +257,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       if (Platform.OS === 'web') {
         if (!webPurchasesInstance) {
           clearPaymentScope();
+          alertPurchasesTemporarilyUnavailable();
           return false;
         }
 
@@ -260,6 +268,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         if (!currentOffering) {
           if (__DEV__) console.error('[Subscription] No offerings available');
           clearPaymentScope();
+          alertPurchasesTemporarilyUnavailable();
           return false;
         }
 
@@ -273,6 +282,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         if (!targetPackage) {
           if (__DEV__) console.error('[Subscription] Package not found:', targetProductId);
           clearPaymentScope();
+          alertPurchasesTemporarilyUnavailable();
           return false;
         }
 
@@ -300,6 +310,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       // Mobile purchase flow
       if (!PurchasesMobile) {
         clearPaymentScope();
+        alertPurchasesTemporarilyUnavailable();
         return false;
       }
 
@@ -311,19 +322,23 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       if (!currentOffering) {
         if (__DEV__) console.error('[Subscription] No offerings available');
         clearPaymentScope();
+        alertPurchasesTemporarilyUnavailable();
         return false;
       }
 
       // Find the requested package or default to monthly
       updatePaymentStage('package_select');
+      const isAnnual = targetProductId.includes('_annual') || targetProductId.includes('annual');
       const targetPackage = currentOffering.availablePackages.find(
         pkg => pkg.product.identifier === targetProductId ||
-               (pkg.identifier === '$rc_monthly' && !productId)
+               (pkg.identifier === '$rc_monthly' && !productId) ||
+               (pkg.identifier === '$rc_annual' && isAnnual)
       );
 
       if (!targetPackage) {
         if (__DEV__) console.error('[Subscription] Package not found:', targetProductId);
         clearPaymentScope();
+        alertPurchasesTemporarilyUnavailable();
         return false;
       }
 
@@ -401,12 +416,14 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         // Web doesn't have traditional "restore" - just refresh customer info
         if (!webPurchasesInstance) {
           clearPaymentScope();
+          alertPurchasesTemporarilyUnavailable();
           return false;
         }
         customerInfo = await webPurchasesInstance.getCustomerInfo();
       } else {
         if (!PurchasesMobile) {
           clearPaymentScope();
+          alertPurchasesTemporarilyUnavailable();
           return false;
         }
         customerInfo = await PurchasesMobile.restorePurchases();
@@ -433,6 +450,11 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
           flow: 'restore',
         },
       });
+
+      Alert.alert(
+        'Restore Failed',
+        'Unable to restore purchases. Please try again or contact support.',
+      );
 
       if (__DEV__) console.error('[Subscription] Restore failed:', error);
       setState(prev => ({

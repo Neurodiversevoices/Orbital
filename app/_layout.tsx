@@ -3,7 +3,7 @@ import 'react-native-gesture-handler';
 import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Modal, Pressable, Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Sentry from '@sentry/react-native';
 import * as Linking from 'expo-linking';
@@ -494,7 +494,8 @@ function RootLayout() {
                   <Stack.Screen
                     name="upgrade"
                     options={{
-                      presentation: 'modal',
+                      // formSheet on iPad improves StoreKit purchase sheet presentation (fixes iPad IAP paywall not initiating)
+                      presentation: Platform.OS === 'ios' && Platform.isPad ? 'formSheet' : 'modal',
                       animation: 'slide_from_bottom',
                     }}
                   />

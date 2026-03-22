@@ -33,6 +33,7 @@ import {
   Linking,
   ScrollView,
   Platform,
+  InteractionManager,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -236,7 +237,8 @@ const CCI_CONFIRMATION_TEXT =
 
 // Issuance confirmation checkboxes (PATCH D)
 const CCI_PERMANENT_RECORD_TEXT = 'I understand this creates a permanent record.';
-const CCI_NOT_DIAGNOSIS_TEXT = 'I understand this is documentation, not a diagnosis.';
+const CCI_DOCUMENTATION_ACK_TEXT =
+  'I understand this is documentation, not a medical assessment.';
 
 interface CCICardProps {
   isPro: boolean;
@@ -312,7 +314,7 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
             <View style={[styles.cciCheckbox, notDiagnosisChecked && styles.cciCheckboxChecked]}>
               {notDiagnosisChecked && <Text style={styles.cciCheckboxMark}>✓</Text>}
             </View>
-            <Text style={styles.cciConfirmationText}>{CCI_NOT_DIAGNOSIS_TEXT}</Text>
+            <Text style={styles.cciConfirmationText}>{CCI_DOCUMENTATION_ACK_TEXT}</Text>
           </Pressable>
 
           <Pressable
@@ -365,7 +367,7 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
 export default function UpgradeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ demoMode?: string }>();
-  const { isLoading: subscriptionLoading, restore } = useSubscription();
+  const { isLoading: subscriptionLoading, restore, purchase: purchaseViaRevenueCat, isAvailable: revenueCatAvailable } = useSubscription();
   const auth = useAuth();
 
   // DOCTRINE: Do not surface CCI purchase options inside demo-only institutional modes
@@ -415,31 +417,54 @@ export default function UpgradeScreen() {
 
     setIsPurchasing(true);
 
-    await handleMockPurchase(
-      productId,
-      () => {
-        if (Platform.OS === 'web') {
-          window.alert(`Success! ${productName} has been activated.`);
+    // Native iOS/Android: use RevenueCat (StoreKit) when available — triggers real IAP sheet
+    // Web or RevenueCat unavailable: fall back to mock checkout
+    const useRealIAP = Platform.OS !== 'web' && revenueCatAvailable;
+
+    if (useRealIAP) {
+      try {
+        // Defer purchase to next frame — ensures view hierarchy is ready (fixes iPad StoreKit sheet not appearing)
+        await new Promise<void>(resolve => InteractionManager.runAfterInteractions(resolve));
+        const success = await purchaseViaRevenueCat(productId);
+        setIsPurchasing(false);
+        if (success) {
           loadEntitlements();
-        } else {
           Alert.alert(
             'Success!',
             `${productName} has been activated.`,
-            [{ text: 'Continue', onPress: () => { loadEntitlements(); } }]
+            [{ text: 'Continue', onPress: () => {} }]
           );
         }
-        setIsPurchasing(false);
-      },
-      (error) => {
-        if (Platform.OS === 'web') {
-          window.alert(`Purchase Failed: ${error}`);
-        } else {
-          Alert.alert('Purchase Failed', error);
-        }
+      } catch {
         setIsPurchasing(false);
       }
-    );
-  }, [auth.isAuthenticated, router]);
+    } else {
+      await handleMockPurchase(
+        productId,
+        () => {
+          if (Platform.OS === 'web') {
+            window.alert(`Success! ${productName} has been activated.`);
+            loadEntitlements();
+          } else {
+            Alert.alert(
+              'Success!',
+              `${productName} has been activated.`,
+              [{ text: 'Continue', onPress: () => { loadEntitlements(); } }]
+            );
+          }
+          setIsPurchasing(false);
+        },
+        (error) => {
+          if (Platform.OS === 'web') {
+            window.alert(`Purchase Failed: ${error}`);
+          } else {
+            Alert.alert('Purchase Failed', error);
+          }
+          setIsPurchasing(false);
+        }
+      );
+    }
+  }, [auth.isAuthenticated, router, revenueCatAvailable, purchaseViaRevenueCat]);
 
   const handleRestore = useCallback(async () => {
     setIsRestoring(true);

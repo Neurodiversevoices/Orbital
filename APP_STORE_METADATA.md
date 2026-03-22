@@ -12,6 +12,27 @@
 Sign in with Apple has been fixed. The OIDC issuer mismatch between appleid.apple.com and account.apple.com has been resolved. Please test with review@orbital.health / Review2026!
 ```
 
+## How to Test the App
+
+1. Launch the app
+2. Tap "Sign in with Apple"
+3. Complete Apple authentication with:
+   review@orbital.health / Review2026!
+4. Grant notification permissions if prompted
+5. On the home screen, tap the orb to log
+   your current capacity state
+6. Swipe up/down to cycle between
+   RESOURCED / ELEVATED / DEPLETED
+7. Navigate to Settings to verify account
+   deletion option is accessible
+8. In-app purchases can be tested via
+   the Upgrade screen
+
+Note: This app tracks neurodivergent
+capacity patterns. The orb is the primary
+interaction — press and hold to log,
+swipe to change state.
+
 ---
 
 ## iOS App Store
