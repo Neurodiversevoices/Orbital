@@ -1,0 +1,1 @@
+Orbital is a personal capacity tracking app. Log signals, see patterns, and stay in sync across devices.
