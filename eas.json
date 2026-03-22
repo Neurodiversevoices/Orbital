@@ -25,7 +25,8 @@
       },
       "env": {
         "EXPO_PUBLIC_IS_REVIEW_MODE": "true",
-        "SENTRY_ALLOW_FAILURE": "true"
+        "SENTRY_ALLOW_FAILURE": "true",
+        "EAS_SAVE_CACHE": "0"
       }
     },
     "review": {
