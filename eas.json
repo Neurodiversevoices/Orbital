@@ -6,13 +6,6 @@
   "build": {
     "production": {
       "distribution": "store",
-      "cache": {
-        "key": "orbital-ios-{{ checksum \"package-lock.json\" }}",
-        "paths": [
-          "node_modules",
-          ".expo"
-        ]
-      },
       "ios": {
         "credentialsSource": "remote",
         "autoIncrement": "buildNumber",
@@ -26,7 +19,7 @@
       "env": {
         "EXPO_PUBLIC_IS_REVIEW_MODE": "true",
         "SENTRY_ALLOW_FAILURE": "true",
-        "EAS_SAVE_CACHE": "0"
+        "EAS_USE_CACHE": "0"
       }
     },
     "review": {
