@@ -1,0 +1,13 @@
+appId: com.erparris.orbital
+---
+- launchApp:
+    appId: com.erparris.orbital
+    clearState: false
+- waitForAnimationToEnd
+- assertVisible: ".*"
+- takeScreenshot: "ipad_01_home"
+- tapOn:
+    text: "Plans"
+    optional: true
+- waitForAnimationToEnd
+- takeScreenshot: "ipad_02_paywall"

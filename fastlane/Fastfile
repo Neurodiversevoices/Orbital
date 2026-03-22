@@ -196,4 +196,10 @@ platform :ios do
     )
   end
 
+  desc "Maestro flow on iPad Pro 12.9 sim (when installed)"
+  lane :ipad_screenshots do
+    sh("xcrun simctl boot 'iPad Pro (12.9-inch) (6th generation)' 2>/dev/null || true")
+    sh("maestro test ./maestro/tests/ipad_test.yaml")
+  end
+
 end
