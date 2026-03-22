@@ -506,7 +506,12 @@ export default function UpgradeScreen() {
         <View style={styles.headerTitleContainer}>
           <Text style={styles.title}>Plans</Text>
         </View>
-        <Pressable onPress={() => router.back()} style={styles.closeButton}>
+        <Pressable
+          onPress={() => router.back()}
+          style={styles.closeButton}
+          accessibilityLabel="×"
+          testID="paywall-close"
+        >
           <X color={colors.textPrimary} size={24} />
         </Pressable>
       </View>

@@ -226,18 +226,28 @@ export default function HomeScreen() {
   const composerBottomPadding = currentState ? COMPOSER_HEIGHT + insets.bottom + spacing.md : spacing.md;
 
   return (
-    <SafeAreaView style={commonStyles.screen} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={commonStyles.screen} edges={['top', 'left', 'right']} testID="orb-screen">
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}
       >
         <Animated.View style={[styles.header, headerAnimatedStyle]}>
-          <Pressable onPress={() => router.push('/upgrade')} style={styles.plansButton}>
+          <Pressable
+            onPress={() => router.push('/upgrade')}
+            style={styles.plansButton}
+            accessibilityLabel="Plans"
+            testID="open-plans"
+          >
             <Sparkles color="#FFD700" size={22} />
           </Pressable>
           <Text style={[styles.title, { color: `${modeConfig.accentColor}CC` }]}>Orbital</Text>
-          <Pressable onPress={() => router.push('/settings')} style={styles.settingsButton}>
+          <Pressable
+            onPress={() => router.push('/settings')}
+            style={styles.settingsButton}
+            accessibilityLabel="Settings"
+            testID="open-settings"
+          >
             <Settings color={colors.textSecondary} size={24} />
           </Pressable>
         </Animated.View>

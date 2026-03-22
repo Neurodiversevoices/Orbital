@@ -1,0 +1,38 @@
+appId: com.erparris.orbital
+---
+- launchApp:
+    appId: com.erparris.orbital
+    clearState: false
+- assertVisible: ".*"
+- waitForAnimationToEnd
+- takeScreenshot: "smoke_01_launch"
+
+# Orb screen
+- assertVisible:
+    id: "orb-screen"
+    optional: true
+- takeScreenshot: "smoke_02_orb"
+
+# Navigate to paywall
+- tapOn:
+    text: "Plans"
+    optional: true
+- waitForAnimationToEnd
+- takeScreenshot: "smoke_03_paywall"
+
+# Verify paywall elements
+- assertVisible: "Free"
+- assertVisible: "Pro"
+- assertVisible: "Restore Purchases"
+
+# Close paywall
+- tapOn:
+    text: "×"
+    optional: true
+
+# Navigate to settings
+- tapOn:
+    text: "Settings"
+    optional: true
+- waitForAnimationToEnd
+- takeScreenshot: "smoke_04_settings"

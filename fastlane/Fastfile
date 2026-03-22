@@ -1,0 +1,77 @@
+default_platform(:ios)
+
+platform :ios do
+
+  desc "Run Maestro smoke tests (blocks release on failure)"
+  lane :run_tests do
+    UI.message("Running Maestro smoke tests...")
+    sh("mkdir -p ./fastlane/logs")
+    sh(
+      "maestro test ./maestro/tests/smoke_test.yaml " \
+      "--format junit " \
+      "--output ./fastlane/logs/test_results.xml"
+    )
+    UI.success("All smoke tests passed!")
+  end
+
+  desc "Full iOS release pipeline (expanded in Phase 12)"
+  lane :release_ios do
+    run_tests
+  end
+
+  desc "Capture screenshots from simulator"
+  lane :screenshots do
+    capture_screenshots(
+      workspace: "./ios/Orbital.xcworkspace",
+      scheme: "Orbital",
+      devices: ["iPhone 16 Pro Max"],
+      languages: ["en-US"],
+      output_directory: "./fastlane/screenshots",
+      clear_previous_screenshots: true,
+      override_status_bar: true
+    )
+  end
+
+  desc "Upload screenshots to App Store Connect"
+  lane :upload_screenshots do
+    upload_to_app_store(
+      app_identifier: "com.erparris.orbital",
+      skip_binary_upload: true,
+      skip_metadata: true,
+      skip_screenshots: false,
+      screenshots_path: "./fastlane/screenshots",
+      api_key_path: "./AuthKey_ZPZ64LP864.p8"
+    )
+  end
+
+  desc "Full screenshot pipeline"
+  lane :refresh_screenshots do
+    screenshots
+    upload_screenshots
+  end
+
+  desc "Build production IPA"
+  lane :build_production do
+    build_app(
+      workspace: "./ios/Orbital.xcworkspace",
+      scheme: "Orbital",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "./build",
+      output_name: "Orbital.ipa"
+    )
+  end
+
+  desc "Submit to App Store"
+  lane :submit do
+    upload_to_app_store(
+      app_identifier: "com.erparris.orbital",
+      ipa: "./build/Orbital.ipa",
+      submit_for_review: true,
+      automatic_release: false,
+      skip_screenshots: true,
+      skip_metadata: true
+    )
+  end
+
+end
