@@ -1,3 +1,4 @@
+# -e REVIEW_EMAIL / -e REVIEW_PASSWORD when auth screen appears
 appId: com.erparris.orbital
 ---
 - launchApp:
@@ -7,16 +8,44 @@ appId: com.erparris.orbital
     when:
       visible: "Terms of Service"
     commands:
-      - scrollDown:
-          speed: 40
-          duration: 3000
-      - tapOn: "Scroll to Accept"
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - tapOn:
+          text: "I Accept"
+          optional: true
+      - tapOn:
+          text: "Scroll to Accept"
+          optional: true
+      - waitForAnimationToEnd
+- runFlow:
+    when:
+      visible: "Age Verification"
+    commands:
+      - tapOn: "YYYY"
+      - inputText: "1990"
+      - tapOn: "I confirm that I am at least 13 years old."
+      - tapOn: "Continue"
+      - waitForAnimationToEnd
+- runFlow:
+    when:
+      visible: "Sign in with email"
+    commands:
+      - tapOn: "Sign in with email"
+      - tapOn: "Email"
+      - inputText: ${REVIEW_EMAIL}
+      - tapOn: "Password"
+      - inputText: ${REVIEW_PASSWORD}
+      - tapOn: "Sign in"
       - waitForAnimationToEnd
 - waitForAnimationToEnd
 
 # Rapid navigation stress test
 - tapOn:
-    text: "Plans"
+    point: "8%, 9%"
     optional: true
 - waitForAnimationToEnd
 - tapOn:
@@ -28,7 +57,7 @@ appId: com.erparris.orbital
     optional: true
 - waitForAnimationToEnd
 - tapOn:
-    text: "Plans"
+    point: "8%, 9%"
     optional: true
 - waitForAnimationToEnd
 
@@ -42,10 +71,38 @@ appId: com.erparris.orbital
     when:
       visible: "Terms of Service"
     commands:
-      - scrollDown:
-          speed: 40
-          duration: 3000
-      - tapOn: "Scroll to Accept"
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - tapOn:
+          text: "I Accept"
+          optional: true
+      - tapOn:
+          text: "Scroll to Accept"
+          optional: true
+      - waitForAnimationToEnd
+- runFlow:
+    when:
+      visible: "Age Verification"
+    commands:
+      - tapOn: "YYYY"
+      - inputText: "1990"
+      - tapOn: "I confirm that I am at least 13 years old."
+      - tapOn: "Continue"
+      - waitForAnimationToEnd
+- runFlow:
+    when:
+      visible: "Sign in with email"
+    commands:
+      - tapOn: "Sign in with email"
+      - tapOn: "Email"
+      - inputText: ${REVIEW_EMAIL}
+      - tapOn: "Password"
+      - inputText: ${REVIEW_PASSWORD}
+      - tapOn: "Sign in"
       - waitForAnimationToEnd
 - waitForAnimationToEnd
 - assertVisible: ".*"

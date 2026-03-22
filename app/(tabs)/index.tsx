@@ -534,7 +534,9 @@ export default function HomeScreen() {
   // RENDER
   // ═══════════════════════════════════════════════════════════════════
   return (
-    <SafeAreaView style={commonStyles.screen} edges={['top', 'left', 'right']} testID="orb-screen">
+    <SafeAreaView style={commonStyles.screen} edges={['top', 'left', 'right']}>
+      {/* Maestro/iOS: testID on SafeAreaView often missing from a11y tree — use inner View */}
+      <View style={styles.orbScreenRoot} testID="orb-screen" collapsable={false}>
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -545,19 +547,28 @@ export default function HomeScreen() {
           <Pressable
             onPress={() => router.push('/upgrade')}
             style={styles.plansButton}
+            accessible
+            accessibilityRole="button"
             accessibilityLabel="Plans"
             testID="open-plans"
           >
-            <Sparkles color="#FFD700" size={22} />
+            {/* Hide SVG subtree from a11y so Pressable label is the only element (Maestro / VoiceOver). */}
+            <View accessibilityElementsHidden>
+              <Sparkles color="#FFD700" size={22} />
+            </View>
           </Pressable>
           <Text style={[styles.title, { color: `${modeConfig.accentColor}CC` }]}>Orbital</Text>
           <Pressable
             onPress={() => router.push('/settings')}
             style={styles.settingsButton}
+            accessible
+            accessibilityRole="button"
             accessibilityLabel="Settings"
             testID="open-settings"
           >
-            <Settings color={colors.textSecondary} size={24} />
+            <View accessibilityElementsHidden>
+              <Settings color={colors.textSecondary} size={24} />
+            </View>
           </Pressable>
         </Animated.View>
 
@@ -712,6 +723,7 @@ export default function HomeScreen() {
           </Animated.View>
         )}
       </KeyboardAvoidingView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -721,6 +733,7 @@ export default function HomeScreen() {
 // =============================================================================
 
 const styles = StyleSheet.create({
+  orbScreenRoot: { flex: 1 },
   keyboardAvoid: { flex: 1 },
   scrollView: { flex: 1 },
   scrollContent: { flexGrow: 1 },

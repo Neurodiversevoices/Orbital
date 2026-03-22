@@ -16,7 +16,8 @@ export default function TabLayout() {
       if (auth.isAuthenticated) {
         const isComplete = await isProfileSetupComplete();
         if (!isComplete) {
-          // Redirect to profile setup
+          // Redirect to profile setup — must clear gate or tabs stay `null` forever (Maestro/orb-screen never appears)
+          setCheckingSetup(false);
           router.replace('/profile-setup');
           return;
         }

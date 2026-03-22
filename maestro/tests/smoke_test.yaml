@@ -1,31 +1,104 @@
+# Orbital smoke test
+# Login (when logged out): pass credentials, e.g.
+#   maestro test maestro/tests/smoke_test.yaml -e REVIEW_EMAIL=review@orbital.health -e REVIEW_PASSWORD='***'
 appId: com.erparris.orbital
 ---
 - launchApp:
     appId: com.erparris.orbital
     clearState: false
+
+# Dismiss in-app Terms of Service (scroll required before Accept is enabled)
 - runFlow:
     when:
       visible: "Terms of Service"
     commands:
-      - scrollDown:
-          speed: 40
-          duration: 3000
-      - tapOn: "Scroll to Accept"
+      # Maestro 2.3: `scroll` has no speed/duration — repeat to reach TOS footer
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - tapOn:
+          text: "I Accept"
+          optional: true
+      - tapOn:
+          text: "Scroll to Accept"
+          optional: true
       - waitForAnimationToEnd
+
+# Age gate (blocks entire app until completed; no home title until this passes)
+- runFlow:
+    when:
+      visible: "Age Verification"
+    commands:
+      - tapOn: "YYYY"
+      - inputText: "1990"
+      - tapOn: "I confirm that I am at least 13 years old."
+      - tapOn: "Continue"
+      - waitForAnimationToEnd
+
+# Email sign-in when session is logged out (uses REVIEW_EMAIL / REVIEW_PASSWORD)
+- runFlow:
+    when:
+      visible: "Sign in with email"
+    commands:
+      - tapOn: "Sign in with email"
+      - tapOn: "Email"
+      - inputText: ${REVIEW_EMAIL}
+      - tapOn: "Password"
+      - inputText: ${REVIEW_PASSWORD}
+      - tapOn: "Sign in"
+      - waitForAnimationToEnd
+
+# B2C profile setup gate (blocks tabs until complete or skipped)
+- runFlow:
+    when:
+      visible: "Skip for now"
+    commands:
+      - tapOn: "Skip for now"
+      - waitForAnimationToEnd
+
+# First-run tutorial (Maestro may not match lone "Skip"; title is reliable)
+- runFlow:
+    when:
+      visible: "Welcome to Orbital"
+    commands:
+      - tapOn: "Skip"
+      - waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible: "Skip"
+    commands:
+      - tapOn: "Skip"
+      - waitForAnimationToEnd
+
+# "Why Orbital Exists" interstitial
+- runFlow:
+    when:
+      visible: "Why Orbital Exists"
+    commands:
+      - tapOn: "I understand"
+      - waitForAnimationToEnd
+
+# Wait for home (profile-setup check can leave a blank screen briefly).
+# RN Fabric + iOS: testID often missing from XCUITest id; home title is in a11y tree.
+- extendedWaitUntil:
+    visible:
+      text: "Today's Capacity State"
+    timeout: 180000
+
 - assertVisible: ".*"
 - waitForAnimationToEnd
 - takeScreenshot: "smoke_01_launch"
 
-# Orb screen
-- assertVisible:
-    id: "orb-screen"
-    optional: true
+# Orb / home
 - takeScreenshot: "smoke_02_orb"
 
-# Navigate to paywall
+# Navigate to paywall — header sparkle (top-left). RN Fabric: testID / a11y label not in Maestro tree; use point.
 - tapOn:
-    text: "Plans"
-    optional: true
+    point: "8%, 9%"
 - waitForAnimationToEnd
 - takeScreenshot: "smoke_03_paywall"
 
