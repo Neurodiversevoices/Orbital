@@ -75,3 +75,4 @@ lib/supabase/config.local.ts
 # Claude local settings (may contain secrets in permission history)
 .claude/settings.local.json
 keys/
+*.p8
