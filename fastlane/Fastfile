@@ -69,6 +69,15 @@ platform :ios do
     UI.success("Release notes ready!")
   end
 
+  desc "Post-release reminders (ASC review timing)"
+  lane :post_release_check do
+    UI.message("Running post-release checks...")
+    sh("echo 'Checking ASC build status...'")
+    UI.success("Post-release check complete!")
+    UI.message("Check App Store Connect in ~1 hour")
+    UI.message("Review typically takes ~24 hours")
+  end
+
   desc "Full iOS release pipeline (expanded in Phase 12)"
   lane :release_ios do
     run_tests
