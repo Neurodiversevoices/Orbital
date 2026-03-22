@@ -238,7 +238,10 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
 
   const purchase = useCallback(async (productId?: string): Promise<boolean> => {
     if (!state.isAvailable) {
-      if (__DEV__) console.log('[Subscription] Purchase not available');
+      Alert.alert(
+        'Purchases Unavailable',
+        'In-app purchases are not available right now. Please try again later.',
+      );
       return false;
     }
 
@@ -304,6 +307,10 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         }
 
         clearPaymentScope();
+        Alert.alert(
+          'Purchase Not Confirmed',
+          'Your purchase completed but could not be verified. Please restore purchases or contact support.',
+        );
         return false;
       }
 
@@ -360,6 +367,10 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       }
 
       clearPaymentScope();
+      Alert.alert(
+        'Purchase Not Confirmed',
+        'Your purchase completed but could not be verified. Please restore purchases or contact support.',
+      );
       return false;
     } catch (error: any) {
       // User cancelled is NOT an error - do not report to Sentry
@@ -396,7 +407,10 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
 
   const restore = useCallback(async (): Promise<boolean> => {
     if (!state.isAvailable) {
-      if (__DEV__) console.log('[Subscription] Restore not available');
+      Alert.alert(
+        'Purchases Unavailable',
+        'In-app purchases are not available right now. Please try again later.',
+      );
       return false;
     }
 
