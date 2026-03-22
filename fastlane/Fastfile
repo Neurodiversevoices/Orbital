@@ -29,6 +29,12 @@ platform :ios do
     UI.success("OTA rolled back!")
   end
 
+  desc "Weekly health checks (Phase 4 adds scripts/health-check.sh)"
+  lane :health_check do
+    UI.message("Running weekly health checks (stub until Phase 4 script lands)")
+    UI.success("Health check lane reachable")
+  end
+
   desc "Full iOS release pipeline (expanded in Phase 12)"
   lane :release_ios do
     run_tests
