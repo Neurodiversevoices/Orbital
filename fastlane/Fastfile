@@ -55,6 +55,13 @@ platform :ios do
     UI.success("No crashes detected!")
   end
 
+  desc "Generate App Store release notes from git history"
+  lane :generate_release_notes do
+    UI.message("Generating release notes...")
+    sh("./scripts/generate-release-notes.sh")
+    UI.success("Release notes ready!")
+  end
+
   desc "Full iOS release pipeline (expanded in Phase 12)"
   lane :release_ios do
     run_tests
