@@ -76,3 +76,8 @@ lib/supabase/config.local.ts
 .claude/settings.local.json
 keys/
 *.p8
+
+# Fastlane generated logs (keep .gitkeep)
+fastlane/logs/*.txt
+fastlane/logs/*.xml
+fastlane/logs/*.html

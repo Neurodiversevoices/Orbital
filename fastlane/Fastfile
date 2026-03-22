@@ -1,3 +1,22 @@
+require "fileutils"
+
+error do |lane, exception|
+  error_message = <<~MSG
+    🚨 ORBITAL RELEASE FAILURE
+    Lane: #{lane}
+    Error: #{exception.message}
+    Time: #{Time.now}
+
+    Fix the error and re-run:
+    bundle exec fastlane #{lane}
+  MSG
+
+  UI.error(error_message)
+  FileUtils.mkdir_p("./fastlane/logs")
+  File.write("./fastlane/logs/last_error.txt", error_message)
+  system("osascript", "-e", "display notification \"#{lane} failed\" with title \"Orbital Release Failed\"")
+end
+
 default_platform(:ios)
 
 platform :ios do
