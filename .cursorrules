@@ -26,7 +26,7 @@ restore immediately before any other work.
 Before every eas build, confirm buildNumber 
 in app.json is higher than last submitted build.
 Last submitted (update when you ship): 77.
-Next build must be higher than that.
+Next build must be higher than that (app.json is 78 for this release).
 
 ## SENTRY XCODE RULE
 Before eas iOS build: ensure Upload Debug Symbols to Sentry in

@@ -19,7 +19,7 @@
       "supportsTablet": true,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "77",
+      "buildNumber": "78",
       "appleTeamId": "2KM3QL4UMV",
       "icon": "./assets/icon.png",
       "infoPlist": {

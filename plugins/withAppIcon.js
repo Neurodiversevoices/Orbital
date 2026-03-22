@@ -34,10 +34,13 @@ module.exports = function withAppIcon(config) {
   );
 
   if (!fs.existsSync(contentsPath)) {
-    throw new Error(
-      `[withAppIcon] Missing AppIcon Contents.json at ${contentsPath}. ` +
-        'Run npx expo prebuild (or ensure ios/ is generated) before building.',
+    // During `expo prebuild --clean`, ios/ is cleared before native assets exist;
+    // validation runs again on later builds once AppIcon.appiconset is generated.
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[withAppIcon] Skipping AppIcon validation (not generated yet): ${contentsPath}`,
     );
+    return config;
   }
 
   let parsed;
