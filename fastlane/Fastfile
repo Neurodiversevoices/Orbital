@@ -21,6 +21,11 @@ default_platform(:ios)
 
 platform :ios do
 
+  desc "Typecheck + repo sanity before release"
+  lane :pre_submit_checks do
+    sh("npm run typecheck")
+  end
+
   desc "Run Maestro smoke tests (blocks release on failure)"
   lane :run_tests do
     UI.message("Running Maestro smoke tests...")
@@ -88,6 +93,28 @@ platform :ios do
     UI.success("Release notes ready!")
   end
 
+  desc "Validate IAP configuration (manual checklist in ASC / RevenueCat)"
+  lane :validate_iap do
+    UI.message("Validate IAP: App Store Connect products + RevenueCat offerings match app code.")
+  end
+
+  desc "Upload IAP review screenshots (manual / asc-mcp for non-subscription IAPs)"
+  lane :upload_iap_screenshots do
+    UI.important("Upload subscription/CCI review screenshots in App Store Connect (see APP_STORE_METADATA.md).")
+  end
+
+  desc "Upload App Store metadata (Fastlane metadata folder)"
+  lane :upload_metadata do
+    upload_to_app_store(
+      app_identifier: "com.erparris.orbital",
+      skip_binary_upload: true,
+      skip_metadata: false,
+      skip_screenshots: true,
+      metadata_path: "./fastlane/metadata",
+      api_key_path: "./AuthKey_ZPZ64LP864.p8"
+    )
+  end
+
   desc "Post-release reminders (ASC review timing)"
   lane :post_release_check do
     UI.message("Running post-release checks...")
@@ -97,9 +124,21 @@ platform :ios do
     UI.message("Review typically takes ~24 hours")
   end
 
-  desc "Full iOS release pipeline (expanded in Phase 12)"
+  desc "Single-command iOS release (local / CI)"
   lane :release_ios do
+    pre_submit_checks
     run_tests
+    check_performance
+    crash_detection
+    validate_iap
+    generate_release_notes
+    screenshots
+    upload_screenshots
+    upload_iap_screenshots
+    upload_metadata
+    build_production
+    submit
+    post_release_check
   end
 
   desc "Capture screenshots from simulator"
