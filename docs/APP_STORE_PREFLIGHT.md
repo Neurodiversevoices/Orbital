@@ -172,6 +172,28 @@ Prepare in App Store Connect → App Review Notes:
 - Note: "This app does not diagnose, treat, or prevent any medical condition. It is a capacity self-tracking tool categorized under Health & Fitness."
 ```
 
+### 11. EAS BUILD — SENTRY XCODE SCRIPT & CACHE (blocks CI if wrong)
+
+**Why:** A bad **Upload Debug Symbols to Sentry** run script can pass locally but **fail on EAS** with `No such file or directory` because the script pointed at a **developer machine path** (e.g. iCloud `Mobile Documents/.../node_modules/.../sentry-xcode-debug-files.sh`). EAS runs under `/Users/expo/workingdir/build/...`.
+
+**Sentry — verify before `eas build`:**
+```bash
+# Must NOT contain your home directory or "Mobile Documents"
+grep -n "sentry-xcode-debug-files\|Mobile Documents\|/Users/" ios/Orbital.xcodeproj/project.pbxproj || true
+```
+
+- **Required:** The **Upload Debug Symbols to Sentry** build phase should `source` `ios/.xcode.env` (and `.local` if present), then set `SENTRY_DEBUG_FILES_UPLOAD_SCRIPT` via `"$NODE_BINARY" --print "require('path').dirname(require.resolve('@sentry/react-native/package.json')) + '/scripts/sentry-xcode-debug-files.sh'"` and run `/bin/sh "$SENTRY_DEBUG_FILES_UPLOAD_SCRIPT"` only if the file exists — **same resolution idea as** the **Bundle React Native code and images** phase (which already wraps `sentry-xcode.sh` + `react-native-xcode.sh`).
+- If you re-run `expo prebuild` or Sentry wizard, re-check this phase is not rewritten to an absolute path.
+
+**EAS cache — verify `eas.json` production profile:**
+```bash
+# Optional: confirm what will ship (no secrets)
+grep -A30 '"production"' eas.json | head -40
+```
+
+- **Avoid** custom `cache.paths` that include **`ios/Pods`** (very large; **Save cache** step can fail and mark the whole job `ERRORED` even when **Xcode archive succeeded**).
+- **If** EAS fails with: *Unknown error. See logs of the **Save cache** build phase* — production profile should **omit** the custom `cache` block and set **`EAS_USE_CACHE=0`** in `build.production.env` so the build can finish and submit. (Tradeoff: slower installs; reliable pipeline.)
+
 ---
 
 ## REVIEWER SIMULATION (Manual — Do This Yourself)
@@ -239,9 +261,9 @@ xcodebuild -version
 
 ## RUN ORDER
 
-Claude Code should run checks 1-9 in sequence. If any check fails, stop and report. Do not proceed to submission with failures.
+Claude Code should run checks **1–11** in sequence. If any check fails, stop and report. Do not proceed to submission with failures.
 
-After all automated checks pass, YOU do the manual reviewer simulation (#10).
+After all automated checks pass, YOU do the manual reviewer simulation (**Reviewer simulation** section below; demo account checklist is §10).
 
 Then submit via:
 ```bash

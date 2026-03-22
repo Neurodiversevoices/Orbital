@@ -25,9 +25,20 @@ restore immediately before any other work.
 ## BUILD NUMBER RULE
 Before every eas build, confirm buildNumber 
 in app.json is higher than last submitted build.
-Current approved build: none yet.
-Last submitted: 73.
-Next build must be: 74 or higher.
+Last submitted (update when you ship): 77.
+Next build must be higher than that.
+
+## SENTRY XCODE RULE
+Before eas iOS build: ensure Upload Debug Symbols to Sentry in
+ios/Orbital.xcodeproj/project.pbxproj does NOT use a hardcoded absolute path
+to sentry-xcode-debug-files.sh (breaks on EAS: /Users/expo/workingdir/build).
+Use NODE_BINARY + require.resolve('@sentry/react-native/...') after sourcing
+.xcode.env — same pattern as Bundle React Native + sentry-xcode.sh.
+
+## EAS CACHE RULE
+eas.json production: do not use custom cache.paths that include ios/Pods
+(Save cache phase can fail after a successful archive). If Save cache errors,
+use EAS_USE_CACHE=0 in production env and remove the custom cache block.
 
 ## Stack
 - Expo SDK 54, Reanimated 4.1.x, worklets 0.5.1, router v6
