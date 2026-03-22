@@ -29,6 +29,13 @@ platform :ios do
     UI.success("OTA rolled back!")
   end
 
+  desc "Staged OTA rollout (percentage 1–100)"
+  lane :staged_ota do |options|
+    pct = options[:percentage] || 10
+    UI.message("Staged OTA rollout: #{pct}%")
+    sh("./scripts/ota-staged.sh #{pct}")
+  end
+
   desc "Weekly health checks"
   lane :health_check do
     UI.message("Running weekly health checks...")
