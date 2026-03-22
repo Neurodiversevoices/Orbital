@@ -14,6 +14,21 @@ platform :ios do
     UI.success("All smoke tests passed!")
   end
 
+  desc "Publish EAS Update OTA to a channel"
+  lane :publish_ota do |options|
+    channel = options[:channel] || "production"
+    UI.message("Publishing OTA to #{channel}...")
+    sh("./scripts/ota-publish.sh #{channel}")
+    UI.success("OTA published!")
+  end
+
+  desc "Rollback production OTA to previous revision"
+  lane :rollback_ota do
+    UI.important("Rolling back OTA update...")
+    sh("./scripts/ota-rollback.sh")
+    UI.success("OTA rolled back!")
+  end
+
   desc "Full iOS release pipeline (expanded in Phase 12)"
   lane :release_ios do
     run_tests
