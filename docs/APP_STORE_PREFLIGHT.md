@@ -231,15 +231,13 @@ bundle exec fastlane deliver_screenshots
 # same as upload_to_app_store with force:true, skip_metadata, screenshots only
 ```
 
-**4) CLI equivalent (non-interactive needs `--force`):**
+**4) Metadata-only (`deliver run` vs Fastlane lane):** The standalone `fastlane deliver run` command expects `--api_key_path` to point at a **JSON** API key bundle (see [fastlane API key JSON](https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)), not a raw `.p8`. Prefer:
 ```bash
-bundle exec fastlane deliver run \
-  --api_key_path ./keys/AuthKey_K5FGNKXMAZ.p8 \
-  --app_identifier com.erparris.orbital \
-  --screenshots_path fastlane/screenshots \
-  --skip_binary_upload \
-  --skip_metadata \
-  --force
+bundle exec fastlane upload_metadata
+```
+Or use the helper that wraps `deliver run --skip_binary_upload --skip_screenshots --force` with a temp JSON built from `keys/AuthKey_HD4HWHHYDK.p8`:
+```bash
+./scripts/deliver-metadata-only.sh
 ```
 
 **Snapfile / `fastlane snapshot`:** `fastlane/Snapfile` lists simulators by **exact Apple name** (e.g. `iPhone 17 Pro Max`). If snapshot fails with “Device not in list”, run `xcrun simctl list devices available` and update `devices` to match. **`bundle exec fastlane snapshot` still requires** adding **SnapshotHelper** and a UI test target — use **`bundle exec fastlane screenshots`** instead unless you intentionally add UI tests.

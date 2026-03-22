@@ -9,7 +9,7 @@ caught by this checklist too late.
 
 ## Prerequisites
 - .env.local with SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY
-- ASC API key at keys/AuthKey_K5FGNKXMAZ.p8
+- ASC API key at keys/AuthKey_HD4HWHHYDK.p8
 - Transporter app installed as backup
 
 ## One-Command Flow
@@ -36,5 +36,5 @@ To verify: `supabase functions list --project-ref tenfwzjccqfecctxdbpi`
 ## Key Info
 - EAS login: erparris
 - SSH remote: git@github.com:Neurodiversevoices/Orbital.git
-- ASC Key ID: K5FGNKXMAZ
+- ASC Key ID: HD4HWHHYDK
 - ASC Issuer ID: a6c8bd6a-8f60-4aed-a0a6-d129cb2aaf7a

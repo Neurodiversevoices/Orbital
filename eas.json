@@ -59,9 +59,9 @@
     "production": {
       "ios": {
         "ascAppId": "6757295146",
-        "ascApiKeyId": "K5FGNKXMAZ",
+        "ascApiKeyId": "HD4HWHHYDK",
         "ascApiKeyIssuerId": "a6c8bd6a-8f60-4aed-a0a6-d129cb2aaf7a",
-        "ascApiKeyPath": "./keys/AuthKey_K5FGNKXMAZ.p8"
+        "ascApiKeyPath": "./keys/AuthKey_HD4HWHHYDK.p8"
       },
       "android": {
         "serviceAccountKeyPath": "./keys/google-play-service-account.json",

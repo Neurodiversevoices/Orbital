@@ -23,9 +23,9 @@ default_platform(:ios)
 # App Store Connect API key (same as eas.json submit.production.ios)
 def orbital_asc_api_key
   app_store_connect_api_key(
-    key_id: "K5FGNKXMAZ",
+    key_id: "HD4HWHHYDK",
     issuer_id: "a6c8bd6a-8f60-4aed-a0a6-d129cb2aaf7a",
-    key_filepath: File.expand_path("../keys/AuthKey_K5FGNKXMAZ.p8", File.dirname(__FILE__))
+    key_filepath: File.expand_path("../keys/AuthKey_HD4HWHHYDK.p8", File.dirname(__FILE__))
   )
 end
 
