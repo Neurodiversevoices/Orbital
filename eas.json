@@ -17,6 +17,7 @@
         "autoIncrement": "versionCode"
       },
       "env": {
+        "EXPO_PUBLIC_IS_REVIEW_MODE": "true",
         "SENTRY_ALLOW_FAILURE": "true"
       }
     },

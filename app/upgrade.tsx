@@ -75,7 +75,9 @@ import {
   type UserEntitlements,
 } from '../lib/entitlements';
 import { useAuth } from '../lib/supabase';
-import { IS_REVIEW_MODE } from '../lib/reviewMode';
+
+const IS_REVIEW_MODE =
+  process.env.EXPO_PUBLIC_IS_REVIEW_MODE === 'true';
 
 // =============================================================================
 // PURCHASE HANDLER (Mock Checkout)
@@ -510,18 +512,90 @@ export default function UpgradeScreen() {
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {IS_REVIEW_MODE ? (
+          <>
+            <Animated.View entering={FadeInDown.delay(50).duration(400)}>
+              <View style={[styles.planCard, !isPro && styles.planCardCurrent]}>
+                <View style={styles.planCardHeader}>
+                  <View>
+                    <Text style={styles.planCardName}>Free</Text>
+                    <Text style={styles.planCardPrice}>$0</Text>
+                  </View>
+                  {!isPro && (
+                    <View style={styles.currentBadge}>
+                      <Text style={styles.currentBadgeText}>CURRENT</Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={styles.planCardDescription}>
+                  Unlimited entries · 7 days history
+                </Text>
+                <View style={styles.planCardCta}>
+                  <Text style={styles.planCardCtaText}>{isPro ? 'Basic tier' : 'Your current plan'}</Text>
+                </View>
+              </View>
+            </Animated.View>
+
+            <Animated.View entering={FadeInDown.delay(100).duration(400)}>
+              <View style={[styles.planCard, styles.planCardHighlight, isPro && !hasFamily && !hasCircle && styles.planCardCurrent]}>
+                <View style={styles.planCardHeader}>
+                  <View>
+                    <Text style={[styles.planCardName, { color: '#FFD700' }]}>Pro</Text>
+                    <Text style={styles.planCardPrice}>{formatPrice(PRO_PRICING.monthly)}/mo</Text>
+                  </View>
+                  {isPro && !hasFamily && !hasCircle && bundleSize === null && (
+                    <View style={[styles.currentBadge, { backgroundColor: '#FFD700' }]}>
+                      <Text style={[styles.currentBadgeText, { color: '#000' }]}>CURRENT</Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={styles.planCardDescription}>
+                  Unlimited signals · Full pattern history · Priority support
+                </Text>
+                <Pressable
+                  style={[
+                    styles.planCardCtaButton,
+                    { width: '100%' },
+                    isPro && styles.planCardCtaButtonDisabled,
+                  ]}
+                  onPress={() => handlePurchase(PRODUCT_IDS.PRO_MONTHLY, 'Pro (Monthly)')}
+                  disabled={isPurchasing || isPro}
+                >
+                  <Text style={[styles.planCardCtaButtonText, isPro && styles.planCardCtaButtonTextDisabled]}>
+                    {isPro ? 'Active' : `Pro Monthly · ${formatPrice(PRO_PRICING.monthly)}/mo`}
+                  </Text>
+                </Pressable>
+              </View>
+            </Animated.View>
+
+            <Animated.View entering={FadeInDown.delay(150).duration(400)} style={styles.footerSection}>
+              <Pressable
+                onPress={handleRestore}
+                disabled={isRestoring}
+                style={styles.restoreButton}
+              >
+                {isRestoring ? (
+                  <ActivityIndicator color="rgba(255,255,255,0.6)" size="small" />
+                ) : (
+                  <>
+                    <RefreshCw size={14} color="rgba(255,255,255,0.5)" />
+                    <Text style={styles.restoreButtonText}>Restore Purchases</Text>
+                  </>
+                )}
+              </Pressable>
+              <Pressable onPress={() => Linking.openURL('https://orbitalhealth.app/privacy')}>
+                <Text style={styles.footerLink}>Privacy Policy</Text>
+              </Pressable>
+            </Animated.View>
+
+            <View style={{ height: 40 }} />
+          </>
+        ) : (
+          <>
         {/* =============================================================== */}
         {/* CHOOSE YOUR PLAN — All options visible and equal */}
         {/* =============================================================== */}
         <Text style={styles.plansHeader}>Choose Your Plan</Text>
-
-        {IS_REVIEW_MODE && (
-          <View style={styles.reviewHint}>
-            <Text style={styles.reviewHintText}>
-              Tap a plan to test the purchase flow. Subscriptions complete instantly in the sandbox environment.
-            </Text>
-          </View>
-        )}
 
         {/* FREE */}
         <Animated.View entering={FadeInDown.delay(50).duration(400)}>
@@ -868,6 +942,8 @@ export default function UpgradeScreen() {
         </Animated.View>
 
         <View style={{ height: 40 }} />
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
