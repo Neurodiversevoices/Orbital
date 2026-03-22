@@ -1,5 +1,5 @@
 export const colors = {
-  background: '#05060A',
+  background: '#01020A',
 
   // Capacity states
   resourced: '#00FFFF',   // Cyan - full capacity

@@ -46,7 +46,7 @@ export function IPhoneFrame({
   batteryLevel = 100,
   showStatusBar = true,
   showHomeIndicator = true,
-  backgroundColor = '#05060A',
+  backgroundColor = '#01020A',
   frameColor = '#1C1C1E',
   mode = 'embed',
 }: IPhoneFrameProps) {

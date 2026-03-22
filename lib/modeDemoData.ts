@@ -194,7 +194,7 @@ const MODE_NOTES: Record<AppMode, Record<CapacityState, string[]>> = {
       'Behavior challenges all day.',
       'Too many IEP meetings.',
       'No support available.',
-      'Need mental health day.',
+      'Need a capacity recovery day.',
     ],
   },
   university: {

@@ -270,6 +270,7 @@ export default function CCIInstrumentScreen() {
             </View>
           )}
 
+          {/* Clinical Capacity Index Notice */}
           <View style={styles.cptNotice}>
             <Text style={styles.cptNoticeText}>
               Supports clinical documentation and record review in a manner compatible with standard clinical review billing codes.

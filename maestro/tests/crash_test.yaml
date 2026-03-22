@@ -3,6 +3,15 @@ appId: com.erparris.orbital
 - launchApp:
     appId: com.erparris.orbital
     clearState: false
+- runFlow:
+    when:
+      visible: "Terms of Service"
+    commands:
+      - scrollDown:
+          speed: 40
+          duration: 3000
+      - tapOn: "Scroll to Accept"
+      - waitForAnimationToEnd
 - waitForAnimationToEnd
 
 # Rapid navigation stress test
@@ -29,5 +38,14 @@ appId: com.erparris.orbital
 - launchApp:
     appId: com.erparris.orbital
     clearState: false
+- runFlow:
+    when:
+      visible: "Terms of Service"
+    commands:
+      - scrollDown:
+          speed: 40
+          duration: 3000
+      - tapOn: "Scroll to Accept"
+      - waitForAnimationToEnd
 - waitForAnimationToEnd
 - assertVisible: ".*"

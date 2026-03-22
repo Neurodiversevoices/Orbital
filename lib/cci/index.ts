@@ -22,3 +22,12 @@ export type { CCINarrativeResult } from './dynamic/narrative';
 export type { CCIFunctionalImpact, SeverityLevel } from './dynamic/impact';
 export type { CCIPowerTemplateInput } from './powerTemplate';
 export type { CCIPdfResult, CCIPdfOptions } from './generateCCIPdf';
+
+// CCI Clinical Artifact v1
+export { generateCCIV1Data, getDriverLabel, classifyBaseline, computeDirection, computeAreasOfChange } from './generateCCIV1Data';
+export type { CCIV1Data, BaselineClassification, DirectionClassification, AreaChangeDirection, AreaOfChange } from './generateCCIV1Data';
+export { buildCCIV1HTML } from './cciV1HTML';
+export { serializeCCIV1ToFHIR } from './cciToFHIR';
+export type { CCIV1FHIRDocumentReference } from './cciToFHIR';
+export { generateCCIV1Pdf } from './cciToPDF';
+export type { CCIV1PdfResult, CCIV1PdfOptions } from './cciToPDF';

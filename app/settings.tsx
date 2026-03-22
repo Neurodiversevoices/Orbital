@@ -45,6 +45,7 @@ import { useAppMode } from '../lib/hooks/useAppMode';
 import { useTutorial } from '../lib/hooks/useTutorial';
 import { useAccess } from '../lib/access';
 import { DELETION_DISCLOSURE } from '../lib/storage';
+import { useAuth } from '../lib/supabase/auth';
 import { ProprietaryFooter } from '../components/legal';
 import { APP_MODE_CONFIGS } from '../types';
 import { ModeSelector } from '../components';
@@ -79,6 +80,7 @@ export default function SettingsScreen() {
     enableFreeUserView,
     disableFreeUserView,
   } = useAccess();
+  const { deleteAccount } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
   const [showDemoPicker, setShowDemoPicker] = useState(false);
@@ -186,6 +188,30 @@ export default function SettingsScreen() {
     await resetTutorial();
     router.replace('/tutorial');
   }, [resetTutorial, router]);
+
+  const handleDeleteAccount = useCallback(() => {
+    Alert.alert(
+      'Delete Account',
+      'This will permanently delete your account and all data. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete Account',
+          style: 'destructive',
+          onPress: async () => {
+            setIsProcessing(true);
+            const result = await deleteAccount();
+            setIsProcessing(false);
+            if (result.success) {
+              router.replace('/auth');
+            } else {
+              Alert.alert('Error', result.error || 'Account deletion failed. Please try again.');
+            }
+          },
+        },
+      ]
+    );
+  }, [deleteAccount, router]);
 
   const demoT = (t as any).demo || {};
   const demoStatusLabel = isDemoMode ? (demoT.demoModeActive || 'Demo Active') : (demoT.demoMode || 'Demo Mode');
@@ -512,6 +538,14 @@ export default function SettingsScreen() {
             label="Data Exit"
             sublabel="Delete all data"
             onPress={() => router.push('/data-exit')}
+            disabled={isProcessing}
+            danger
+          />
+          <SettingsRow
+            icon={Trash2}
+            label="Delete Account"
+            sublabel="Permanently delete account and all data"
+            onPress={handleDeleteAccount}
             disabled={isProcessing}
             danger
           />

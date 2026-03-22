@@ -124,7 +124,7 @@ function assessOverloadRisk(
     descriptor = 'No significant overload indicators';
   }
 
-  return { domain: 'Overload Risk', severity, descriptor };
+  return { domain: 'Burnout Risk', severity, descriptor };
 }
 
 /**
