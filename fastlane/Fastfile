@@ -43,6 +43,18 @@ platform :ios do
     UI.success("Performance check passed!")
   end
 
+  desc "Crash stress (Maestro navigation + resume)"
+  lane :crash_detection do
+    UI.message("Running crash detection...")
+    sh("mkdir -p ./fastlane/logs")
+    sh(
+      "maestro test ./maestro/tests/crash_test.yaml " \
+      "--format junit " \
+      "--output ./fastlane/logs/crash_results.xml"
+    )
+    UI.success("No crashes detected!")
+  end
+
   desc "Full iOS release pipeline (expanded in Phase 12)"
   lane :release_ios do
     run_tests

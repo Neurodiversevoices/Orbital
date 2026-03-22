@@ -1,0 +1,33 @@
+appId: com.erparris.orbital
+---
+- launchApp:
+    appId: com.erparris.orbital
+    clearState: false
+- waitForAnimationToEnd
+
+# Rapid navigation stress test
+- tapOn:
+    text: "Plans"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "×"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Settings"
+    optional: true
+- waitForAnimationToEnd
+- tapOn:
+    text: "Plans"
+    optional: true
+- waitForAnimationToEnd
+
+# Background/foreground
+- pressKey: Home
+- waitForAnimationToEnd
+- launchApp:
+    appId: com.erparris.orbital
+    clearState: false
+- waitForAnimationToEnd
+- assertVisible: ".*"
