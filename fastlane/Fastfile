@@ -36,6 +36,13 @@ platform :ios do
     UI.success("Health check complete!")
   end
 
+  desc "Performance check (Maestro smoke duration)"
+  lane :check_performance do
+    UI.message("Running performance checks...")
+    sh("./scripts/perf-check.sh")
+    UI.success("Performance check passed!")
+  end
+
   desc "Full iOS release pipeline (expanded in Phase 12)"
   lane :release_ios do
     run_tests
