@@ -9,8 +9,8 @@ Read this file before any submission task.
    → zero matches required
 3. grep -rn "console\.log" app/ components/ | grep -v "__DEV__"
    → zero matches required  
-4. ls ios/Orbital/PrivacyInfo.xcprivacy
-   → file must exist, not deleted
+4. ls ios/PrivacyInfo.xcprivacy && ls ios/Orbital/PrivacyInfo.xcprivacy
+   → both must exist, not deleted
 5. cat app.json | grep buildNumber
    → must be incremented from last submission
 6. cat app.json | grep usesAppleSignIn
@@ -36,7 +36,7 @@ Read this file before any submission task.
 - Purchase state not hardcoded → verify
 
 ## Privacy Checks
-- ios/Orbital/PrivacyInfo.xcprivacy exists
+- ios/PrivacyInfo.xcprivacy and ios/Orbital/PrivacyInfo.xcprivacy both exist
 - Account deletion accessible from Settings
 - No forbidden regulatory terms in user-visible strings
 

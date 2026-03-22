@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.local
+.env.*
+keys/
+ios/
+android/
+dist/
+.expo/
+*.ipa
+*.aab
+*.tfstate
+*.p8
