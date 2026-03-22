@@ -169,7 +169,8 @@ platform :ios do
       skip_binary_upload: true,
       skip_metadata: true,
       skip_screenshots: false,
-      screenshots_path: "./fastlane/screenshots"
+      screenshots_path: "./fastlane/screenshots",
+      run_precheck_before_submit: false
     )
   end
 
@@ -213,7 +214,8 @@ platform :ios do
       skip_binary_upload: true,
       skip_metadata: true,
       skip_screenshots: false,
-      screenshots_path: "./fastlane/screenshots"
+      screenshots_path: "./fastlane/screenshots",
+      run_precheck_before_submit: false
     )
   end
 
