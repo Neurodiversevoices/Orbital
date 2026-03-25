@@ -324,9 +324,9 @@ function GovernanceFooter({ data }: { data: CCIV1Data }) {
     <View style={styles.footer}>
       <Text style={styles.footerText}>
         This instrument is generated from self-reported capacity check-ins and
-        does not constitute a clinical diagnosis, treatment recommendation, or
-        medical device output. Excluded from Clinical Decision Support
-        requirements under 21st Century Cures Act §3060(a). Provider
+        does not constitute a pattern identification conclusion, support recommendation, or
+        observational tool output. Excluded from Clinical Decision Support
+        requirements under 21st Century Cures Act Section 3060(a). Provider
         interpretation required.
       </Text>
       <View style={styles.footerBottomRow}>

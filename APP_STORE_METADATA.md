@@ -1,8 +1,8 @@
 # App Store & Play Store Metadata — Orbital
 
-**Date:** 2026-03-03
+**Date:** 2026-03-25
 **Bundle ID:** com.erparris.orbital
-**Version:** 1.0.0 (Build 73)
+**Version:** 1.0.0 (Build 80)
 
 ---
 
@@ -69,7 +69,7 @@ Orbital 1.0 — the first public release. Log your capacity state, see patterns 
 ### Description (4000 chars max)
 
 ```
-Orbital is a clinical-grade capacity tracking instrument for adults who need to understand how their capacity shifts day to day.
+Orbital is a pattern-based capacity tracking app for adults who want to understand how their capacity shifts day to day.
 
 LOG IN SECONDS
 Record your capacity with a single gesture. No typing, no journaling — just a quick daily signal that takes under 30 seconds.
@@ -83,17 +83,14 @@ Your data stays on your device. Cloud sync is optional, encrypted in transit, an
 SHARE ON YOUR TERMS
 Circles let you share capacity patterns with people you trust — family, close friends, trusted supporters. Every member must explicitly consent. No surprises, no surveillance.
 
-CLINICAL CAPACITY INDEX (CCI)
-Generate a formal capacity summary — a PDF document synthesizing your patterns over time. Useful for personal records, workplace conversations, or professional consultations.
+CAPACITY CREDENTIAL INDEX (CCI)
+Generate a capacity summary from your logging history when eligible. Useful for personal records, workplace conversations, or professional consultations. Exact format and eligibility are shown in the app.
 
 BUILT FOR PEOPLE WHO THINK DIFFERENTLY
 Designed from the ground up for neurodivergent adults, people with chronic fluctuations, caregivers, and high-performance professionals whose capacity varies in ways that standard tools don't capture.
 
-PRICING
-• Starter (Free): Unlimited logging, 7-day pattern history
-• Pro ($29/month or $290/year): Full pattern history, trend analysis, data export
-• Circle ($79/month or $790/year): Shared visibility for up to 5 people
-• CCI: One-time purchase for capacity credential generation
+IN-APP PURCHASES (REVENUECAT / APP STORE)
+Tiers and one-time products use these product IDs (pricing is shown at purchase in the app and in App Store Connect): orbital_pro_monthly, orbital_pro_annual; orbital_family_monthly, orbital_family_annual; orbital_family_plus_monthly, orbital_family_plus_annual; orbital_circle_monthly, orbital_circle_annual; orbital_bundle_10_annual, orbital_bundle_15_annual, orbital_bundle_20_annual; orbital_admin_addon_monthly, orbital_admin_addon_annual; orbital_cci_30, orbital_cci_60, orbital_cci_90, orbital_cci_bundle, orbital_cci_free, orbital_cci_pro, orbital_cci_circle_all, orbital_cci_bundle_all.
 
 OFFLINE-FIRST
 Works without internet. Your data is stored locally first, always. Cloud sync happens automatically when you're connected.
@@ -142,8 +139,8 @@ Your data stays on your device. When you sign in, it syncs across your devices �
 SHARE ON YOUR TERMS
 Circles let you share capacity patterns with people you trust — family, close friends, trusted supporters. Every member must explicitly consent. No surprises, no surveillance.
 
-CLINICAL CAPACITY INDEX (CCI)
-When you're ready, generate a formal capacity summary — a PDF document synthesizing your patterns over time. Useful for personal records, workplace conversations, or professional consultations.
+CAPACITY CREDENTIAL INDEX (CCI)
+When you're ready, generate a capacity summary from your logging history. Useful for personal records, workplace conversations, or professional consultations. Exact format and eligibility are shown in the app.
 
 WHAT ORBITAL IS NOT
 Orbital is not a diagnostic instrument. It does not provide clinical assessments or care recommendations. It is a personal data instrument — you record, you own, you decide what to do with it.
@@ -151,11 +148,8 @@ Orbital is not a diagnostic instrument. It does not provide clinical assessments
 BUILT FOR PEOPLE WHO THINK DIFFERENTLY
 Designed from the ground up for neurodivergent individuals, people with chronic fluctuations, caregivers, and anyone whose capacity shifts in ways that standard tools don't capture.
 
-PRICING
-- Starter (Free): Unlimited logging, 7-day pattern history
-- Pro ($29/month or $290/year): Full pattern history, trend analysis, data export
-- Circle ($79/month or $790/year): Shared visibility for up to 5 people
-- CCI: One-time purchase for capacity credential generation
+IN-APP PURCHASES (REVENUECAT / PLAY BILLING)
+Use the same product ID family as iOS where applicable; all prices are shown at purchase in the app and in Play Console.
 
 OFFLINE-FIRST
 Works without internet. Your data is stored locally first, always. Cloud sync happens automatically when you're connected.
@@ -178,7 +172,7 @@ Everyone (IARC)
 No
 
 ### In-App Purchases
-Yes — $9.00 – $5,200.00 per item
+Yes — tiered subscriptions and one-time products; prices shown at purchase.
 
 ---
 

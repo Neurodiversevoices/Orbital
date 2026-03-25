@@ -36,7 +36,7 @@ import {
   InteractionManager,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   X,
   Check,
@@ -284,8 +284,7 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
           </Text>
         )}
         <Text style={styles.cciCptNotice}>
-          Supports clinical documentation and record review in a manner compatible with standard clinical review billing codes.
-          Reimbursement is not guaranteed and varies by payer.
+          Designed to support documentation workflows.
         </Text>
       </View>
 
@@ -516,6 +515,7 @@ export default function UpgradeScreen() {
   const hasAdminAddOn = entitlements?.hasAdminAddOn ?? false;
   const hasCCIPurchased = entitlements?.hasCCIPurchased ?? false;
   const bundleSize = entitlements?.bundleSize ?? null;
+  const insets = useSafeAreaInsets();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -575,6 +575,10 @@ export default function UpgradeScreen() {
                 <Text style={styles.planCardDescription}>
                   Unlimited signals · Full pattern history · Priority support
                 </Text>
+                <Text style={styles.reviewRenewalNotice}>
+                  Subscriptions automatically renew unless cancelled at least 24 hours before the end of the
+                  current period. Manage or cancel in App Store Settings.
+                </Text>
                 <Pressable
                   style={[
                     styles.planCardCtaButton,
@@ -591,27 +595,7 @@ export default function UpgradeScreen() {
               </View>
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(150).duration(400)} style={styles.footerSection}>
-              <Pressable
-                onPress={handleRestore}
-                disabled={isRestoring}
-                style={styles.restoreButton}
-              >
-                {isRestoring ? (
-                  <ActivityIndicator color="rgba(255,255,255,0.6)" size="small" />
-                ) : (
-                  <>
-                    <RefreshCw size={14} color="rgba(255,255,255,0.5)" />
-                    <Text style={styles.restoreButtonText}>Restore Purchases</Text>
-                  </>
-                )}
-              </Pressable>
-              <Pressable onPress={() => Linking.openURL('https://orbitalhealth.app/privacy')}>
-                <Text style={styles.footerLink}>Privacy Policy</Text>
-              </Pressable>
-            </Animated.View>
-
-            <View style={{ height: 40 }} />
+            <View style={{ height: 16 }} />
           </>
         ) : (
           <>
@@ -921,21 +905,6 @@ export default function UpgradeScreen() {
         {/* FOOTER */}
         {/* =============================================================== */}
         <Animated.View entering={FadeInDown.delay(450).duration(400)} style={styles.footerSection}>
-          <Pressable
-            onPress={handleRestore}
-            disabled={isRestoring}
-            style={styles.restoreButton}
-          >
-            {isRestoring ? (
-              <ActivityIndicator color="rgba(255,255,255,0.6)" size="small" />
-            ) : (
-              <>
-                <RefreshCw size={14} color="rgba(255,255,255,0.5)" />
-                <Text style={styles.restoreButtonText}>Restore Purchases</Text>
-              </>
-            )}
-          </Pressable>
-
           {!PAYMENTS_ENABLED && (
             <View style={styles.stubNotice}>
               <Text style={styles.stubNoticeText}>
@@ -952,22 +921,43 @@ export default function UpgradeScreen() {
             You can manage and cancel your subscriptions by going to your App Store
             account settings after purchase.
           </Text>
-
-          <View style={styles.footerLinks}>
-            <Pressable onPress={() => Linking.openURL('https://orbitalhealth.app/terms')}>
-              <Text style={styles.footerLink}>Terms</Text>
-            </Pressable>
-            <Text style={styles.footerDot}>·</Text>
-            <Pressable onPress={() => Linking.openURL('https://orbitalhealth.app/privacy')}>
-              <Text style={styles.footerLink}>Privacy</Text>
-            </Pressable>
-          </View>
         </Animated.View>
 
-        <View style={{ height: 40 }} />
+        <View style={{ height: 24 }} />
           </>
         )}
       </ScrollView>
+      <View
+        style={[
+          styles.paywallStickyFooter,
+          { paddingBottom: Math.max(insets.bottom, 12) },
+        ]}
+      >
+        <Pressable
+          onPress={handleRestore}
+          disabled={isRestoring}
+          style={styles.restoreButton}
+          testID="paywall-restore-sticky"
+        >
+          {isRestoring ? (
+            <ActivityIndicator color="rgba(255,255,255,0.6)" size="small" />
+          ) : (
+            <>
+              <RefreshCw size={14} color="rgba(255,255,255,0.5)" />
+              <Text style={styles.restoreButtonText}>Restore Purchases</Text>
+            </>
+          )}
+        </Pressable>
+        <View style={styles.footerLinks}>
+          <Pressable onPress={() => Linking.openURL('https://orbitalhealth.app/terms')}>
+            <Text style={styles.footerLink}>Terms</Text>
+          </Pressable>
+          <Text style={styles.footerDot}>·</Text>
+          <Pressable onPress={() => Linking.openURL('https://orbitalhealth.app/privacy')}>
+            <Text style={styles.footerLink}>Privacy</Text>
+          </Pressable>
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
@@ -1023,6 +1013,21 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     paddingHorizontal: spacing.md,
+  },
+  paywallStickyFooter: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: colors.background,
+    paddingTop: spacing.sm,
+    paddingHorizontal: spacing.md,
+    alignItems: 'center',
+  },
+  reviewRenewalNotice: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.45)',
+    lineHeight: 16,
+    marginBottom: spacing.md,
+    textAlign: 'center',
   },
 
   // Plans Header
