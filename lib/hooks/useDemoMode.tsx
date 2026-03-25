@@ -26,9 +26,15 @@ import {
 // =============================================================================
 // FOUNDER-ONLY GATE
 // Demo mode is ONLY available when EXPO_PUBLIC_FOUNDER_DEMO=1
-// In production builds, this is unset → demo entry points do not render
+// Store-bound profiles set EXPO_PUBLIC_IS_REVIEW_MODE or EXPO_PUBLIC_APP_STORE_REVIEW —
+// founder demo must never run there even if FOUNDER_DEMO is mis-set in env.
 // =============================================================================
-export const FOUNDER_DEMO_ENABLED = process.env.EXPO_PUBLIC_FOUNDER_DEMO === '1';
+const IS_APP_STORE_BUILD =
+  process.env.EXPO_PUBLIC_IS_REVIEW_MODE === 'true' ||
+  process.env.EXPO_PUBLIC_APP_STORE_REVIEW === '1';
+
+export const FOUNDER_DEMO_ENABLED =
+  process.env.EXPO_PUBLIC_FOUNDER_DEMO === '1' && !IS_APP_STORE_BUILD;
 
 /**
  * HARD EXECUTION GUARD — Engine-level protection

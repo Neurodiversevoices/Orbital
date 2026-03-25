@@ -47,6 +47,7 @@ import { useAccess } from '../lib/access';
 import { DELETION_DISCLOSURE } from '../lib/storage';
 import { useAuth } from '../lib/supabase/auth';
 import { ProprietaryFooter } from '../components/legal';
+import ShaderOrb from '../components/orb/ShaderOrb';
 import { APP_MODE_CONFIGS } from '../types';
 import { ModeSelector } from '../components';
 import { getUserEntitlements, type UserEntitlements } from '../lib/entitlements';
@@ -238,7 +239,7 @@ export default function SettingsScreen() {
         <View style={styles.headerSpacer} />
         <View style={styles.logoContainer}>
           <View style={[styles.logoOrb, isDemoMode && styles.logoOrbDemo]}>
-            <View style={[styles.logoInner, { backgroundColor: isDemoMode ? '#FF9800' : '#00E5FF' }]} />
+            <ShaderOrb size={32} staticCapacity={isDemoMode ? 0.5 : 1.0} disabled />
           </View>
         </View>
         <Pressable onPress={() => router.back()} style={styles.closeButton}>
@@ -835,11 +836,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
-  },
-  logoInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    overflow: 'hidden',
   },
   closeButton: {
     padding: spacing.sm,

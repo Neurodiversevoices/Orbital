@@ -10,6 +10,8 @@
     "newArchEnabled": true,
     "jsEngine": "hermes",
     "scheme": "orbital",
+    "assets": ["./assets/orb_interior.png"],
+    "assetBundlePatterns": ["./assets/**/*"],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",

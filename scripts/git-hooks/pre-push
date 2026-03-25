@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Pre-push audit — runs only when pushing branch `submission`.
+# Install: git config core.hooksPath scripts/git-hooks
+#          chmod +x scripts/git-hooks/pre-push
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+if [[ "$BRANCH" != "submission" ]]; then
+  exit 0
+fi
+
+echo "Orbital pre-push audit (branch: submission)..."
+
+# 1) Forbidden terms (user-visible surfaces)
+if grep -r -E "diagnosis|treatment|therapy|medical device|HIPAA|CPT|FDA" app/ components/ 2>/dev/null | grep -q .; then
+  echo "FAIL: forbidden regulatory term in app/ or components/"
+  exit 1
+fi
+
+# 2) console.log outside __DEV__-only lines (same rule as .cursorrules)
+if grep -rn "console\.log" app/ components/ --include='*.tsx' --include='*.ts' 2>/dev/null | grep -v "__DEV__" | grep -q .; then
+  echo "FAIL: console.log without __DEV__ on same line — grep app/ components/ and fix"
+  grep -rn "console\.log" app/ components/ --include='*.tsx' --include='*.ts' 2>/dev/null | grep -v "__DEV__" | head -25 || true
+  exit 1
+fi
+
+# 3) TypeScript (entire project; known issue: supabase/functions Deno imports may fail locally)
+if ! npx tsc --noEmit; then
+  echo "FAIL: npx tsc --noEmit"
+  exit 1
+fi
+
+# 4) Obvious hardcoded IAP bypass
+if grep -rnE "isPro\s*=\s*true|bypassSubscription\s*=\s*true" lib/subscription app lib --include='*.tsx' --include='*.ts' 2>/dev/null | grep -q .; then
+  echo "FAIL: suspicious IAP override"
+  exit 1
+fi
+
+echo "Pre-push audit passed."
+exit 0

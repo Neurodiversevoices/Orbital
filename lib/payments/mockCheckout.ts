@@ -12,6 +12,7 @@
  * INTEGRATION POINT: Replace `simulatePurchase` with Stripe Checkout Session
  */
 
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   PRODUCT_IDS,
@@ -558,6 +559,17 @@ export async function executePurchase(
   productId: ProductId,
   userId: string = 'demo_user'
 ): Promise<PurchaseResult> {
+  if (Platform.OS === 'ios' || Platform.OS === 'android') {
+    if (__DEV__) {
+      console.warn('[MockCheckout] executePurchase blocked on native — use RevenueCat / StoreKit');
+    }
+    return {
+      success: false,
+      purchaseId: '',
+      error: 'Mock checkout is not available on this device.',
+    };
+  }
+
   const product = PRODUCT_CATALOG[productId];
 
   if (!product) {

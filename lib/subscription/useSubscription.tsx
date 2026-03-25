@@ -534,10 +534,11 @@ export function useSubscription(): SubscriptionContextType {
     return {
       ...DEFAULT_SUBSCRIPTION_STATE,
       isLoading: false,
+      isAvailable: false,
       purchase: async (_productId?: string) => false,
       restore: async () => false,
       refresh: async () => {},
-      hasAccess: () => true, // Default to allowing access
+      hasAccess: () => false,
       currentMonthSignals: 0,
       setCurrentMonthSignals: () => {},
     };

@@ -1,0 +1,30 @@
+# Single-screen orb capture for shader iteration (Home tab).
+# Run from repo root: maestro test maestro/tests/orb_home_preview.yaml
+appId: com.erparris.orbital
+---
+- launchApp:
+    appId: com.erparris.orbital
+    clearState: false
+
+# Leave non-Home tabs (tab bar: Home ≈ first icon, ~10% x, ~96% y).
+- runFlow:
+    when:
+      visible: "Briefings"
+    commands:
+      - tapOn:
+          point: "10%, 96%"
+      - waitForAnimationToEnd
+- runFlow:
+    when:
+      visible: "Clinical Capacity Instrument"
+    commands:
+      - tapOn:
+          point: "10%, 96%"
+      - waitForAnimationToEnd
+
+- extendedWaitUntil:
+    visible: "Today's Capacity State"
+    timeout: 120000
+
+- waitForAnimationToEnd
+- takeScreenshot: orb_preview

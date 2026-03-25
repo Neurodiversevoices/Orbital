@@ -23,16 +23,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, FileText, Download, Eye, ExternalLink, Mail, Users } from 'lucide-react-native';
 import { colors, spacing, borderRadius, commonStyles } from '../theme';
-import { generateCCIArtifactHTML, getGoldenMasterHTML, getCircleGoldenMasterHTML, getBundleGoldenMasterHTML } from '../lib/cci';
-import { FOUNDER_DEMO_ENABLED } from '../lib/hooks/useDemoMode';
+import { getGoldenMasterHTML, getCircleGoldenMasterHTML, getBundleGoldenMasterHTML } from '../lib/cci';
 import { ISSUANCE_REQUEST_URL } from '../lib/payments';
 
 /**
- * CCI-Q4 is ALWAYS demo-safe: it uses hardcoded golden master data.
- * On web, we allow all visitors to view the sample instrument.
- * On native, we gate behind FOUNDER_DEMO for App Store compliance.
+ * Golden master only — no user data, no live issuance on-device.
+ * Production native builds intentionally unset EXPO_PUBLIC_FOUNDER_DEMO; gating on that
+ * hid this screen on iPhone/iPad ("CCI Issuance not available") even though content is safe.
  */
-const CCI_ACCESSIBLE = Platform.OS === 'web' || FOUNDER_DEMO_ENABLED;
+const CCI_ACCESSIBLE = true;
 
 // =============================================================================
 // CCI TYPE VALIDATION — NO SILENT FALLBACKS

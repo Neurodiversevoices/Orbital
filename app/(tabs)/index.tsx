@@ -66,7 +66,8 @@ function formatDate(locale: Locale): string {
 // =============================================================================
 
 const INITIAL_CAPACITY = 0.82;
-const ORB_SIZE = 280;
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const ORB_SIZE = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT) * 0.82;
 const ORB_HIT_PADDING = 20; // Extra touch forgiveness around orb
 const ORB_HIT_SIZE = ORB_SIZE + ORB_HIT_PADDING * 2; // 320x320
 
@@ -450,6 +451,22 @@ export default function HomeScreen() {
     return { color: c as string };
   });
 
+  /** Capacity-tinted drop shadow under the orb (matches shader ramp) */
+  const orbDropShadowStyle = useAnimatedStyle(() => {
+    const shadowColor = interpolateColor(
+      capacityShared.value,
+      [0, 0.5, 1],
+      ['#D11A1A', '#E0AD1F', '#0DC6D9'],
+    );
+    return {
+      shadowColor: shadowColor as string,
+      shadowOffset: { width: 0, height: 14 },
+      shadowOpacity: 0.6,
+      shadowRadius: 40,
+      elevation: 28,
+    };
+  });
+
   // ─── Handlers ──────────────────────────────────────────────────────
 
   const handleCategorySelect = useCallback((category: Category) => {
@@ -661,7 +678,7 @@ export default function HomeScreen() {
                 {currentState && (
                   <SavePulse trigger={saveTrigger} state={currentState} />
                 )}
-                <View style={styles.instrumentContainer}>
+                <Animated.View style={[styles.instrumentContainer, orbDropShadowStyle]}>
                   <ShaderOrb
                     size={ORB_SIZE}
                     capacity={capacityShared}
@@ -676,7 +693,7 @@ export default function HomeScreen() {
                       uCrossfade={crossfadeTherm}
                     />
                   </View>
-                </View>
+                </Animated.View>
               </Animated.View>
             </GestureDetector>
 
@@ -808,11 +825,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
+    overflow: 'visible',
   },
   // ─── Instrument container (Orb + Therm stacked) ───
   instrumentContainer: {
     width: ORB_SIZE,
     height: ORB_SIZE,
+    borderRadius: ORB_SIZE / 2,
+    overflow: "hidden" as const,
   },
   thermOverlay: {
     position: 'absolute' as const,

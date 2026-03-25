@@ -419,11 +419,18 @@ export default function UpgradeScreen() {
 
     setIsPurchasing(true);
 
-    // Native iOS/Android: use RevenueCat (StoreKit) when available — triggers real IAP sheet
-    // Web or RevenueCat unavailable: fall back to mock checkout
-    const useRealIAP = Platform.OS !== 'web' && revenueCatAvailable;
+    const isNativeMobile = Platform.OS === 'ios' || Platform.OS === 'android';
 
-    if (useRealIAP) {
+    // iOS/Android: never use mock checkout — it simulates success without StoreKit.
+    if (isNativeMobile) {
+      if (!revenueCatAvailable) {
+        setIsPurchasing(false);
+        Alert.alert(
+          'Purchases Unavailable',
+          'In-app purchases are not available right now. Please check your connection and try again later.',
+        );
+        return;
+      }
       try {
         // Defer purchase to next frame — ensures view hierarchy is ready (fixes iPad StoreKit sheet not appearing)
         await new Promise<void>(resolve => InteractionManager.runAfterInteractions(resolve));
@@ -434,38 +441,49 @@ export default function UpgradeScreen() {
           Alert.alert(
             'Success!',
             `${productName} has been activated.`,
-            [{ text: 'Continue', onPress: () => {} }]
+            [{ text: 'Continue', onPress: () => {} }],
           );
         }
-      } catch {
+      } catch (error) {
         setIsPurchasing(false);
+        Alert.alert(
+          'Purchase Failed',
+          error instanceof Error ? error.message : 'Something went wrong. Please try again.',
+        );
       }
-    } else {
-      await handleMockPurchase(
-        productId,
-        () => {
-          if (Platform.OS === 'web') {
-            window.alert(`Success! ${productName} has been activated.`);
-            loadEntitlements();
-          } else {
-            Alert.alert(
-              'Success!',
-              `${productName} has been activated.`,
-              [{ text: 'Continue', onPress: () => { loadEntitlements(); } }]
-            );
-          }
-          setIsPurchasing(false);
-        },
-        (error) => {
-          if (Platform.OS === 'web') {
-            window.alert(`Purchase Failed: ${error}`);
-          } else {
-            Alert.alert('Purchase Failed', error);
-          }
-          setIsPurchasing(false);
-        }
-      );
+      return;
     }
+
+    // Web: RevenueCat when configured; otherwise stub checkout only on web.
+    if (revenueCatAvailable) {
+      try {
+        const success = await purchaseViaRevenueCat(productId);
+        setIsPurchasing(false);
+        if (success) {
+          loadEntitlements();
+          window.alert(`Success! ${productName} has been activated.`);
+        }
+      } catch (error) {
+        setIsPurchasing(false);
+        window.alert(
+          `Purchase failed: ${error instanceof Error ? error.message : 'Please try again.'}`,
+        );
+      }
+      return;
+    }
+
+    await handleMockPurchase(
+      productId,
+      () => {
+        window.alert(`Success! ${productName} has been activated.`);
+        loadEntitlements();
+        setIsPurchasing(false);
+      },
+      (error) => {
+        window.alert(`Purchase Failed: ${error}`);
+        setIsPurchasing(false);
+      },
+    );
   }, [auth.isAuthenticated, router, revenueCatAvailable, purchaseViaRevenueCat]);
 
   const handleRestore = useCallback(async () => {

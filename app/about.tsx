@@ -21,6 +21,7 @@ import {
 } from 'lucide-react-native';
 import { colors, commonStyles, spacing } from '../theme';
 import { ProprietaryFooter } from '../components/legal';
+import ShaderOrb from '../components/orb/ShaderOrb';
 
 export default function AboutScreen() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function AboutScreen() {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <View style={styles.logoOrb}>
-            <View style={styles.logoInner} />
+            <ShaderOrb size={32} staticCapacity={1.0} disabled />
           </View>
           <Text style={styles.headerTitle}>About Orbital</Text>
         </View>
@@ -270,12 +271,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
-  },
-  logoInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#00E5FF',
+    overflow: 'hidden',
   },
   headerTitle: {
     fontSize: 20,

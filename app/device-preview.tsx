@@ -24,7 +24,7 @@ import { View, Text, StyleSheet, Platform, useWindowDimensions } from 'react-nat
 import { useLocalSearchParams } from 'expo-router';
 import { TrendingUp, Minus } from 'lucide-react-native';
 import { IPhoneFrame } from '../components/device';
-import { GlassOrb } from '../components';
+import ShaderOrb from '../components/orb/ShaderOrb';
 import { colors, spacing } from '../theme';
 import { useEnergyLogs } from '../lib/hooks/useEnergyLogs';
 import { useLocale } from '../lib/hooks/useLocale';
@@ -136,7 +136,7 @@ function HomePreview() {
 
         {/* Orb */}
         <View style={previewStyles.orbContainer}>
-          <GlassOrb state={null} onStateChange={() => {}} onSave={() => {}} />
+          <ShaderOrb size={240} staticCapacity={0.82} disabled />
           {/* Capacity Spectrum */}
           <View style={previewStyles.spectrumContainer}>
             <View style={previewStyles.spectrumTrack}>

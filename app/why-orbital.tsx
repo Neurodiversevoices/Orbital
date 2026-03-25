@@ -25,6 +25,7 @@ import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { colors, spacing, borderRadius } from '../theme';
 import { useWhyOrbital } from '../lib/hooks/useWhyOrbital';
 import { ProprietaryFooter } from '../components/legal';
+import ShaderOrb from '../components/orb/ShaderOrb';
 
 interface PrincipleProps {
   icon: React.ComponentType<{ color: string; size: number }>;
@@ -123,9 +124,7 @@ export default function WhyOrbitalScreen() {
         {/* Hero */}
         <Animated.View entering={FadeIn.duration(600)} style={styles.hero}>
           <View style={styles.orbContainer}>
-            <View style={styles.orbOuter}>
-              <View style={styles.orbInner} />
-            </View>
+            <ShaderOrb size={64} staticCapacity={1.0} disabled />
           </View>
           <Text style={styles.heroTitle}>Why Orbital Exists</Text>
         </Animated.View>
@@ -243,22 +242,7 @@ const styles = StyleSheet.create({
   },
   orbContainer: {
     marginBottom: spacing.lg,
-  },
-  orbOuter: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: 'rgba(0,229,255,0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.2)',
-    justifyContent: 'center',
     alignItems: 'center',
-  },
-  orbInner: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#00E5FF',
   },
   heroTitle: {
     fontSize: 22,
