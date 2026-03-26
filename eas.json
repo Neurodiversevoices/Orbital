@@ -18,6 +18,7 @@
       },
       "env": {
         "EXPO_PUBLIC_IS_REVIEW_MODE": "true",
+        "EXPO_PUBLIC_PAYMENTS_ENABLED": "true",
         "SENTRY_ALLOW_FAILURE": "true",
         "EAS_USE_CACHE": "0"
       }

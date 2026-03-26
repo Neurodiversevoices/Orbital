@@ -956,6 +956,10 @@ export default function UpgradeScreen() {
           <Pressable onPress={() => Linking.openURL('https://orbitalhealth.app/privacy')}>
             <Text style={styles.footerLink}>Privacy</Text>
           </Pressable>
+          <Text style={styles.footerDot}>·</Text>
+          <Pressable onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}>
+            <Text style={styles.footerLink}>EULA</Text>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>
