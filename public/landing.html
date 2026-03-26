@@ -2,1733 +2,1724 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Orbital — Capacity intelligence for high-performance professionals and their care teams</title>
-<meta name="description" content="Capacity intelligence for high-performance professionals and their care teams. Daily check-ins become longitudinal capacity records for care teams. Founded for therapists, coaches, and neurodivergent adults.">
-<meta name="theme-color" content="#05060A">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orbital — Your nervous system has a signature.</title>
+<meta name="description" content="Capacity intelligence for people who need to understand themselves. Track your functional capacity. See your patterns. Know yourself.">
+<meta name="theme-color" content="#01020A">
 <link rel="icon" href="/favicon.ico">
 <link rel="canonical" href="https://orbitalhealth.app/">
-
-<!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://orbitalhealth.app/">
-<meta property="og:title" content="Orbital — Capacity intelligence for high-performance professionals and their care teams">
-<meta property="og:description" content="One daily check-in. Three capacity states. 90 days of signals become a clinical-grade Clinical Capacity Instrument — a longitudinal record that informs clinical decisions.">
+<meta property="og:title" content="Orbital — Your nervous system has a signature.">
+<meta property="og:description" content="Capacity intelligence. Daily check-ins become longitudinal pattern data. Know yourself at the systems level.">
 <meta property="og:image" content="https://orbitalhealth.app/og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:site_name" content="Orbital">
-
-<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Orbital — Clinical-grade capacity tracking">
-<meta name="twitter:description" content="One daily check-in. Three states. 90 days of data becomes a longitudinal Clinical Capacity Instrument for care teams.">
+<meta name="twitter:title" content="Orbital — Your nervous system has a signature.">
 <meta name="twitter:image" content="https://orbitalhealth.app/og-image.png">
-<meta name="tiktok-domain-verification" content="7XMuWmJty3dFvyUwe0Tw5i50mDNMdKq5" />
 
-<!-- Fonts: DM Sans (headings/buttons), Space Mono (data/labels) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..900;1,9..40,100..900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-<!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-FHEH76Q0JZ"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-FHEH76Q0JZ');
-</script>
-
-<!-- JSON-LD Structured Data -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "name": "Orbital Health Intelligence",
-      "url": "https://orbitalhealth.app",
-      "logo": "https://orbitalhealth.app/Orbital.png",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "email": "contact@orbitalhealth.app",
-        "contactType": "customer service"
-      }
-    },
-    {
-      "@type": "SoftwareApplication",
-      "name": "Orbital",
-      "applicationCategory": "HealthApplication",
-      "operatingSystem": "iOS, Web",
-      "url": "https://orbitalhealth.app",
-      "description": "Capacity intelligence for high-performance professionals and their care teams. Daily check-ins become longitudinal capacity records for care teams.",
-      "offers": [
-        {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD",
-          "name": "Free"
-        },
-        {
-          "@type": "Offer",
-          "price": "29",
-          "priceCurrency": "USD",
-          "name": "Pro",
-          "billingPeriod": "P1M"
-        },
-        {
-          "@type": "Offer",
-          "price": "199",
-          "priceCurrency": "USD",
-          "name": "CCI Founding Cohort"
-        }
-      ]
-    }
-  ]
-}
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','G-FHEH76Q0JZ');
+function track(n,p){if(typeof gtag==='function')gtag('event',n,p||{});}
 </script>
 
 <style>
-  /* ================================================================
-     CSS CUSTOM PROPERTIES
-     ================================================================ */
-  :root {
-    --bg: #05060A;
-    --cyan: #00D7FF;
-    --cyan-dim: rgba(0, 215, 255, 0.12);
-    --cyan-border: rgba(0, 215, 255, 0.25);
-    --amber: #F5B700;
-    --red: #FF3B30;
-    --text: rgba(255,255,255,0.85);
-    --text-dim: rgba(255,255,255,0.5);
-    --text-faint: rgba(255,255,255,0.3);
-    --surface: rgba(255,255,255,0.03);
-    --surface-hover: rgba(255,255,255,0.06);
-    --border: rgba(255,255,255,0.06);
-    --border-hover: rgba(255,255,255,0.12);
-    --font-heading: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-mono: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
-    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  }
+:root {
+  --void: #01020A;
+  --cyan: #00C2CC;
+  --amber: #C88A14;
+  --crimson: #B01414;
+  --text: #F0F0F0;
+  --muted: #666680;
+  --orb-color: var(--cyan);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;font-size:16px;}
+body{
+  background:var(--void);
+  color:var(--text);
+  font-family:'DM Sans',system-ui,sans-serif;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:rgba(0,194,204,0.2);color:var(--text);}
+a{color:inherit;text-decoration:none;}
+canvas{display:block;}
 
-  /* ================================================================
-     RESET & BASE
-     ================================================================ */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
-  }
-  h1, h2, h3 { font-family: var(--font-heading); }
+/* ── HERO ── */
+#hero{
+  position:relative;
+  width:100vw;height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+#orb-canvas{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  z-index:1;
+}
+.hero-text{
+  position:relative;z-index:10;
+  text-align:left;
+  padding:0 8vw;
+  opacity:0;
+  pointer-events:none;
+  max-width:680px;
+}
+.hero-text.visible{opacity:1;}
+.hero-eyebrow{
+  font-family:'Space Mono',monospace;
+  font-size:clamp(10px,1vw,13px);
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+  color:var(--cyan);
+  margin-bottom:20px;
+}
+.hero-brand{
+  font-family:'DM Sans',sans-serif;
+  font-size:clamp(52px,7vw,88px);
+  font-weight:800;
+  letter-spacing:-0.02em;
+  line-height:1;
+  color:var(--text);
+  margin-bottom:12px;
+}
+.hero-divider{
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:24px;
+  letter-spacing:0.1em;
+}
+.hero-headline{
+  font-family:'DM Sans',sans-serif;
+  font-size:clamp(20px,2.8vw,32px);
+  font-weight:300;
+  line-height:1.3;
+  color:var(--text);
+  white-space:pre-line;
+  margin-bottom:48px;
+}
+.hero-cta{
+  font-family:'Space Mono',monospace;
+  font-size:clamp(12px,1.2vw,15px);
+  color:var(--cyan);
+  letter-spacing:0.08em;
+  cursor:pointer;
+  display:inline-block;
+  position:relative;
+  pointer-events:all;
+}
+.hero-cta::after{
+  content:'';
+  position:absolute;bottom:-2px;left:0;
+  width:0;height:2px;
+  background:var(--cyan);
+  transition:width 300ms ease;
+}
+.hero-cta:hover::after{width:100%;}
 
-  /* ================================================================
-     LAYOUT
-     ================================================================ */
-  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+/* ── ORB PIN ── */
+#orb-pin{
+  position:fixed;top:24px;right:24px;
+  width:80px;height:80px;
+  border-radius:50%;
+  z-index:100;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 400ms ease;
+  mix-blend-mode:screen;
+}
+#orb-pin.visible{opacity:1;}
 
-  /* ================================================================
-     NAV
-     ================================================================ */
-  nav {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(5,6,10,0.88);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-inner {
-    display: flex; align-items: center; justify-content: space-between;
-    max-width: 960px; margin: 0 auto; padding: 14px 24px;
-  }
-  .nav-logo {
-    display: inline-flex; align-items: center; gap: 10px;
-    font-family: var(--font-heading);
-    font-size: 18px; font-weight: 700; color: #fff;
-    letter-spacing: 0.5px; text-decoration: none;
-  }
-  .nav-logo img { width: 32px; height: 32px; border-radius: 50%; }
-  .founding-nav-badge {
-    font-family: var(--font-mono);
-    font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
-    color: var(--amber); background: rgba(245,183,0,0.1);
-    border: 1px solid rgba(245,183,0,0.2);
-    border-radius: 100px; padding: 3px 10px;
-    animation: pulse-glow 2.5s ease-in-out infinite;
-  }
-  @keyframes pulse-glow {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.55; }
-  }
-  .nav-links { display: flex; gap: 24px; align-items: center; }
-  .nav-links a {
-    font-size: 14px; color: var(--text-dim);
-    text-decoration: none; transition: color 0.2s;
-  }
-  .nav-links a:hover { color: #fff; }
-  .nav-cta {
-    background: var(--cyan); color: var(--bg);
-    border-radius: 8px; padding: 8px 18px;
-    font-family: var(--font-heading);
-    font-size: 13px; font-weight: 700;
-    text-decoration: none; transition: all 0.2s;
-  }
-  .nav-cta:hover { background: #33e0ff; color: var(--bg); }
+/* ── SECTION BASE ── */
+section{position:relative;width:100%;overflow:hidden;}
 
-  /* ================================================================
-     HERO
-     ================================================================ */
-  .hero {
-    padding: 100px 0 80px;
-    text-align: center;
-    position: relative;
-  }
-  .hero::before {
-    content: ""; position: absolute;
-    top: -60px; left: 50%; transform: translateX(-50%);
-    width: 700px; height: 700px;
-    background: radial-gradient(circle, rgba(0,215,255,0.06) 0%, transparent 65%);
-    pointer-events: none;
-  }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(245,183,0,0.08);
-    border: 1px solid rgba(245,183,0,0.2); border-radius: 100px;
-    padding: 8px 20px; margin-bottom: 28px;
-    font-family: var(--font-mono);
-    font-size: 12px; font-weight: 700; color: var(--amber);
-    letter-spacing: 0.5px;
-  }
-  .hero-badge-dot {
-    width: 6px; height: 6px; border-radius: 50%; background: var(--amber);
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-  .hero h1 {
-    font-size: clamp(32px, 5.5vw, 52px);
-    font-weight: 700; color: #fff;
-    line-height: 1.15; margin-bottom: 20px;
-    letter-spacing: -0.5px;
-    max-width: 720px; margin-left: auto; margin-right: auto;
-  }
-  .hero .subtitle {
-    font-size: clamp(15px, 2.2vw, 18px);
-    color: var(--text-dim);
-    max-width: 580px; margin: 0 auto 36px;
-    line-height: 1.6;
-  }
-  .hero-cta {
-    display: inline-block;
-    background: var(--cyan); color: var(--bg);
-    font-family: var(--font-heading);
-    font-size: 16px; font-weight: 700;
-    border: none; border-radius: 12px;
-    padding: 18px 40px;
-    cursor: pointer; transition: all 0.2s;
-    text-decoration: none;
-  }
-  .hero-cta:hover { background: #33e0ff; transform: translateY(-1px); }
-  .hero-fine {
-    font-size: 13px; color: var(--text-faint);
-    margin-top: 14px; line-height: 1.5;
-  }
-  .spots-counter {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-family: var(--font-mono);
-    font-size: 13px; font-weight: 700; color: var(--cyan);
-    background: rgba(0,215,255,0.06);
-    border: 1px solid rgba(0,215,255,0.15);
-    border-radius: 100px; padding: 8px 20px;
-    margin-top: 20px;
-  }
-  .spots-dot {
-    width: 7px; height: 7px; border-radius: 50%; background: #32D74B;
-    flex-shrink: 0;
-  }
+/* ── SCROLL SECTIONS ── */
+#panels{min-height:300vh;}
+.panel{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:10vh 10vw;
+  position:relative;
+}
+.panel-text{
+  font-family:'DM Sans',sans-serif;
+  font-size:clamp(24px,3.5vw,48px);
+  font-weight:300;
+  line-height:1.5;
+  color:var(--text);
+  white-space:pre-line;
+  text-align:center;
+  max-width:760px;
+  position:relative;z-index:5;
+}
+.panel-divider{
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+  color:var(--muted);
+  margin:24px 0;
+  letter-spacing:0.1em;
+}
+#particle-canvas{
+  position:fixed;top:0;left:0;
+  width:100%;height:100%;
+  z-index:3;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 800ms ease;
+}
+#particle-canvas.active{opacity:1;}
 
-  /* ================================================================
-     SOCIAL PROOF BAR
-     ================================================================ */
-  .social-proof {
-    padding: 40px 0;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-  }
-  .social-proof-label {
-    font-size: 12px; color: var(--text-faint);
-    letter-spacing: 1px; text-transform: uppercase;
-    margin-bottom: 16px; font-weight: 500;
-  }
-  .proof-pills {
-    display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
-  }
-  .proof-pill {
-    font-family: var(--font-heading);
-    font-size: 13px; font-weight: 600; color: var(--text-dim);
-    background: var(--surface);
-    border: 1px solid var(--border); border-radius: 100px;
-    padding: 8px 20px;
-  }
+/* ── DEMO ── */
+#demo{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:10vh 5vw;
+  gap:32px;
+}
+.demo-label{
+  font-family:'Space Mono',monospace;
+  font-size:clamp(10px,1.2vw,13px);
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--muted);
+  text-align:center;
+}
+#demo-state{
+  font-family:'DM Sans',sans-serif;
+  font-size:clamp(14px,1.8vw,20px);
+  font-weight:600;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:var(--cyan);
+  text-align:center;
+  min-height:28px;
+}
+#demo-canvas-wrap{
+  position:relative;
+  width:min(480px,80vw);
+  height:min(480px,80vw);
+  cursor:grab;
+}
+#demo-canvas-wrap:active{cursor:grabbing;}
+#demo-canvas{width:100%;height:100%;}
+#demo-pct{
+  font-family:'Space Mono',monospace;
+  font-size:clamp(28px,4vw,52px);
+  font-weight:700;
+  color:var(--text);
+  text-align:center;
+}
+.demo-slider-wrap{
+  width:min(480px,80vw);
+  display:flex;align-items:center;gap:16px;
+}
+.demo-slider-wrap span{
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  color:var(--muted);
+  width:60px;
+  white-space:nowrap;
+}
+#demo-slider{
+  flex:1;
+  -webkit-appearance:none;appearance:none;
+  height:2px;
+  background:rgba(255,255,255,0.1);
+  border-radius:2px;
+  outline:none;
+  cursor:pointer;
+}
+#demo-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:16px;height:16px;
+  border-radius:50%;
+  background:var(--cyan);
+  cursor:grab;
+  box-shadow:0 0 12px rgba(0,194,204,0.6);
+}
+#mirror-btn{
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+  letter-spacing:0.15em;
+  color:var(--muted);
+  border:1px solid rgba(255,255,255,0.1);
+  padding:10px 24px;
+  border-radius:4px;
+  cursor:pointer;
+  transition:color 200ms,border-color 200ms;
+  background:transparent;
+}
+#mirror-btn:hover{color:var(--cyan);border-color:var(--cyan);}
+#mirror-status{
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+  color:var(--cyan);
+  text-align:center;
+  min-height:18px;
+  letter-spacing:0.1em;
+}
 
-  /* ================================================================
-     SECTIONS — SHARED
-     ================================================================ */
-  section { padding: 80px 0; }
-  .section-label {
-    font-family: var(--font-mono);
-    font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--cyan); margin-bottom: 12px;
-  }
-  section h2 {
-    font-size: clamp(24px, 4vw, 36px); font-weight: 700; color: #fff;
-    margin-bottom: 16px; letter-spacing: -0.3px;
-  }
-  section h2 + p.section-sub, p.section-sub {
-    color: var(--text-dim); font-size: 16px;
-    max-width: 580px; margin-bottom: 48px; line-height: 1.6;
-  }
+/* ── CONSTELLATION ── */
+#constellation{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:10vh 5vw;
+  gap:32px;
+}
+#constellation-canvas{
+  width:min(700px,90vw);
+  height:min(420px,60vw);
+  cursor:grab;
+  border-radius:4px;
+}
+#constellation-canvas:active{cursor:grabbing;}
+.constellation-caption{
+  font-family:'DM Sans',sans-serif;
+  font-size:clamp(16px,2vw,22px);
+  font-weight:300;
+  color:var(--muted);
+  text-align:center;
+  max-width:480px;
+}
+.constellation-caption em{color:var(--text);font-style:normal;}
+#tooltip{
+  position:fixed;
+  background:rgba(1,2,10,0.95);
+  border:1px solid rgba(0,194,204,0.3);
+  color:var(--text);
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  padding:6px 10px;
+  border-radius:4px;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 150ms;
+  z-index:200;
+  letter-spacing:0.05em;
+}
 
-  /* ================================================================
-     HOW IT WORKS — 3 CARDS
-     ================================================================ */
-  .steps {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-  .step-card {
-    background: var(--surface);
-    border: 1px solid var(--border); border-radius: 16px;
-    padding: 32px 28px;
-    transition: border-color 0.25s;
-  }
-  .step-card:hover { border-color: var(--border-hover); }
-  .step-num {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 36px; height: 36px; border-radius: 50%;
-    background: rgba(0,215,255,0.08); border: 1px solid rgba(0,215,255,0.2);
-    font-family: var(--font-mono);
-    color: var(--cyan); font-size: 14px; font-weight: 700;
-    margin-bottom: 16px;
-  }
-  .step-card h3 {
-    font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;
-  }
-  .step-card p {
-    font-size: 14px; color: var(--text-dim); line-height: 1.65;
-  }
+/* ── WHO ── */
+#who{
+  padding:15vh 8vw;
+  display:flex;flex-direction:column;
+  align-items:center;gap:48px;
+}
+.who-label{
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.who-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:2px;
+  width:100%;
+  max-width:1100px;
+}
+.who-card{
+  padding:36px 28px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  font-family:'DM Sans',sans-serif;
+  font-size:clamp(14px,1.4vw,17px);
+  font-weight:300;
+  line-height:1.5;
+  color:var(--muted);
+  transition:color 400ms,border-color 400ms;
+  opacity:0;
+  transform:translateY(16px);
+}
+.who-card.visible{opacity:1;transform:none;transition:opacity 600ms,transform 600ms,color 400ms,border-color 400ms;}
+.who-card:hover{color:var(--text);border-color:rgba(255,255,255,0.15);}
+.who-card.you{
+  color:var(--text);
+  font-weight:700;
+  font-size:clamp(18px,2vw,24px);
+}
+.who-card.you.visible{
+  animation:orbpulse 2s ease-out forwards;
+}
+@keyframes orbpulse{
+  0%{box-shadow:0 0 0 0 rgba(0,194,204,0);}
+  30%{box-shadow:0 0 40px 8px rgba(0,194,204,0.2);}
+  100%{box-shadow:0 0 0 0 rgba(0,194,204,0);}
+}
 
-  /* ================================================================
-     CCI SHOWCASE
-     ================================================================ */
-  .cci-showcase { text-align: center; }
-  .cci-showcase h2 { margin-bottom: 16px; }
-  .cci-showcase .section-sub {
-    max-width: 620px; margin-left: auto; margin-right: auto;
-  }
-  .cci-preview-box {
-    width: 100%; max-width: 400px; height: 300px;
-    margin: 0 auto 36px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text-faint); font-size: 14px;
-    font-family: var(--font-mono);
-  }
-  .cci-cta {
-    display: inline-block;
-    background: var(--cyan); color: var(--bg);
-    font-family: var(--font-heading);
-    font-size: 15px; font-weight: 700;
-    border: none; border-radius: 10px;
-    padding: 16px 36px;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .cci-cta:hover { background: #33e0ff; transform: translateY(-1px); }
+/* ── PROOF ── */
+#proof{
+  padding:15vh 8vw;
+  display:flex;flex-direction:column;
+  align-items:center;gap:64px;
+}
+.proof-label{
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.proof-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:48px;
+  max-width:1100px;
+  width:100%;
+}
+.proof-card{
+  display:flex;flex-direction:column;gap:20px;
+  opacity:0;transform:translateY(20px);
+}
+.proof-card.visible{opacity:1;transform:none;transition:opacity 700ms,transform 700ms;}
+.proof-quote{
+  font-family:'DM Sans',sans-serif;
+  font-size:clamp(16px,1.6vw,20px);
+  font-weight:300;
+  line-height:1.6;
+  color:var(--text);
+  white-space:pre-line;
+}
+.proof-attr{
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:0.1em;
+}
 
-  /* ================================================================
-     CCI INTERACTIVE DEMO
-     ================================================================ */
-  .cci-demo {
-    background: #0A0C12;
-    border: 1px solid rgba(0, 212, 255, 0.1);
-    border-radius: 12px;
-    padding: 32px;
-    max-width: 720px;
-    margin: 0 auto 36px;
-    text-align: left;
-    position: relative;
-    overflow: hidden;
-  }
-  .cci-demo-label {
-    font-family: var(--font-mono);
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
-    color: var(--cyan); margin-bottom: 4px;
-  }
-  .cci-demo-title {
-    font-family: var(--font-heading);
-    font-size: 22px; font-weight: 700;
-    color: #fff; margin-bottom: 4px;
-  }
-  .cci-demo-period {
-    font-family: var(--font-mono);
-    font-size: 11px; color: var(--text-faint);
-    margin-bottom: 24px;
-  }
-  .cci-tabs {
-    display: flex; gap: 4px;
-    margin-bottom: 28px;
-  }
-  .cci-tab {
-    font-family: var(--font-mono);
-    font-size: 13px; font-weight: 700;
-    color: var(--text-dim);
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 8px;
-    padding: 10px 24px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .cci-tab:hover { border-color: var(--border-hover); color: #fff; }
-  .cci-tab.active {
-    color: var(--bg);
-    background: var(--cyan);
-    border-color: var(--cyan);
-  }
-  .cci-score-section {
-    display: flex;
-    align-items: center;
-    gap: 32px;
-    margin-bottom: 28px;
-    justify-content: center;
-  }
-  .cci-score-ring {
-    position: relative;
-    width: 140px; height: 140px;
-    flex-shrink: 0;
-  }
-  .cci-score-ring svg {
-    width: 140px; height: 140px;
-    transform: rotate(-90deg);
-  }
-  .cci-score-ring .ring-bg {
-    fill: none;
-    stroke: rgba(255,255,255,0.06);
-    stroke-width: 8;
-  }
-  .cci-score-ring .ring-fg {
-    fill: none;
-    stroke-width: 8;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 0.6s ease, stroke 0.4s ease;
-  }
-  .cci-score-value {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-  }
-  .cci-score-num {
-    font-family: var(--font-heading);
-    font-size: 38px; font-weight: 700;
-    color: #fff; line-height: 1;
-    transition: color 0.3s;
-  }
-  .cci-score-of {
-    font-family: var(--font-mono);
-    font-size: 12px; color: var(--text-faint);
-  }
-  .cci-score-label-text {
-    font-family: var(--font-mono);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 1.5px;
-    color: var(--text-dim);
-    margin-top: 2px;
-  }
-  .cci-score-meta {
-    text-align: left;
-  }
-  .cci-score-badge {
-    font-family: var(--font-mono);
-    font-size: 12px; font-weight: 700;
-    letter-spacing: 1px;
-    padding: 4px 12px;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    display: inline-block;
-    transition: all 0.3s;
-  }
-  .cci-trend-info {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--text-dim);
-  }
-  .cci-trend-rate {
-    font-weight: 700;
-    transition: color 0.3s;
-  }
-  .cci-distribution {
-    margin-bottom: 28px;
-  }
-  .cci-dist-label {
-    font-family: var(--font-mono);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 8px;
-  }
-  .cci-dist-bar {
-    display: flex;
-    height: 8px;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 6px;
-  }
-  .cci-dist-bar span {
-    transition: width 0.6s ease;
-  }
-  .cci-dist-labels {
-    display: flex;
-    justify-content: space-between;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-faint);
-  }
-  .cci-dist-labels span {
-    display: flex; align-items: center; gap: 4px;
-  }
-  .cci-dist-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-  .cci-wave {
-    margin-bottom: 28px;
-  }
-  .cci-wave-label {
-    font-family: var(--font-mono);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 8px;
-  }
-  .cci-wave-chart {
-    width: 100%;
-    height: 200px;
-  }
-  .cci-wave-chart svg {
-    width: 100%;
-    height: 100%;
-  }
-  .cci-drivers {
-    margin-bottom: 28px;
-  }
-  .cci-drivers-label {
-    font-family: var(--font-mono);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 12px;
-  }
-  .cci-drivers-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .cci-driver-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-    border-left: 3px solid;
-    transition: border-color 0.3s;
-  }
-  .cci-driver-card.positive { border-left-color: #2DD4BF; }
-  .cci-driver-card.negative { border-left-color: #FF3B30; }
-  .cci-driver-name {
-    font-family: var(--font-heading);
-    font-size: 13px; font-weight: 600;
-    color: #fff; margin-bottom: 2px;
-  }
-  .cci-driver-impact {
-    font-family: var(--font-mono);
-    font-size: 11px; font-weight: 700;
-    margin-bottom: 1px;
-    transition: color 0.3s;
-  }
-  .cci-driver-impact.positive { color: #2DD4BF; }
-  .cci-driver-impact.negative { color: #FF3B30; }
-  .cci-driver-corr {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-faint);
-  }
-  .cci-observations {
-    margin-bottom: 24px;
-    border-left: 2px solid rgba(0,215,255,0.2);
-    padding-left: 16px;
-  }
-  .cci-obs-label {
-    font-family: var(--font-mono);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 10px;
-  }
-  .cci-obs-list {
-    list-style: none; padding: 0; margin: 0;
-  }
-  .cci-obs-list li {
-    font-size: 13px;
-    color: var(--text-dim);
-    line-height: 1.6;
-    padding: 3px 0;
-    padding-left: 12px;
-    position: relative;
-  }
-  .cci-obs-list li::before {
-    content: "\2022";
-    position: absolute;
-    left: 0;
-    color: var(--cyan);
-  }
-  .cci-demo-footer {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    color: rgba(255,255,255,0.2);
-    text-align: center;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-  }
-  .cci-client-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: rgba(255,255,255,0.3);
-    margin-bottom: 12px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border);
-  }
-  .cci-watermark {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-35deg);
-    font-family: var(--font-mono);
-    font-size: 48px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.03);
-    pointer-events: none;
-    white-space: nowrap;
-    letter-spacing: 8px;
-    z-index: 1;
-  }
-  .cci-forecast {
-    margin-bottom: 24px;
-    padding: 16px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-  }
-  .cci-forecast-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 4px;
-  }
-  .cci-forecast-divider {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: rgba(255,255,255,0.1);
-    margin-bottom: 8px;
-  }
-  .cci-forecast-text {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-dim);
-    line-height: 1.7;
-  }
-  .cci-forecast-arrow {
-    color: var(--cyan);
-  }
-  .cci-credibility {
-    text-align: center;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: rgba(255,255,255,0.4);
-    margin-bottom: 20px;
-  }
-  .cci-download-link {
-    text-align: center;
-    margin-top: 16px;
-  }
-  .cci-download-link a {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--text-dim);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    transition: color 0.2s;
-  }
-  .cci-download-link a:hover {
-    color: var(--cyan);
-  }
+/* ── FINAL CTA ── */
+#final{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:48px;
+  padding:10vh 8vw;
+  position:relative;
+}
+#final-orb{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  z-index:0;
+  opacity:0.7;
+}
+.final-text{
+  position:relative;z-index:5;
+  text-align:center;
+}
+.final-headline{
+  font-family:'DM Sans',sans-serif;
+  font-size:clamp(28px,4vw,54px);
+  font-weight:300;
+  line-height:1.4;
+  color:var(--text);
+  white-space:pre-line;
+  margin-bottom:48px;
+}
+.final-ctas{
+  display:flex;flex-direction:column;
+  align-items:center;gap:24px;
+}
+.cta-primary{
+  font-family:'Space Mono',monospace;
+  font-size:clamp(13px,1.4vw,16px);
+  color:var(--void);
+  background:var(--cyan);
+  padding:16px 40px;
+  border-radius:4px;
+  letter-spacing:0.1em;
+  cursor:pointer;
+  transition:opacity 200ms,transform 200ms;
+  display:inline-block;
+}
+.cta-primary:hover{opacity:0.88;transform:translateY(-1px);}
+.cta-secondary{
+  font-family:'Space Mono',monospace;
+  font-size:clamp(11px,1.1vw,13px);
+  color:var(--text);
+  letter-spacing:0.1em;
+  cursor:pointer;
+  opacity:0.5;
+  transition:opacity 300ms;
+  position:relative;
+  display:inline-block;
+}
+.cta-secondary:hover{opacity:1;}
+.cta-secondary::after{
+  content:'';position:absolute;
+  bottom:-2px;left:0;
+  width:0;height:1px;
+  background:rgba(255,255,255,0.4);
+  transition:width 400ms ease;
+}
+.cta-secondary:hover::after{width:100%;}
 
-  /* ================================================================
-     PRICING — 3 CARDS
-     ================================================================ */
-  .pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px; max-width: 960px; margin: 0 auto;
-    align-items: start;
-  }
-  .pricing-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px; padding: 36px 28px;
-    display: flex; flex-direction: column;
-    transition: border-color 0.25s;
-  }
-  .pricing-card:hover { border-color: var(--border-hover); }
-  .pricing-card.featured {
-    border-color: rgba(0,215,255,0.35);
-    background: rgba(0,215,255,0.03);
-    box-shadow: 0 0 40px rgba(0,215,255,0.06), 0 0 80px rgba(0,215,255,0.03);
-    position: relative;
-  }
-  .pricing-tag {
-    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-    background: var(--cyan); color: var(--bg);
-    font-family: var(--font-heading);
-    font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
-    padding: 4px 16px; border-radius: 100px;
-    white-space: nowrap;
-  }
-  .pricing-card h3 {
-    font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px;
-  }
-  .pricing-card .price {
-    font-family: var(--font-heading);
-    font-size: 36px; font-weight: 700; color: #fff;
-    line-height: 1; margin-bottom: 4px;
-  }
-  .pricing-card .price small {
-    font-size: 16px; font-weight: 500; color: var(--text-faint);
-  }
-  .pricing-card .price-note {
-    font-size: 13px; color: var(--text-faint); margin-bottom: 24px;
-  }
-  .plan-features {
-    list-style: none; padding: 0; margin: 0 0 28px; flex: 1;
-  }
-  .plan-features li {
-    font-size: 14px; color: var(--text-dim);
-    padding: 6px 0 6px 22px; position: relative; line-height: 1.5;
-  }
-  .plan-features li::before {
-    content: "\2713"; position: absolute; left: 0;
-    color: var(--cyan); font-weight: 700; font-size: 13px;
-  }
-  .pricing-cta {
-    display: block; text-align: center;
-    padding: 14px; border-radius: 10px;
-    font-family: var(--font-heading);
-    font-size: 14px; font-weight: 600;
-    text-decoration: none; transition: all 0.2s;
-    cursor: pointer; border: none;
-  }
-  .pricing-cta.primary {
-    background: var(--cyan); color: var(--bg);
-  }
-  .pricing-cta.primary:hover { background: #33e0ff; }
-  .pricing-cta.secondary {
-    background: var(--surface-hover); color: var(--text-dim);
-    border: 1px solid var(--border);
-  }
-  .pricing-cta.secondary:hover { background: rgba(255,255,255,0.1); color: #fff; }
+/* ── GLITCH ── */
+body.glitch #orb-canvas{
+  animation:glitch-rgb 0.15s steps(2) infinite;
+}
+@keyframes glitch-rgb{
+  0%{filter:none;}
+  25%{filter:drop-shadow(3px 0 0 rgba(180,0,0,0.8)) drop-shadow(-3px 0 0 rgba(0,180,200,0.8));}
+  50%{filter:none;}
+  75%{filter:drop-shadow(-2px 0 0 rgba(180,0,0,0.6)) drop-shadow(2px 0 0 rgba(0,180,200,0.6));}
+  100%{filter:none;}
+}
 
-  /* ================================================================
-     FAQ ACCORDION
-     ================================================================ */
-  .faq-list { max-width: 680px; margin: 0 auto; }
-  .faq-item { border-bottom: 1px solid var(--border); padding: 24px 0; }
-  .faq-item:last-child { border-bottom: none; }
-  .faq-q {
-    font-family: var(--font-heading);
-    font-size: 16px; font-weight: 600; color: #fff;
-    cursor: pointer;
-    display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-  }
-  .faq-q::after {
-    content: "+"; font-size: 20px; font-weight: 400;
-    color: var(--text-faint); flex-shrink: 0;
-    line-height: 1.3; transition: transform 0.2s;
-  }
-  .faq-item.open .faq-q::after { transform: rotate(45deg); color: var(--text-dim); }
-  .faq-a {
-    font-size: 14px; color: var(--text-dim); line-height: 1.65;
-    display: none; padding: 12px 32px 0 0;
-  }
-  .faq-item.open .faq-a { display: block; }
+/* ── SCROLL BAR ── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--void);}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);}
 
-  /* ================================================================
-     BOTTOM CTA
-     ================================================================ */
-  .cta-bottom {
-    text-align: center; padding: 100px 0 60px;
-  }
-  .cta-bottom h2 {
-    font-size: clamp(24px, 4vw, 36px); font-weight: 700; color: #fff;
-    margin-bottom: 12px; letter-spacing: -0.3px;
-  }
-  .cta-bottom .cta-sub {
-    color: var(--text-dim); font-size: 16px;
-    max-width: 500px; margin: 0 auto 36px; line-height: 1.55;
-  }
-  .bottom-cta-btn {
-    display: inline-block;
-    background: var(--cyan); color: var(--bg);
-    font-family: var(--font-heading);
-    font-size: 16px; font-weight: 700;
-    border: none; border-radius: 12px;
-    padding: 18px 40px;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .bottom-cta-btn:hover { background: #33e0ff; transform: translateY(-1px); }
-
-  /* ================================================================
-     FOOTER
-     ================================================================ */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 40px 0 32px;
-  }
-  .footer-inner {
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 16px;
-  }
-  .footer-left { font-size: 13px; color: var(--text-faint); }
-  .footer-links { display: flex; gap: 24px; }
-  .footer-links a {
-    font-size: 13px; color: rgba(255,255,255,0.35);
-    text-decoration: none; transition: color 0.2s;
-  }
-  .footer-links a:hover { color: var(--text-dim); }
-  .footer-disclaimer {
-    width: 100%; text-align: center;
-    font-size: 11px; color: rgba(255,255,255,0.2);
-    margin-top: 20px; line-height: 1.5;
-  }
-
-  /* ================================================================
-     CHECKOUT MODAL
-     ================================================================ */
-  .modal-overlay {
-    display: none;
-    position: fixed; inset: 0; z-index: 1000;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(4px);
-    align-items: center; justify-content: center;
-  }
-  .modal-overlay.active { display: flex; }
-  .modal-box {
-    background: #0D0E14;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 40px 36px;
-    max-width: 420px; width: 90%;
-    text-align: center;
-    position: relative;
-  }
-  .modal-box h3 {
-    font-family: var(--font-heading);
-    font-size: 20px; font-weight: 700; color: #fff;
-    margin-bottom: 8px;
-  }
-  .modal-box .modal-sub {
-    font-size: 14px; color: var(--text-dim); margin-bottom: 24px;
-  }
-  .modal-input {
-    width: 100%;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 10px;
-    padding: 14px 18px;
-    font-size: 15px; color: #fff;
-    font-family: var(--font-body);
-    outline: none; transition: border-color 0.2s;
-    margin-bottom: 16px;
-  }
-  .modal-input::placeholder { color: var(--text-faint); }
-  .modal-input:focus { border-color: rgba(0,215,255,0.4); }
-  .modal-input.error { border-color: var(--red); }
-  .modal-submit {
-    width: 100%;
-    background: var(--cyan); color: var(--bg);
-    font-family: var(--font-heading);
-    font-size: 15px; font-weight: 700;
-    border: none; border-radius: 10px;
-    padding: 16px;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .modal-submit:hover { background: #33e0ff; }
-  .modal-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-  .modal-close {
-    position: absolute; top: 16px; right: 16px;
-    background: none; border: none;
-    color: var(--text-faint); font-size: 24px;
-    cursor: pointer; line-height: 1;
-  }
-  .modal-close:hover { color: #fff; }
-  .modal-error {
-    font-size: 13px; color: var(--red);
-    margin-top: 12px;
-  }
-
-  /* ================================================================
-     SUCCESS BANNER
-     ================================================================ */
-  .success-banner {
-    background: rgba(50,215,75,0.1);
-    border-bottom: 1px solid rgba(50,215,75,0.2);
-    color: #32D74B;
-    text-align: center; padding: 14px 24px;
-    font-family: var(--font-heading);
-    font-size: 14px; font-weight: 600;
-  }
-
-  /* ================================================================
-     RESPONSIVE
-     ================================================================ */
-  @media (max-width: 768px) {
-    .steps { grid-template-columns: 1fr; }
-    .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
-    .hero { padding: 80px 0 60px; }
-    .nav-links a:not(.nav-cta) { display: none; }
-    .footer-inner { flex-direction: column; text-align: center; }
-    .container { display: flex; flex-direction: column; }
-    .hero { order: 0; }
-    .social-proof { order: 1; }
-    .cci-showcase { order: 2; }
-    #how-it-works { order: 3; }
-    #pricing { order: 4; }
-    #faq { order: 5; }
-    .cta-bottom { order: 6; }
-    footer { order: 7; }
-    .cci-demo { padding: 24px 20px; }
-    .cci-score-section { flex-direction: column; gap: 16px; }
-    .cci-score-meta { text-align: center; }
-    .cci-drivers-grid { grid-template-columns: 1fr; }
-    .cci-watermark { font-size: 32px; }
-  }
-  @media (max-width: 480px) {
-    .hero h1 { font-size: 28px; }
-    .hero-cta, .bottom-cta-btn, .cci-cta { padding: 16px 28px; font-size: 15px; }
-    .cci-tabs { flex-wrap: wrap; }
-  }
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .hero-text{padding:0 6vw;}
+  .panel{padding:10vh 6vw;}
+  .who-grid{grid-template-columns:1fr;}
+  .proof-grid{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
 
-<!-- Success banner (shown on return from Stripe) -->
-<div id="success-banner" class="success-banner" style="display:none">
-  Thank you! Check your email for next steps.
-</div>
-
-<!-- ================================================================
-     SECTION 1 — NAV
-     ================================================================ -->
-<nav>
-  <div class="nav-inner">
-    <a href="/" class="nav-logo">
-      <img src="/Orbital.png?v=2" alt="Orbital" width="32" height="32">
-      Orbital
-      <span class="founding-nav-badge">Founding Offer</span>
+<!-- Hero Orb Canvas (OffscreenCanvas) -->
+<section id="hero">
+  <canvas id="orb-canvas"></canvas>
+  <div class="hero-text" id="hero-text">
+    <div class="hero-eyebrow">CAPACITY INTELLIGENCE</div>
+    <div class="hero-brand">ORBITAL</div>
+    <div class="hero-divider" id="hero-divider">───────────────────────────────</div>
+    <div class="hero-headline" id="hero-headline">Your nervous system
+has a signature.</div>
+    <a class="hero-cta" href="https://apps.apple.com/app/orbital/id6757295146" id="hero-cta" onclick="track('hero_cta_click')">
+      Download for iOS →
     </a>
-    <div class="nav-links">
-      <a href="#how-it-works">How It Works</a>
-      <a href="#pricing">Pricing</a>
-      <a href="#faq">FAQ</a>
-      <a href="#pricing" class="nav-cta">Claim Founding Access</a>
+  </div>
+</section>
+
+<!-- Pinned Mini Orb -->
+<canvas id="orb-pin"></canvas>
+
+<!-- Particle canvas (text condensation) -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- Tooltip (constellation hover) -->
+<div id="tooltip"></div>
+
+<!-- Section 2: Particle Text Panels -->
+<section id="panels">
+  <div class="panel" id="panel-1" data-panel="1">
+    <div class="panel-text" id="pt-1">You've been told
+you're too sensitive.
+Too much. Not enough.
+<span class="panel-divider">
+───────────────────
+</span>
+Your nervous system
+disagrees.</div>
+  </div>
+  <div class="panel" id="panel-2" data-panel="2">
+    <div class="panel-text" id="pt-2">Some days you move
+mountains.
+
+Some days the email
+sits unopened for
+72 hours.
+<span class="panel-divider">
+───────────────────
+</span>
+Nobody taught you
+to read the difference.</div>
+  </div>
+  <div class="panel" id="panel-3" data-panel="3">
+    <div class="panel-text" id="pt-3">Until now.</div>
+  </div>
+</section>
+
+<!-- Section 3: Live Demo -->
+<section id="demo">
+  <div class="demo-label">INTERACTIVE DEMO</div>
+  <div id="demo-state">RESOURCED</div>
+  <div id="demo-canvas-wrap">
+    <canvas id="demo-canvas"></canvas>
+  </div>
+  <div id="demo-pct">85%</div>
+  <div class="demo-slider-wrap">
+    <span>DEPLETED</span>
+    <input type="range" id="demo-slider" min="0" max="100" value="85">
+    <span style="text-align:right">RESOURCED</span>
+  </div>
+  <button id="mirror-btn" onclick="activateMirrorMode()">◉ MIRROR MODE — LET THE ORB READ YOU</button>
+  <div id="mirror-status"></div>
+</section>
+
+<!-- Section 4: Constellation -->
+<section id="constellation">
+  <div class="demo-label">YOUR CAPACITY PATTERN — LAST 90 DAYS</div>
+  <canvas id="constellation-canvas"></canvas>
+  <p class="constellation-caption"><em>Patterns you couldn't see before.</em><br>Click and drag to rotate the data.</p>
+</section>
+
+<!-- Section 5: Who -->
+<section id="who">
+  <div class="who-label">WHO ORBITAL IS FOR</div>
+  <div class="who-grid" id="who-grid">
+    <div class="who-card">The executive who has everything and feels nothing.</div>
+    <div class="who-card">The parent running on empty but can't name it.</div>
+    <div class="who-card">The athlete whose training feels impossible for no reason.</div>
+    <div class="who-card">The therapist who helps everyone but themselves.</div>
+    <div class="who-card">The person who searches "why am I so tired" at 2am.</div>
+    <div class="who-card you">You.</div>
+  </div>
+</section>
+
+<!-- Section 6: Proof -->
+<section id="proof">
+  <div class="proof-label">EARLY OBSERVATIONS</div>
+  <div class="proof-grid">
+    <div class="proof-card">
+      <div class="proof-quote">"I finally have language
+for something I've felt
+my whole life."</div>
+      <div class="proof-attr">— Early user, 34</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-quote">"My therapist started
+recommending it."</div>
+      <div class="proof-attr">— Beta tester, 41</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-quote">"The data doesn't lie.
+I was at 8% and still
+saying I was fine."</div>
+      <div class="proof-attr">— Founding cohort member</div>
     </div>
   </div>
-</nav>
+</section>
 
-<!-- ================================================================
-     SECTION 2 — HERO
-     ================================================================ -->
-<div class="container">
-  <section class="hero">
-    <div class="hero-badge"><span class="hero-badge-dot"></span> Founding Cohort &mdash; 100 Spots</div>
+<!-- Section 7: Final CTA -->
+<section id="final">
+  <canvas id="final-orb"></canvas>
+  <div class="final-text">
+    <div class="final-headline">Your body has been
+keeping score.
 
-    <h1>Capacity intelligence for high-performance professionals and their care teams</h1>
-
-    <p class="subtitle">One daily check-in. Three capacity states. 90 days of signals become a clinical-grade Clinical Capacity Instrument — a longitudinal record that informs clinical decisions.</p>
-
-    <button class="hero-cta cta-founding" type="button">Claim Founding Access &mdash; $199</button>
-
-    <p class="hero-fine">Includes 3 months Pro free. First 100 only.</p>
-
-    <div><span class="spots-counter"><span class="spots-dot"></span> <span class="counter-text">Loading spots...</span></span></div>
-  </section>
-
-  <!-- ================================================================
-       SECTION 3 — SOCIAL PROOF BAR
-       ================================================================ -->
-  <div class="social-proof">
-    <div class="social-proof-label">Built for:</div>
-    <div class="proof-pills">
-      <span class="proof-pill">Therapists</span>
-      <span class="proof-pill">Executive Coaches</span>
-      <span class="proof-pill">Sports Performance</span>
-      <span class="proof-pill">Occupational Health</span>
+Start reading it.</div>
+    <div class="final-ctas">
+      <a class="cta-primary" href="https://apps.apple.com/app/orbital/id6757295146" onclick="track('final_cta_click')">Download for iOS</a>
+      <a class="cta-secondary" href="/index.html" id="pro-link" onmouseenter="onProHover(true)" onmouseleave="onProHover(false)">Learn about Orbital Pro →</a>
     </div>
   </div>
+</section>
 
-  <!-- ================================================================
-       SECTION 4 — HOW IT WORKS
-       ================================================================ -->
-  <section id="how-it-works">
-    <div class="section-label">How It Works</div>
-    <h2>Three steps. Zero friction.</h2>
-
-    <div class="steps">
-      <div class="step-card">
-        <div class="step-num">1</div>
-        <h3>Check in daily</h3>
-        <p>5 seconds. Swipe to set your capacity state. Resourced, Stretched, or Depleted.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">2</div>
-        <h3>Patterns emerge</h3>
-        <p>After 14 days, Orbital detects trends in your capacity data automatically.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">3</div>
-        <h3>Generate your CCI</h3>
-        <p>At 90 days, receive a clinical-grade Clinical Capacity Instrument &mdash; a longitudinal record for care teams.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================================================================
-       SECTION 5 — CCI SHOWCASE
-       ================================================================ -->
-  <section class="cci-showcase">
-    <div class="section-label">Clinical Capacity Instrument</div>
-    <h2>What your client's care team receives</h2>
-    <p class="section-sub" style="margin-left:auto;margin-right:auto;">Three timepoints. One longitudinal story. Tap through a sample Clinical Capacity Instrument.</p>
-
-    <div class="cci-demo" id="cci-demo">
-      <div class="cci-watermark">SAMPLE REPORT</div>
-      <div class="cci-client-header">
-        <span>[CLIENT NAME REDACTED]</span>
-        <span>CONFIDENTIAL</span>
-      </div>
-      <div class="cci-demo-label">ORBITAL</div>
-      <div class="cci-demo-title">Capacity Composite Index</div>
-      <div class="cci-demo-period" id="cci-period-text">Q1 2026 &middot; 90-Day Report &middot; Confidential</div>
-
-      <div class="cci-tabs">
-        <button class="cci-tab" data-period="30" type="button">30-Day</button>
-        <button class="cci-tab" data-period="60" type="button">60-Day</button>
-        <button class="cci-tab active" data-period="90" type="button">90-Day (Full CCI)</button>
-      </div>
-
-      <div class="cci-score-section">
-        <div class="cci-score-ring">
-          <svg viewBox="0 0 140 140">
-            <circle class="ring-bg" cx="70" cy="70" r="58"/>
-            <circle class="ring-fg" id="cci-ring-fg" cx="70" cy="70" r="58" stroke="#00D7FF" stroke-dasharray="364.42" stroke-dashoffset="364.42"/>
-          </svg>
-          <div class="cci-score-value">
-            <div class="cci-score-num" id="cci-score-num">72</div>
-            <div class="cci-score-of">/100</div>
-            <div class="cci-score-label-text">CAPACITY SCORE</div>
-          </div>
-        </div>
-        <div class="cci-score-meta">
-          <div class="cci-score-badge" id="cci-score-badge" style="background:rgba(45,212,191,0.15);color:#2DD4BF">STABLE</div>
-          <div class="cci-trend-info">
-            Trend: <span id="cci-trend-label">improving</span> &middot; <span class="cci-trend-rate" id="cci-trend-rate" style="color:#2DD4BF">+1.4 pts/week</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="cci-distribution">
-        <div class="cci-dist-label">State Distribution</div>
-        <div class="cci-dist-bar">
-          <span id="cci-dist-resourced" style="width:52%;background:#2DD4BF"></span>
-          <span id="cci-dist-stretched" style="width:34%;background:#F5B700"></span>
-          <span id="cci-dist-depleted" style="width:14%;background:#FF3B30"></span>
-        </div>
-        <div class="cci-dist-labels">
-          <span><span class="cci-dist-dot" style="background:#2DD4BF"></span> <span id="cci-dist-r-label">Resourced 52%</span></span>
-          <span><span class="cci-dist-dot" style="background:#F5B700"></span> <span id="cci-dist-s-label">Stretched 34%</span></span>
-          <span><span class="cci-dist-dot" style="background:#FF3B30"></span> <span id="cci-dist-d-label">Depleted 14%</span></span>
-        </div>
-      </div>
-
-      <div class="cci-wave">
-        <div class="cci-wave-label">Capacity Wave</div>
-        <div class="cci-wave-chart">
-          <svg id="cci-wave-svg" viewBox="0 0 700 185" preserveAspectRatio="none"></svg>
-        </div>
-      </div>
-
-      <div class="cci-drivers">
-        <div class="cci-drivers-label">Top Capacity Drivers</div>
-        <div class="cci-drivers-grid" id="cci-drivers-grid"></div>
-      </div>
-
-      <div class="cci-observations">
-        <div class="cci-obs-label">Clinical Observations</div>
-        <ul class="cci-obs-list" id="cci-obs-list"></ul>
-      </div>
-
-      <div class="cci-forecast" id="cci-forecast"></div>
-
-      <div class="cci-demo-footer">Generated by Orbital Health Intelligence Inc. &middot; orbitalhealth.app &middot; Confidential</div>
-    </div>
-
-    <p class="cci-credibility">Designed with input from licensed clinicians, ADHD coaches, and occupational health specialists.</p>
-
-    <button class="cci-cta cta-founding" type="button">Claim Founding Access &mdash; $199</button>
-
-    <div class="cci-download-link">
-      <!-- TODO: Replace with actual PDF link when available -->
-      <a href="mailto:contact@orbitalhealth.app?subject=Request%20Sample%20CCI%20PDF">Download sample CCI report (PDF)</a>
-    </div>
-  </section>
-
-  <!-- ================================================================
-       SECTION 6 — PRICING
-       ================================================================ -->
-  <section id="pricing">
-    <div class="section-label">Pricing</div>
-    <h2>Simple, transparent pricing</h2>
-    <p class="section-sub">Start free. Upgrade when your data is ready.</p>
-
-    <div class="pricing-grid">
-      <!-- Free -->
-      <div class="pricing-card">
-        <h3>Free</h3>
-        <div class="price">$0</div>
-        <p class="price-note">Free forever</p>
-        <ul class="plan-features">
-          <li>Daily check-ins</li>
-          <li>3 capacity states</li>
-          <li>7-day history</li>
-          <li>On-device storage</li>
-        </ul>
-        <a href="https://apps.apple.com/app/id6757295146" class="pricing-cta secondary" target="_blank" rel="noopener" data-tier="free">Download Free</a>
-      </div>
-
-      <!-- Pro -->
-      <div class="pricing-card">
-        <h3>Pro</h3>
-        <div class="price">$29<small>/mo</small></div>
-        <p class="price-note">Full capacity intelligence</p>
-        <ul class="plan-features">
-          <li>Full history</li>
-          <li>Pattern detection</li>
-          <li>Driver tracking</li>
-          <li>Trend analysis</li>
-          <li>Encrypted cloud sync</li>
-        </ul>
-        <a href="https://apps.apple.com/app/id6757295146" class="pricing-cta secondary" target="_blank" rel="noopener" data-tier="pro">Start Pro</a>
-      </div>
-
-      <!-- CCI Founding — featured -->
-      <div class="pricing-card featured">
-        <div class="pricing-tag">First 100 Only</div>
-        <h3>Clinical Capacity Instrument</h3>
-        <div class="price">$199<small> one-time</small></div>
-        <p class="price-note">Full CCI report at 90 days + 3 months Pro free</p>
-        <ul class="plan-features">
-          <li>Full CCI report at 90 days</li>
-          <li>3 months Pro access free</li>
-          <li>Longitudinal capacity record</li>
-          <li>Shareable with care teams</li>
-          <li>Founding price locked forever</li>
-        </ul>
-        <button class="pricing-cta primary cta-founding" type="button" data-tier="cci">Claim Founding Access &mdash; $199</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================================================================
-       SECTION 7 — FAQ
-       ================================================================ -->
-  <section id="faq">
-    <div class="section-label">FAQ</div>
-    <h2>Common questions</h2>
-
-    <div class="faq-list">
-      <div class="faq-item">
-        <div class="faq-q">What is a Clinical Capacity Instrument?</div>
-        <div class="faq-a">A longitudinal record of your capacity states over 90+ days. Unlike mood scales or symptom checklists, the CCI tracks how you perform under real-world cognitive, emotional, and environmental load. It's designed to be shared with therapists, coaches, and care teams.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">Is this a diagnostic tool?</div>
-        <div class="faq-a">No. Orbital is not a medical device and does not diagnose conditions. The CCI is an observational capacity record that supplements clinical judgment.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">What does the founding offer include?</div>
-        <div class="faq-a">$199 one-time payment. You get the full CCI report generated after 90 days of daily logging, plus 3 months of Pro access free. This price is locked for the first 100 users only.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">How long does a daily check-in take?</div>
-        <div class="faq-a">About 5 seconds. You swipe to set your state and optionally add context tags.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">Who is this for?</div>
-        <div class="faq-a">High-performance professionals, neurodivergent adults, therapists tracking client capacity, executive coaches, and sports performance staff.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================================================================
-       SECTION 8 — BOTTOM CTA
-       ================================================================ -->
-  <section class="cta-bottom">
-    <h2>Join the founding cohort.</h2>
-    <p class="cta-sub">First 100 get the CCI at founding price &mdash; locked forever.</p>
-
-    <button class="bottom-cta-btn cta-founding" type="button">Claim Your Spot &mdash; $199</button>
-
-    <div style="margin-top:20px"><span class="spots-counter"><span class="spots-dot"></span> <span class="counter-text">Loading spots...</span></span></div>
-  </section>
-
-  <!-- ================================================================
-       SECTION 9 — FOOTER
-       ================================================================ -->
-  <footer>
-    <div class="footer-inner">
-      <div class="footer-left">&copy; 2026 Orbital Health Intelligence, Inc.</div>
-      <div class="footer-links">
-        <a href="/privacy">Privacy</a>
-        <a href="/support">Terms</a>
-        <a href="/support">Support</a>
-        <a href="mailto:contact@orbitalhealth.app">contact@orbitalhealth.app</a>
-      </div>
-      <p class="footer-disclaimer">Orbital is not a medical device and does not provide medical advice, diagnosis, or treatment. The CCI is an observational record only.</p>
-    </div>
-  </footer>
-</div>
-
-<!-- ================================================================
-     CHECKOUT MODAL
-     ================================================================ -->
-<div id="checkout-modal" class="modal-overlay">
-  <div class="modal-box">
-    <button class="modal-close" type="button" aria-label="Close">&times;</button>
-    <h3>Continue to checkout</h3>
-    <p class="modal-sub">Enter your email to claim your founding spot.</p>
-    <input type="email" id="checkout-email" class="modal-input" placeholder="you@example.com" autocomplete="email">
-    <button id="checkout-submit" class="modal-submit" type="button">Continue to Checkout &mdash; $199</button>
-    <div id="checkout-error" class="modal-error" style="display:none"></div>
-  </div>
-</div>
-
-<!-- ================================================================
-     JAVASCRIPT
-     ================================================================ -->
+<!-- ═══════════════════════════════════ JAVASCRIPT ═══════════════════════════════════ -->
 <script>
-// =========================================================================
-// UTM PARAMS
-// =========================================================================
-var urlParams = new URLSearchParams(window.location.search);
-var utm = {
-  utm_source: urlParams.get('utm_source') || undefined,
-  utm_medium: urlParams.get('utm_medium') || undefined,
-  utm_campaign: urlParams.get('utm_campaign') || undefined,
+// ─── UTILS ───
+const $ = id => document.getElementById(id);
+const lerp = (a,b,t) => a+(b-a)*t;
+const clamp = (v,lo,hi) => Math.min(Math.max(v,lo),hi);
+const PI2 = Math.PI*2;
+
+// ─── CIRCADIAN ───
+const hour = new Date().getHours();
+const isLate = hour>=0&&hour<=5;
+if(isLate){
+  $('hero-headline').textContent='Still awake?\nYour nervous system\nhas a signature.';
+  document.documentElement.style.setProperty('--void','#030208');
+}
+
+// ─── ORB SHADER (OffscreenCanvas via Blob Worker) ───
+const ORB_FRAG = `
+precision highp float;
+uniform vec2 uResolution;
+uniform float uTime;
+uniform float uCapacity;    // 0-1
+uniform float uGlitch;      // 0-1
+uniform float uCyanShift;   // 0-1
+uniform float uBreath;      // -1 to 1
+#define PI 3.14159265358979
+
+float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float noise(vec2 p){
+  vec2 i=floor(p),f=fract(p);
+  f=f*f*(3.-2.*f);
+  float a=hash(i),b=hash(i+vec2(1,0)),c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));
+  return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);
+}
+float fbm(vec2 p){
+  float v=0.,a=.5;
+  for(int i=0;i<5;i++){v+=a*noise(p);p=p*2.+vec2(1.7,9.2);a*=.5;}
+  return v;
+}
+
+void main(){
+  vec2 uv=(gl_FragCoord.xy-.5*uResolution)/min(uResolution.x,uResolution.y);
+  float t=uTime;
+  
+  // Breathing
+  float breathScale=1.0+uBreath*0.07;
+  uv/=breathScale;
+
+  float r=length(uv);
+  float a=atan(uv.y,uv.x);
+  
+  // Capacity color
+  vec3 cCyan=vec3(0.,0.757,0.8);
+  vec3 cAmber=vec3(0.784,0.541,0.078);
+  vec3 cCrimson=vec3(0.69,0.078,0.078);
+  vec3 c;
+  float cap=clamp(uCapacity,0.,1.);
+  if(cap>0.5) c=mix(cAmber,cCyan,(cap-0.5)*2.);
+  else c=mix(cCrimson,cAmber,cap*2.);
+  
+  if(uCyanShift<1.0){
+    // late night amber shift
+    c=mix(c,mix(c,cAmber,0.4),1.-uCyanShift);
+  }
+  
+  // Orb body
+  float rimWidth=0.06+0.02*sin(t*0.3);
+  float outerR=0.42+0.02*uBreath*0.5;
+  float innerR=outerR-rimWidth;
+  
+  // Nebula distortion
+  vec2 warp=vec2(
+    fbm(uv*3.+vec2(t*0.11,-t*0.07)),
+    fbm(uv*3.+vec2(-t*0.09,t*0.13))
+  );
+  float dist=length(uv+warp*0.12);
+  
+  // Core glow
+  float core=smoothstep(0.45,0.,r)*0.8;
+  float rim=smoothstep(outerR+0.04,outerR,r)-smoothstep(innerR,innerR-0.04,r);
+  rim*=0.7+0.3*sin(a*6.+t*1.2+fbm(uv*8.+t*0.2)*4.);
+  
+  // Plasma tendrils
+  float plasma=0.;
+  for(int i=0;i<3;i++){
+    float fi=float(i);
+    vec2 p=uv*2.5+vec2(sin(t*0.3+fi*2.1),cos(t*0.25+fi*1.7));
+    plasma+=max(0.,fbm(p+t*0.1)-0.4)*(1.-smoothstep(0.3,0.55,r));
+  }
+  plasma*=0.4;
+  
+  // Pulse ring
+  float pulse=max(0.,1.-abs(r-outerR-0.06-sin(t*1.5)*0.02)*20.)*0.35;
+  pulse*=(0.5+0.5*sin(t*2.0));
+  
+  // Micro shimmer
+  float shimmer=fbm(uv*12.+t*0.4)*0.12*(1.-smoothstep(0.0,0.45,r));
+  
+  // Combine
+  float intensity=core+rim+plasma+pulse+shimmer;
+  vec3 col=c*intensity;
+  
+  // Outer nebula halo
+  float halo=exp(-r*r*5.)*0.15;
+  col+=c*halo;
+  
+  // Glitch
+  if(uGlitch>0.01){
+    vec2 gUv=uv;
+    gUv.x+=uGlitch*0.012*sin(t*40.+uv.y*50.);
+    float gr=length(gUv);
+    float gRim=smoothstep(outerR+0.04,outerR,gr)-smoothstep(innerR,innerR-0.04,gr);
+    col.r+=gRim*uGlitch*0.4;
+    col.b-=gRim*uGlitch*0.3;
+    col+=vec3(0.15,0.,0.)*smoothstep(outerR,outerR+0.02,r)*uGlitch;
+  }
+  
+  // Background
+  float bg=exp(-r*r*2.)*0.04;
+  col+=c*bg*0.3;
+  
+  gl_FragColor=vec4(col,1.);
+}
+`;
+
+const ORB_VERT = `
+attribute vec2 aPos;
+void main(){gl_Position=vec4(aPos,0.,1.);}
+`;
+
+// Worker code as Blob
+const WORKER_CODE = `
+const ORB_FRAG = \`${ORB_FRAG}\`;
+const ORB_VERT = \`${ORB_VERT}\`;
+
+let gl,prog,uniforms,canvas,W,H;
+let animId;
+let uTime=0,uCapacity=0.85,uGlitch=0,uCyanShift=1,uBreath=0;
+const late=${isLate?'true':'false'};
+if(late){uCapacity=0.6;uCyanShift=0.6;}
+
+function compile(type,src){
+  const s=gl.createShader(type);
+  gl.shaderSource(s,src);gl.compileShader(s);
+  if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(s);
+  return s;
+}
+
+function init(c){
+  canvas=c;W=c.width;H=c.height;
+  gl=c.getContext('webgl',{antialias:true,alpha:false});
+  if(!gl)return;
+  prog=gl.createProgram();
+  gl.attachShader(prog,compile(gl.VERTEX_SHADER,ORB_VERT));
+  gl.attachShader(prog,compile(gl.FRAGMENT_SHADER,ORB_FRAG));
+  gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog,gl.LINK_STATUS))throw gl.getProgramInfoLog(prog);
+  gl.useProgram(prog);
+  const buf=gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+  const loc=gl.getAttribLocation(prog,'aPos');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  uniforms={
+    res:gl.getUniformLocation(prog,'uResolution'),
+    time:gl.getUniformLocation(prog,'uTime'),
+    cap:gl.getUniformLocation(prog,'uCapacity'),
+    glitch:gl.getUniformLocation(prog,'uGlitch'),
+    cyan:gl.getUniformLocation(prog,'uCyanShift'),
+    breath:gl.getUniformLocation(prog,'uBreath'),
+  };
+  render();
+}
+
+function render(){
+  animId=requestAnimationFrame(render);
+  uTime+=0.016;
+  // 4s breathing cycle
+  uBreath=Math.sin(uTime*(Math.PI*2/4));
+  // Glitch decay
+  if(uGlitch>0.001)uGlitch=uGlitch*0.93;
+  gl.viewport(0,0,W,H);
+  gl.uniform2f(uniforms.res,W,H);
+  gl.uniform1f(uniforms.time,uTime);
+  gl.uniform1f(uniforms.cap,uCapacity);
+  gl.uniform1f(uniforms.glitch,uGlitch);
+  gl.uniform1f(uniforms.cyan,uCyanShift);
+  gl.uniform1f(uniforms.breath,uBreath);
+  gl.drawArrays(gl.TRIANGLES,0,6);
+}
+
+function resize(w,h){
+  W=w;H=h;
+  if(canvas){canvas.width=w;canvas.height=h;}
+}
+
+self.onmessage=function(e){
+  const d=e.data;
+  if(d.type==='init'){init(d.canvas);resize(d.w,d.h);}
+  else if(d.type==='resize'){resize(d.w,d.h);}
+  else if(d.type==='uniforms'){
+    if(d.capacity!==undefined)uCapacity=d.capacity;
+    if(d.glitch!==undefined)uGlitch=Math.max(uGlitch,d.glitch);
+    if(d.cyanShift!==undefined)uCyanShift=d.cyanShift;
+  }
 };
+`;
 
-// =========================================================================
-// SUCCESS STATE (return from Stripe checkout)
-// =========================================================================
-if (urlParams.get('purchased') === '1') {
-  var banner = document.getElementById('success-banner');
-  if (banner) banner.style.display = 'block';
+// Init orb worker
+let orbWorker=null, orbSupported=false;
+const orbCanvas=$('orb-canvas');
+const dpr=window.devicePixelRatio||1;
+orbCanvas.width=window.innerWidth*dpr;
+orbCanvas.height=window.innerHeight*dpr;
+orbCanvas.style.width='100%';
+orbCanvas.style.height='100%';
+
+if(typeof OffscreenCanvas!=='undefined'&&typeof Worker!=='undefined'){
+  try{
+    const blob=new Blob([WORKER_CODE],{type:'application/javascript'});
+    const blobUrl=URL.createObjectURL(blob);
+    orbWorker=new Worker(blobUrl);
+    const offscreen=orbCanvas.transferControlToOffscreen();
+    orbWorker.postMessage({type:'init',canvas:offscreen,w:orbCanvas.width,h:orbCanvas.height},[offscreen]);
+    orbSupported=true;
+  }catch(e){
+    orbSupported=false;
+  }
 }
 
-// =========================================================================
-// ANALYTICS — keep existing custom trackEvent system
-// =========================================================================
-function trackEvent(event, metadata) {
-  fetch('/api/track', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      event: event,
-      page: window.location.pathname,
-      referrer: document.referrer || undefined,
-      utm_source: utm.utm_source,
-      utm_medium: utm.utm_medium,
-      utm_campaign: utm.utm_campaign,
-      metadata: metadata || {},
-    }),
-  }).catch(function() {}); // fire-and-forget
+if(!orbSupported){
+  // Inline fallback
+  (function(){
+    const g=orbCanvas.getContext('webgl',{antialias:true,alpha:false});
+    if(!g)return;
+    function cp(type,src){const s=g.createShader(type);g.shaderSource(s,src);g.compileShader(s);return s;}
+    const p=g.createProgram();
+    g.attachShader(p,cp(g.VERTEX_SHADER,ORB_VERT));
+    g.attachShader(p,cp(g.FRAGMENT_SHADER,ORB_FRAG));
+    g.linkProgram(p);g.useProgram(p);
+    const buf=g.createBuffer();
+    g.bindBuffer(g.ARRAY_BUFFER,buf);
+    g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),g.STATIC_DRAW);
+    const al=g.getAttribLocation(p,'aPos');
+    g.enableVertexAttribArray(al);g.vertexAttribPointer(al,2,g.FLOAT,false,0,0);
+    const uR=g.getUniformLocation(p,'uResolution');
+    const uT=g.getUniformLocation(p,'uTime');
+    const uC=g.getUniformLocation(p,'uCapacity');
+    const uG=g.getUniformLocation(p,'uGlitch');
+    const uCS=g.getUniformLocation(p,'uCyanShift');
+    const uB=g.getUniformLocation(p,'uBreath');
+    let t=0,cap=0.85,gli=0,cyan=1;
+    function frame(){
+      requestAnimationFrame(frame);
+      t+=0.016;
+      if(gli>0.001)gli*=0.93;
+      const W=orbCanvas.width,H=orbCanvas.height;
+      g.viewport(0,0,W,H);
+      g.uniform2f(uR,W,H);g.uniform1f(uT,t);
+      g.uniform1f(uC,cap);g.uniform1f(uG,gli);
+      g.uniform1f(uCS,cyan);g.uniform1f(uB,Math.sin(t*Math.PI*2/4));
+      g.drawArrays(g.TRIANGLES,0,6);
+    }
+    frame();
+    window._orbSetUniforms=function(u){
+      if(u.capacity!==undefined)cap=u.capacity;
+      if(u.glitch!==undefined)gli=Math.max(gli,u.glitch);
+      if(u.cyanShift!==undefined)cyan=u.cyanShift;
+    };
+  })();
 }
 
-// Track page view
-trackEvent('page_view');
+function setOrbUniforms(u){
+  if(orbWorker)orbWorker.postMessage({type:'uniforms',...u});
+  else if(window._orbSetUniforms)window._orbSetUniforms(u);
+}
+if(isLate)setOrbUniforms({cyanShift:0.6,capacity:0.6});
 
-// =========================================================================
-// CCI COUNTER — fetch from /api/cci-counter
-// =========================================================================
-(function loadCounter() {
-  var counterEls = document.querySelectorAll('.counter-text');
-  fetch('/api/cci-counter')
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      var remaining = typeof data.remaining === 'number' ? data.remaining : 100;
-      counterEls.forEach(function(el) {
-        el.textContent = remaining + ' of 100 founding spots remaining';
-      });
-    })
-    .catch(function() {
-      counterEls.forEach(function(el) {
-        el.textContent = 'Limited spots remaining';
-      });
-    });
+window.addEventListener('resize',()=>{
+  const w=window.innerWidth*dpr,h=window.innerHeight*dpr;
+  if(orbWorker)orbWorker.postMessage({type:'resize',w,h});
+  else{orbCanvas.width=w;orbCanvas.height=h;}
+});
+
+// ─── HERO TEXT MATERIALIZE ───
+setTimeout(()=>{$('hero-text').classList.add('visible');},1200);
+
+// ─── DEMO ORB (inline canvas) ───
+const demoCanvas=$('demo-canvas');
+const demoWrap=$('demo-canvas-wrap');
+const demoSlider=$('demo-slider');
+const demoState=$('demo-state');
+const demoPct=$('demo-pct');
+
+function setupDemoCanvas(){
+  const sz=demoWrap.clientWidth;
+  demoCanvas.width=sz;
+  demoCanvas.height=sz;
+}
+setupDemoCanvas();
+
+let demoCapacity=0.85;
+let demoDragging=false;
+let demoMouseStart={x:0,y:0};
+let demoCapStart=0;
+
+function capacityToState(c){
+  if(c>=0.65)return{label:'RESOURCED',color:'#00C2CC'};
+  if(c>=0.35)return{label:'ELEVATED',color:'#C88A14'};
+  return{label:'DEPLETED',color:'#B01414'};
+}
+
+(function demoLoop(){
+  requestAnimationFrame(demoLoop);
+  const g=demoCanvas.getContext('2d');
+  if(!g)return;
+  const W=demoCanvas.width,H=demoCanvas.height;
+  const cx=W/2,cy=H/2;
+  const R=W*0.38;
+  const t=performance.now()/1000;
+  const breath=Math.sin(t*Math.PI*2/4);
+  const rr=R*(1+breath*0.04);
+  const st=capacityToState(demoCapacity);
+  
+  g.clearRect(0,0,W,H);
+  
+  // Glow
+  const grad=g.createRadialGradient(cx,cy,0,cx,cy,rr*1.5);
+  grad.addColorStop(0,st.color+'33');
+  grad.addColorStop(0.5,st.color+'11');
+  grad.addColorStop(1,'transparent');
+  g.fillStyle=grad;
+  g.beginPath();g.arc(cx,cy,rr*1.5,0,PI2);g.fill();
+  
+  // Rim
+  const grad2=g.createRadialGradient(cx,cy,rr*0.8,cx,cy,rr);
+  grad2.addColorStop(0,'transparent');
+  grad2.addColorStop(0.5,st.color+'AA');
+  grad2.addColorStop(0.8,st.color+'FF');
+  grad2.addColorStop(1,st.color+'44');
+  g.strokeStyle=st.color;
+  g.lineWidth=rr*0.06;
+  g.shadowColor=st.color;
+  g.shadowBlur=20;
+  g.beginPath();g.arc(cx,cy,rr,0,PI2);g.stroke();
+  g.shadowBlur=0;
+  
+  // Inner plasma
+  g.save();
+  g.beginPath();g.arc(cx,cy,rr*0.9,0,PI2);g.clip();
+  const plasma=g.createRadialGradient(cx,cy,0,cx,cy,rr*0.9);
+  plasma.addColorStop(0,st.color+'22');
+  plasma.addColorStop(1,'transparent');
+  g.fillStyle=plasma;g.fillRect(0,0,W,H);
+  // Plasma arcs
+  for(let i=0;i<3;i++){
+    const fi=i/3*PI2+t*0.3;
+    const x=cx+Math.cos(fi)*rr*0.5;
+    const y=cy+Math.sin(fi)*rr*0.5;
+    const arcGrad=g.createRadialGradient(x,y,0,x,y,rr*0.3);
+    arcGrad.addColorStop(0,st.color+'44');
+    arcGrad.addColorStop(1,'transparent');
+    g.fillStyle=arcGrad;
+    g.beginPath();g.arc(x,y,rr*0.3,0,PI2);g.fill();
+  }
+  g.restore();
 })();
 
-// =========================================================================
-// CCI INTERACTIVE DEMO
-// =========================================================================
-var cciData = {
-  '30': {
-    period: '30-Day',
-    capacityScore: 58,
-    scoreLabel: 'STRAINED',
-    trend: 'declining',
-    trendRate: '-2.1 pts/week',
-    stateDistribution: { resourced: 30, stretched: 42, depleted: 28 },
-    capacityWave: [72,70,68,65,63,60,58,55,57,54,52,50,53,55,52,49,51,48,50,52,55,53,50,52,54,56,58,55,57,58],
-    drivers: [
-      { name: 'Sensory Load', impact: '-16pts avg impact', correlation: '30-day correlation', direction: 'negative' },
-      { name: 'Social Demand', impact: '-11pts avg impact', correlation: '30-day correlation', direction: 'negative' },
-      { name: 'Sleep Quality', impact: '+9pts avg impact', correlation: '30-day correlation', direction: 'positive' },
-      { name: 'Focus Blocks', impact: '+7pts avg impact', correlation: '30-day correlation', direction: 'positive' }
-    ],
-    clinicalObservations: [
-      'Subject shows declining capacity trend over initial 30-day observation period.',
-      'Sensory overload events correlate with 48\u201372hr capacity suppression.',
-      'Baseline stability score: 5.1/10 \u2014 below cohort average of 6.1.'
-    ],
-    forecast: {
-      label: 'CAPACITY FORECAST',
-      intro: 'Insufficient data for projection. Continue logging to unlock forecasting.',
-      items: ['\u2192 60 more days needed for reliable forecast.']
-    }
-  },
-  '60': {
-    period: '60-Day',
-    capacityScore: 65,
-    scoreLabel: 'BUILDING',
-    trend: 'stabilizing',
-    trendRate: '+0.8 pts/week',
-    stateDistribution: { resourced: 40, stretched: 38, depleted: 22 },
-    capacityWave: [72,70,68,65,63,60,58,55,57,54,52,50,53,55,52,49,51,48,50,52,55,53,50,52,54,56,58,55,57,58,60,62,58,61,63,60,62,64,61,63,65,63,66,64,67,65,63,66,68,65,67,64,66,68,65,67,66,64,66,65],
-    drivers: [
-      { name: 'Sensory Load', impact: '-14pts avg impact', correlation: '60-day correlation', direction: 'negative' },
-      { name: 'Sleep Quality', impact: '+14pts avg impact', correlation: '60-day correlation', direction: 'positive' },
-      { name: 'Social Demand', impact: '-9pts avg impact', correlation: '60-day correlation', direction: 'negative' },
-      { name: 'Focus Blocks', impact: '+11pts avg impact', correlation: '60-day correlation', direction: 'positive' }
-    ],
-    clinicalObservations: [
-      'Capacity trend stabilizing after week 5 intervention adjustments.',
-      'Sleep quality emerging as primary positive driver \u2014 recovery pattern improving.',
-      'Baseline stability score: 6.0/10 \u2014 approaching cohort average of 6.1.'
-    ],
-    forecast: {
-      label: 'CAPACITY FORECAST (PRELIMINARY)',
-      intro: 'Early projection based on emerging patterns:',
-      items: [
-        '\u2192 Projected capacity in 4 weeks: 69/100',
-        '\u2192 Risk of capacity drop below 60: MODERATE',
-        '\u2192 Primary risk factor: Sensory load spikes',
-        '\u2192 30 more days of data will improve forecast accuracy.'
-      ]
-    }
-  },
-  '90': {
-    period: '90-Day',
-    capacityScore: 72,
-    scoreLabel: 'STABLE',
-    trend: 'improving',
-    trendRate: '+1.4 pts/week',
-    stateDistribution: { resourced: 52, stretched: 34, depleted: 14 },
-    capacityWave: [72,70,68,65,63,60,58,55,57,54,52,50,53,55,52,49,51,48,50,52,55,53,50,52,54,56,58,55,57,58,60,62,58,61,63,60,62,64,61,63,65,63,66,64,67,65,63,66,68,65,67,64,66,68,65,67,66,64,66,65,68,70,67,69,71,68,70,72,69,71,73,70,72,74,71,73,72,70,73,75,72,74,73,71,73,72,74,73,72,72],
-    drivers: [
-      { name: 'Sleep Quality', impact: '+18pts avg impact', correlation: '90-day correlation', direction: 'positive' },
-      { name: 'Sensory Load', impact: '-14pts on high days', correlation: '90-day correlation', direction: 'negative' },
-      { name: 'Social Demand', impact: '-9pts avg impact', correlation: '90-day correlation', direction: 'negative' },
-      { name: 'Focus Blocks', impact: '+11pts when present', correlation: '90-day correlation', direction: 'positive' }
-    ],
-    clinicalObservations: [
-      'Subject demonstrates consistent capacity recovery following rest intervals.',
-      'Sensory overload events correlate with 48\u201372hr capacity suppression.',
-      'Baseline stability score: 7.2/10 \u2014 above cohort average of 6.1.'
-    ],
-    forecast: {
-      label: 'CAPACITY FORECAST',
-      intro: 'Based on current trajectory and driver patterns:',
-      items: [
-        '\u2192 Projected capacity in 4 weeks: 76/100',
-        '\u2192 Risk of capacity drop below 60: LOW',
-        '\u2192 Highest leverage intervention: Maintain sleep consistency'
-      ]
-    }
-  }
-};
-
-var currentCciPeriod = '90';
-var cciRingInitialized = false;
-
-function getCciColor(score) {
-  if (score >= 65) return '#00D7FF';
-  if (score >= 40) return '#F5B700';
-  return '#FF3B30';
-}
-
-function getCciBadgeStyle(label) {
-  switch (label) {
-    case 'STRAINED': return 'background:rgba(245,183,0,0.15);color:#F5B700';
-    case 'BUILDING': return 'background:rgba(0,215,255,0.15);color:#00D7FF';
-    case 'STABLE': return 'background:rgba(45,212,191,0.15);color:#2DD4BF';
-    default: return 'background:rgba(255,255,255,0.1);color:#fff';
-  }
-}
-
-function getTrendColor(trend) {
-  switch (trend) {
-    case 'declining': return '#FF3B30';
-    case 'stabilizing': return '#F5B700';
-    case 'improving': return '#2DD4BF';
-    default: return 'rgba(255,255,255,0.5)';
-  }
-}
-
-function renderWaveChart(data, color, period) {
-  var svg = document.getElementById('cci-wave-svg');
-  var w = 700, h = 185;
-  var padL = 50, padR = 10, padT = 10, padB = 35;
-  var plotW = w - padL - padR;
-  var plotH = h - padT - padB;
-
-  var html = '';
-
-  // Defs: color gradient for line + fill
-  html += '<defs>';
-  html += '<linearGradient id="cci-line-grad" gradientUnits="userSpaceOnUse" x1="0" y1="' + padT + '" x2="0" y2="' + (padT + plotH) + '">';
-  html += '<stop offset="0%" stop-color="#00D7FF"/>';
-  html += '<stop offset="30%" stop-color="#00D7FF"/>';
-  html += '<stop offset="30.7%" stop-color="#F5B700"/>';
-  html += '<stop offset="50%" stop-color="#F5B700"/>';
-  html += '<stop offset="50.7%" stop-color="#FF3B30"/>';
-  html += '<stop offset="100%" stop-color="#FF3B30"/>';
-  html += '</linearGradient>';
-  html += '<linearGradient id="cci-fill-grad" gradientUnits="userSpaceOnUse" x1="0" y1="' + padT + '" x2="0" y2="' + (padT + plotH) + '">';
-  html += '<stop offset="0%" stop-color="#00D7FF" stop-opacity="0.10"/>';
-  html += '<stop offset="30%" stop-color="#00D7FF" stop-opacity="0.10"/>';
-  html += '<stop offset="30.7%" stop-color="#F5B700" stop-opacity="0.08"/>';
-  html += '<stop offset="50%" stop-color="#F5B700" stop-opacity="0.06"/>';
-  html += '<stop offset="50.7%" stop-color="#FF3B30" stop-opacity="0.04"/>';
-  html += '<stop offset="100%" stop-color="#FF3B30" stop-opacity="0.01"/>';
-  html += '</linearGradient>';
-  html += '</defs>';
-
-  // Grid lines + Y-axis tick labels at 0, 25, 50, 75, 100
-  [0, 25, 50, 75, 100].forEach(function(val) {
-    var y = padT + plotH - (val / 100 * plotH);
-    html += '<line x1="' + padL + '" y1="' + y.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + y.toFixed(1) + '" stroke="rgba(255,255,255,0.06)" stroke-dasharray="4,4"/>';
-    html += '<text x="' + (padL - 6) + '" y="' + (y + 3).toFixed(1) + '" fill="rgba(255,255,255,0.2)" font-size="9" font-family="\'Space Mono\', monospace" text-anchor="end">' + val + '</text>';
-  });
-
-  // Y-axis rotated label
-  var midY = padT + plotH / 2;
-  html += '<text x="10" y="' + midY + '" fill="rgba(255,255,255,0.15)" font-size="9" font-family="\'Space Mono\', monospace" text-anchor="middle" transform="rotate(-90, 10, ' + midY + ')">Capacity Score</text>';
-
-  // X-axis labels
-  var xLabels;
-  if (period === '90') {
-    xLabels = [{t: 'Month 1', p: 0}, {t: 'Month 2', p: 0.33}, {t: 'Month 3', p: 0.67}];
-  } else if (period === '60') {
-    xLabels = [{t: 'Week 1', p: 0}, {t: 'Week 4', p: 0.47}, {t: 'Week 8', p: 0.93}];
-  } else {
-    xLabels = [{t: 'Week 1', p: 0}, {t: 'Week 2', p: 0.33}, {t: 'Week 3', p: 0.67}, {t: 'Week 4', p: 1}];
-  }
-  xLabels.forEach(function(label) {
-    var x = padL + label.p * plotW;
-    var anchor = label.p === 0 ? 'start' : label.p >= 0.9 ? 'end' : 'middle';
-    html += '<text x="' + x.toFixed(1) + '" y="' + (padT + plotH + 20) + '" fill="rgba(255,255,255,0.2)" font-size="9" font-family="\'Space Mono\', monospace" text-anchor="' + anchor + '">' + label.t + '</text>';
-  });
-
-  // Build points
-  var points = [];
-  data.forEach(function(val, i) {
-    var x = padL + (i / (data.length - 1)) * plotW;
-    var y = padT + plotH - (val / 100 * plotH);
-    points.push(x.toFixed(1) + ',' + y.toFixed(1));
-  });
-
-  // Fill area
-  var firstX = padL;
-  var lastX = (padL + plotW).toFixed(1);
-  var bottomY = (padT + plotH).toFixed(1);
-  html += '<path d="M' + points.join(' L') + ' L' + lastX + ',' + bottomY + ' L' + firstX + ',' + bottomY + ' Z" fill="url(#cci-fill-grad)"/>';
-
-  // Line with color gradient
-  html += '<polyline points="' + points.join(' ') + '" fill="none" stroke="url(#cci-line-grad)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
-
-  // End dot with glow
-  var lastPt = points[points.length - 1].split(',');
-  html += '<circle cx="' + lastPt[0] + '" cy="' + lastPt[1] + '" r="7" fill="' + color + '" opacity="0.2"/>';
-  html += '<circle cx="' + lastPt[0] + '" cy="' + lastPt[1] + '" r="4" fill="' + color + '"/>';
-
-  svg.innerHTML = html;
-}
-
-function renderCciDemo(period) {
-  currentCciPeriod = period;
-  var d = cciData[period];
-  var color = getCciColor(d.capacityScore);
-
-  // Update tabs
-  document.querySelectorAll('.cci-tab').forEach(function(tab) {
-    tab.classList.toggle('active', tab.getAttribute('data-period') === period);
-  });
-
-  // Period label
-  document.getElementById('cci-period-text').textContent = 'Q1 2026 \u00B7 ' + d.period + ' Report \u00B7 Confidential';
-
-  // Score ring — only animate if IntersectionObserver has fired
-  var circumference = 2 * Math.PI * 58;
-  var ringFg = document.getElementById('cci-ring-fg');
-  ringFg.style.strokeDasharray = circumference;
-  ringFg.setAttribute('stroke', color);
-  if (cciRingInitialized) {
-    ringFg.style.transition = 'stroke-dashoffset 0.6s ease, stroke 0.4s ease';
-    ringFg.style.strokeDashoffset = circumference * (1 - d.capacityScore / 100);
-  }
-
-  // Score number
-  document.getElementById('cci-score-num').textContent = d.capacityScore;
-  document.getElementById('cci-score-num').style.color = color;
-
-  // Score badge
-  var badge = document.getElementById('cci-score-badge');
-  badge.textContent = d.scoreLabel;
-  badge.setAttribute('style', getCciBadgeStyle(d.scoreLabel));
-
-  // Trend
-  document.getElementById('cci-trend-label').textContent = d.trend;
-  var trendRate = document.getElementById('cci-trend-rate');
-  trendRate.textContent = d.trendRate;
-  trendRate.style.color = getTrendColor(d.trend);
-
-  // Distribution bar
-  var dist = d.stateDistribution;
-  document.getElementById('cci-dist-resourced').style.width = dist.resourced + '%';
-  document.getElementById('cci-dist-stretched').style.width = dist.stretched + '%';
-  document.getElementById('cci-dist-depleted').style.width = dist.depleted + '%';
-  document.getElementById('cci-dist-r-label').textContent = 'Resourced ' + dist.resourced + '%';
-  document.getElementById('cci-dist-s-label').textContent = 'Stretched ' + dist.stretched + '%';
-  document.getElementById('cci-dist-d-label').textContent = 'Depleted ' + dist.depleted + '%';
-
-  // Wave chart with period for axis labels
-  renderWaveChart(d.capacityWave, color, period);
-
-  // Drivers
-  var driversHtml = '';
-  d.drivers.forEach(function(dr) {
-    driversHtml += '<div class="cci-driver-card ' + dr.direction + '">';
-    driversHtml += '<div class="cci-driver-name">' + dr.name + '</div>';
-    driversHtml += '<div class="cci-driver-impact ' + dr.direction + '">' + dr.impact + '</div>';
-    driversHtml += '<div class="cci-driver-corr">' + dr.correlation + '</div>';
-    driversHtml += '</div>';
-  });
-  document.getElementById('cci-drivers-grid').innerHTML = driversHtml;
-
-  // Clinical observations
-  var obsHtml = '';
-  d.clinicalObservations.forEach(function(obs) {
-    obsHtml += '<li>' + obs + '</li>';
-  });
-  document.getElementById('cci-obs-list').innerHTML = obsHtml;
-
-  // Capacity forecast
-  var fc = d.forecast;
-  var fcHtml = '<div class="cci-forecast-label">' + fc.label + '</div>';
-  fcHtml += '<div class="cci-forecast-divider">\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501</div>';
-  fcHtml += '<div class="cci-forecast-text">';
-  fcHtml += fc.intro;
-  if (fc.items.length > 0) {
-    fcHtml += '<br><br>';
-    fc.items.forEach(function(item) {
-      fcHtml += '<span class="cci-forecast-arrow">' + item + '</span><br>';
-    });
-  }
-  fcHtml += '</div>';
-  document.getElementById('cci-forecast').innerHTML = fcHtml;
-}
-
-// Tab click handlers
-document.querySelectorAll('.cci-tab').forEach(function(tab) {
-  tab.addEventListener('click', function() {
-    var period = tab.getAttribute('data-period');
-    renderCciDemo(period);
-    trackEvent('cci_demo_tab_clicked', { period: period });
-  });
+demoSlider.addEventListener('input',()=>{
+  demoCapacity=demoSlider.value/100;
+  updateDemoUI();
+  setOrbUniforms({capacity:demoCapacity});
+  track('demo_interaction',{capacity:Math.round(demoCapacity*100)});
 });
 
-// Initial render — 90-day by default
-renderCciDemo('90');
+function updateDemoUI(){
+  const st=capacityToState(demoCapacity);
+  demoState.textContent=st.label;
+  demoState.style.color=st.color;
+  demoPct.textContent=Math.round(demoCapacity*100)+'%';
+  demoSlider.value=Math.round(demoCapacity*100);
+}
 
-// Score ring scroll animation — animate from 0 on first viewport entry
-var cciObserver = new IntersectionObserver(function(entries) {
-  entries.forEach(function(entry) {
-    if (entry.isIntersecting && !cciRingInitialized) {
-      cciRingInitialized = true;
-      var d = cciData[currentCciPeriod];
-      var circumference = 2 * Math.PI * 58;
-      var ringFg = document.getElementById('cci-ring-fg');
-      // Ensure empty state
-      ringFg.style.transition = 'none';
-      ringFg.style.strokeDashoffset = circumference;
-      ringFg.getBoundingClientRect(); // force reflow
-      // Animate to score over 1.5s
-      ringFg.style.transition = 'stroke-dashoffset 1.5s ease-out';
-      ringFg.style.strokeDashoffset = circumference * (1 - d.capacityScore / 100);
-      cciObserver.disconnect();
-    }
-  });
-}, { threshold: 0.3 });
-cciObserver.observe(document.getElementById('cci-demo'));
-
-// =========================================================================
-// CHECKOUT MODAL — wire all .cta-founding buttons
-// =========================================================================
-var modal = document.getElementById('checkout-modal');
-var emailInput = document.getElementById('checkout-email');
-var submitBtn = document.getElementById('checkout-submit');
-var errorEl = document.getElementById('checkout-error');
-
-// Open modal on any founding CTA click
-document.querySelectorAll('.cta-founding').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    modal.classList.add('active');
-    emailInput.value = '';
-    emailInput.classList.remove('error');
-    errorEl.style.display = 'none';
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Continue to Checkout \u2014 $199';
-    setTimeout(function() { emailInput.focus(); }, 100);
-    trackEvent('founding_cta_clicked');
-  });
+// Drag orb directly
+demoWrap.addEventListener('mousedown',e=>{
+  demoDragging=true;
+  demoMouseStart={x:e.clientX,y:e.clientY};
+  demoCapStart=demoCapacity;
+  e.preventDefault();
+},{passive:false});
+window.addEventListener('mousemove',e=>{
+  if(!demoDragging)return;
+  const dy=-(e.clientY-demoMouseStart.y);
+  demoCapacity=clamp(demoCapStart+dy/demoWrap.clientHeight,0,1);
+  updateDemoUI();
+  setOrbUniforms({capacity:demoCapacity});
 });
-
-// Close modal
-modal.querySelector('.modal-close').addEventListener('click', function() {
-  modal.classList.remove('active');
+window.addEventListener('mouseup',()=>{demoDragging=false;});
+demoWrap.addEventListener('touchstart',e=>{
+  demoDragging=true;
+  demoMouseStart={x:e.touches[0].clientX,y:e.touches[0].clientY};
+  demoCapStart=demoCapacity;
+},{passive:true});
+window.addEventListener('touchmove',e=>{
+  if(!demoDragging)return;
+  const dy=-(e.touches[0].clientY-demoMouseStart.y);
+  demoCapacity=clamp(demoCapStart+dy/demoWrap.clientHeight,0,1);
+  updateDemoUI();
+  setOrbUniforms({capacity:demoCapacity});
 });
-modal.addEventListener('click', function(e) {
-  if (e.target === modal) modal.classList.remove('active');
-});
+window.addEventListener('touchend',()=>{demoDragging=false;});
 
-// Handle enter key in email input
-emailInput.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') submitBtn.click();
-});
-
-// Submit checkout
-submitBtn.addEventListener('click', async function() {
-  var email = emailInput.value.trim();
-  if (!email || !email.includes('@') || !email.includes('.')) {
-    emailInput.classList.add('error');
-    errorEl.textContent = 'Please enter a valid email address.';
-    errorEl.style.display = 'block';
+// ─── MIRROR MODE (rPPG) ───
+async function activateMirrorMode(){
+  if(!navigator.mediaDevices?.getUserMedia){
+    $('mirror-status').textContent='Camera not available on this device.';
     return;
   }
-
-  emailInput.classList.remove('error');
-  errorEl.style.display = 'none';
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Redirecting to Stripe...';
-
-  try {
-    trackEvent('checkout_started', { product_id: 'cci_founding' });
-
-    var res = await fetch('/api/create-checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        product_id: 'cci_founding',
-        supabase_user_id: 'guest',
-        customer_email: email,
-        success_url: window.location.origin + '/?purchased=1',
-        cancel_url: window.location.origin + '/',
-      }),
-    });
-
-    var data = await res.json();
-
-    if (res.ok && data.checkout_url) {
-      window.location.href = data.checkout_url;
-    } else {
-      throw new Error(data.error || 'Checkout unavailable');
+  $('mirror-btn').disabled=true;
+  $('mirror-status').textContent='Requesting camera access...';
+  track('mirror_mode_activated');
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:320,height:240}});
+    $('mirror-status').textContent='Reading pulse — keep face still...';
+    const vid=document.createElement('video');
+    vid.srcObject=stream;vid.autoplay=true;vid.playsInline=true;
+    vid.style.cssText='position:fixed;top:-100px;left:-100px;width:10px;height:10px;opacity:0.01;';
+    document.body.appendChild(vid);
+    await new Promise(r=>setTimeout(r,500));
+    const cv=document.createElement('canvas');
+    cv.width=32;cv.height=32;
+    const ctx=cv.getContext('2d');
+    const samples=[];
+    const start=Date.now();
+    const duration=10000;
+    function sample(){
+      if(!vid.videoWidth){requestAnimationFrame(sample);return;}
+      ctx.drawImage(vid,0,0,32,32);
+      const d=ctx.getImageData(8,4,16,10).data;
+      let g=0;
+      for(let i=0;i<d.length;i+=4)g+=d[i+1];
+      g/=(d.length/4);
+      samples.push({t:Date.now(),v:g});
+      const elapsed=Date.now()-start;
+      if(elapsed<duration){requestAnimationFrame(sample);}
+      else{
+        stream.getTracks().forEach(t=>t.stop());
+        document.body.removeChild(vid);
+        analyzePPG(samples);
+      }
     }
-  } catch (err) {
-    // TODO: Fallback to mailto if Stripe STRIPE_PRICE_CCI_FOUNDING env var is not set
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Continue to Checkout \u2014 $199';
-    errorEl.innerHTML = 'Checkout temporarily unavailable. <a href="mailto:contact@orbitalhealth.app?subject=CCI%20Founding%20Access" style="color:#00D7FF;text-decoration:underline;">Email us instead</a>';
-    errorEl.style.display = 'block';
+    requestAnimationFrame(sample);
+  }catch(e){
+    $('mirror-status').textContent='Camera access denied.';
+    $('mirror-btn').disabled=false;
+  }
+}
+
+function analyzePPG(samples){
+  if(samples.length<30){
+    $('mirror-status').textContent='Not enough data. Try again.';
+    $('mirror-btn').disabled=false;return;
+  }
+  // Simple zero-crossing BPM estimate from green channel
+  const vs=samples.map(s=>s.v);
+  const mean=vs.reduce((a,b)=>a+b,0)/vs.length;
+  const centered=vs.map(v=>v-mean);
+  // Count positive zero crossings
+  let crossings=0;
+  for(let i=1;i<centered.length;i++){
+    if(centered[i-1]<0&&centered[i]>=0)crossings++;
+  }
+  const durationS=(samples[samples.length-1].t-samples[0].t)/1000;
+  const bpm=Math.round((crossings/durationS)*60);
+  const clampedBpm=clamp(bpm,45,140);
+  const cap=clamp((clampedBpm-40)/100,0,1);
+  $('mirror-status').textContent='YOUR CURRENT STATE: '+clampedBpm+' bpm';
+  setOrbUniforms({capacity:1-Math.abs(cap-0.5)*1.5+0.4});
+  demoCapacity=clamp(0.9-(clampedBpm-60)/80,0.1,1);
+  updateDemoUI();
+  $('mirror-btn').disabled=false;
+}
+
+// ─── CONSTELLATION (Three.js-style with Canvas 2D + OrbitControls simulation) ───
+const constCanvas=$('constellation-canvas');
+let constW=constCanvas.clientWidth, constH=constCanvas.clientHeight;
+constCanvas.width=constW;constCanvas.height=constH;
+
+// 90 days of synthetic data
+const DAYS=90;
+const DAY_POINTS=[];
+for(let i=0;i<DAYS;i++){
+  const angle=(i/DAYS)*PI2;
+  const r=0.7+Math.sin(i*0.4)*0.2+Math.random()*0.1;
+  const capacity=0.3+0.5*Math.sin(i*0.15+1.2)+0.2*Math.random();
+  DAY_POINTS.push({
+    x:Math.cos(angle)*r,
+    y:(i/DAYS-0.5)*1.2,
+    z:Math.sin(angle)*r,
+    cap:clamp(capacity,0,1),
+    day:i+1
+  });
+}
+
+// 3D rotation state
+let constRot={x:0.3,y:0};
+let constTarget={x:0.3,y:0};
+let constDragging=false;
+let constDragStart={x:0,y:0};
+let constRotStart={x:0,y:0};
+let constVel={x:0,y:0};
+let constLastMouse={x:0,y:0};
+let constAnimating=false;
+
+function project3D(pt,rx,ry){
+  // Rotate around Y then X
+  let x=pt.x,y=pt.y,z=pt.z;
+  const cy=Math.cos(ry),sy=Math.sin(ry);
+  const nx=x*cy+z*sy,nz=-x*sy+z*cy;
+  x=nx;z=nz;
+  const cx2=Math.cos(rx),sx2=Math.sin(rx);
+  const ny=y*cx2-z*sx2,nz2=y*sx2+z*cx2;
+  y=ny;z=nz2;
+  const fov=2.5;
+  const sc=fov/(fov+z+1.5);
+  return{sx:x*sc,sy:y*sc,z:z,sc};
+}
+
+const tooltip=$('tooltip');
+let hoveredDay=-1;
+
+function drawConstellation(){
+  const g=constCanvas.getContext('2d');
+  g.clearRect(0,0,constW,constH);
+  const cx=constW/2,cy=constH/2,scale=Math.min(constW,constH)*0.38;
+  const rx=constRot.x,ry=constRot.y;
+  
+  // Project all points
+  const projected=DAY_POINTS.map((pt,i)=>{
+    const p=project3D(pt,rx,ry);
+    return{...p,cap:pt.cap,day:pt.day,i};
+  });
+  projected.sort((a,b)=>a.z-b.z);
+  
+  // Draw connections to neighbors
+  g.lineWidth=0.5;
+  for(let i=0;i<projected.length-1;i++){
+    const a=projected[i],b=projected[i+1];
+    const ax=cx+a.sx*scale,ay=cy+a.sy*scale;
+    const bx=cx+b.sx*scale,by=cy+b.sy*scale;
+    const alpha=0.08+a.sc*0.08;
+    g.strokeStyle=`rgba(0,194,204,${alpha})`;
+    g.beginPath();g.moveTo(ax,ay);g.lineTo(bx,by);g.stroke();
+  }
+  
+  // Draw points
+  for(const pt of projected){
+    const px=cx+pt.sx*scale;
+    const py=cy+pt.sy*scale;
+    const r=1.5+pt.sc*2.5;
+    const alpha=0.4+pt.sc*0.6;
+    // Color by capacity
+    let col;
+    if(pt.cap>0.65)col=`rgba(0,194,204,${alpha})`;
+    else if(pt.cap>0.35)col=`rgba(200,138,20,${alpha})`;
+    else col=`rgba(176,20,20,${alpha})`;
+    
+    if(pt.day-1===hoveredDay){
+      g.beginPath();g.arc(px,py,r*2,0,PI2);
+      g.fillStyle=col.replace(/[\d.]+\)$/,'0.2)');
+      g.fill();
+    }
+    
+    g.beginPath();g.arc(px,py,r,0,PI2);
+    g.fillStyle=col;
+    if(pt.day-1===hoveredDay){g.shadowColor=col;g.shadowBlur=10;}
+    g.fill();
+    g.shadowBlur=0;
+  }
+}
+
+function constAnimate(){
+  if(!constDragging){
+    constRot.x=lerp(constRot.x,constTarget.x,0.08);
+    constRot.y=lerp(constRot.y,constTarget.y+performance.now()/8000,0.02);
+    if(Math.abs(constVel.x)>0.0001||Math.abs(constVel.y)>0.0001){
+      constTarget.x+=constVel.x;constTarget.y+=constVel.y;
+      constVel.x*=0.95;constVel.y*=0.95;
+    }
+  }
+  drawConstellation();
+  requestAnimationFrame(constAnimate);
+}
+constAnimate();
+
+constCanvas.addEventListener('mousedown',e=>{
+  constDragging=true;
+  constDragStart={x:e.clientX,y:e.clientY};
+  constRotStart={x:constRot.x,y:constRot.y};
+  constVel={x:0,y:0};
+});
+window.addEventListener('mousemove',e=>{
+  if(!constDragging)return;
+  const dx=e.clientX-constDragStart.x;
+  const dy=e.clientY-constDragStart.y;
+  constRot.x=constRotStart.x+dy*0.005;
+  constRot.y=constRotStart.y+dx*0.005;
+  constVel.x=(e.clientY-constLastMouse.y)*0.0005*0.95;
+  constVel.y=(e.clientX-constLastMouse.x)*0.0005*0.95;
+  constLastMouse={x:e.clientX,y:e.clientY};
+});
+window.addEventListener('mouseup',()=>{constDragging=false;});
+
+constCanvas.addEventListener('mousemove',e=>{
+  const rect=constCanvas.getBoundingClientRect();
+  const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  const cx=constW/2,cy=constH/2,scale=Math.min(constW,constH)*0.38;
+  let closest=-1,closestDist=20;
+  const projected=DAY_POINTS.map((pt,i)=>{
+    const p=project3D(pt,constRot.x,constRot.y);
+    return{...p,cap:pt.cap,day:pt.day,i};
+  });
+  for(const pt of projected){
+    const px=cx+pt.sx*scale,py=cy+pt.sy*scale;
+    const d=Math.hypot(px-mx,py-my);
+    if(d<closestDist){closestDist=d;closest=pt.day-1;}
+  }
+  hoveredDay=closest;
+  if(closest>=0){
+    const pt=DAY_POINTS[closest];
+    const stName=pt.cap>0.65?'RESOURCED':pt.cap>0.35?'ELEVATED':'DEPLETED';
+    tooltip.textContent=`Day ${pt.day} — ${stName} (${Math.round(pt.cap*100)}%)`;
+    tooltip.style.opacity='1';
+    tooltip.style.left=(e.clientX+12)+'px';
+    tooltip.style.top=(e.clientY-4)+'px';
+  }else{
+    tooltip.style.opacity='0';
   }
 });
-
-// =========================================================================
-// PRICING CARD CLICKS — track tier
-// =========================================================================
-document.querySelectorAll('.pricing-cta').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    var tier = btn.getAttribute('data-tier') || '';
-    trackEvent('pricing_card_clicked', { tier: tier });
-  });
+constCanvas.addEventListener('mouseleave',()=>{
+  tooltip.style.opacity='0';
+  hoveredDay=-1;
 });
 
-// =========================================================================
-// FAQ ACCORDION
-// =========================================================================
-document.querySelectorAll('.faq-item').forEach(function(item) {
-  item.querySelector('.faq-q').addEventListener('click', function() {
-    var isOpen = item.classList.contains('open');
-    // Close all
-    document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('open'); });
-    // Toggle clicked
-    if (!isOpen) {
-      item.classList.add('open');
-      trackEvent('faq_opened', { question: item.querySelector('.faq-q').textContent.replace('+','').trim() });
+// Touch
+constCanvas.addEventListener('touchstart',e=>{
+  constDragging=true;
+  constDragStart={x:e.touches[0].clientX,y:e.touches[0].clientY};
+  constRotStart={x:constRot.x,y:constRot.y};
+},{passive:true});
+window.addEventListener('touchmove',e=>{
+  if(!constDragging)return;
+  const dx=e.touches[0].clientX-constDragStart.x;
+  const dy=e.touches[0].clientY-constDragStart.y;
+  constRot.x=constRotStart.x+dy*0.006;
+  constRot.y=constRotStart.y+dx*0.006;
+},{passive:true});
+window.addEventListener('touchend',()=>{constDragging=false;});
+
+// ─── FINAL ORB ───
+const finalOrbCanvas=$('final-orb');
+(function setupFinalOrb(){
+  const g=finalOrbCanvas.getContext('2d');
+  if(!g)return;
+  function resize(){
+    finalOrbCanvas.width=finalOrbCanvas.offsetWidth;
+    finalOrbCanvas.height=finalOrbCanvas.offsetHeight;
+  }
+  resize();
+  new ResizeObserver(resize).observe(finalOrbCanvas);
+  let t=0;
+  (function frame(){
+    requestAnimationFrame(frame);
+    t+=0.005; // slower 6s breathing
+    const W=finalOrbCanvas.width,H=finalOrbCanvas.height;
+    g.clearRect(0,0,W,H);
+    const cx=W/2,cy=H/2;
+    const breath=Math.sin(t*PI2/6);
+    const R=Math.min(W,H)*0.32*(1+breath*0.04);
+    // Outer halo
+    for(let i=3;i>0;i--){
+      const grad=g.createRadialGradient(cx,cy,R*0.5,cx,cy,R*(1+i*0.3));
+      grad.addColorStop(0,`rgba(0,194,204,${0.04/i})`);
+      grad.addColorStop(1,'transparent');
+      g.fillStyle=grad;g.beginPath();g.arc(cx,cy,R*(1+i*0.3),0,PI2);g.fill();
+    }
+    // Rim
+    g.strokeStyle='rgba(0,194,204,0.6)';
+    g.lineWidth=R*0.04;
+    g.shadowColor='rgba(0,194,204,0.4)';
+    g.shadowBlur=30;
+    g.beginPath();g.arc(cx,cy,R,0,PI2);g.stroke();
+    g.shadowBlur=0;
+    // Inner glow
+    const ig=g.createRadialGradient(cx,cy,0,cx,cy,R*0.85);
+    ig.addColorStop(0,'rgba(0,194,204,0.08)');
+    ig.addColorStop(1,'transparent');
+    g.fillStyle=ig;g.beginPath();g.arc(cx,cy,R*0.85,0,PI2);g.fill();
+  })();
+})();
+
+// ─── SCROLL MECHANICS ───
+let scrollVelocity=0,lastScrollY=0,lastScrollTime=0,glitchActive=false,glitchDecay=0;
+let heroVisible=true,panelsPinned=false,orbPinned=false;
+const orbPin=$('orb-pin');
+
+// Scroll velocity → glitch
+const velocityHistory=[];
+window.addEventListener('scroll',()=>{
+  const now=performance.now();
+  const dt=(now-lastScrollTime)||1;
+  const dy=Math.abs(window.scrollY-lastScrollY);
+  scrollVelocity=dy/dt*1000;
+  velocityHistory.push(scrollVelocity);
+  if(velocityHistory.length>5)velocityHistory.shift();
+  const avgVel=velocityHistory.reduce((a,b)=>a+b,0)/velocityHistory.length;
+  lastScrollY=window.scrollY;lastScrollTime=now;
+  
+  if(avgVel>3500&&!glitchActive){
+    glitchActive=true;glitchDecay=0;
+    document.body.classList.add('glitch');
+    setOrbUniforms({glitch:1.0});
+    track('glitch_triggered',{velocity:Math.round(avgVel)});
+    setTimeout(()=>{
+      document.body.classList.remove('glitch');
+      glitchActive=false;
+    },800);
+  }
+  
+  updateScrollState();
+  updateGravityTypography();
+},{passive:true});
+
+function updateScrollState(){
+  const sy=window.scrollY;
+  const wh=window.innerHeight;
+  const heroEl=$('hero');
+  const heroBottom=heroEl.offsetTop+heroEl.offsetHeight;
+  
+  // Hero exit → pin orb
+  if(sy>heroBottom*0.7&&!orbPinned){
+    orbPinned=true;
+    orbPin.classList.add('visible');
+    $('hero-text').classList.remove('visible');
+    drawPinOrb(0.85);
+  }else if(sy<=heroBottom*0.5&&orbPinned){
+    orbPinned=false;
+    orbPin.classList.remove('visible');
+    $('hero-text').classList.add('visible');
+  }
+  
+  // Section-based orb color
+  const sections=['panels','demo','constellation','who','proof','final'];
+  for(const id of sections){
+    const el=$(id);
+    if(!el)continue;
+    const top=el.offsetTop,bot=top+el.offsetHeight;
+    if(sy+wh*0.5>top&&sy<bot){
+      if(id==='panels'){
+        const pct=(sy-top)/(bot-top);
+        if(pct<0.33)setOrbUniforms({capacity:0.3});
+        else if(pct<0.66)setOrbUniforms({capacity:0.55});
+        else setOrbUniforms({capacity:0.85});
+        drawPinOrb(pct<0.33?0.3:pct<0.66?0.55:0.85);
+      }else if(id==='demo'||id==='constellation'||id==='final'){
+        setOrbUniforms({capacity:0.85});
+        drawPinOrb(0.85);
+      }
+    }
+  }
+  
+  // Scroll depth tracking
+  const total=document.body.scrollHeight-wh;
+  const pct=Math.round(sy/total*100);
+  [25,50,75,100].forEach(p=>{
+    if(pct>=p&&!window['_depth'+p]){
+      window['_depth'+p]=true;
+      track('scroll_depth',{percent:p});
     }
   });
-});
-</script>
+}
 
+// Pin orb canvas
+(function(){
+  const g=orbPin.getContext('2d');
+  if(!g)return;
+  let cap=0.85;
+  function frame(){
+    requestAnimationFrame(frame);
+    const t=performance.now()/1000;
+    const W=orbPin.width||80,H=orbPin.height||80;
+    orbPin.width=80;orbPin.height=80;
+    g.clearRect(0,0,80,80);
+    const breath=Math.sin(t*PI2/4);
+    const R=32*(1+breath*0.03);
+    const st=capacityToState(cap);
+    const grad=g.createRadialGradient(40,40,0,40,40,R*1.3);
+    grad.addColorStop(0,st.color+'33');
+    grad.addColorStop(1,'transparent');
+    g.fillStyle=grad;g.beginPath();g.arc(40,40,R*1.3,0,PI2);g.fill();
+    g.strokeStyle=st.color;g.lineWidth=2.5;
+    g.shadowColor=st.color;g.shadowBlur=12;
+    g.beginPath();g.arc(40,40,R,0,PI2);g.stroke();
+    g.shadowBlur=0;
+  }
+  window.drawPinOrb=c=>{cap=c;};
+  frame();
+})();
+
+// ─── GRAVITATIONAL TYPOGRAPHY ───
+const gravTargets=[];
+function initGravity(){
+  document.querySelectorAll('.panel-text,.demo-label,#demo-state,.constellation-caption,.who-card,.proof-quote,.final-headline').forEach(el=>{
+    el.style.willChange='font-variation-settings,letter-spacing,opacity';
+    gravTargets.push(el);
+  });
+}
+initGravity();
+
+const PIN_X=window.innerWidth-52, PIN_Y=52;
+function updateGravityTypography(){
+  if(!orbPinned)return;
+  for(const el of gravTargets){
+    const rect=el.getBoundingClientRect();
+    const cx=rect.left+rect.width/2;
+    const cy=rect.top+rect.height/2;
+    const dist=Math.hypot(cx-PIN_X,cy-PIN_Y);
+    const influence=clamp(1-dist/220,0,1);
+    if(influence>0.01){
+      const ls=lerp(0,0.4,influence)+'em';
+      const fw=Math.round(lerp(700,200,influence));
+      el.style.letterSpacing=ls;
+      el.style.fontWeight=fw;
+      el.style.opacity=(1-influence*0.4).toString();
+    }else{
+      el.style.letterSpacing='';
+      el.style.fontWeight='';
+      el.style.opacity='';
+    }
+  }
+}
+
+// ─── PARTICLE TEXT CONDENSATION ───
+const particleCanvas=$('particle-canvas');
+const pctx=particleCanvas.getContext('2d');
+let pcW=window.innerWidth,pcH=window.innerHeight;
+particleCanvas.width=pcW;particleCanvas.height=pcH;
+
+const NUM_PARTICLES=1800;
+const particles=[];
+let activePanel=-1;
+let particleTarget=null;
+
+for(let i=0;i<NUM_PARTICLES;i++){
+  particles.push({
+    x:Math.random()*pcW,
+    y:Math.random()*pcH,
+    vx:(Math.random()-0.5)*0.3,
+    vy:(Math.random()-0.5)*0.3,
+    tx:Math.random()*pcW,
+    ty:Math.random()*pcH,
+    r:0.6+Math.random()*1.2,
+    alpha:0.04+Math.random()*0.06,
+    toTarget:0, // 0=nebula, 1=text
+    delay:Math.random()*0.8,
+  });
+}
+
+function getLetterPositions(text,fontSize,cx,cy){
+  const cv=document.createElement('canvas');
+  cv.width=pcW;cv.height=pcH;
+  const g=cv.getContext('2d');
+  g.font=`300 ${fontSize}px 'DM Sans',sans-serif`;
+  const lines=text.split('\n').filter(l=>l.trim());
+  const positions=[];
+  const lineH=fontSize*1.5;
+  const totalH=lines.length*lineH;
+  let startY=cy-totalH/2+fontSize/2;
+  for(const line of lines){
+    if(line.includes('──')){startY+=lineH*0.6;continue;}
+    const tw=g.measureText(line).width;
+    let startX=cx-tw/2;
+    for(const ch of line){
+      if(ch===' '){startX+=g.measureText(' ').width;continue;}
+      positions.push({x:startX+Math.random()*fontSize*0.3,y:startY+Math.random()*fontSize*0.3});
+      startX+=g.measureText(ch).width;
+    }
+    startY+=lineH;
+  }
+  return positions;
+}
+
+function assignParticlesToText(panelId){
+  if(activePanel===panelId)return;
+  activePanel=panelId;
+  const texts=['','','You\'ve been told\nyou\'re too sensitive.\nToo much. Not enough.\n\nYour nervous system\ndisagrees.','Some days you move\nmountains.\n\nSome days the email\nsits unopened for\n72 hours.\n\nNobody taught you\nto read the difference.','Until now.'];
+  const text=texts[panelId]||'';
+  if(!text){
+    particles.forEach(p=>{p.toTarget=0;});
+    return;
+  }
+  const fs=Math.max(18,Math.min(32,pcW*0.025));
+  const targets=getLetterPositions(text,fs,pcW/2,pcH/2);
+  particles.forEach((p,i)=>{
+    const t=targets[i%targets.length];
+    if(t){p.tx=t.x;p.ty=t.y;}
+    p.toTarget=1;
+    p.delay=Math.random()*0.6;
+  });
+}
+
+let pTime=0;
+(function pLoop(){
+  requestAnimationFrame(pLoop);
+  if(!particleCanvas.classList.contains('active'))return;
+  pTime+=0.016;
+  pctx.clearRect(0,0,pcW,pcH);
+  for(const p of particles){
+    const progressDelay=clamp((pTime-p.delay)*1.5,0,1);
+    const ease=progressDelay*progressDelay*(3-2*progressDelay);
+    const t=p.toTarget;
+    let tx,ty;
+    if(t>0.01){tx=lerp(p.x,p.tx,ease*t);ty=lerp(p.y,p.ty,ease*t);}
+    else{
+      p.x+=p.vx;p.y+=p.vy;
+      p.x=(p.x+pcW)%pcW;p.y=(p.y+pcH)%pcH;
+      tx=p.x;ty=p.y;
+    }
+    // Nebula drift
+    if(t<0.5){
+      tx+=Math.sin(pTime*0.3+p.r*10)*1.5;
+      ty+=Math.cos(pTime*0.2+p.r*7)*1.5;
+    }
+    const alpha=lerp(p.alpha,0.7,ease*t);
+    const r=lerp(p.r,1.2,ease*t);
+    pctx.beginPath();
+    pctx.arc(tx,ty,r,0,PI2);
+    const cyan=`rgba(0,194,204,${alpha})`;
+    pctx.fillStyle=cyan;
+    pctx.fill();
+  }
+})();
+
+// ─── INTERSECTION OBSERVER — panels + cards + proof ───
+const io=new IntersectionObserver((entries)=>{
+  for(const e of entries){
+    const el=e.target;
+    if(e.isIntersecting){
+      if(el.classList.contains('who-card')||el.classList.contains('proof-card')){
+        const delay=Array.from(el.parentNode.children).indexOf(el)*80;
+        setTimeout(()=>el.classList.add('visible'),delay);
+      }
+      // Particle panels
+      if(el.dataset.panel){
+        const n=parseInt(el.dataset.panel);
+        particleCanvas.classList.add('active');
+        pTime=0;
+        setTimeout(()=>assignParticlesToText(n),100);
+        particles.forEach(p=>{p.toTarget=0;});
+      }
+    }else{
+      if(el.dataset.panel&&parseInt(el.dataset.panel)===activePanel){
+        activePanel=-1;
+        particles.forEach(p=>{p.toTarget=0;p.delay=Math.random()*0.4;});
+      }
+    }
+  }
+},{threshold:0.3});
+
+document.querySelectorAll('.who-card,.proof-card,[data-panel]').forEach(el=>io.observe(el));
+
+// ─── AUDIO ENGINE ───
+let audioCtx=null,audioStarted=false;
+let oscillators=[],masterGain=null,stateMixer={current:0.85};
+
+function initAudio(){
+  if(audioStarted)return;
+  audioStarted=true;
+  try{
+    audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    masterGain=audioCtx.createGain();
+    masterGain.gain.setValueAtTime(0,audioCtx.currentTime);
+    masterGain.gain.linearRampToValueAtTime(0.04,audioCtx.currentTime+3);
+    masterGain.connect(audioCtx.destination);
+    buildAudioState(0.85);
+  }catch(e){}
+}
+
+function buildAudioState(cap){
+  if(!audioCtx)return;
+  const now=audioCtx.currentTime;
+  // Clear old
+  oscillators.forEach(n=>{try{n.gain.linearRampToValueAtTime(0,now+2);setTimeout(()=>{try{n.osc.stop();}catch(e){}},2200);}catch(e){}});
+  oscillators=[];
+  function addOsc(freq,type,vol,detune=0){
+    const osc=audioCtx.createOscillator();
+    const g=audioCtx.createGain();
+    const rev=audioCtx.createConvolver();
+    osc.type=type;osc.frequency.value=freq;
+    if(detune)osc.detune.value=detune;
+    g.gain.setValueAtTime(0,now);
+    g.gain.linearRampToValueAtTime(vol,now+2);
+    osc.connect(g);g.connect(masterGain);
+    osc.start();
+    oscillators.push({osc,gain:g});
+  }
+  if(cap>0.65){
+    // Resourced: crystalline shimmer 800-2000Hz
+    addOsc(880,'sine',0.008);addOsc(1320,'sine',0.006,3);
+    addOsc(1760,'sine',0.004,7);addOsc(2200,'sine',0.003);
+  }else if(cap>0.35){
+    // Elevated: warm mid 200-400Hz
+    addOsc(220,'sine',0.012);addOsc(330,'sine',0.008,2);
+    addOsc(440,'triangle',0.005);
+  }else{
+    // Depleted: sub rumble 40-80Hz
+    addOsc(55,'sine',0.015);addOsc(40,'sine',0.012,5);
+  }
+}
+
+// Audio on first gesture
+let audioInitialized=false;
+['scroll','touchstart','click'].forEach(ev=>{
+  window.addEventListener(ev,()=>{
+    if(!audioInitialized){audioInitialized=true;initAudio();}
+  },{once:true,passive:true});
+});
+
+// ─── HAPTIC HEARTBEAT ───
+const isMobile='ontouchstart'in window||navigator.maxTouchPoints>0;
+let hapticInterval=null;
+function startHaptics(){
+  if(!('vibrate'in navigator)||!isMobile)return;
+  navigator.vibrate(1); // test
+  hapticInterval=setInterval(()=>{
+    if(heroVisible)navigator.vibrate([20,180,20]);
+  },4000);
+  setTimeout(()=>navigator.vibrate([20,180,20]),2000);
+}
+function stopHaptics(){
+  if(hapticInterval){clearInterval(hapticInterval);hapticInterval=null;}
+}
+const heroObserver=new IntersectionObserver(entries=>{
+  for(const e of entries){
+    heroVisible=e.isIntersecting;
+    if(e.isIntersecting)startHaptics();
+    else stopHaptics();
+  }
+},{threshold:0.3});
+heroObserver.observe($('hero'));
+
+// ─── ORBITAL PRO REFRACTION HOVER ───
+let proHoverProgress=0,proHoverActive=false,proHoverRaf=null;
+function onProHover(entering){
+  proHoverActive=entering;
+  if(proHoverRaf)cancelAnimationFrame(proHoverRaf);
+  track(entering?'pro_hover_refraction':null,entering?{}:null);
+  function animate(){
+    const target=proHoverActive?1:0;
+    proHoverProgress=lerp(proHoverProgress,target,proHoverActive?0.04:0.025);
+    // Apply chromatic aberration to hero/final canvas
+    const split=proHoverProgress*2;
+    [$('orb-canvas'),$('final-orb')].forEach(cv=>{
+      if(cv)cv.style.filter=split>0.05?`drop-shadow(${split}px 0 0 rgba(180,50,50,0.5)) drop-shadow(-${split}px 0 0 rgba(0,180,220,0.5))`:'';
+    });
+    // IOR shimmer on body bg
+    document.body.style.background=proHoverProgress>0.05
+      ?`radial-gradient(ellipse at ${PIN_X}px ${PIN_Y}px, rgba(0,194,204,${proHoverProgress*0.04}) 0%, var(--void) 50%)`
+      :'';
+    if(Math.abs(proHoverProgress-target)>0.001)proHoverRaf=requestAnimationFrame(animate);
+    else{if(!proHoverActive)document.body.style.background='';proHoverRaf=null;}
+  }
+  proHoverRaf=requestAnimationFrame(animate);
+}
+
+// ─── RESIZE ───
+window.addEventListener('resize',()=>{
+  pcW=window.innerWidth;pcH=window.innerHeight;
+  particleCanvas.width=pcW;particleCanvas.height=pcH;
+  setupDemoCanvas();
+  constW=constCanvas.clientWidth;constH=constCanvas.clientHeight;
+  constCanvas.width=constW;constCanvas.height=constH;
+},{passive:true});
+
+// ─── JSON-LD ───
+const ld={
+  "@context":"https://schema.org",
+  "@type":"MobileApplication",
+  "name":"Orbital",
+  "operatingSystem":"iOS",
+  "applicationCategory":"HealthApplication",
+  "url":"https://orbitalhealth.app",
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "description":"Capacity intelligence for people who need to understand themselves."
+};
+const sc=document.createElement('script');
+sc.type='application/ld+json';sc.textContent=JSON.stringify(ld);
+document.head.appendChild(sc);
+</script>
 </body>
 </html>
