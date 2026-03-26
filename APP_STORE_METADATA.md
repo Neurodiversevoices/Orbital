@@ -98,7 +98,7 @@ Works without internet. Your data is stored locally first, always. Cloud sync ha
 OPEN DATA
 Export your data anytime as CSV or PDF. Your data belongs to you. If you leave, it comes with you.
 
-Non-diagnostic. Not a substitute for professional consultation. All data is self-reported.
+Informational only. Not a substitute for professional consultation. All data is self-reported.
 ```
 (1,543 chars)
 

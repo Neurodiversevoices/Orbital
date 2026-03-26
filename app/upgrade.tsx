@@ -293,7 +293,7 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
         <View style={styles.cciConfirmationContainer}>
           <Text style={styles.cciModalTitle}>Confirm Individual CCI Issuance</Text>
           <Text style={styles.cciModalBody}>
-            This action creates a fixed clinical-grade record derived from your stored capacity history.
+            This action creates a fixed structured capacity record derived from your stored capacity history.
             Once issued, the artifact cannot be altered. Issued per individual.
           </Text>
           <Pressable

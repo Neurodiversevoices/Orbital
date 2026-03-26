@@ -82,3 +82,11 @@ diagnosis, treatment, therapy, medical device, HIPAA, CPT, FDA
 - Never create branches. Commit to current branch.
 - Never push without being told.
 - Never force push.
+
+# Orbital Submission Automation
+When user mentions submit, TestFlight, App Store, archive, or resubmit:
+1. Switch to Agent Mode immediately
+2. Execute .cursor/rules/submission-protocol.md in full parallel
+3. Never ask "should I check X" — just do it
+4. Output: Submission Readiness Report with READY TO SUBMIT or BLOCKING ERRORS
+5. Escalate only for: 2FA codes, final Confirm Submission click

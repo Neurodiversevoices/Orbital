@@ -1,7 +1,7 @@
 /**
  * QCR Chart Types
  *
- * Type definitions for clinical-grade capacity visualization.
+ * Type definitions for capacity visualization.
  * No gamification. Institutional styling only.
  */
 

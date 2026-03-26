@@ -10,8 +10,12 @@
     "newArchEnabled": true,
     "jsEngine": "hermes",
     "scheme": "orbital",
-    "assets": ["./assets/orb_interior.png"],
-    "assetBundlePatterns": ["./assets/**/*"],
+    "assets": [
+      "./assets/orb_interior.png"
+    ],
+    "assetBundlePatterns": [
+      "./assets/**/*"
+    ],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -21,13 +25,14 @@
       "supportsTablet": true,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "79",
+      "buildNumber": "81",
       "appleTeamId": "2KM3QL4UMV",
       "icon": "./assets/icon.png",
       "infoPlist": {
         "LSApplicationCategoryType": "public.app-category.healthcare-fitness",
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "runtimeVersion": "1.0.0"
     },
     "android": {
       "package": "com.erparris.orbital",
@@ -35,6 +40,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0A0A1A"
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
       }
     },
     "web": {
@@ -76,6 +84,9 @@
       "eas": {
         "projectId": "60d17137-74cc-4a95-a1d5-bd0692cf1e2a"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/60d17137-74cc-4a95-a1d5-bd0692cf1e2a"
     }
   }
 }

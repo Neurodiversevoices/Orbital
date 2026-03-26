@@ -28,7 +28,7 @@ export const es = {
     trend: 'Tendencia',
     signals: 'Señales',
     patterns: 'Patrones',
-    nonDiagnostic: 'Sin valor diagnóstico',
+    nonDiagnostic: 'Solo informativo',
   },
 
   // ============================================
@@ -73,7 +73,7 @@ export const es = {
     lockedProgress: '{count} de 7 registradas',
 
     // Chart context
-    chartContext: 'Capacidad a lo largo del tiempo — normalizada, sin valor diagnóstico',
+    chartContext: 'Capacidad a lo largo del tiempo — normalizada, sin interpretación clínica',
 
     // Stats
     statsBaseline: 'Línea base',
@@ -225,7 +225,7 @@ export const es = {
     fullJsonSublabel: 'Respaldo completo, legible por máquinas',
     fullCsv: 'Datos completos (CSV)',
     fullCsvSublabel: 'Formato compatible con hojas de cálculo',
-    disclaimer: 'Sin valor diagnóstico. Datos de capacidad autorreportados normalizados.',
+    disclaimer: 'Solo informativo. Datos de capacidad autorreportados normalizados.',
     noData: 'No hay datos disponibles para este rango',
     exportSuccess: 'Exportación lista',
   },
@@ -283,8 +283,8 @@ export const es = {
   // DISCLAIMER (Institutional contexts)
   // ============================================
   disclaimer: {
-    short: 'Sin valor diagnóstico',
-    full: 'Esta herramienta registra capacidad funcional autorreportada. No constituye evaluación clínica ni diagnóstico.',
+    short: 'Solo informativo',
+    full: 'Esta herramienta registra capacidad funcional autorreportada. No sustituye el consejo profesional de salud ni una evaluación clínica formal.',
     dataDescription: 'Señales de capacidad normalizadas a lo largo del tiempo.',
     purpose: 'Registro longitudinal de capacidad disponible para uso personal o compartido.',
   },

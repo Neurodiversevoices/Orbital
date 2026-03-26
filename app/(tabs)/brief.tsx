@@ -179,7 +179,7 @@ function PersonalBrief() {
         <Text style={styles.cciSubtitle}>CCI-Q4</Text>
 
         <Text style={styles.cciDescription}>
-          Your personal capacity signal rendered as a clinical-grade instrument.
+          Your personal capacity signal rendered as a pattern-based instrument.
           Demo data shown — real issuance reflects your actual capacity patterns.
         </Text>
 
@@ -252,7 +252,7 @@ function CirclesCCIBrief() {
             {' '}over time — reflecting how much emotional, cognitive, sensory, and social load the group can tolerate before regulation begins to degrade.
           </Text>
           <Text style={styles.circleCCINote}>
-            This report summarizes patterns, not individuals. No diagnoses. No signal scoring
+            This report summarizes patterns, not individuals. No labels. No signal scoring
           </Text>
         </View>
 

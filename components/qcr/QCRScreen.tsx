@@ -1,7 +1,7 @@
 /**
  * QCR Screen Component
  *
- * Displays the Quarterly Capacity Report with clinical-grade visualizations.
+ * Displays the Quarterly Capacity Report with capacity visualizations.
  * Institutional styling — no wellness language.
  *
  * REQUIRED SECTIONS:

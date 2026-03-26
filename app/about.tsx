@@ -46,7 +46,7 @@ export default function AboutScreen() {
           <Text style={styles.heroTitle}>Longitudinal Capacity Intelligence</Text>
           <Text style={styles.heroSubtitle}>
             A calm, serious tool for tracking functional capacity over time.
-            No diagnoses. No prescriptions. Just signal and pattern.
+            No individual labels. No prescriptions. Just signal and pattern.
           </Text>
         </View>
 
