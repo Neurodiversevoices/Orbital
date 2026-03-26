@@ -1,0 +1,8 @@
+🚨 ORBITAL RELEASE FAILURE
+Lane: upload_screenshots
+Error: An exception has occurred for locale: en-US.
+Error: The request cannot be fulfilled because of the state of another resource. - Can't Create Screenshot Set while In ReviewappScreenshotSets
+Time: 2026-03-24 15:28:48 -0400
+
+Fix the error and re-run:
+bundle exec fastlane upload_screenshots

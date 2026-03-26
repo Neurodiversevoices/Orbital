@@ -25,7 +25,9 @@
     "cci:render": "cd output && node render_ultra.js",
     "bundle:export": "npx tsx scripts/bundle-cci-export-pdf.ts",
     "android": "expo run:android",
-    "ios": "expo run:ios"
+    "ios": "expo run:ios",
+    "marketing": "node scripts/marketing-agent.js",
+    "creative": "node scripts/marketing-agent.js campaign"
   },
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.4.2",

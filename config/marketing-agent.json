@@ -1,0 +1,9 @@
+{
+  "creativityMode": "unrestricted",
+  "referenceArtists": ["Banksy", "Refik Anadol", "James Jean", "David Lynch", "FKA Twigs"],
+  "forbiddenConcepts": ["inspiring", "journey", "empower", "transform", "wellness"],
+  "mandatoryQuestion": "Has anyone ever done this before? If yes, start over.",
+  "temperatureOverride": 1.0,
+  "rejectSafeIdeas": true,
+  "minimumWeirdnessScore": 8
+}
