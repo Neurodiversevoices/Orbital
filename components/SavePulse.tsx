@@ -8,25 +8,16 @@ import Animated, {
 } from 'react-native-reanimated';
 import { CapacityState } from '../types';
 
-const PULSE_SIZE = 320;
-
-// Medical-grade color palette matching the orb
-const stateColors = {
-  resourced: '#00E5FF',
-  stretched: '#E8A830',
-  depleted: '#F44336',
-};
-
 interface SavePulseProps {
   trigger: number;
   state: CapacityState;
+  /** Match hero orb diameter so the ring sits behind it */
+  size?: number;
 }
 
-export function SavePulse({ trigger, state }: SavePulseProps) {
+export function SavePulse({ trigger, state, size = 280 }: SavePulseProps) {
   const scale = useSharedValue(0.8);
   const opacity = useSharedValue(0);
-
-  const color = stateColors[state];
 
   useEffect(() => {
     if (trigger > 0) {
@@ -56,11 +47,15 @@ export function SavePulse({ trigger, state }: SavePulseProps) {
     <Animated.View
       style={[
         styles.pulse,
-        animatedStyle,
         {
-          backgroundColor: color,
-          shadowColor: color,
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          backgroundColor: 'transparent',
+          // Teal/capacity-colored shadow drew a visible ring behind the orb; keep layout only.
+          shadowColor: 'transparent',
         },
+        animatedStyle,
       ]}
       pointerEvents="none"
       testID="save-pulse"
@@ -72,12 +67,9 @@ export function SavePulse({ trigger, state }: SavePulseProps) {
 const styles = StyleSheet.create({
   pulse: {
     position: 'absolute',
-    width: PULSE_SIZE,
-    height: PULSE_SIZE,
-    borderRadius: PULSE_SIZE / 2,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 40,
-    elevation: 15,
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
 });

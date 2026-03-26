@@ -39,6 +39,20 @@
         "SENTRY_ALLOW_FAILURE": "true"
       }
     },
+    "preview": {
+      "distribution": "internal",
+      "ios": {
+        "credentialsSource": "remote",
+        "resourceClass": "m-medium"
+      },
+      "android": {
+        "credentialsSource": "remote",
+        "buildType": "apk"
+      },
+      "env": {
+        "SENTRY_ALLOW_FAILURE": "true"
+      }
+    },
     "founder-demo": {
       "distribution": "internal",
       "ios": {

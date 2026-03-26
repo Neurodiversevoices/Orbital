@@ -17,6 +17,7 @@ import Animated, {
   FadeOut,
   SlideInDown,
   useAnimatedStyle,
+  withSequence,
   withSpring,
   withTiming,
   useSharedValue,
@@ -33,14 +34,17 @@ import { Settings, Sparkles, TrendingUp, TrendingDown, Minus } from 'lucide-reac
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import {
-  SavePulse,
   CategorySelector,
   Composer,
   COMPOSER_HEIGHT,
   ModeInsightsPanel,
   OrgRoleBanner,
 } from '../../components';
-import ShaderOrb from '../../components/orb/ShaderOrb';
+import ShaderOrb, {
+  useOrbTouchGesture,
+  useSoulLongPress,
+  type ShaderOrbRef,
+} from '../../components/orb/ShaderOrb';
 import ShaderTherm from '../../components/orb/ShaderTherm';
 import { colors, commonStyles, spacing } from '../../theme';
 import { CapacityState, Category } from '../../types';
@@ -67,8 +71,9 @@ function formatDate(locale: Locale): string {
 
 const INITIAL_CAPACITY = 0.82;
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const ORB_SIZE = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT) * 0.82;
-const ORB_HIT_PADDING = 20; // Extra touch forgiveness around orb
+/** Orb scaled to fit header → stats → orb → label → tags → composer on one screen (iPhone class). */
+const ORB_SIZE = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT) * 0.65;
+const ORB_HIT_PADDING = 16; // Touch slop around orb (keeps hit target without inflating layout)
 const ORB_HIT_SIZE = ORB_SIZE + ORB_HIT_PADDING * 2; // 320x320
 
 // Drag range: 40% of screen width for full 0→1 traversal
@@ -167,7 +172,6 @@ export default function HomeScreen() {
   const [currentState, setCurrentState] = useState<CapacityState | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [note, setNote] = useState('');
-  const [saveTrigger, setSaveTrigger] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -176,11 +180,26 @@ export default function HomeScreen() {
   const headerOpacity = useSharedValue(1);
   const capacityShared = useSharedValue(INITIAL_CAPACITY);
   const dragStartCapacity = useSharedValue(INITIAL_CAPACITY);
-  const labelOpacity = useSharedValue(0); // 0 = hidden (no interaction yet), 1 = visible
-  const isDragging = useSharedValue(false);
+  const labelOpacity = useSharedValue(1);
+  const stateLabelScale = useSharedValue(1);
 
   // Track previous "zone" for haptic threshold crossing (0, 1, or 2)
   const prevZone = useSharedValue(-1); // -1 = uninitialized
+  const lastCapHapticBucket = useSharedValue(-999);
+  const lastCapHapticTime = useSharedValue(-999);
+
+  const orbRef = useRef<ShaderOrbRef>(null);
+  const rotationImpulse = useSharedValue(0);
+  const soulReveal = useSharedValue(0);
+  const soulRipple = useSharedValue(0);
+
+  const orbTouch = useOrbTouchGesture({
+    orbSize: ORB_SIZE,
+    hitOffsetX: ORB_HIT_PADDING,
+    hitOffsetY: ORB_HIT_PADDING,
+  });
+
+  const soulGesture = useSoulLongPress(soulReveal, soulRipple);
 
   // ─── Orb↔Therm mode switching ─────────────────────────────────────
   const orbClock = useSharedValue(0);
@@ -198,8 +217,22 @@ export default function HomeScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   }, []);
 
-  const fireSettleHaptic = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  const fireCapTextureHaptic = useCallback(() => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, []);
+
+  const fireDetentHeavy = useCallback(() => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+  }, []);
+
+  const fireSettleNotification = useCallback((target: number) => {
+    if (target >= 0.99) {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } else if (Math.abs(target - 0.5) < 0.01) {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    } else {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    }
   }, []);
 
   const fireModeHaptic = useCallback(() => {
@@ -217,6 +250,23 @@ export default function HomeScreen() {
     (modeVal) => {
       crossfadeOrb.value = 1.0 - modeVal;
       crossfadeTherm.value = modeVal;
+    },
+  );
+
+  const [thermLayerMounted, setThermLayerMounted] = useState(false);
+  const syncThermLayerMounted = useCallback((mounted: boolean) => {
+    setThermLayerMounted(mounted);
+  }, []);
+  useAnimatedReaction(
+    () => crossfadeTherm.value,
+    (v, prev) => {
+      const on = v > 0.02;
+      if (prev === null || prev === undefined) {
+        if (on) runOnJS(syncThermLayerMounted)(true);
+        return;
+      }
+      const wasOn = prev > 0.02;
+      if (on !== wasOn) runOnJS(syncThermLayerMounted)(on);
     },
   );
 
@@ -355,14 +405,16 @@ export default function HomeScreen() {
     .onBegin(() => {
       'worklet';
       dragStartCapacity.value = capacityShared.value;
-      isDragging.value = true;
-      labelOpacity.value = withTiming(0, { duration: 150 });
 
       // Initialize zone tracking
       const cap = capacityShared.value;
       if (cap >= THRESHOLD_RESOURCED) prevZone.value = 2;
       else if (cap >= THRESHOLD_STRETCHED) prevZone.value = 1;
       else prevZone.value = 0;
+
+      const c0 = Math.max(0, Math.min(1, capacityShared.value));
+      lastCapHapticBucket.value = Math.floor(c0 / 0.05);
+      lastCapHapticTime.value = orbClock.value;
     })
     .onUpdate((e) => {
       'worklet';
@@ -371,6 +423,9 @@ export default function HomeScreen() {
 
       // Apply rubberband at bounds
       capacityShared.value = rubberband(rawCapacity);
+
+      rotationImpulse.value += (e.velocityX / 4500) * (1 + Math.abs(e.velocityX) / 8000);
+      rotationImpulse.value = Math.max(-2.8, Math.min(2.8, rotationImpulse.value));
 
       // Check for zone crossing → haptic
       const clamped = Math.max(0, Math.min(1, rawCapacity));
@@ -383,23 +438,40 @@ export default function HomeScreen() {
         runOnJS(fireThresholdHaptic)();
       }
       prevZone.value = currentZone;
+
+      const displayed = Math.max(0, Math.min(1, capacityShared.value));
+      const bucket = Math.floor(displayed / 0.05);
+      if (bucket !== lastCapHapticBucket.value) {
+        const now = orbClock.value;
+        if (now - lastCapHapticTime.value >= 0.08) {
+          lastCapHapticTime.value = now;
+          runOnJS(fireCapTextureHaptic)();
+        }
+        lastCapHapticBucket.value = bucket;
+      }
     })
-    .onEnd(() => {
+    .onEnd((e) => {
       'worklet';
       // Clamp back from rubberband and snap to nearest detent
       const clamped = Math.max(0, Math.min(1, capacityShared.value));
       const target = nearestDetent(clamped);
 
+      runOnJS(fireDetentHeavy)();
       capacityShared.value = withSpring(target, SETTLE_SPRING);
-      isDragging.value = false;
 
-      // Show state label
-      labelOpacity.value = withTiming(1, { duration: 200 });
+      const flick = e.velocityX / 2200;
+      rotationImpulse.value = Math.max(-2.8, Math.min(2.8, rotationImpulse.value + flick));
+
+      labelOpacity.value = withSpring(1, { damping: 15, stiffness: 140 });
+      stateLabelScale.value = withSequence(
+        withSpring(1.1, { damping: 12, stiffness: 260 }),
+        withSpring(1, { damping: 16, stiffness: 200 }),
+      );
 
       // Derive discrete state for saving
       const state = capacityToState(target) as CapacityState;
       runOnJS(setCurrentState)(state);
-      runOnJS(fireSettleHaptic)();
+      runOnJS(fireSettleNotification)(target);
     });
 
   // ═══════════════════════════════════════════════════════════════════
@@ -433,12 +505,23 @@ export default function HomeScreen() {
       });
     });
 
-  // Compose: horizontal = capacity, vertical = mode switch
-  const composedGesture = Gesture.Race(orbGesture, modeGesture);
+  // Compose: capacity pan + touch overlay + long-press soul (simultaneous); vertical = mode (race)
+  const composedGesture = useMemo(
+    () =>
+      Gesture.Race(
+        Gesture.Simultaneous(
+          Gesture.Simultaneous(orbGesture, orbTouch.gesture),
+          soulGesture,
+        ),
+        modeGesture,
+      ),
+    [orbGesture, modeGesture, orbTouch.gesture, soulGesture],
+  );
 
   // ─── State label animated style ───────────────────────────────────
   const labelAnimatedStyle = useAnimatedStyle(() => ({
     opacity: labelOpacity.value,
+    transform: [{ scale: stateLabelScale.value }],
   }));
 
   // ─── State label color (driven by capacity) ──────────────────────
@@ -446,26 +529,15 @@ export default function HomeScreen() {
     const c = interpolateColor(
       capacityShared.value,
       [0, 0.33, 0.67, 1],
-      ['rgba(244,67,54,0.6)', 'rgba(232,168,48,0.6)', 'rgba(232,168,48,0.6)', 'rgba(0,229,255,0.6)'],
+      ['#F44336', '#E8A830', '#E8A830', '#00E5FF'],
     );
     return { color: c as string };
   });
 
-  /** Capacity-tinted drop shadow under the orb (matches shader ramp) */
-  const orbDropShadowStyle = useAnimatedStyle(() => {
-    const shadowColor = interpolateColor(
-      capacityShared.value,
-      [0, 0.5, 1],
-      ['#D11A1A', '#E0AD1F', '#0DC6D9'],
-    );
-    return {
-      shadowColor: shadowColor as string,
-      shadowOffset: { width: 0, height: 14 },
-      shadowOpacity: 0.6,
-      shadowRadius: 40,
-      elevation: 28,
-    };
-  });
+  /** Hides thermometer Skia layer entirely when in orb mode (avoids opaque Canvas / column leak). */
+  const thermLayerOpacityStyle = useAnimatedStyle(() => ({
+    opacity: crossfadeTherm.value,
+  }));
 
   // ─── Handlers ──────────────────────────────────────────────────────
 
@@ -480,12 +552,12 @@ export default function HomeScreen() {
     if (currentState && !isSaving && canLogSignal) {
       Keyboard.dismiss();
       setIsSaving(true);
-      setSaveTrigger((prev) => prev + 1);
 
       try {
         const tags = selectedCategory ? [selectedCategory] : [];
         const trimmedNote = note.trim() || undefined;
         await saveEntry(currentState, tags, trimmedNote, trimmedNote);
+        orbRef.current?.pulseSave();
         setTimeout(() => {
           setCurrentState(null);
           setSelectedCategory(null);
@@ -544,8 +616,8 @@ export default function HomeScreen() {
   }
 
   const composerBottomPadding = currentState
-    ? COMPOSER_HEIGHT + insets.bottom + spacing.md
-    : spacing.md;
+    ? COMPOSER_HEIGHT + insets.bottom + spacing.sm
+    : spacing.sm;
 
   // ═══════════════════════════════════════════════════════════════════
   // RENDER
@@ -610,7 +682,9 @@ export default function HomeScreen() {
 
             {currentMode !== 'personal' && <ModeInsightsPanel logs={logs} />}
 
-            <View style={[styles.signalBar, { borderColor: `${modeConfig.accentColor}20` }]}>
+            <Animated.View
+              style={[styles.signalBar, { borderColor: `${modeConfig.accentColor}20` }]}
+            >
               <View style={styles.signalItem}>
                 <Text style={styles.signalLabel}>{t.core.today.toUpperCase()}</Text>
                 <Text
@@ -651,7 +725,7 @@ export default function HomeScreen() {
                   {signalData.totalSignals}
                 </Text>
               </View>
-            </View>
+            </Animated.View>
 
             <Animated.Text entering={FadeIn.delay(200).duration(400)} style={styles.instruction}>
               {!currentState ? t.home.adjustPrompt : t.home.driversLabel}
@@ -663,7 +737,7 @@ export default function HomeScreen() {
                 style={styles.orbGestureTarget}
                 accessible
                 accessibilityRole="adjustable"
-                accessibilityLabel="Capacity input. Swipe left for resourced, right for depleted. Swipe up for thermometer view."
+                accessibilityLabel="Capacity input. Swipe left for resourced, right for depleted. Long press for numeric percent. Swipe up for thermometer view."
                 accessibilityValue={{
                   min: 0,
                   max: 100,
@@ -675,25 +749,36 @@ export default function HomeScreen() {
                 ]}
                 onAccessibilityAction={handleAccessibilityAction}
               >
-                {currentState && (
-                  <SavePulse trigger={saveTrigger} state={currentState} />
-                )}
-                <Animated.View style={[styles.instrumentContainer, orbDropShadowStyle]}>
+                <View style={styles.orbInstrumentWrap}>
                   <ShaderOrb
+                    ref={orbRef}
                     size={ORB_SIZE}
                     capacity={capacityShared}
                     externalClock={orbClock}
                     uCrossfade={crossfadeOrb}
+                    soulReveal={soulReveal}
+                    soulRipple={soulRipple}
+                    touchX={orbTouch.touchX}
+                    touchY={orbTouch.touchY}
+                    touchActive={orbTouch.touchActive}
+                    touchPressure={orbTouch.touchPressure}
+                    touchVelocity={orbTouch.touchVelocity}
+                    rotationImpulse={rotationImpulse}
                   />
-                  <View style={styles.thermOverlay}>
-                    <ShaderTherm
-                      size={ORB_SIZE}
-                      capacity={capacityShared}
-                      externalClock={orbClock}
-                      uCrossfade={crossfadeTherm}
-                    />
-                  </View>
-                </Animated.View>
+                  {thermLayerMounted ? (
+                    <Animated.View
+                      pointerEvents="none"
+                      style={[styles.thermOverlay, thermLayerOpacityStyle]}
+                    >
+                      <ShaderTherm
+                        size={ORB_SIZE}
+                        capacity={capacityShared}
+                        externalClock={orbClock}
+                        uCrossfade={crossfadeTherm}
+                      />
+                    </Animated.View>
+                  ) : null}
+                </View>
               </Animated.View>
             </GestureDetector>
 
@@ -750,16 +835,16 @@ export default function HomeScreen() {
 // =============================================================================
 
 const styles = StyleSheet.create({
-  orbScreenRoot: { flex: 1 },
-  keyboardAvoid: { flex: 1 },
-  scrollView: { flex: 1 },
-  scrollContent: { flexGrow: 1 },
+  orbScreenRoot: { flex: 1, position: 'relative', backgroundColor: 'transparent' },
+  keyboardAvoid: { flex: 1, backgroundColor: 'transparent' },
+  scrollView: { flex: 1, backgroundColor: 'transparent' },
+  scrollContent: { flexGrow: 1, backgroundColor: 'transparent' },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.xs,
+    paddingTop: 0,
     paddingBottom: 0,
   },
   plansButton: { padding: spacing.sm },
@@ -777,9 +862,10 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: spacing.sm,
+    paddingTop: spacing.xs,
+    backgroundColor: 'transparent',
   },
-  welcomeSection: { alignItems: 'center', marginBottom: spacing.md },
+  welcomeSection: { alignItems: 'center', marginBottom: spacing.sm },
   welcomeText: {
     fontSize: 18,
     fontWeight: '300',
@@ -795,9 +881,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.xs,
     paddingHorizontal: spacing.md,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.sm,
   },
   signalItem: { alignItems: 'center', paddingHorizontal: spacing.md, minWidth: 70 },
   signalLabel: {
@@ -815,7 +901,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: 'rgba(255, 255, 255, 0.5)',
     letterSpacing: 0.5,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
     textAlign: 'center',
   },
   // ─── Orb gesture target ───
@@ -824,36 +910,42 @@ const styles = StyleSheet.create({
     height: ORB_HIT_SIZE,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
     overflow: 'visible',
+    backgroundColor: 'transparent',
   },
-  // ─── Instrument container (Orb + Therm stacked) ───
-  instrumentContainer: {
+  orbInstrumentWrap: {
     width: ORB_SIZE,
     height: ORB_SIZE,
-    borderRadius: ORB_SIZE / 2,
-    overflow: "hidden" as const,
+    position: 'relative' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
   },
   thermOverlay: {
     position: 'absolute' as const,
     top: 0,
     left: 0,
+    width: ORB_SIZE,
+    height: ORB_SIZE,
+    backgroundColor: 'transparent',
+    // Skia Canvas sits above the static orb image; without this it steals pans from GestureDetector.
+    pointerEvents: 'none' as const,
   },
-  // ─── State label ───
   stateLabelWrap: {
     alignItems: 'center',
-    marginBottom: spacing.lg,
-    minHeight: 20,
+    marginBottom: spacing.sm,
+    minHeight: 18,
   },
   stateLabel: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '500',
-    letterSpacing: 2.4,
+    letterSpacing: 4,
     textTransform: 'uppercase',
   },
   // ─── Category / Tags ───
   categoryContainer: {
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
     zIndex: 10,
   },
 });

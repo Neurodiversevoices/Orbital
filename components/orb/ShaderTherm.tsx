@@ -61,6 +61,9 @@ vec3 capColorDim(float cap) {
 }
 
 half4 main(float2 coord) {
+  if (uCrossfade < 0.001) {
+    return half4(0.0, 0.0, 0.0, 0.0);
+  }
   // Normalize to centered UV, aspect-aware
   float2 res = uResolution;
   float minDim = min(res.x, res.y);
@@ -227,6 +230,7 @@ const ShaderTherm = memo(function ShaderTherm({
             width: size,
             height: size,
             borderRadius: 14,
+            backgroundColor: "transparent",
           },
         ]}
       />
@@ -235,8 +239,9 @@ const ShaderTherm = memo(function ShaderTherm({
 
   return (
     <Canvas
-      style={{ width: size, height: size }}
+      style={{ width: size, height: size, backgroundColor: "transparent" }}
       testID={testID}
+      opaque={false}
     >
       <Fill>
         <Shader source={thermEffect} uniforms={uniforms} />
@@ -247,9 +252,8 @@ const ShaderTherm = memo(function ShaderTherm({
 
 const styles = StyleSheet.create({
   fallback: {
-    backgroundColor: "#01020A",
-    borderWidth: 1,
-    borderColor: "rgba(8, 209, 224, 0.15)",
+    backgroundColor: "transparent",
+    borderWidth: 0,
   },
 });
 
