@@ -42,7 +42,14 @@ health-report.md
 config-snapshot.json
 
 # generated native folders
-/ios
+/ios/Pods/
+/ios/build/
+/ios/**/*.xcuserstate
+/ios/**/*.xcscheme
+/ios/**/xcuserdata/
+/ios/.xcode.env.local
+/ios/Orbital.xcodeproj/project.pbxproj.bak
+/ios/Orbital.xcodeproj/project.pbxproj.bak2
 /android
 
 .env.local
