@@ -282,7 +282,7 @@ export const de = {
   // ============================================
   disclaimer: {
     short: 'Nicht diagnostisch',
-    full: 'Dieses Tool erfasst selbstberichtete funktionale Kapazität. Es stellt keine klinische Bewertung oder Diagnose dar.',
+    full: 'Dieses Tool erfasst selbstberichtete funktionale Kapazität. Es stellt keine klinische Bewertung oder ärztliche Einschätzung dar.',
     dataDescription: 'Normalisierte Kapazitätssignale im Zeitverlauf.',
     purpose: 'Longitudinale Aufzeichnung der verfügbaren Kapazität für persönliche oder geteilte Nutzung.',
   },
