@@ -14,20 +14,16 @@
 <meta property="og:description" content="Capacity intelligence. Daily check-ins become longitudinal pattern data.">
 <meta property="og:image" content="https://orbitalhealth.app/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Orbital — Your nervous system has a signature.">
-<meta name="twitter:image" content="https://orbitalhealth.app/og-image.png">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;1,9..40,200&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-FHEH76Q0JZ"></script>
 <script>
-window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+window.dataLayer=window.dataLayer||[];
+function gtag(){dataLayer.push(arguments);}
 gtag('js',new Date());gtag('config','G-FHEH76Q0JZ');
 function track(n,p){if(typeof gtag==='function')gtag('event',n,p||{});}
 </script>
-
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -36,1285 +32,1212 @@ function track(n,p){if(typeof gtag==='function')gtag('event',n,p||{});}
   --amber:#C88A14;
   --crimson:#B01414;
   --text:#F0F0F0;
-  --muted:#666680;
-  --card:#0a0a14;
+  --muted:#555570;
+  --card:#080810;
   --border:#1a1a2e;
-  --font-sans:'DM Sans',system-ui,sans-serif;
-  --font-mono:'Space Mono',monospace;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'Space Mono',monospace;
 }
-html{scroll-behavior:smooth;background:var(--void);color:var(--text)}
+html{scroll-behavior:auto;overflow-x:hidden}
 body{
-  font-family:var(--font-sans);
+  background:var(--void);
+  color:var(--text);
+  font-family:var(--sans);
   font-weight:300;
-  background:var(--void);
-  color:var(--text);
   overflow-x:hidden;
-  line-height:1.6;
 }
-::selection{background:var(--cyan);color:var(--void)}
 
-/* ── HERO ────────────────────────────────────────────────── */
-#hero{
-  position:relative;
-  width:100vw;
-  height:100vh;
-  min-height:600px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  background:var(--void);
-}
+/* ── CANVAS ── */
 #orb-canvas{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  opacity:0;
-  transition:opacity 1.2s ease;
-}
-#orb-canvas.visible{opacity:1}
-
-.hero-content{
-  position:relative;
-  z-index:2;
-  text-align:center;
-  padding:0 32px;
+  position:fixed;top:0;left:0;
+  width:100%;height:100%;
+  z-index:100;
   pointer-events:none;
-}
-.hero-headline{
-  font-family:var(--font-sans);
-  font-size:clamp(2.2rem,6vw,5rem);
-  font-weight:200;
-  line-height:1.15;
-  letter-spacing:-0.02em;
-  color:var(--text);
-  margin-bottom:2rem;
-}
-.hero-headline .word{
-  display:inline-block;
-  opacity:0;
-  transform:translateY(8px);
-}
-.hero-sub{
-  font-family:var(--font-mono);
-  font-size:clamp(0.85rem,1.5vw,1.1rem);
-  color:var(--cyan);
-  letter-spacing:0.04em;
-  opacity:0;
-  margin-bottom:3rem;
-}
-.hero-cta{
-  display:inline-block;
-  font-family:var(--font-mono);
-  font-size:1rem;
-  color:var(--text);
-  text-decoration:none;
-  border:1px solid rgba(255,255,255,0.2);
-  padding:14px 28px;
-  letter-spacing:0.04em;
-  opacity:0;
-  transition:border-color .3s,color .3s,background .3s;
-  pointer-events:auto;
-  position:relative;
-  overflow:hidden;
-}
-.hero-cta::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  background:var(--cyan);
-  transform:translateX(-101%);
-  transition:transform .35s ease;
-  z-index:-1;
-}
-.hero-cta:hover{color:var(--void);border-color:var(--cyan)}
-.hero-cta:hover::after{transform:translateX(0)}
-.hero-cta-note{
-  font-family:var(--font-mono);
-  font-size:0.72rem;
-  color:var(--muted);
-  margin-top:1rem;
-  opacity:0;
-  letter-spacing:0.03em;
-}
-.hero-cta-note a{color:var(--cyan);text-decoration:none}
-.hero-cta-note a:hover{text-decoration:underline}
-.scroll-hint{
-  position:absolute;
-  bottom:2rem;
-  left:50%;
-  transform:translateX(-50%);
-  font-family:var(--font-mono);
-  font-size:0.65rem;
-  color:var(--muted);
-  letter-spacing:0.1em;
-  opacity:0;
-  animation:fadeInUp 1s ease 4s forwards;
-}
-@keyframes fadeInUp{to{opacity:.5;transform:translateX(-50%) translateY(0)}}
-
-/* ── HORIZONTAL PANELS ──────────────────────────────────── */
-#panels-outer{
-  position:relative;
-  background:var(--void);
-}
-.panels-sticky{
-  position:sticky;
-  top:0;
-  width:100vw;
-  height:100vh;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-}
-.panels-track{
-  display:flex;
-  align-items:center;
   will-change:transform;
 }
-.panel{
-  flex-shrink:0;
-  width:100vw;
-  padding:0 clamp(32px,8vw,120px);
-}
-.panel-text{
-  font-family:var(--font-mono);
-  font-size:clamp(1.2rem,2.8vw,2.4rem);
-  font-weight:400;
-  line-height:1.7;
-  color:var(--text);
-  max-width:680px;
-  white-space:pre-line;
-}
-.panel-text em{color:var(--muted);font-style:normal}
+#orb-canvas.interactive{pointer-events:all;cursor:grab}
+#orb-canvas.interactive:active{cursor:grabbing}
 
-/* ── ORB DEMO ─────────────────────────────────────────────── */
-#orb-demo{
-  position:relative;
-  width:100vw;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  background:var(--void);
-  padding:80px 32px;
-}
-.demo-label{
-  font-family:var(--font-mono);
-  font-size:0.75rem;
-  letter-spacing:0.15em;
-  color:var(--muted);
-  text-transform:uppercase;
-  margin-bottom:2rem;
-}
-#demo-canvas-wrap{
-  position:relative;
-  width:min(480px,85vw);
-  height:min(480px,85vw);
-  cursor:grab;
-  user-select:none;
-}
-#demo-canvas-wrap:active{cursor:grabbing}
-#demo-canvas{width:100%;height:100%;border-radius:50%}
-.demo-state{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  text-align:center;
+/* ── SECTIONS ── */
+section{position:relative;width:100%}
+
+/* ── HERO ── */
+#s-hero{
+  height:100vh;
+  display:flex;align-items:flex-end;
+  padding:0 clamp(32px,6vw,100px) clamp(80px,12vh,140px);
+  background:transparent;
   pointer-events:none;
 }
-.demo-pct{
-  font-family:var(--font-mono);
-  font-size:2.5rem;
-  font-weight:700;
-  color:var(--text);
-  line-height:1;
+#hero-content{pointer-events:all;max-width:680px}
+#hero-headline{
+  font-size:clamp(36px,6vw,76px);
+  font-weight:200;
+  line-height:1.15;
+  color:#fff;
+  margin-bottom:clamp(16px,2vh,28px);
+  min-height:3.5em;
 }
-.demo-label-state{
-  font-family:var(--font-mono);
-  font-size:0.75rem;
-  letter-spacing:0.15em;
-  color:var(--muted);
-  margin-top:4px;
+#hero-headline .cursor{
+  display:inline-block;
+  width:3px;height:1em;
+  background:var(--cyan);
+  margin-left:4px;
+  vertical-align:text-bottom;
+  animation:blink 0.9s step-end infinite;
 }
-.demo-hint{
-  font-family:var(--font-mono);
-  font-size:0.75rem;
-  color:var(--muted);
-  margin-top:1.5rem;
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+#hero-tagline{
+  font-family:var(--mono);
+  font-size:clamp(11px,1.1vw,14px);
+  letter-spacing:0.4em;
+  color:var(--cyan);
+  text-transform:uppercase;
+  margin-bottom:clamp(32px,4vh,48px);
+  opacity:0;
+}
+#hero-cta{
+  display:inline-block;
+  font-family:var(--mono);
+  font-size:clamp(13px,1.2vw,16px);
+  color:var(--cyan);
+  text-decoration:none;
   letter-spacing:0.05em;
+  padding-bottom:2px;
+  border-bottom:1px solid transparent;
+  background:linear-gradient(to right,var(--cyan),var(--cyan)) no-repeat bottom;
+  background-size:0 1px;
+  transition:background-size 0.4s ease;
+  opacity:0;
 }
-.demo-tagline{
-  font-family:var(--font-sans);
-  font-size:clamp(1rem,2vw,1.4rem);
-  font-weight:300;
+#hero-cta:hover{background-size:100% 1px}
+#hero-sub{
+  display:block;
+  margin-top:14px;
+  font-size:clamp(11px,1vw,13px);
   color:var(--muted);
-  margin-top:2.5rem;
-  text-align:center;
-  max-width:480px;
+  font-family:var(--mono);
+  opacity:0;
 }
-.demo-tagline strong{color:var(--text);font-weight:400}
 
-/* ── CONSTELLATION ────────────────────────────────────────── */
-#constellation{
-  width:100vw;
-  min-height:100vh;
+/* ── HORIZONTAL ── */
+#s-horizontal{
+  height:100vh;
+  overflow:hidden;
+}
+#h-track{
   display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  background:var(--void);
-  padding:80px 32px;
+  width:300vw;
+  height:100vh;
+  will-change:transform;
 }
-.section-eyebrow{
-  font-family:var(--font-mono);
-  font-size:0.72rem;
-  letter-spacing:0.15em;
-  color:var(--muted);
-  text-transform:uppercase;
-  margin-bottom:1rem;
-}
-.constellation-headline{
-  font-family:var(--font-sans);
-  font-size:clamp(2rem,5vw,3.8rem);
-  font-weight:200;
-  line-height:1.2;
-  text-align:center;
-  max-width:700px;
-  margin-bottom:0.5rem;
-}
-.constellation-sub{
-  font-family:var(--font-mono);
-  font-size:0.85rem;
-  color:var(--muted);
-  margin-bottom:3rem;
-  letter-spacing:0.03em;
-}
-#constellation-canvas{
-  width:min(540px,90vw);
-  height:min(540px,90vw);
-  cursor:grab;
-  border-radius:50%;
-}
-#constellation-canvas:active{cursor:grabbing}
-.constellation-caption{
-  font-family:var(--font-sans);
-  font-size:1rem;
-  font-weight:300;
-  color:var(--muted);
-  margin-top:2.5rem;
-  text-align:center;
-  max-width:480px;
-  line-height:1.7;
-}
-.constellation-caption strong{color:var(--text);font-weight:400}
-
-/* ── WHO IT'S FOR ─────────────────────────────────────────── */
-#who{
-  position:relative;
-  width:100vw;
-  background:var(--void);
-}
-.who-sticky{
-  position:sticky;
-  top:0;
+.h-panel{
   width:100vw;
   height:100vh;
   display:flex;
   align-items:center;
-  justify-content:center;
-  overflow:hidden;
-}
-.who-sentence{
-  position:absolute;
-  font-family:var(--font-sans);
-  font-size:clamp(1.5rem,4vw,3.2rem);
-  font-weight:300;
-  text-align:center;
-  max-width:min(780px,88vw);
-  padding:0 32px;
-  opacity:0;
-  transform:translateY(16px);
-  line-height:1.3;
-}
-.who-sentence .period{
-  color:var(--cyan);
-  display:inline-block;
-}
-.who-sentence.last{
-  font-size:clamp(2.5rem,8vw,6rem);
-  font-weight:200;
-  letter-spacing:-0.02em;
-}
-
-/* ── STATUS CARD ──────────────────────────────────────────── */
-#status{
-  width:100vw;
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  padding:0 clamp(40px,8vw,120px);
   background:var(--void);
-  padding:80px 32px;
+  flex-shrink:0;
 }
-.status-card{
-  background:var(--card);
-  border:1px solid var(--border);
-  padding:clamp(40px,6vw,64px);
-  max-width:580px;
+.h-panel-inner{
   width:100%;
-}
-.status-indicator{
-  font-family:var(--font-mono);
-  font-size:0.72rem;
-  letter-spacing:0.18em;
-  color:var(--amber);
-  margin-bottom:1.5rem;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.status-dot{
-  width:8px;height:8px;
-  border-radius:50%;
-  background:var(--amber);
-  animation:pulse-amber 2s ease infinite;
-}
-@keyframes pulse-amber{
-  0%,100%{opacity:1;transform:scale(1)}
-  50%{opacity:.4;transform:scale(0.8)}
-}
-.status-card h2{
-  font-family:var(--font-sans);
-  font-size:clamp(1.4rem,3vw,2rem);
-  font-weight:300;
-  line-height:1.3;
-  margin-bottom:1rem;
-}
-.status-card p{
-  font-family:var(--font-sans);
-  font-size:1rem;
-  color:var(--muted);
-  margin-bottom:2rem;
-  line-height:1.7;
-}
-.btn-primary{
-  display:inline-block;
-  font-family:var(--font-mono);
-  font-size:0.9rem;
-  color:var(--void);
-  background:var(--cyan);
-  text-decoration:none;
-  padding:14px 24px;
-  letter-spacing:0.04em;
-  transition:opacity .2s;
-  margin-bottom:2.5rem;
-}
-.btn-primary:hover{opacity:.85}
-.waitlist-divider{
-  border:none;
-  border-top:1px solid var(--border);
-  margin-bottom:2rem;
-}
-.waitlist-label{
-  font-family:var(--font-mono);
-  font-size:0.72rem;
-  letter-spacing:0.12em;
-  color:var(--muted);
-  text-transform:uppercase;
-  margin-bottom:1rem;
-}
-.waitlist-form{
-  display:flex;
-  gap:0;
-  flex-wrap:wrap;
-}
-.waitlist-form input[type="email"]{
-  flex:1;
-  min-width:200px;
-  font-family:var(--font-mono);
-  font-size:0.9rem;
-  background:var(--void);
-  border:1px solid var(--border);
-  border-right:none;
-  color:var(--text);
-  padding:12px 16px;
-  outline:none;
-  letter-spacing:0.03em;
-  transition:border-color .2s;
-}
-.waitlist-form input[type="email"]::placeholder{color:var(--muted)}
-.waitlist-form input[type="email"]:focus{border-color:var(--cyan)}
-.waitlist-form button{
-  font-family:var(--font-mono);
-  font-size:0.85rem;
-  background:var(--cyan);
-  color:var(--void);
-  border:none;
-  padding:12px 20px;
-  cursor:pointer;
-  letter-spacing:0.04em;
-  transition:opacity .2s,background .2s;
-  white-space:nowrap;
-}
-.waitlist-form button:hover{opacity:.85}
-.waitlist-form button:disabled{opacity:.5;cursor:not-allowed}
-.waitlist-msg{
-  font-family:var(--font-mono);
-  font-size:0.78rem;
-  margin-top:10px;
-  letter-spacing:0.03em;
-  min-height:1.2em;
-}
-.waitlist-msg.ok{color:var(--cyan)}
-.waitlist-msg.err{color:var(--crimson)}
-
-/* ── SOCIAL PROOF ─────────────────────────────────────────── */
-#proof{
-  width:100vw;
-  padding:80px clamp(32px,8vw,120px);
-  background:var(--void);
-  border-top:1px solid var(--border);
-}
-.proof-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:clamp(32px,6vw,80px);
-  max-width:900px;
-  margin:0 auto;
-}
-@media(max-width:600px){.proof-grid{grid-template-columns:1fr}}
-.proof-col-label{
-  font-family:var(--font-mono);
-  font-size:0.72rem;
-  letter-spacing:0.15em;
-  color:var(--muted);
-  text-transform:uppercase;
-  padding-bottom:1rem;
-  border-bottom:1px solid var(--border);
-  margin-bottom:1.5rem;
-}
-.proof-stat{
-  margin-bottom:1.5rem;
-}
-.proof-num{
-  font-family:var(--font-mono);
-  font-size:2rem;
-  font-weight:700;
-  color:var(--cyan);
-  line-height:1;
-}
-.proof-num-label{
-  font-family:var(--font-sans);
-  font-size:0.9rem;
-  color:var(--muted);
-  margin-top:4px;
-}
-.proof-list{
-  list-style:none;
-}
-.proof-list li{
-  font-family:var(--font-mono);
-  font-size:0.85rem;
-  color:var(--muted);
-  padding:6px 0;
-  border-bottom:1px solid var(--border);
-  letter-spacing:0.02em;
-}
-.proof-list li:last-child{border-bottom:none}
-
-/* ── FINAL CTA ────────────────────────────────────────────── */
-#cta-final{
-  position:relative;
-  width:100vw;
-  height:100vh;
-  min-height:600px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  background:var(--void);
-  overflow:hidden;
-}
-#final-orb-canvas{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  opacity:0.4;
-}
-.final-content{
-  position:relative;
-  z-index:2;
-  text-align:center;
-  padding:0 32px;
-}
-.final-headline{
-  font-family:var(--font-sans);
-  font-size:clamp(2rem,6vw,4.5rem);
-  font-weight:200;
-  line-height:1.2;
-  margin-bottom:1rem;
-  letter-spacing:-0.02em;
-  opacity:0;
-  transform:translateY(20px);
-}
-.final-pause{
-  font-family:var(--font-mono);
-  font-size:clamp(1rem,2vw,1.5rem);
-  color:var(--cyan);
-  margin-bottom:3rem;
-  opacity:0;
-  letter-spacing:0.03em;
-}
-.final-ctas{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:16px;
-  opacity:0;
-}
-.final-cta-primary{
-  font-family:var(--font-mono);
-  font-size:0.95rem;
-  color:var(--void);
-  background:var(--cyan);
-  text-decoration:none;
-  padding:16px 32px;
-  letter-spacing:0.04em;
-  transition:opacity .2s;
-}
-.final-cta-primary:hover{opacity:.85}
-.final-cta-secondary{
-  font-family:var(--font-mono);
-  font-size:0.8rem;
-  color:var(--muted);
-  background:none;
-  border:none;
-  cursor:pointer;
-  letter-spacing:0.04em;
-  text-decoration:underline;
-  padding:4px 0;
-}
-.final-cta-secondary:hover{color:var(--text)}
-
-/* ── FOOTER ───────────────────────────────────────────────── */
-footer{
-  padding:32px;
-  border-top:1px solid var(--border);
   display:flex;
   justify-content:space-between;
   align-items:center;
-  flex-wrap:wrap;
-  gap:16px;
+  gap:clamp(40px,8vw,120px);
 }
-.footer-brand{font-family:var(--font-mono);font-size:0.8rem;color:var(--muted)}
-.footer-links{display:flex;gap:24px}
-.footer-links a{
-  font-family:var(--font-mono);
-  font-size:0.75rem;
+.h-setup{
+  font-size:clamp(20px,2.8vw,40px);
+  font-weight:200;
   color:var(--muted);
-  text-decoration:none;
-  letter-spacing:0.03em;
+  line-height:1.6;
+  flex:1;
 }
-.footer-links a:hover{color:var(--text)}
+.h-punchline{
+  font-size:clamp(28px,3.8vw,58px);
+  font-weight:200;
+  color:#fff;
+  line-height:1.3;
+  flex:1;
+  opacity:0;
+  transform:translateX(40px);
+}
+.h-panel:nth-child(2) .h-punchline,
+.h-panel:nth-child(3) .h-punchline{opacity:0;transform:translateX(40px)}
 
-/* ── UTILS ────────────────────────────────────────────────── */
-.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+/* ── DEMO ── */
+#s-demo{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:transparent;
+  gap:clamp(20px,3vh,40px);
+}
+#demo-instruction{
+  font-family:var(--mono);
+  font-size:clamp(11px,1vw,14px);
+  letter-spacing:0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  user-select:none;
+  pointer-events:none;
+}
+#state-display{
+  font-family:var(--mono);
+  font-size:clamp(40px,6vw,80px);
+  font-weight:700;
+  letter-spacing:0.08em;
+  color:var(--cyan);
+  transition:color 0.3s ease;
+  user-select:none;
+  pointer-events:none;
+}
+#demo-sub{
+  font-size:clamp(14px,1.4vw,20px);
+  font-weight:200;
+  color:var(--muted);
+  text-align:center;
+  line-height:1.8;
+  pointer-events:none;
+}
+/* spacer so demo center aligns with orb */
+#demo-spacer{height:48vh}
+
+/* ── CONSTELLATION ── */
+#s-constellation{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:var(--void);
+  gap:clamp(24px,4vh,48px);
+  padding:0 clamp(24px,5vw,80px);
+}
+#constellation-label{
+  font-family:var(--mono);
+  font-size:clamp(10px,0.9vw,12px);
+  letter-spacing:0.5em;
+  color:var(--cyan);
+  text-transform:uppercase;
+}
+#const-canvas{
+  width:min(500px,80vw);
+  height:min(500px,80vw);
+  cursor:grab;
+  border-radius:50%;
+}
+#const-canvas:active{cursor:grabbing}
+#constellation-text{
+  font-size:clamp(18px,2.2vw,32px);
+  font-weight:200;
+  text-align:center;
+  line-height:1.8;
+  color:var(--text);
+  opacity:0.8;
+}
+
+/* ── WHO ── */
+#s-who{
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--void);
+  padding:0 clamp(24px,8vw,120px);
+}
+#who-text{
+  font-size:clamp(24px,3.8vw,56px);
+  font-weight:200;
+  text-align:center;
+  line-height:1.4;
+  color:#fff;
+  max-width:900px;
+}
+#who-text .period{color:var(--amber)}
+
+/* ── STATUS ── */
+#s-status{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--void);
+  padding:clamp(60px,10vh,120px) clamp(24px,6vw,80px);
+}
+.status-card{
+  max-width:640px;
+  width:100%;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:clamp(40px,6vw,72px);
+}
+.status-indicator{
+  font-family:var(--mono);
+  font-size:13px;
+  letter-spacing:0.3em;
+  margin-bottom:32px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.status-dot{
+  display:inline-block;
+  width:8px;height:8px;
+  border-radius:50%;
+  background:var(--amber);
+  animation:pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot{
+  0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(200,138,20,.4)}
+  50%{opacity:0.7;box-shadow:0 0 0 8px rgba(200,138,20,0)}
+}
+.status-card h2{
+  font-size:clamp(22px,2.8vw,36px);
+  font-weight:200;
+  line-height:1.4;
+  margin-bottom:16px;
+}
+.status-card>p{
+  font-size:clamp(14px,1.4vw,18px);
+  color:var(--muted);
+  line-height:1.8;
+  margin-bottom:40px;
+}
+.btn-primary{
+  display:inline-block;
+  font-family:var(--mono);
+  font-size:clamp(12px,1.1vw,15px);
+  color:var(--void);
+  background:var(--cyan);
+  text-decoration:none;
+  padding:14px 28px;
+  border-radius:6px;
+  letter-spacing:0.05em;
+  transition:opacity 0.2s;
+  margin-bottom:40px;
+}
+.btn-primary:hover{opacity:0.85}
+.waitlist-divider{
+  height:1px;
+  background:var(--border);
+  margin-bottom:32px;
+}
+.waitlist-label{
+  font-size:clamp(13px,1.2vw,16px);
+  color:var(--muted);
+  margin-bottom:16px;
+  line-height:1.6;
+}
+#waitlist-form{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+#waitlist-email{
+  flex:1;
+  min-width:200px;
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:12px 16px;
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--text);
+  outline:none;
+  transition:border-color 0.2s;
+}
+#waitlist-email::placeholder{color:var(--muted)}
+#waitlist-email:focus{border-color:var(--cyan)}
+#waitlist-form button{
+  background:transparent;
+  border:1px solid var(--cyan);
+  border-radius:6px;
+  padding:12px 20px;
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--cyan);
+  cursor:pointer;
+  letter-spacing:0.05em;
+  transition:background 0.2s,color 0.2s;
+  white-space:nowrap;
+}
+#waitlist-form button:hover{background:var(--cyan);color:var(--void)}
+.waitlist-success{
+  font-family:var(--mono);
+  font-size:14px;
+  color:var(--cyan);
+  letter-spacing:0.1em;
+  padding:16px 0;
+}
+
+/* ── FINAL ── */
+#s-final{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:transparent;
+  text-align:center;
+  padding:0 clamp(24px,6vw,80px);
+  gap:clamp(16px,3vh,32px);
+}
+#final-pre{
+  font-size:clamp(28px,4vw,56px);
+  font-weight:200;
+  line-height:1.4;
+  color:var(--text);
+  opacity:0;
+}
+#final-reveal{
+  font-size:clamp(28px,4vw,56px);
+  font-weight:200;
+  line-height:1.4;
+  color:#fff;
+  opacity:0;
+  min-height:1.5em;
+}
+#final-cta{
+  display:inline-block;
+  font-family:var(--mono);
+  font-size:clamp(12px,1.1vw,15px);
+  color:var(--void);
+  background:var(--cyan);
+  text-decoration:none;
+  padding:16px 36px;
+  border-radius:6px;
+  letter-spacing:0.05em;
+  opacity:0;
+  transition:opacity 0.2s,transform 0.2s;
+}
+#final-cta:hover{opacity:0.85;transform:translateY(-2px)}
+
+/* ── SCROLL DEPTH TRIGGERS ── */
+.depth-trigger{height:1px;width:100%}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .h-panel-inner{flex-direction:column;gap:32px}
+  .h-setup{font-size:clamp(16px,4vw,24px)}
+  .h-punchline{font-size:clamp(22px,5.5vw,36px)}
+  #state-display{font-size:clamp(32px,8vw,56px)}
+}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════ HERO ═══════════════════════════ -->
-<section id="hero" aria-label="Hero">
-  <canvas id="orb-canvas" aria-hidden="true"></canvas>
+<!-- ── THREE.JS ORB CANVAS (fixed, z=100, transparent bg) ── -->
+<canvas id="orb-canvas"></canvas>
 
-  <div class="hero-content">
-    <h1 class="hero-headline" id="hero-headline" aria-label="Your nervous system has been trying to tell you something.">
-      <span class="word">Your</span> <span class="word">nervous</span> <span class="word">system</span><br>
-      <span class="word">has</span> <span class="word">been</span> <span class="word">trying</span><br>
-      <span class="word">to</span> <span class="word">tell</span> <span class="word">you</span> <span class="word">something.</span>
-    </h1>
-    <p class="hero-sub" id="hero-sub">Orbital reads the signal.</p>
-    <a href="https://orbitalhealth.app/app" class="hero-cta" id="hero-cta" onclick="track('web_app_click',{location:'hero'})">
+<!-- ── ACT I & II: HERO ── -->
+<section id="s-hero">
+  <div id="hero-content">
+    <div id="hero-headline"></div>
+    <div id="hero-tagline">ORBITAL READS THE SIGNAL.</div>
+    <a id="hero-cta" href="https://orbitalhealth.app/app" onclick="track('web_app_clicked')">
       Try Orbital — free, in your browser →
     </a>
-    <p class="hero-cta-note" id="hero-note">
-      iOS app in review. <a href="#status" onclick="track('scroll_to_waitlist')">Get notified when it launches ↓</a>
-    </p>
+    <span id="hero-sub">iOS app in review. Get notified when it launches ↓</span>
   </div>
-
-  <p class="scroll-hint" aria-hidden="true">scroll</p>
 </section>
 
-<!-- ═══════════════════════ HORIZONTAL PANELS ══════════════ -->
-<section id="panels-outer" aria-label="What Orbital solves">
-  <div style="height:300vh">
-    <div class="panels-sticky">
-      <div class="panels-track" id="panels-track">
-        <div class="panel">
-          <p class="panel-text">You've tracked your sleep.<br><em>Your steps.</em><br><em>Your macros.</em><br><br>Nobody tracked<br>your capacity.</p>
+<!-- ── ACT IV: HORIZONTAL SCROLL ── -->
+<section id="s-horizontal">
+  <div id="h-track">
+    <!-- Panel 1 -->
+    <div class="h-panel">
+      <div class="h-panel-inner">
+        <div class="h-setup">
+          You've tracked your sleep.<br>
+          Your steps.<br>
+          Your macros.
         </div>
-        <div class="panel">
-          <p class="panel-text">You've tried the apps.<br><em>The journals.</em><br><em>The breathing exercises.</em><br><br>None of them showed you<br>the pattern.</p>
+        <div class="h-punchline" id="hp1-punch">
+          Nobody tracked<br>your capacity.
         </div>
-        <div class="panel">
-          <p class="panel-text">Because the pattern<br>isn't in the data.<br><br>It's in the signal<br>underneath the data.</p>
+      </div>
+    </div>
+    <!-- Panel 2 -->
+    <div class="h-panel">
+      <div class="h-panel-inner">
+        <div class="h-setup">
+          You've tried the journals.<br>
+          The apps.<br>
+          The breathing exercises.
+        </div>
+        <div class="h-punchline" id="hp2-punch">
+          None of them showed you<br>the pattern.
+        </div>
+      </div>
+    </div>
+    <!-- Panel 3 -->
+    <div class="h-panel">
+      <div class="h-panel-inner">
+        <div class="h-setup">
+          Because the pattern<br>
+          isn't in the data.
+        </div>
+        <div class="h-punchline" id="hp3-punch">
+          It's in the signal<br>underneath the data.
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════════ ORB DEMO ═══════════════════════ -->
-<section id="orb-demo" aria-label="Interactive orb demo">
-  <p class="demo-label">THIS IS WHAT ORBITAL TRACKS</p>
-
-  <div id="demo-canvas-wrap">
-    <canvas id="demo-canvas" aria-label="Interactive capacity orb — drag to change capacity state"></canvas>
-    <div class="demo-state" aria-live="polite">
-      <div class="demo-pct" id="demo-pct">74%</div>
-      <div class="demo-label-state" id="demo-state-label">RESOURCED</div>
-    </div>
-  </div>
-
-  <p class="demo-hint">← drag to shift capacity →</p>
-  <p class="demo-tagline">Your orb looks different.<br><strong>It reads your patterns.</strong></p>
-</section>
-
-<!-- ═══════════════════════ CONSTELLATION ══════════════════ -->
-<section id="constellation" aria-label="90 days of data as a constellation">
-  <p class="section-eyebrow">90 DAYS OF DATA</p>
-  <h2 class="constellation-headline">Rendered as a constellation.</h2>
-  <p class="constellation-sub">Every point is a day. Every color is a truth you couldn't see before.</p>
-
-  <canvas id="constellation-canvas" aria-label="Point cloud showing 90 days of capacity data — drag to rotate"></canvas>
-
-  <p class="constellation-caption">
-    <strong>Cyan</strong> = resourced &nbsp;·&nbsp;
-    <strong style="color:var(--amber)">Amber</strong> = elevated &nbsp;·&nbsp;
-    <strong style="color:var(--crimson)">Crimson</strong> = depleted
+<!-- ── ACT V: DRAGGABLE DEMO ── -->
+<section id="s-demo">
+  <p id="demo-instruction">DRAG THE ORB.</p>
+  <div id="demo-spacer"></div>
+  <div id="state-display">RESOURCED</div>
+  <p id="demo-sub">
+    This is what Orbital tracks.<br>
+    Your orb looks different.<br>
+    It reads your patterns.
   </p>
 </section>
 
-<!-- ═══════════════════════ WHO IT'S FOR ═══════════════════ -->
-<section id="who" aria-label="Who Orbital is for">
-  <div style="height:700vh">
-    <div class="who-sticky">
-      <p class="who-sentence" id="who-0">The executive who has everything and feels nothing<span class="period">.</span></p>
-      <p class="who-sentence" id="who-1">The parent who loves their kids and is running on empty<span class="period">.</span></p>
-      <p class="who-sentence" id="who-2">The athlete whose training is identical but some days feel impossible<span class="period">.</span></p>
-      <p class="who-sentence" id="who-3">The therapist who holds space for everyone but themselves<span class="period">.</span></p>
-      <p class="who-sentence" id="who-4">The person who searches "why am I always tired" at 2am<span class="period">.</span></p>
-      <p class="who-sentence" id="who-5">The one who looks completely fine<span class="period">.</span></p>
-      <p class="who-sentence last" id="who-6">You<span class="period">.</span></p>
-    </div>
-  </div>
+<!-- ── ACT VI: CONSTELLATION ── -->
+<section id="s-constellation">
+  <p id="constellation-label">90 DAYS. RENDERED AS LIGHT.</p>
+  <canvas id="const-canvas"></canvas>
+  <p id="constellation-text">
+    Every point is a day.<br>
+    Every color is a truth<br>
+    you couldn't see before.
+  </p>
 </section>
 
-<!-- ═══════════════════════ STATUS + WAITLIST ═══════════════ -->
-<section id="status" aria-label="App Store status and waitlist">
+<!-- ── ACT VII: WHO IT'S FOR ── -->
+<section id="s-who">
+  <div id="who-text"></div>
+</section>
+
+<!-- ── ACT VIII: STATUS + WAITLIST ── -->
+<section id="s-status">
   <div class="status-card">
     <div class="status-indicator">
-      <span class="status-dot" aria-hidden="true"></span>
-      iOS APP IN REVIEW
+      <span class="status-dot"></span>
+      IN REVIEW — iOS 1.0
     </div>
-    <h2>Currently in Apple&nbsp;review.</h2>
-    <p>The iOS app is submitted and waiting for Apple's review team. While you wait — try the full Orbital experience right now in your browser. No install required.</p>
-
-    <a href="https://orbitalhealth.app/app" class="btn-primary" onclick="track('web_app_click',{location:'status_card'})">
+    <h2>The iOS app is submitted<br>and waiting for Apple.</h2>
+    <p>Try the full experience right now — in your browser.<br>No install required.</p>
+    <a href="https://orbitalhealth.app/app" class="btn-primary" onclick="track('web_app_clicked')">
       Try Orbital on the web →
     </a>
-
-    <hr class="waitlist-divider">
-
-    <p class="waitlist-label">Get notified the moment it's live</p>
-    <form class="waitlist-form" id="waitlist-form" novalidate>
-      <label for="waitlist-email" class="visually-hidden">Email address</label>
-      <input
-        type="email"
-        id="waitlist-email"
-        name="email"
-        placeholder="your@email.com"
-        autocomplete="email"
-        required
-      >
-      <button type="submit" id="waitlist-btn">Notify me</button>
-    </form>
-    <p class="waitlist-msg" id="waitlist-msg" role="status" aria-live="polite"></p>
-  </div>
-</section>
-
-<!-- ═══════════════════════ SOCIAL PROOF ═══════════════════ -->
-<section id="proof" aria-label="Early cohort data">
-  <div class="proof-grid">
-    <div>
-      <p class="proof-col-label">Early access cohort</p>
-      <div class="proof-stat">
-        <div class="proof-num" data-count="847">0</div>
-        <div class="proof-num-label">signals logged</div>
-      </div>
-      <div class="proof-stat">
-        <div class="proof-num" data-count="23">0</div>
-        <div class="proof-num-label">avg days active</div>
-      </div>
-      <div class="proof-stat">
-        <div class="proof-num" data-count="91">0</div>
-        <div class="proof-num-label">% say "first time I've had language for this"</div>
-      </div>
-    </div>
-    <div>
-      <p class="proof-col-label">Built for</p>
-      <ul class="proof-list">
-        <li>Neurodivergent adults</li>
-        <li>Burnout researchers</li>
-        <li>Capacity-aware therapists</li>
-        <li>High performers tracking edge</li>
-        <li>Humans who want to understand themselves</li>
-      </ul>
+    <div class="waitlist-divider"></div>
+    <p class="waitlist-label">Get notified the moment it's live on the App Store.</p>
+    <div class="waitlist-wrap">
+      <form id="waitlist-form">
+        <input type="email" id="waitlist-email" placeholder="your@email.com" required autocomplete="email">
+        <button type="submit">Notify me →</button>
+      </form>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════════ FINAL CTA ═══════════════════════ -->
-<section id="cta-final" aria-label="Final call to action">
-  <canvas id="final-orb-canvas" aria-hidden="true"></canvas>
-
-  <div class="final-content">
-    <h2 class="final-headline" id="final-headline">
-      Your body has been<br>keeping score.
-    </h2>
-    <p class="final-pause" id="final-pause">Start reading it.</p>
-    <div class="final-ctas" id="final-ctas">
-      <a href="https://orbitalhealth.app/app" class="final-cta-primary" onclick="track('web_app_click',{location:'final_cta'})">
-        Try free in your browser →
-      </a>
-      <button class="final-cta-secondary" onclick="document.getElementById('status').scrollIntoView({behavior:'smooth'});track('scroll_to_waitlist',{source:'final_cta'})">
-        Notify me when the iOS app launches
-      </button>
-    </div>
-  </div>
+<!-- ── ACT IX: FINAL ── -->
+<section id="s-final">
+  <p id="final-pre">Your body has been<br>keeping score.</p>
+  <p id="final-reveal"></p>
+  <a id="final-cta" href="https://orbitalhealth.app/app" onclick="track('web_app_clicked')">
+    Try free in your browser →
+  </a>
 </section>
 
-<!-- ═══════════════════════ FOOTER ══════════════════════════ -->
-<footer>
-  <span class="footer-brand">© 2026 Orbital Health Intelligence</span>
-  <nav class="footer-links" aria-label="Footer links">
-    <a href="/privacy">Privacy</a>
-    <a href="/support">Support</a>
-    <a href="https://orbitalhealth.app/app">Web app</a>
-  </nav>
-</footer>
-
-<!-- ═══════════════════════ SCRIPTS ═════════════════════════ -->
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-<script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
-</script>
-
-<script type="module">
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-// ── GSAP SETUP ──────────────────────────────────────────────
+<!-- ── DEPS ── -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/ScrollTrigger.min.js"></script>
+<script>
+'use strict';
 gsap.registerPlugin(ScrollTrigger);
 
-// ── HERO ENTRANCE SEQUENCE ──────────────────────────────────
-const words = document.querySelectorAll('.hero-headline .word');
-const heroSub = document.getElementById('hero-sub');
-const heroCta = document.getElementById('hero-cta');
-const heroNote = document.getElementById('hero-note');
-const orbCanvas = document.getElementById('orb-canvas');
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+const SUPABASE_URL  = 'https://tenfwzjccqfecctxdbpi.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlbmZ3empjY3FmZWNjdHhkYnBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxNjMyOTEsImV4cCI6MjA4NDczOTI5MX0.xeRT_gTzqx9EBcqzThJyydMWk28HnE3IV0nThzRNvi8';
 
-const heroTl = gsap.timeline({ delay: 0.3 });
+const WHO_SENTENCES = [
+  'The executive who has everything\nand feels nothing.',
+  'The parent who loves their kids\nand is running on empty.',
+  'The athlete whose training is identical\nbut some days feel impossible.',
+  'The therapist who holds space\nfor everyone but themselves.',
+  "The person who searches\n'why am I always tired' at 2am.",
+  'The one who looks\ncompletely fine.',
+  'You.',
+];
 
-// Orb materializes at 800ms
-heroTl.to(orbCanvas, { opacity: 1, duration: 1.4, ease: 'power2.out' }, 0.8);
-
-// Words materialize with 120ms stagger
-heroTl.to(words, {
-  opacity: 1,
-  y: 0,
-  duration: 0.6,
-  ease: 'power2.out',
-  stagger: 0.12
-}, 1.2);
-
-// Subline appears
-heroTl.to(heroSub, { opacity: 1, duration: 0.6, ease: 'power2.out' }, 2.8);
-
-// CTA appears
-heroTl.to([heroCta, heroNote], {
-  opacity: 1,
-  duration: 0.6,
-  ease: 'power2.out',
-  stagger: 0.2
-}, 3.2);
-
-// ── SCROLL DEPTH TRACKING ───────────────────────────────────
-const depths = { 25: false, 50: false, 75: false, 100: false };
-ScrollTrigger.create({
-  trigger: 'body',
-  start: 'top top',
-  end: 'bottom bottom',
-  onUpdate(self) {
-    const pct = Math.round(self.progress * 100);
-    [25, 50, 75, 100].forEach(d => {
-      if (pct >= d && !depths[d]) {
-        depths[d] = true;
-        track('scroll_depth', { percent: d });
-      }
-    });
-  }
-});
-
-// ── HORIZONTAL PANELS ───────────────────────────────────────
-const track2 = document.getElementById('panels-track');
-const panels = gsap.utils.toArray('.panel');
-const panelWidth = () => window.innerWidth;
-
-gsap.to(track2, {
-  x: () => -(panelWidth() * (panels.length - 1)),
-  ease: 'none',
-  scrollTrigger: {
-    trigger: '#panels-outer',
-    pin: '.panels-sticky',
-    start: 'top top',
-    end: () => `+=${panelWidth() * (panels.length - 1)}`,
-    scrub: 1,
-    invalidateOnRefresh: true
-  }
-});
-
-// ── WHO IT'S FOR ─────────────────────────────────────────────
-const sentences = Array.from({ length: 7 }, (_, i) => document.getElementById(`who-${i}`));
-const whoSection = document.getElementById('who');
-
-sentences.forEach((el, i) => {
-  if (!el) return;
-  const pStart = i / 7;
-  const pPeak = (i + 0.4) / 7;
-  const pEnd = (i + 0.85) / 7;
-
-  ScrollTrigger.create({
-    trigger: whoSection,
-    start: 'top top',
-    end: 'bottom bottom',
-    scrub: 0.5,
-    onUpdate(self) {
-      const p = self.progress;
-      if (p < pStart) {
-        gsap.set(el, { opacity: 0, y: 16 });
-      } else if (p < pPeak) {
-        const t = (p - pStart) / (pPeak - pStart);
-        gsap.set(el, { opacity: t, y: 16 * (1 - t) });
-      } else if (p < pEnd) {
-        gsap.set(el, { opacity: 1, y: 0 });
-      } else {
-        const t = (p - pEnd) / (1 / 7 * 0.15);
-        gsap.set(el, { opacity: Math.max(0, 1 - t), y: 0 });
-      }
-    }
-  });
-});
-
-// ── FINAL CTA ENTRANCE ───────────────────────────────────────
-const finalHeadline = document.getElementById('final-headline');
-const finalPause = document.getElementById('final-pause');
-const finalCtas = document.getElementById('final-ctas');
-
-ScrollTrigger.create({
-  trigger: '#cta-final',
-  start: 'top 80%',
-  once: true,
-  onEnter() {
-    const tl = gsap.timeline();
-    tl.to(finalHeadline, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' })
-      .to(finalPause, { opacity: 1, duration: 0.6, ease: 'power2.out' }, '+=0.5')
-      .to(finalCtas, { opacity: 1, duration: 0.6, ease: 'power2.out' }, '+=0.3');
-  }
-});
-
-// ── NUMBER COUNTERS ──────────────────────────────────────────
-document.querySelectorAll('.proof-num[data-count]').forEach(el => {
-  const target = parseInt(el.dataset.count, 10);
-  const suffix = el.dataset.suffix || '';
-  ScrollTrigger.create({
-    trigger: el,
-    start: 'top 85%',
-    once: true,
-    onEnter() {
-      gsap.to({ v: 0 }, {
-        v: target,
-        duration: 1.8,
-        ease: 'power2.out',
-        onUpdate() { el.textContent = Math.round(this.targets()[0].v) + suffix; }
-      });
-    }
-  });
-});
-
-// ── ORB SHADER (Hero + Final) ────────────────────────────────
-const ORB_VERT = `
-varying vec2 vUv;
-varying vec3 vNormal;
-varying vec3 vPosition;
+// ─── SHADERS ──────────────────────────────────────────────────────────────────
+const VERT = /* glsl */`
+precision highp float;
+varying vec3 vN;
+varying vec3 vV;
+varying vec3 vWP;
 void main(){
-  vUv=uv;
-  vNormal=normalize(normalMatrix*normal);
-  vPosition=position;
-  gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);
-}`;
-
-const ORB_FRAG = `
-uniform float uTime;
-uniform float uCapacity;
-uniform vec2 uResolution;
-varying vec2 vUv;
-varying vec3 vNormal;
-varying vec3 vPosition;
-
-vec3 cyan=vec3(0.0,0.76,0.8);
-vec3 amber=vec3(0.78,0.54,0.08);
-vec3 crimson=vec3(0.69,0.08,0.08);
-
-float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-float noise(vec2 p){
-  vec2 i=floor(p),f=fract(p);
-  f=f*f*(3.0-2.0*f);
-  return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);
+  vN  = normalize(normalMatrix * normal);
+  vWP = (modelMatrix * vec4(position,1.0)).xyz;
+  vec4 mv = modelViewMatrix * vec4(position,1.0);
+  vV  = -mv.xyz;
+  gl_Position = projectionMatrix * mv;
 }
+`;
 
+const FRAG = /* glsl */`
+precision highp float;
+uniform float uT;
+uniform float uC;
+uniform float uB;
+varying vec3 vN;
+varying vec3 vV;
+varying vec3 vWP;
+
+float h(vec3 p){
+  p = fract(p * vec3(.1031,.103,.0973));
+  p += dot(p, p.yxz + 33.33);
+  return fract((p.x + p.y) * p.z);
+}
+float vn(vec3 x){
+  vec3 i = floor(x), f = fract(x);
+  f = f*f*(3.-2.*f);
+  return mix(
+    mix(mix(h(i),            h(i+vec3(1,0,0)),f.x),
+        mix(h(i+vec3(0,1,0)),h(i+vec3(1,1,0)),f.x),f.y),
+    mix(mix(h(i+vec3(0,0,1)),h(i+vec3(1,0,1)),f.x),
+        mix(h(i+vec3(0,1,1)),h(i+vec3(1,1,1)),f.x),f.y),f.z);
+}
+float fbm(vec3 p){
+  float v=0.,a=.5;
+  for(int i=0;i<6;i++){v+=a*vn(p);p=p*2.1+vec3(13.7,5.3,7.1);a*=.5;}
+  return v;
+}
 void main(){
-  float breathe=0.5+0.5*sin(uTime*1.57);
-  float c=clamp(uCapacity,0.0,1.0);
-  vec3 col;
-  if(c>0.5) col=mix(amber,cyan,(c-0.5)*2.0);
-  else col=mix(crimson,amber,c*2.0);
+  vec3 n = normalize(vN);
+  vec3 v = normalize(vV);
+  float fr = pow(1.-abs(dot(v,n)), 2.8);
 
-  float n=noise(vUv*4.0+vec2(uTime*0.2));
-  float rim=1.0-dot(vNormal,vec3(0,0,1));
-  rim=pow(rim,2.5);
-  float glow=0.55+0.25*breathe+n*0.15;
-  vec3 fc=col*glow+col*rim*0.6;
-  float alpha=(0.82+rim*0.18)*(0.85+0.15*breathe);
-  gl_FragColor=vec4(fc,alpha);
-}`;
+  float cs = cos(uT*.14), sn = sin(uT*.14);
+  vec3 p = vWP;
+  p.xz = mat2(cs,-sn,sn,cs)*p.xz;
 
-function makeOrbScene(canvas) {
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  float n1 = fbm(p*2.2 + vec3(0.,uT*.04,0.));
+  float n2 = fbm(p*4.8 - vec3(uT*.025,0.,uT*.03));
+  float pl = clamp(n1*.65+n2*.35, 0., 1.);
 
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-  camera.position.z = 2.8;
+  vec3 cr = vec3(.70,.05,.05);
+  vec3 am = vec3(.84,.56,.04);
+  vec3 cy = vec3(.00,.76,.80);
+  vec3 wh = vec3(.96,.93,.88);
+  vec3 dk = mix(vec3(.20,.02,.09), vec3(.01,.09,.13), uC);
+  vec3 md = mix(cr, am, clamp(uC*1.7,0.,1.));
+  vec3 br = mix(am, cy, clamp(uC*2.-1.,0.,1.));
 
-  const geo = new THREE.SphereGeometry(1, 64, 64);
-  const mat = new THREE.ShaderMaterial({
-    vertexShader: ORB_VERT,
-    fragmentShader: ORB_FRAG,
-    uniforms: {
-      uTime: { value: 0 },
-      uCapacity: { value: 0.74 },
-      uResolution: { value: new THREE.Vector2(1, 1) }
-    },
-    transparent: true
-  });
-  const mesh = new THREE.Mesh(geo, mat);
-  scene.add(mesh);
+  vec3 col = mix(dk, md, pl);
+  col = mix(col, br, pow(pl,2.)*uC);
 
-  function resize() {
-    const w = canvas.clientWidth, h = canvas.clientHeight;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-  }
-  resize();
-  return { renderer, scene, camera, mat, resize };
+  /* stellar nodes */
+  float st = pow(max(0., pl-.73)*3.7, 7.5)*16.;
+  col += wh * st * (.4+uC*.6);
+
+  /* fresnel rim */
+  col = mix(col, mix(vec3(.9,.18,.08),cy*1.5,uC), fr*.86);
+
+  /* breath brightness */
+  col *= .84 + uB*.16;
+
+  gl_FragColor = vec4(col, mix(.95,.10,fr*fr));
 }
+`;
 
-// Hero orb
-const heroCanvasEl = document.getElementById('orb-canvas');
-const heroOrb = makeOrbScene(heroCanvasEl);
-let heroStartTime = Date.now();
-
-function animHeroOrb() {
-  requestAnimationFrame(animHeroOrb);
-  heroOrb.resize();
-  heroOrb.mat.uniforms.uTime.value = (Date.now() - heroStartTime) / 1000;
-  heroOrb.renderer.render(heroOrb.scene, heroOrb.camera);
-}
-animHeroOrb();
-
-// Final orb
-const finalOrbCanvas = document.getElementById('final-orb-canvas');
-const finalOrb = makeOrbScene(finalOrbCanvas);
-let finalStartTime = Date.now();
-finalOrb.mat.uniforms.uCapacity.value = 0.85;
-
-function animFinalOrb() {
-  requestAnimationFrame(animFinalOrb);
-  finalOrb.resize();
-  finalOrb.mat.uniforms.uTime.value = (Date.now() - finalStartTime) / 1000;
-  finalOrb.renderer.render(finalOrb.scene, finalOrb.camera);
-}
-animFinalOrb();
-
-// ── INTERACTIVE DEMO ORB ─────────────────────────────────────
-const demoCanvas = document.getElementById('demo-canvas');
-const demoPct = document.getElementById('demo-pct');
-const demoStateLabel = document.getElementById('demo-state-label');
-
-const DEMO_SIZE = () => demoCanvas.clientWidth;
-const demoRenderer = new THREE.WebGLRenderer({ canvas: demoCanvas, alpha: true, antialias: true });
-demoRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-const demoScene = new THREE.Scene();
-const demoCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-demoCamera.position.z = 2.8;
-
-const demoGeo = new THREE.SphereGeometry(1, 64, 64);
-const demoMat = new THREE.ShaderMaterial({
-  vertexShader: ORB_VERT,
-  fragmentShader: ORB_FRAG,
-  uniforms: {
-    uTime: { value: 0 },
-    uCapacity: { value: 0.74 },
-    uResolution: { value: new THREE.Vector2(1, 1) }
-  },
-  transparent: true
+// ─── THREE.JS SETUP ───────────────────────────────────────────────────────────
+const canvas = document.getElementById('orb-canvas');
+const renderer = new THREE.WebGLRenderer({
+  canvas, antialias:true, alpha:true,
+  powerPreference:'high-performance',
 });
-demoScene.add(new THREE.Mesh(demoGeo, demoMat));
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x000000, 0);
 
-let demoCapacity = 0.74;
-let demoIsDragging = false;
-let demoDragStartX = 0;
-let demoDragStartCap = 0.74;
+const scene  = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 100);
+camera.position.z = 3;
 
-function getDemoState(c) {
-  if (c >= 0.66) return 'RESOURCED';
-  if (c >= 0.33) return 'ELEVATED';
-  return 'DEPLETED';
-}
-function updateDemoUI(c) {
-  demoPct.textContent = Math.round(c * 100) + '%';
-  demoStateLabel.textContent = getDemoState(c);
-  demoMat.uniforms.uCapacity.value = c;
-  demoCapacity = c;
-  document.documentElement.style.setProperty('--demo-cap', c);
-}
-
-function getDemoX(e) { return e.touches ? e.touches[0].clientX : e.clientX; }
-
-demoCanvas.addEventListener('mousedown', e => {
-  demoIsDragging = true;
-  demoDragStartX = getDemoX(e);
-  demoDragStartCap = demoCapacity;
-  demoCanvas.style.cursor = 'grabbing';
-  track('orb_interaction');
-});
-demoCanvas.addEventListener('touchstart', e => {
-  demoIsDragging = true;
-  demoDragStartX = getDemoX(e);
-  demoDragStartCap = demoCapacity;
-  track('orb_interaction');
-}, { passive: true });
-window.addEventListener('mousemove', e => {
-  if (!demoIsDragging) return;
-  const dx = (getDemoX(e) - demoDragStartX) / DEMO_SIZE();
-  updateDemoUI(Math.max(0, Math.min(1, demoDragStartCap + dx)));
-});
-window.addEventListener('touchmove', e => {
-  if (!demoIsDragging) return;
-  const dx = (getDemoX(e) - demoDragStartX) / DEMO_SIZE();
-  updateDemoUI(Math.max(0, Math.min(1, demoDragStartCap + dx)));
-}, { passive: true });
-window.addEventListener('mouseup', () => { demoIsDragging = false; demoCanvas.style.cursor = 'grab'; });
-window.addEventListener('touchend', () => { demoIsDragging = false; });
-
-let demoT = 0;
-function animDemo() {
-  requestAnimationFrame(animDemo);
-  demoT += 0.016;
-  const s = DEMO_SIZE();
-  demoRenderer.setSize(s, s, false);
-  demoMat.uniforms.uTime.value = demoT;
-  demoRenderer.render(demoScene, demoCamera);
-}
-animDemo();
-
-// ── CONSTELLATION ─────────────────────────────────────────────
-const ccCanvas = document.getElementById('constellation-canvas');
-const ccSize = () => ccCanvas.clientWidth;
-const ccRenderer = new THREE.WebGLRenderer({ canvas: ccCanvas, alpha: true, antialias: true });
-ccRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-const ccScene = new THREE.Scene();
-const ccCamera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
-ccCamera.position.z = 3.5;
-
-const controls = new OrbitControls(ccCamera, ccCanvas);
-controls.enableZoom = false;
-controls.enablePan = false;
-controls.autoRotate = true;
-controls.autoRotateSpeed = 0.6;
-controls.dampingFactor = 0.05;
-controls.enableDamping = true;
-
-// Generate 90 days of synthetic capacity data
-const cyanC = new THREE.Color(0x00C2CC);
-const amberC = new THREE.Color(0xC88A14);
-const crimsonC = new THREE.Color(0xB01414);
-
-const positions = [];
-const colors = [];
-
-// Seed a believable pattern
-let baseCap = 0.65;
-for (let d = 0; d < 90; d++) {
-  // Natural drift + weekly rhythm
-  const weekday = d % 7;
-  const weeklyBias = weekday < 5 ? -0.04 : 0.06;
-  baseCap = Math.max(0.05, Math.min(0.97, baseCap + (Math.random() - 0.45) * 0.12 + weeklyBias));
-
-  // Cylindrical path through time
-  const angle = (d / 90) * Math.PI * 4;
-  const radius = 1.2 + Math.sin(d / 8) * 0.25;
-  const x = Math.cos(angle) * radius;
-  const z = Math.sin(angle) * radius;
-  const y = (d / 90 - 0.5) * 2.4;
-
-  positions.push(x, y, z);
-
-  const col = baseCap > 0.6 ? cyanC.clone().lerp(new THREE.Color(1,1,1), 0.1)
-    : baseCap > 0.35 ? amberC.clone()
-    : crimsonC.clone();
-  colors.push(col.r, col.g, col.b);
-}
-
-const ccGeo = new THREE.BufferGeometry();
-ccGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-ccGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-const ccMat = new THREE.PointsMaterial({
-  size: 0.08,
-  vertexColors: true,
-  sizeAttenuation: true,
+// ── Orb mesh ──
+const orbGeo  = new THREE.SphereGeometry(1, 128, 128);
+const orbMat  = new THREE.ShaderMaterial({
+  vertexShader:   VERT,
+  fragmentShader: FRAG,
   transparent: true,
-  opacity: 0.9
+  depthWrite:  false,
+  uniforms:{
+    uT:{ value:0 },
+    uC:{ value:0.72 },
+    uB:{ value:0 },
+  }
 });
-ccScene.add(new THREE.Points(ccGeo, ccMat));
+const orbMesh = new THREE.Mesh(orbGeo, orbMat);
+orbMesh.scale.setScalar(0.001);
+scene.add(orbMesh);
 
-// Animate points flying in
-const posArr = ccGeo.attributes.position.array;
-const origPositions = [...posArr];
-const randomStartPositions = [];
-for (let i = 0; i < positions.length / 3; i++) {
-  randomStartPositions.push(
-    (Math.random() - 0.5) * 8,
-    (Math.random() - 0.5) * 8,
-    (Math.random() - 0.5) * 8
-  );
+// ── Resize ──
+function onResize(){
+  renderer.setSize(innerWidth, innerHeight);
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
 }
-// Set to random initially
-for (let i = 0; i < posArr.length; i++) posArr[i] = randomStartPositions[i];
-ccGeo.attributes.position.needsUpdate = true;
+onResize();
+window.addEventListener('resize', onResize);
 
-ScrollTrigger.create({
-  trigger: '#constellation',
-  start: 'top 70%',
-  once: true,
-  onEnter() {
-    gsap.to({ t: 0 }, {
-      t: 1,
-      duration: 1.8,
-      ease: 'power3.out',
-      onUpdate() {
-        const t = this.targets()[0].t;
-        for (let i = 0; i < posArr.length; i++) {
-          posArr[i] = randomStartPositions[i] + (origPositions[i] - randomStartPositions[i]) * t;
+// ── World position helpers ──
+function screenToWorld(sx, sy){
+  const fov = camera.fov * Math.PI/180;
+  const h   = Math.tan(fov/2) * camera.position.z;
+  const w   = h * camera.aspect;
+  return {
+    x: ((sx/innerWidth)*2-1)*w,
+    y: (-(sy/innerHeight)*2+1)*h,
+  };
+}
+function pinnedWorld(){
+  const pad = 44;
+  return screenToWorld(innerWidth - pad - 32, pad + 32);
+}
+
+// ─── ORB STATE ────────────────────────────────────────────────────────────────
+let orbState = {
+  targetScale: 0, currentScale: 0,
+  targetX:0, targetY:0,
+  breathPhase:0, breathSpeed:4,
+  capacity:0.72,
+  isPinned:false,
+};
+let demoMode = false;
+let whoActive = false;
+let whoIdx = 0;
+let whoTimer = null;
+
+// ─── ANIMATION LOOP ───────────────────────────────────────────────────────────
+let raf, lastTime = 0, paused = false;
+
+function animate(ts){
+  raf = requestAnimationFrame(animate);
+  if(paused) return;
+
+  const dt = Math.min((ts - lastTime)/1000, 0.05);
+  lastTime = ts;
+
+  orbMat.uniforms.uT.value = ts * 0.001;
+
+  // Breath
+  orbState.breathPhase += dt * (Math.PI*2 / orbState.breathSpeed);
+  orbMat.uniforms.uB.value = Math.sin(orbState.breathPhase)*0.5+0.5;
+
+  // Smooth scale
+  orbState.currentScale += (orbState.targetScale - orbState.currentScale) * Math.min(dt*4, 1);
+  const breathScale = 1 + Math.sin(orbState.breathPhase)*0.025;
+  orbMesh.scale.setScalar(orbState.currentScale * breathScale);
+
+  // Smooth position (only in non-drag mode)
+  if(!dragging){
+    orbMesh.position.x += (orbState.targetX - orbMesh.position.x)*Math.min(dt*5,1);
+    orbMesh.position.y += (orbState.targetY - orbMesh.position.y)*Math.min(dt*5,1);
+  }
+
+  renderer.render(scene, camera);
+}
+animate(0);
+
+document.addEventListener('visibilitychange', ()=>{
+  paused = document.hidden;
+  if(!paused) lastTime = performance.now();
+});
+
+// ─── TYPEWRITER ───────────────────────────────────────────────────────────────
+const LINES = ['Your nervous system', 'has a signature.'];
+let typeReady = false;
+
+function typeLines(el, lines, charDelay, lineDelay){
+  return new Promise(resolve=>{
+    let li=0, ci=0, str='';
+    const cur = '<span class="cursor"></span>';
+    function tick(){
+      if(li >= lines.length){ el.innerHTML = str + cur; resolve(); return; }
+      const ln = lines[li];
+      if(ci < ln.length){
+        str += ln[ci++];
+        el.innerHTML = str + (li<lines.length-1?'':cur);
+        if(ci===ln.length && li<lines.length-1){
+          str += '<br>';
+          li++; ci=0;
+          setTimeout(tick, lineDelay);
+        } else {
+          setTimeout(tick, charDelay);
         }
-        ccGeo.attributes.position.needsUpdate = true;
       }
-    });
-    track('constellation_rotate');
+    }
+    tick();
+  });
+}
+
+// ─── HERO ENTRANCE ────────────────────────────────────────────────────────────
+(async function heroEntrance(){
+  // 1. Orb materialises after 800ms
+  await delay(800);
+  track('orb_materialized');
+  gsap.to(orbState, {
+    targetScale:1, duration:1.2, ease:'back.out(1.4)',
+    onUpdate: ()=>{ orbState.targetX=0; orbState.targetY=0; }
+  });
+
+  // 2. Let orb breathe silently for 2s
+  await delay(2400);
+
+  // 3. Typewriter for headline
+  const headline = document.getElementById('hero-headline');
+  await typeLines(headline, LINES, 40, 180);
+
+  // Remove cursor after 800ms
+  setTimeout(()=>{
+    const c = headline.querySelector('.cursor');
+    if(c) gsap.to(c,{opacity:0,duration:0.3,onComplete:()=>c.remove()});
+  }, 800);
+
+  // 4. Tagline
+  await delay(600);
+  gsap.to('#hero-tagline',{opacity:1,duration:0.6});
+
+  // 5. CTA
+  await delay(400);
+  gsap.to('#hero-cta',{opacity:1,duration:0.6});
+
+  // 6. Sub
+  await delay(200);
+  gsap.to('#hero-sub',{opacity:1,duration:0.6});
+
+  typeReady = true;
+})();
+
+// ─── HORIZONTAL PUNCHLINE REVEALS ─────────────────────────────────────────────
+function revealPunch(id){
+  gsap.to('#'+id,{
+    opacity:1, x:0, duration:0.8, ease:'power3.out'
+  });
+}
+
+// ─── SCROLL ANIMATIONS ────────────────────────────────────────────────────────
+// Give the hero a chance to set up before ScrollTrigger runs
+setTimeout(()=>{
+
+// ── Pin hero → shrink orb ──
+ScrollTrigger.create({
+  trigger:'#s-hero',
+  start:'bottom bottom',
+  end:'bottom top',
+  onUpdate(self){
+    const p = self.progress;
+    const pw = pinnedWorld();
+    orbState.targetScale = gsap.utils.interpolate(1, 0.10, p);
+    orbState.targetX     = gsap.utils.interpolate(0, pw.x, p);
+    orbState.targetY     = gsap.utils.interpolate(0, pw.y, p);
+    // Capacity dims slightly as we leave hero
+    orbState.capacity = 0.72 - p*0.15;
+    orbMat.uniforms.uC.value = orbState.capacity;
+  },
+  onLeave(){
+    orbState.isPinned = true;
+    orbState.breathSpeed = 4;
+  },
+  onEnterBack(){
+    orbState.isPinned = false;
+    orbState.breathSpeed = 4;
   }
 });
 
-ccCanvas.addEventListener('mousedown', () => { controls.autoRotate = false; });
-ccCanvas.addEventListener('touchstart', () => { controls.autoRotate = false; }, { passive: true });
-
-function animCC() {
-  requestAnimationFrame(animCC);
-  const s = ccSize();
-  ccRenderer.setSize(s, s, false);
-  controls.update();
-  ccRenderer.render(ccScene, ccCamera);
-}
-animCC();
-
-// ── WAITLIST FORM ─────────────────────────────────────────────
-const form = document.getElementById('waitlist-form');
-const emailInput = document.getElementById('waitlist-email');
-const btn = document.getElementById('waitlist-btn');
-const msg = document.getElementById('waitlist-msg');
-
-form.addEventListener('submit', async e => {
-  e.preventDefault();
-  const email = emailInput.value.trim();
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    msg.textContent = 'Please enter a valid email address.';
-    msg.className = 'waitlist-msg err';
-    return;
+// ── Horizontal scrub ──
+const hTrack = document.getElementById('h-track');
+gsap.to('#h-track',{
+  x: ()=> -(hTrack.scrollWidth - innerWidth),
+  ease:'none',
+  scrollTrigger:{
+    trigger:'#s-horizontal',
+    pin:true,
+    scrub:1.2,
+    start:'top top',
+    end: ()=> '+=' + (hTrack.scrollWidth - innerWidth),
+    invalidateOnRefresh:true,
+    onUpdate(self){
+      const p = self.progress;
+      const cap = 0.57 - p*0.40;
+      orbMat.uniforms.uC.value = cap;
+      // Reveal punchlines
+      if(p>0.10) revealPunch('hp1-punch');
+      if(p>0.43) revealPunch('hp2-punch');
+      if(p>0.76) revealPunch('hp3-punch');
+      // Panel 3: crimson flash at end
+      if(p>0.96){
+        orbState.breathSpeed = 2;
+      }
+    },
+    onLeave(){
+      orbState.breathSpeed = 4;
+      orbMat.uniforms.uC.value = 0.55;
+    }
   }
+});
+
+// ── Demo section: re-center orb ──
+ScrollTrigger.create({
+  trigger:'#s-demo',
+  start:'top 60%',
+  end:'bottom 40%',
+  onEnter(){
+    demoMode = true;
+    canvas.classList.add('interactive');
+    orbState.targetX = 0;
+    orbState.targetY = 0;
+    gsap.to(orbState,{targetScale:1,duration:0.8,ease:'power2.out'});
+    orbState.breathSpeed = 4;
+  },
+  onLeave(){
+    exitDemo();
+  },
+  onEnterBack(){
+    demoMode = true;
+    canvas.classList.add('interactive');
+    orbState.targetX = 0;
+    orbState.targetY = 0;
+    gsap.to(orbState,{targetScale:1,duration:0.8,ease:'power2.out'});
+  },
+  onLeaveBack(){
+    exitDemo();
+  }
+});
+
+function exitDemo(){
+  demoMode = false;
+  canvas.classList.remove('interactive');
+  const pw = pinnedWorld();
+  gsap.to(orbState,{targetScale:0.10,duration:0.6,ease:'power2.in'});
+  orbState.targetX = pw.x;
+  orbState.targetY = pw.y;
+}
+
+// ── Constellation section ──
+ScrollTrigger.create({
+  trigger:'#s-constellation',
+  start:'top 70%',
+  once:true,
+  onEnter(){ initConstellation(); }
+});
+
+// ── Who section: pin + cycle ──
+ScrollTrigger.create({
+  trigger:'#s-who',
+  start:'top top',
+  end:'+=100%',
+  pin:true,
+  onEnter(){
+    whoActive = true;
+    startWho();
+  },
+  onLeave(){
+    whoActive = false;
+    clearTimeout(whoTimer);
+  },
+  onEnterBack(){
+    whoActive = true;
+    startWho();
+  },
+  onLeaveBack(){
+    whoActive = false;
+    clearTimeout(whoTimer);
+  }
+});
+
+// ── Final section: orb returns ──
+ScrollTrigger.create({
+  trigger:'#s-final',
+  start:'top 60%',
+  onEnter(){
+    orbState.targetX = 0;
+    orbState.targetY = 0;
+    gsap.to(orbState,{targetScale:1,duration:1.2,ease:'back.out(1.2)'});
+    orbMat.uniforms.uC.value = 1.0;
+    orbState.breathSpeed = 8;
+    // Animate text
+    gsap.to('#final-pre',{opacity:1,y:0,duration:1,ease:'power2.out',delay:0.4});
+    setTimeout(()=>typeLines(document.getElementById('final-reveal'),['Start reading it.'],60,0).then(()=>{
+      // Remove cursor
+      const c = document.querySelector('#final-reveal .cursor');
+      if(c) setTimeout(()=>gsap.to(c,{opacity:0,duration:0.3,onComplete:()=>c.remove()}),800);
+      gsap.to('#final-cta',{opacity:1,y:0,duration:0.6,delay:0.3});
+    }), 1800);
+  }
+});
+
+ScrollTrigger.refresh();
+}, 200);
+
+// ─── WHO CYCLING ──────────────────────────────────────────────────────────────
+function startWho(){
+  const el = document.getElementById('who-text');
+  whoIdx = 0;
+  showWho(el, whoIdx);
+}
+
+function showWho(el, idx){
+  if(!whoActive) return;
+  const lines = WHO_SENTENCES[idx].split('\n');
+  const isYou = lines[0] === 'You.';
+
+  gsap.set(el,{opacity:0});
+  el.innerHTML = lines.map((l,i)=>i<lines.length-1?l+'<br>':l+'<span class="period">.</span>').join('').replace('You.<span class="period">.</span>','You<span class="period">.</span>');
+  gsap.to(el,{opacity:1,duration:0.8,ease:'power2.out'});
+
+  if(isYou){
+    // Flash orb full
+    setTimeout(()=>{
+      const savedScale = orbState.targetScale;
+      gsap.to(orbState,{targetScale:1,duration:0.15,ease:'power2.out'});
+      setTimeout(()=>gsap.to(orbState,{targetScale:savedScale,duration:0.5,ease:'power2.in'}), 250);
+    }, 400);
+  }
+
+  whoTimer = setTimeout(()=>{
+    if(!whoActive) return;
+    gsap.to(el,{opacity:0,duration:0.6,ease:'power2.in',onComplete:()=>{
+      whoIdx = (whoIdx+1) % WHO_SENTENCES.length;
+      showWho(el, whoIdx);
+    }});
+  }, 3200);
+}
+
+// ─── DRAG INTERACTION ─────────────────────────────────────────────────────────
+let dragging = false, dragStartY = 0, dragStartCap = 0.72;
+let dragTracked = false;
+
+canvas.addEventListener('pointerdown', e=>{
+  if(!demoMode) return;
+  dragging = true;
+  dragStartY  = e.clientY;
+  dragStartCap = orbMat.uniforms.uC.value;
+  e.preventDefault();
+});
+
+canvas.addEventListener('pointermove', e=>{
+  if(!dragging || !demoMode) return;
+  const dy = (dragStartY - e.clientY) / innerHeight;
+  const cap = Math.max(0.02, Math.min(1, dragStartCap + dy*2.5));
+  orbMat.uniforms.uC.value = cap;
+  orbState.capacity = cap;
+
+  // Move orb with pointer (horizontal)
+  const dx = e.clientX - innerWidth/2;
+  const w = screenToWorld(e.clientX, innerHeight/2);
+  orbMesh.position.x = w.x * 0.3;
+
+  updateStateDisplay(cap);
+  if(!dragTracked){ track('orb_dragged'); dragTracked = true; }
+});
+
+window.addEventListener('pointerup', ()=>{
+  if(!dragging) return;
+  dragging = false;
+  if(demoMode){
+    gsap.to(orbMesh.position,{x:0,duration:0.5,ease:'elastic.out(1,0.5)'});
+  }
+});
+
+function updateStateDisplay(cap){
+  const el = document.getElementById('state-display');
+  if(!el) return;
+  if(cap > 0.65){
+    el.textContent = 'RESOURCED';
+    el.style.color = '#00C2CC';
+  } else if(cap > 0.33){
+    el.textContent = 'ELEVATED';
+    el.style.color = '#C88A14';
+  } else {
+    el.textContent = 'DEPLETED';
+    el.style.color = '#B01414';
+  }
+}
+
+// ─── CONSTELLATION ────────────────────────────────────────────────────────────
+let constInitialized = false;
+
+function initConstellation(){
+  if(constInitialized) return;
+  constInitialized = true;
+
+  const c = document.getElementById('const-canvas');
+  const size = Math.min(500, innerWidth*0.8);
+  c.width  = size * Math.min(devicePixelRatio,2);
+  c.height = size * Math.min(devicePixelRatio,2);
+  c.style.width  = size+'px';
+  c.style.height = size+'px';
+
+  const ctx = c.getContext('2d');
+  const dpr = Math.min(devicePixelRatio,2);
+  ctx.scale(dpr,dpr);
+
+  const N = 90;
+  const pts = [];
+  // Seed realistic capacity data — spiral-ish distribution
+  const rng = mulberry32(42);
+  for(let i=0;i<N;i++){
+    const t  = i/N;
+    const r  = (0.3 + rng()*0.18) * size/2;
+    const a  = t * Math.PI*6 + rng()*0.5;
+    const x  = Math.cos(a)*r;
+    const y  = Math.sin(a)*r;
+    const z  = (rng()-0.5)*0.4;
+    // capacity curve: mostly amber, peaks of cyan, a few crimson
+    const cap = clampCap(0.5 + Math.sin(t*Math.PI*4)*0.3 + (rng()-0.5)*0.25);
+    pts.push({x,y,z,cap,ox:x,oy:y,oz:z,
+      phase: rng()*Math.PI*2,
+      speed: 0.2+rng()*0.3,
+      size:  1.5+rng()*2});
+  }
+
+  let rotY = 0, rotX = 0.1;
+  let velY = 0.002, velX = 0;
+  let constDragging = false, cdx=0,cdy=0,cpx=0,cpy=0;
+  let constTracked = false;
+
+  c.addEventListener('pointerdown',e=>{
+    constDragging=true;
+    cpx=e.clientX; cpy=e.clientY;
+    e.preventDefault();
+    if(!constTracked){track('constellation_rotated');constTracked=true;}
+  });
+  c.addEventListener('pointermove',e=>{
+    if(!constDragging)return;
+    cdx=e.clientX-cpx; cdy=e.clientY-cpy;
+    velY=cdx*0.005; velX=cdy*0.005;
+    rotY+=cdx*0.005; rotX+=cdy*0.005;
+    cpx=e.clientX; cpy=e.clientY;
+  });
+  window.addEventListener('pointerup',()=>constDragging=false);
+
+  let constRaf;
+  function drawConst(ts){
+    constRaf = requestAnimationFrame(drawConst);
+    if(paused)return;
+
+    const t = ts*0.001;
+    if(!constDragging){
+      velY *= 0.97;
+      velX *= 0.97;
+      velY += 0.001;
+      rotY += velY;
+      rotX += velX;
+    }
+
+    ctx.clearRect(0,0,size,size);
+
+    // Project points
+    const projected = pts.map(p=>{
+      // Rotate Y
+      const cx=Math.cos(rotY),sx=Math.sin(rotY);
+      let rx=p.ox*cx+p.oz*sx, rz=-p.ox*sx+p.oz*cx;
+      // Rotate X
+      const cy=Math.cos(rotX),sy=Math.sin(rotX);
+      let ry=p.oy*cy-rz*sy, rz2=p.oy*sy+rz*cy;
+      // Pulse
+      const pulse=1+Math.sin(t*p.speed+p.phase)*0.08;
+      const sz=size/2, fov=400, scale=fov/(fov+rz2*80);
+      return {
+        sx:sz+rx*scale*pulse,
+        sy:sz+ry*scale*pulse,
+        scale, cap:p.cap, size:p.size*scale,
+        z:rz2
+      };
+    }).sort((a,b)=>a.z-b.z);
+
+    projected.forEach(p=>{
+      const col = capColor(p.cap);
+      const glowSize = p.size*2.5;
+      const grd = ctx.createRadialGradient(p.sx,p.sy,0,p.sx,p.sy,glowSize);
+      grd.addColorStop(0,col.replace(')',',0.9)').replace('rgb','rgba'));
+      grd.addColorStop(1,col.replace(')',',0)').replace('rgb','rgba'));
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(p.sx,p.sy,glowSize,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(p.sx,p.sy,p.size*0.7,0,Math.PI*2);
+      ctx.fill();
+    });
+  }
+  drawConst(0);
+
+  // Animate entrance
+  gsap.fromTo('#const-canvas',{opacity:0,scale:0.9},{opacity:1,scale:1,duration:1.2,ease:'power2.out'});
+  gsap.fromTo('#constellation-text',{opacity:0,y:20},{opacity:1,y:0,duration:1,ease:'power2.out',delay:0.4});
+}
+
+function capColor(cap){
+  if(cap>0.65) return `rgb(0,194,204)`;
+  if(cap>0.33) return `rgb(200,138,20)`;
+  return `rgb(176,20,20)`;
+}
+function clampCap(v){ return Math.max(0.05,Math.min(1,v)); }
+function mulberry32(a){ return ()=>{ a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296; }; }
+
+// ─── WAITLIST ─────────────────────────────────────────────────────────────────
+document.getElementById('waitlist-form')?.addEventListener('submit', async e=>{
+  e.preventDefault();
+  const email = document.getElementById('waitlist-email').value.trim();
+  if(!email) return;
+
+  const btn = e.target.querySelector('button');
+  btn.textContent = '…';
   btn.disabled = true;
-  btn.textContent = 'Saving…';
-  msg.textContent = '';
 
   try {
-    const params = new URLSearchParams(window.location.search);
-    const res = await fetch('/api/waitlist', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    await fetch(`${SUPABASE_URL}/rest/v1/waitlist_signups`, {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey': SUPABASE_ANON,
+        'Authorization': `Bearer ${SUPABASE_ANON}`,
+        'Prefer':'return=minimal',
+      },
       body: JSON.stringify({
         email,
-        source: 'landing_page',
-        utm_source: params.get('utm_source'),
-        utm_medium: params.get('utm_medium'),
-        utm_campaign: params.get('utm_campaign'),
+        source:'landing_page',
+        created_at: new Date().toISOString(),
       })
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed');
+  } catch(_){}
 
-    msg.textContent = "You're on the list. We'll email you the moment it's live.";
-    msg.className = 'waitlist-msg ok';
-    emailInput.value = '';
-    btn.textContent = '✓ Saved';
-    track('waitlist_signup', { email_captured: true });
-  } catch (err) {
-    msg.textContent = 'Something went wrong. Try again?';
-    msg.className = 'waitlist-msg err';
-    btn.disabled = false;
-    btn.textContent = 'Notify me';
-  }
+  document.querySelector('.waitlist-wrap').innerHTML =
+    `<p class="waitlist-success">✓ You're on the list.</p>`;
+  track('waitlist_submitted');
 });
 
-// Final CTA secondary button scrolls to waitlist
-// (already wired inline)
-
-// ── FINAL SECTION WAITLIST DUPLICATE ────────────────────────
-document.querySelectorAll('.final-cta-secondary').forEach(b => {
-  b.addEventListener('click', () => {
-    document.getElementById('status').scrollIntoView({ behavior: 'smooth' });
-    setTimeout(() => emailInput.focus(), 800);
+// ─── SCROLL DEPTH ─────────────────────────────────────────────────────────────
+const depths = [25,50,75,100];
+const depthFired = new Set();
+window.addEventListener('scroll',()=>{
+  const pct = (scrollY/(document.body.scrollHeight-innerHeight))*100;
+  depths.forEach(d=>{
+    if(pct>=d && !depthFired.has(d)){
+      depthFired.add(d);
+      track('scroll_depth',{percent:d});
+    }
   });
-});
+},{passive:true});
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
 </script>
 </body>
