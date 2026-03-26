@@ -1,0 +1,129 @@
+# Orbital — store screenshots for App Review / ASC (iPhone 16)
+#
+# From repo root (Maestro on PATH; iPhone 16 booted or pass --udid):
+#
+#   export PATH="$HOME/.maestro/bin:$PATH"
+#   SCREENSHOT_DIR="$HOME/Desktop/screenshots"
+#   mkdir -p "$SCREENSHOT_DIR"
+#   xcrun simctl boot "$(xcrun simctl list devices available | grep 'iPhone 16)' | grep -v 16e | head -1 | grep -o '[A-F0-9-]\{36\}')"
+#
+#   maestro test scripts/maestro/screenshot-flow.yaml \
+#     --udid "$(xcrun simctl list devices booted | grep 'iPhone 16)' | grep -v 16e | head -1 | grep -o '[A-F0-9-]\{36\}')" \
+#     --test-output-dir "$SCREENSHOT_DIR" \
+#     -e REVIEW_EMAIL='review@orbital.health' \
+#     -e REVIEW_PASSWORD='YourPassword'
+#
+# Screenshots: orbital_01_home.png, orbital_02_paywall.png, orbital_03_cci.png in --test-output-dir
+#
+appId: com.erparris.orbital
+---
+- launchApp:
+    appId: com.erparris.orbital
+    clearState: false
+
+# Onboarding / gates (aligned with maestro/tests/smoke_test.yaml)
+- runFlow:
+    when:
+      visible: "Terms of Service"
+    commands:
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - tapOn:
+          text: "I Accept"
+          optional: true
+      - tapOn:
+          text: "Scroll to Accept"
+          optional: true
+      - waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible: "Age Verification"
+    commands:
+      - tapOn: "YYYY"
+      - inputText: "1990"
+      - tapOn: "I confirm that I am at least 13 years old."
+      - tapOn: "Continue"
+      - waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible: "Sign in with email"
+    commands:
+      - tapOn: "Sign in with email"
+      - tapOn: "Email"
+      - inputText: ${REVIEW_EMAIL}
+      - tapOn: "Password"
+      - inputText: ${REVIEW_PASSWORD}
+      - tapOn: "Sign in"
+      - waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible: "Skip for now"
+    commands:
+      - tapOn: "Skip for now"
+      - waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible: "Welcome to Orbital"
+    commands:
+      - tapOn: "Skip"
+      - waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible: "Skip"
+    commands:
+      - tapOn: "Skip"
+      - waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible: "Why Orbital Exists"
+    commands:
+      - tapOn: "I understand"
+      - waitForAnimationToEnd
+
+# Home + orb (capacity header is stable in a11y tree)
+- extendedWaitUntil:
+    visible:
+      text: "Today's Capacity State"
+    timeout: 180000
+
+- waitForAnimationToEnd
+
+- takeScreenshot: orbital_01_home
+
+# Paywall — header sparkle region (matches smoke_test)
+- tapOn:
+    point: "8%, 9%"
+- waitForAnimationToEnd
+
+- takeScreenshot: orbital_02_paywall
+
+# Dismiss paywall so deep link can present CCI full screen
+- tapOn:
+    text: "×"
+    optional: true
+- tapOn:
+    text: "Close"
+    optional: true
+- waitForAnimationToEnd
+
+# CCI via deep link (try Expo scheme, then bundle scheme)
+- openLink: "orbital://cci"
+- waitForAnimationToEnd
+- openLink: "com.erparris.orbital://cci"
+- waitForAnimationToEnd
+
+- extendedWaitUntil:
+    visible: "CCI-Q4"
+    timeout: 90000
+
+- takeScreenshot: orbital_03_cci
