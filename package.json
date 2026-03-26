@@ -25,7 +25,10 @@
     "cci:render": "cd output && node render_ultra.js",
     "bundle:export": "npx tsx scripts/bundle-cci-export-pdf.ts",
     "android": "expo run:android",
-    "ios": "expo run:ios"
+    "ios": "expo run:ios",
+    "agent": "node scripts/submission-agent.js",
+    "agent:once": "node scripts/submission-agent.js --once",
+    "agent:daemon": "pm2 start scripts/submission-agent.js --name orbital-submission-agent --watch"
   },
   "dependencies": {
     "@callstack/liquid-glass": "^0.7.0",

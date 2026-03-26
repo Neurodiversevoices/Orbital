@@ -1,0 +1,99 @@
+name: Rejection Monitor
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Enable verbose logging'
+        required: false
+        default: 'false'
+
+concurrency:
+  group: orbital-rejection-monitor
+  cancel-in-progress: true
+
+jobs:
+  monitor:
+    name: Check ASC state & auto-fix rejections
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: submission
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Write ASC p8 key
+        env:
+          ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
+        run: |
+          mkdir -p keys
+          printf '%s\n' "$ASC_API_KEY_P8" > keys/AuthKey_HD4HWHHYDK.p8
+
+      - name: Run submission agent (single cycle)
+        id: agent
+        env:
+          ASC_KEY_ID: HD4HWHHYDK
+          ASC_ISSUER_ID: a6c8bd6a-8f60-4aed-a0a6-d129cb2aaf7a
+          ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: Neurodiversevoices/Orbital
+        run: |
+          node scripts/submission-agent.js --once 2>&1 | tee agent-output.txt
+          echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
+
+      - name: Upload agent log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: submission-agent-log-${{ github.run_number }}
+          path: |
+            agent-output.txt
+            logs/submission-agent.log
+          retention-days: 14
+
+      - name: Check for REJECTED state in output
+        id: check_rejected
+        run: |
+          if grep -q '"REJECTED"' agent-output.txt || grep -q 'state: REJECTED' agent-output.txt; then
+            echo "rejected=true" >> $GITHUB_OUTPUT
+          else
+            echo "rejected=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit any auto-fixed files to submission branch
+        if: steps.check_rejected.outputs.rejected == 'true'
+        run: |
+          git config user.name  "orbital-agent[bot]"
+          git config user.email "orbital-agent@orbitalhealth.app"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "fix: auto-fix from rejection monitor [skip ci]"
+            git push origin submission
+            echo "Changes committed and pushed"
+          else
+            echo "No file changes to commit"
+          fi
+
+      - name: Trigger build if submission was created
+        if: contains(steps.agent.outcome, 'success')
+        run: |
+          if grep -q 'Submitted for review' agent-output.txt; then
+            echo "Submission agent triggered a review submission — build was attached during agent run."
+          fi
