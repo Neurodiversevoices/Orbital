@@ -320,8 +320,8 @@ float al=(0.76+0.24*fr)*(.87+.13*br);gl_FragColor=vec4(col,al);}`;
 function mkOrb(canvas){
   const R=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance'});
   R.setPixelRatio(Math.min(devicePixelRatio,2));
-  const S=new THREE.Scene(),C=new THREE.PerspectiveCamera(42,1,0.1,100);C.position.z=3.6;
-  const mat=new THREE.ShaderMaterial({vertexShader:VERT,fragmentShader:FRAG,uniforms:{uT:{value:0},uC:{value:0.74}},transparent:true});
+  const S=new THREE.Scene(),C=new THREE.PerspectiveCamera(42,1,0.1,100);C.position.z=4.2;
+  const mat=new THREE.ShaderMaterial({vertexShader:VERT,fragmentShader:FRAG,uniforms:{uT:{value:0},uC:{value:0.28}},transparent:true});
   S.add(new THREE.Mesh(new THREE.SphereGeometry(1,96,96),mat));
   function rsz(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;R.setSize(w,h,false);C.aspect=w/h;C.updateProjectionMatrix();}
   rsz();return{R,S,C,mat,rsz};
