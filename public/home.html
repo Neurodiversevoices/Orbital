@@ -45,7 +45,7 @@ a,button,input{cursor:none}
 #orb-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;opacity:0;transition:opacity 1.4s ease}
 .orb-glow{position:absolute;width:62vmin;height:62vmin;border-radius:50%;background:radial-gradient(circle,rgba(0,194,204,.055) 0%,rgba(0,194,204,.015) 40%,transparent 70%);z-index:0;animation:gb 4.2s ease-in-out infinite;pointer-events:none}
 @keyframes gb{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.14);opacity:1}}
-.hero-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 clamp(24px,5vw,80px);pointer-events:none;width:100%}
+.hero-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 clamp(24px,5vw,80px);pointer-events:none;width:100%;filter:drop-shadow(0 0 40px rgba(1,2,10,0.5))}
 .status-pill{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:clamp(.55rem,.7vw,.64rem);letter-spacing:.18em;color:var(--amber);text-transform:uppercase;margin-bottom:clamp(10px,1.5vh,18px);opacity:0;pointer-events:all}
 .sp-dot{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:pa 2.4s ease infinite;flex-shrink:0}
 @keyframes pa{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(200,138,20,.5)}50%{opacity:.5;box-shadow:0 0 0 6px rgba(200,138,20,0)}}
@@ -320,7 +320,7 @@ float al=(0.76+0.24*fr)*(.87+.13*br);gl_FragColor=vec4(col,al);}`;
 function mkOrb(canvas){
   const R=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance'});
   R.setPixelRatio(Math.min(devicePixelRatio,2));
-  const S=new THREE.Scene(),C=new THREE.PerspectiveCamera(42,1,0.1,100);C.position.z=4.2;
+  const S=new THREE.Scene(),C=new THREE.PerspectiveCamera(42,1,0.1,100);C.position.z=5.0;
   const mat=new THREE.ShaderMaterial({vertexShader:VERT,fragmentShader:FRAG,uniforms:{uT:{value:0},uC:{value:0.28}},transparent:true});
   S.add(new THREE.Mesh(new THREE.SphereGeometry(1,96,96),mat));
   function rsz(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;R.setSize(w,h,false);C.aspect=w/h;C.updateProjectionMatrix();}
