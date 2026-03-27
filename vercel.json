@@ -13,6 +13,7 @@
     { "source": "/dashboard", "destination": "/dashboard.html" },
     { "source": "/reset-password", "destination": "/reset-password.html" },
     { "source": "/googleab503251e2637e3e.html", "destination": "/googleab503251e2637e3e.html" },
+    { "source": "/blog", "destination": "/blog.html" },
     { "source": "/", "destination": "/landing.html" },
     { "source": "/app", "destination": "/_app.html" },
     { "source": "/((?!api/)(?!.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|woff|woff2|ttf|pdf|html)).*)", "destination": "/_app.html" }
@@ -43,7 +44,7 @@
         },
         {
           "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+          "value": "camera=(self), microphone=(), geolocation=(), interest-cohort=()"
         },
         {
           "key": "Strict-Transport-Security",
