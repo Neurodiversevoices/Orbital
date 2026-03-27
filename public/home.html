@@ -50,9 +50,9 @@ a,button,input{cursor:none}
 .sp-dot{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:pa 2.4s ease infinite;flex-shrink:0}
 @keyframes pa{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(200,138,20,.5)}50%{opacity:.5;box-shadow:0 0 0 6px rgba(200,138,20,0)}}
 .hero-ey{font-family:var(--mono);font-size:clamp(.58rem,.74vw,.7rem);letter-spacing:.22em;color:var(--muted);text-transform:uppercase;margin-bottom:clamp(12px,1.8vh,22px);opacity:0}
-.hero-h1{font-size:clamp(2.8rem,7vw,7.4rem);font-weight:200;line-height:1.07;letter-spacing:-0.032em;color:#fff;margin-bottom:clamp(16px,2.5vh,30px);max-width:960px}
+.hero-h1{font-size:clamp(2.8rem,7vw,7.4rem);font-weight:200;line-height:1.07;letter-spacing:-0.032em;color:#fff;margin-bottom:clamp(16px,2.5vh,30px);max-width:960px;text-shadow:0 2px 30px rgba(1,2,10,0.8),0 0 60px rgba(1,2,10,0.6)}
 .hero-h1 .c{display:inline-block;opacity:0;transform:translateY(6px)}
-.hero-sub{font-family:var(--mono);font-size:clamp(.72rem,1vw,.9rem);letter-spacing:.04em;color:var(--muted);max-width:400px;line-height:1.75;margin-bottom:clamp(24px,4vh,40px);opacity:0}
+.hero-sub{font-family:var(--mono);font-size:clamp(.72rem,1vw,.9rem);letter-spacing:.04em;color:var(--muted);max-width:400px;line-height:1.75;margin-bottom:clamp(24px,4vh,40px);opacity:0;text-shadow:0 2px 20px rgba(1,2,10,0.9),0 0 40px rgba(1,2,10,0.7)}
 .hero-acts{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;opacity:0;pointer-events:all}
 .btn-p{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--cyan);color:var(--void);font-family:var(--mono);font-size:.75rem;font-weight:700;letter-spacing:.06em;text-decoration:none;border:none;outline:none;transition:background .2s,box-shadow .25s,transform .15s}
 .btn-p:hover{background:var(--cyan2);box-shadow:0 0 28px rgba(0,194,204,.4);transform:translateY(-1px)}
@@ -320,7 +320,7 @@ float al=(0.76+0.24*fr)*(.87+.13*br);gl_FragColor=vec4(col,al);}`;
 function mkOrb(canvas){
   const R=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance'});
   R.setPixelRatio(Math.min(devicePixelRatio,2));
-  const S=new THREE.Scene(),C=new THREE.PerspectiveCamera(42,1,0.1,100);C.position.z=2.8;
+  const S=new THREE.Scene(),C=new THREE.PerspectiveCamera(42,1,0.1,100);C.position.z=3.6;
   const mat=new THREE.ShaderMaterial({vertexShader:VERT,fragmentShader:FRAG,uniforms:{uT:{value:0},uC:{value:0.74}},transparent:true});
   S.add(new THREE.Mesh(new THREE.SphereGeometry(1,96,96),mat));
   function rsz(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;R.setSize(w,h,false);C.aspect=w/h;C.updateProjectionMatrix();}
@@ -449,4 +449,4 @@ wlF.addEventListener('submit',async e=>{
 document.querySelectorAll('.fcs-btn').forEach(b=>b.addEventListener('click',()=>{document.getElementById('status').scrollIntoView({behavior:'smooth'});setTimeout(()=>wlE.focus(),800);}));
 </script>
 </body>
-</html>
+</html><!-- Thu Mar 26 21:36:51 EDT 2026 -->
