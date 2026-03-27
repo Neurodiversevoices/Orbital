@@ -193,7 +193,7 @@ footer{width:100vw;background:var(--void);border-top:1px solid var(--border);pad
   <div id="demo-wrap" role="img" aria-label="Interactive capacity orb">
     <canvas id="demo-canvas" aria-hidden="true"></canvas>
     <div class="demo-ov" aria-live="polite" aria-atomic="true">
-      <div class="demo-pct" id="dpct">74%</div>
+      <div class="demo-pct" id="dpct">28%</div>
       <div class="demo-st" id="dst">NOMINAL</div>
     </div>
   </div>
@@ -327,7 +327,7 @@ function mkOrb(canvas){
   rsz();return{R,S,C,mat,rsz};
 }
 const hOrb=mkOrb(document.getElementById('orb-canvas'));
-let hT0=Date.now(),hCap=0.74,hTC=0.74,hMx=0,hMy=0,hDrag=false,hDY=0,hDC=0.74;
+let hT0=Date.now(),hCap=0.28,hTC=0.28,hMx=0,hMy=0,hDrag=false,hDY=0,hDC=0.28;
 document.getElementById('hero').addEventListener('mousemove',e=>{hMx=(e.clientX/innerWidth-.5)*.09;hMy=(e.clientY/innerHeight-.5)*-.09;},{passive:true});
 document.getElementById('orb-canvas').addEventListener('mousedown',e=>{hDrag=true;hDY=e.clientY;hDC=hCap;cur.classList.add('grab');});
 document.getElementById('orb-canvas').addEventListener('touchstart',e=>{hDrag=true;hDY=e.touches[0].clientY;hDC=hCap;},{passive:true});
