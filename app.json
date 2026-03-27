@@ -4,13 +4,18 @@
     "slug": "orbital",
     "owner": "orbital-health",
     "version": "1.0.0",
-    "runtimeVersion": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "jsEngine": "hermes",
     "scheme": "orbital",
+    "assets": [
+      "./assets/orb_interior.png"
+    ],
+    "assetBundlePatterns": [
+      "./assets/**/*"
+    ],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -18,8 +23,9 @@
     },
     "ios": {
       "supportsTablet": true,
+      "usesAppleSignIn": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "67",
+      "buildNumber": "89",
       "appleTeamId": "2KM3QL4UMV",
       "icon": "./assets/icon.png",
       "infoPlist": {
@@ -43,6 +49,7 @@
       }
     },
     "plugins": [
+      "./plugins/withAppIcon",
       "expo-router",
       "expo-apple-authentication",
       [
