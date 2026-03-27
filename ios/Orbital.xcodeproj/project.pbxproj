@@ -14,6 +14,7 @@
 		D9C6072F22CBDB0A4AAABE43 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BD5CFE146FA331030FB24EC7 /* PrivacyInfo.xcprivacy */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 		FA189D45EE0BA18E7F426DF2 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 555143E3D47B17DC4F388DFC /* ExpoModulesProvider.swift */; };
+		D4E38F1D2A5B6C7D008E01A1 /* Products.storekit in Resources */ = {isa = PBXBuildFile; fileRef = D4E38F1C2A5B6C7D008E01A1 /* Products.storekit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Orbital/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* Orbital-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Orbital-Bridging-Header.h"; path = "Orbital/Orbital-Bridging-Header.h"; sourceTree = "<group>"; };
+		D4E38F1C2A5B6C7D008E01A1 /* Products.storekit */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Products.storekit; path = Orbital/Products.storekit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +56,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
 				BD5CFE146FA331030FB24EC7 /* PrivacyInfo.xcprivacy */,
+				D4E38F1C2A5B6C7D008E01A1 /* Products.storekit */,
 			);
 			name = Orbital;
 			sourceTree = "<group>";
@@ -200,6 +203,7 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				D9C6072F22CBDB0A4AAABE43 /* PrivacyInfo.xcprivacy in Resources */,
+				D4E38F1D2A5B6C7D008E01A1 /* Products.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

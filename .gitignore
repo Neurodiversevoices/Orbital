@@ -46,6 +46,8 @@ config-snapshot.json
 /ios/build/
 /ios/**/*.xcuserstate
 /ios/**/*.xcscheme
+# Track shared scheme so StoreKit configuration ships with EAS builds
+!/ios/Orbital.xcodeproj/xcshareddata/xcschemes/Orbital.xcscheme
 /ios/**/xcuserdata/
 /ios/.xcode.env.local
 /ios/Orbital.xcodeproj/project.pbxproj.bak

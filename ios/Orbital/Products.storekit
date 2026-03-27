@@ -1,0 +1,524 @@
+{
+  "identifier": "E92A7A4C-1B8E-4F3D-9C2E-8F4A5B6C7D8E",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "99",
+      "familyShareable": false,
+      "internalID": "CCI30001",
+      "localizations": [
+        {
+          "description": "30-day capacity intelligence report",
+          "displayName": "CCI 30-Day Report",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_cci_30",
+      "referenceName": "CCI 30-Day Report",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "149",
+      "familyShareable": false,
+      "internalID": "CCI60001",
+      "localizations": [
+        {
+          "description": "60-day capacity intelligence report",
+          "displayName": "CCI 60-Day Report",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_cci_60",
+      "referenceName": "CCI 60-Day Report",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "199",
+      "familyShareable": false,
+      "internalID": "CCI90001",
+      "localizations": [
+        {
+          "description": "90-day capacity intelligence report",
+          "displayName": "CCI 90-Day Report",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_cci_90",
+      "referenceName": "CCI 90-Day Report",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "349",
+      "familyShareable": false,
+      "internalID": "CCIBUN01",
+      "localizations": [
+        {
+          "description": "Full capacity intelligence bundle report",
+          "displayName": "CCI Bundle Report",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_cci_bundle",
+      "referenceName": "CCI Bundle Report",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "399",
+      "familyShareable": false,
+      "internalID": "CCICIR01",
+      "localizations": [
+        {
+          "description": "CCI report for all circle members",
+          "displayName": "CCI Circle All",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_cci_circle_all",
+      "referenceName": "CCI Circle All",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "999",
+      "familyShareable": false,
+      "internalID": "CCIBNA01",
+      "localizations": [
+        {
+          "description": "CCI report for all bundle members",
+          "displayName": "CCI Bundle All",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_cci_bundle_all",
+      "referenceName": "CCI Bundle All",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "149",
+      "familyShareable": false,
+      "internalID": "QCRI0001",
+      "localizations": [
+        {
+          "description": "Individual quarterly capacity report",
+          "displayName": "Individual QCR",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_qcr_individual",
+      "referenceName": "Individual QCR",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "299",
+      "familyShareable": false,
+      "internalID": "QCRC0001",
+      "localizations": [
+        {
+          "description": "Circle quarterly capacity report",
+          "displayName": "Circle QCR",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_qcr_circle",
+      "referenceName": "Circle QCR",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "499",
+      "familyShareable": false,
+      "internalID": "QCRB0001",
+      "localizations": [
+        {
+          "description": "Bundle quarterly capacity report",
+          "displayName": "Bundle QCR",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_qcr_bundle",
+      "referenceName": "Bundle QCR",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_applicationInternalID": "6757295146",
+    "_developerTeamID": "2KM3QL4UMV",
+    "_failTransactionsEnabled": false,
+    "_lastError": "",
+    "_locale": "en_US",
+    "_storefront": "USA",
+    "_storeKitErrors": [
+      {
+        "current": null,
+        "enabled": false,
+        "name": "Load Products"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "Purchase"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "Verification"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "App Store Sync"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "Subscription Status"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "App Transaction"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "Manage Subscriptions Sheet"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "Offer Code Redeem Sheet"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "Transaction"
+      }
+    ]
+  },
+  "subscriptionGroups": [
+    {
+      "id": "orbital_subscriptions",
+      "localizations": [],
+      "name": "Orbital Subscriptions",
+      "subscriptions": [
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "29",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "PRO_M001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Private capacity tracking with full pattern history",
+              "displayName": "Orbital Pro Monthly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_pro_monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "Orbital Pro Monthly",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "290",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "PRO_A001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Private capacity tracking with full pattern history",
+              "displayName": "Orbital Pro Annual",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_pro_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Orbital Pro Annual",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "29",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "IND_M001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Private capacity tracking with full pattern history",
+              "displayName": "Individual Monthly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_individual_monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "Orbital Individual Monthly",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "290",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "IND_A001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Private capacity tracking with full pattern history",
+              "displayName": "Individual Annual",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_individual_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Orbital Individual Annual",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "49",
+          "familyShareable": true,
+          "groupNumber": 2,
+          "internalID": "FAM_M001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Full Pro features for the whole household (5 seats)",
+              "displayName": "Orbital Family Monthly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_family_monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "Orbital Family Monthly",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "490",
+          "familyShareable": true,
+          "groupNumber": 2,
+          "internalID": "FAM_A001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Full Pro features for the whole household (5 seats)",
+              "displayName": "Orbital Family Annual",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_family_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Orbital Family Annual",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "69",
+          "familyShareable": true,
+          "groupNumber": 3,
+          "internalID": "FAMP_M01",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Full Pro features for larger families (8 seats)",
+              "displayName": "Orbital Family+ Monthly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_family_plus_monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "Orbital Family+ Monthly",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "690",
+          "familyShareable": true,
+          "groupNumber": 3,
+          "internalID": "FAMP_A01",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Full Pro features for larger families (8 seats)",
+              "displayName": "Orbital Family+ Annual",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_family_plus_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Orbital Family+ Annual",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "79",
+          "familyShareable": false,
+          "groupNumber": 4,
+          "internalID": "CIR_M001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Mesh visibility for trusted groups (5 buddies)",
+              "displayName": "Orbital Circle Monthly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_circle_monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "Orbital Circle Monthly",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "790",
+          "familyShareable": false,
+          "groupNumber": 4,
+          "internalID": "CIR_A001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Mesh visibility for trusted groups (5 buddies)",
+              "displayName": "Orbital Circle Annual",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_circle_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Orbital Circle Annual",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "29",
+          "familyShareable": false,
+          "groupNumber": 5,
+          "internalID": "ADM_M001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Read-only history access for Circle/Bundle admins",
+              "displayName": "Admin Add-on Monthly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_admin_addon_monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "Admin Add-on Monthly",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "290",
+          "familyShareable": false,
+          "groupNumber": 5,
+          "internalID": "ADM_A001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Read-only history access for Circle/Bundle admins",
+              "displayName": "Admin Add-on Annual",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_admin_addon_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Admin Add-on Annual",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "2700",
+          "familyShareable": false,
+          "groupNumber": 6,
+          "internalID": "BN10A001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "10-seat Pro bundle (annual only)",
+              "displayName": "Pro Bundle 10 Seats",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_bundle_10_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Pro Bundle 10 Annual",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "4000",
+          "familyShareable": false,
+          "groupNumber": 6,
+          "internalID": "BN15A001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "15-seat Pro bundle (annual only)",
+              "displayName": "Pro Bundle 15 Seats",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_bundle_15_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Pro Bundle 15 Annual",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "5200",
+          "familyShareable": false,
+          "groupNumber": 6,
+          "internalID": "BN20A001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "20-seat Pro bundle (annual only)",
+              "displayName": "Pro Bundle 20 Seats",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_bundle_20_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Pro Bundle 20 Annual",
+          "subscriptionGroupID": "orbital_subscriptions",
+          "type": "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version": {
+    "major": 3,
+    "minor": 0
+  }
+}
