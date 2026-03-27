@@ -36,27 +36,32 @@ body{font-family:var(--sans);font-weight:300;background:var(--void);color:var(--
 .cursor-dot.grab{width:34px;height:34px;background:transparent;border:1.5px solid rgba(0,194,204,.7)}
 a,button,input{cursor:none}
 @media(hover:none){.cursor-dot{display:none}body,a,button,input{cursor:auto}}
-#topbar{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content:space-between;align-items:center;padding:18px clamp(20px,4vw,56px);pointer-events:none}
-.tb-brand{font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;color:rgba(90,90,112,.55);text-transform:uppercase}
-.tb-meta{display:flex;gap:20px}
+#topbar{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content:space-between;align-items:center;padding:18px clamp(20px,4vw,56px);pointer-events:none;background:rgba(1,2,10,0.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.tb-brand{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;color:rgba(240,240,240,0.9);text-transform:uppercase;pointer-events:all}
+.tb-meta{display:flex;gap:20px;align-items:center;pointer-events:all}
 .tb-item{font-family:var(--mono);font-size:.56rem;letter-spacing:.08em;color:rgba(90,90,112,.38)}
 .tb-item em{color:rgba(240,240,240,.22);font-style:normal}
+.tb-nav-right{display:flex;gap:20px;align-items:center}
+.tb-nav-right a{font-family:var(--mono);font-size:.56rem;letter-spacing:.08em;color:rgba(90,90,112,.7);text-decoration:none;transition:color .2s}
+.tb-nav-right a:hover{color:var(--cyan)}
+.tb-nav-right .btn-nav{display:inline-flex;align-items:center;padding:8px 16px;border:1px solid rgba(0,194,204,0.5);color:var(--cyan);font-family:var(--mono);font-size:.56rem;letter-spacing:.06em;text-decoration:none;background:transparent;border-radius:6px;transition:border-color .2s,color .2s}
+.tb-nav-right .btn-nav:hover{border-color:var(--cyan);color:var(--cyan2)}
 #hero{position:relative;width:100vw;height:100vh;min-height:640px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;background:var(--void)}
-#orb-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;opacity:0;transition:opacity 1.4s ease}
-.orb-glow{position:absolute;width:62vmin;height:62vmin;border-radius:50%;background:radial-gradient(circle,rgba(0,194,204,.055) 0%,rgba(0,194,204,.015) 40%,transparent 70%);z-index:0;animation:gb 4.2s ease-in-out infinite;pointer-events:none}
+#orb-canvas{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(500px,55vmin);height:min(500px,55vmin);z-index:1;opacity:0;transition:opacity 1.4s ease}
+.orb-glow{position:absolute;width:62vmin;height:62vmin;border-radius:50%;background:radial-gradient(circle,rgba(180,80,20,.08) 0%,rgba(180,80,20,.02) 40%,transparent 70%);z-index:0;animation:gb 4.2s ease-in-out infinite;pointer-events:none}
 @keyframes gb{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.14);opacity:1}}
-.hero-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 clamp(24px,5vw,80px);pointer-events:none;width:100%;filter:drop-shadow(0 0 40px rgba(1,2,10,0.5))}
+.hero-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:10vh clamp(24px,5vw,80px) 0;pointer-events:none;width:100%}
 .status-pill{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:clamp(.55rem,.7vw,.64rem);letter-spacing:.18em;color:var(--amber);text-transform:uppercase;margin-bottom:clamp(10px,1.5vh,18px);opacity:0;pointer-events:all}
 .sp-dot{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:pa 2.4s ease infinite;flex-shrink:0}
 @keyframes pa{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(200,138,20,.5)}50%{opacity:.5;box-shadow:0 0 0 6px rgba(200,138,20,0)}}
-.hero-ey{font-family:var(--mono);font-size:clamp(.58rem,.74vw,.7rem);letter-spacing:.22em;color:var(--muted);text-transform:uppercase;margin-bottom:clamp(12px,1.8vh,22px);opacity:0}
-.hero-h1{font-size:clamp(2.8rem,7vw,7.4rem);font-weight:200;line-height:1.07;letter-spacing:-0.032em;color:#fff;margin-bottom:clamp(16px,2.5vh,30px);max-width:960px;text-shadow:0 2px 30px rgba(1,2,10,0.8),0 0 60px rgba(1,2,10,0.6)}
+.hero-ey{font-family:var(--mono);font-size:clamp(.58rem,.74vw,.7rem);letter-spacing:.22em;color:var(--cyan);text-transform:uppercase;margin-bottom:clamp(12px,1.8vh,22px);opacity:0}
+.hero-h1{font-size:clamp(2.8rem,7vw,5.6rem);font-weight:300;line-height:1.07;letter-spacing:-0.032em;color:#fff;margin-bottom:clamp(16px,2.5vh,30px);max-width:960px;text-shadow:0 4px 40px rgba(1,2,10,0.95),0 0 80px rgba(1,2,10,0.8);word-break:keep-all}
 .hero-h1 .c{display:inline-block;opacity:0;transform:translateY(6px)}
-.hero-sub{font-family:var(--mono);font-size:clamp(.72rem,1vw,.9rem);letter-spacing:.04em;color:var(--muted);max-width:400px;line-height:1.75;margin-bottom:clamp(24px,4vh,40px);opacity:0;text-shadow:0 2px 20px rgba(1,2,10,0.9),0 0 40px rgba(1,2,10,0.7)}
+.hero-sub{font-family:var(--mono);font-size:clamp(.72rem,1vw,.9rem);letter-spacing:.04em;color:rgba(200,200,220,0.7);max-width:400px;line-height:1.75;margin-bottom:clamp(24px,4vh,40px);opacity:0;text-shadow:0 2px 20px rgba(1,2,10,0.9),0 0 40px rgba(1,2,10,0.7)}
 .hero-acts{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;opacity:0;pointer-events:all}
-.btn-p{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--cyan);color:var(--void);font-family:var(--mono);font-size:.75rem;font-weight:700;letter-spacing:.06em;text-decoration:none;border:none;outline:none;transition:background .2s,box-shadow .25s,transform .15s}
+.btn-p{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--cyan);color:var(--void);font-family:var(--mono);font-size:.75rem;font-weight:700;letter-spacing:.06em;text-decoration:none;border:none;outline:none;border-radius:6px;transition:background .2s,box-shadow .25s,transform .15s}
 .btn-p:hover{background:var(--cyan2);box-shadow:0 0 28px rgba(0,194,204,.4);transform:translateY(-1px)}
-.btn-g{display:inline-flex;align-items:center;padding:13px 22px;background:transparent;color:var(--muted);font-family:var(--mono);font-size:.75rem;letter-spacing:.06em;text-decoration:none;border:1px solid var(--border);outline:none;transition:border-color .2s,color .2s}
+.btn-g{display:inline-flex;align-items:center;padding:13px 22px;background:transparent;color:var(--muted);font-family:var(--mono);font-size:.75rem;letter-spacing:.06em;text-decoration:none;border:1px solid var(--border);outline:none;border-radius:6px;transition:border-color .2s,color .2s}
 .btn-g:hover{border-color:rgba(0,194,204,.45);color:var(--cyan)}
 .drag-hint{position:absolute;bottom:clamp(20px,4vh,44px);left:50%;transform:translateX(-50%);z-index:3;font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;opacity:0;display:flex;flex-direction:column;align-items:center;gap:8px}
 .drag-line{width:1px;height:28px;background:linear-gradient(to bottom,transparent,rgba(90,90,112,.5));animation:dl 2s ease-in-out infinite}
@@ -145,25 +150,18 @@ footer{width:100vw;background:var(--void);border-top:1px solid var(--border);pad
 <div class="cursor-dot" id="cursor" aria-hidden="true"></div>
 <div id="topbar" aria-hidden="true">
   <span class="tb-brand">Orbital</span>
-  <div class="tb-meta">
-    <span class="tb-item" id="tick-t">--:--:--</span>
-    <span class="tb-item">CAP <em id="tick-c">--</em></span>
-    <span class="tb-item">BUILD <em>85</em></span>
+  <div class="tb-nav-right">
+    <a href="/privacy">Privacy</a>
+    <a href="#status" class="btn-nav">Join Waitlist</a>
   </div>
 </div>
 <section id="hero" aria-label="Hero">
   <div class="orb-glow" aria-hidden="true"></div>
   <canvas id="orb-canvas" aria-hidden="true"></canvas>
   <div class="hero-content">
-    <p class="status-pill" id="sp">
-      <span class="sp-dot" aria-hidden="true"></span>
-      iOS 1.0 &middot; In Review
-    </p>
     <p class="hero-ey" id="hey">Capacity intelligence</p>
-    <h1 class="hero-h1" id="hh1" aria-label="Your nervous system has a signature.">
-      Your nervous system<br>has a signature<span style="color:var(--cyan)">.</span>
-    </h1>
-    <p class="hero-sub" id="hsub">Daily signals become longitudinal<br>pattern data. Know yourself at the<br>systems level.</p>
+    <h1 class="hero-h1" id="hh1" aria-label="Your nervous system has a signature.">Your nervous system has a signature<span style="color:var(--cyan)">.</span></h1>
+    <p class="hero-sub" id="hsub">Daily signals become longitudinal pattern data. Know yourself at the systems level.</p>
     <div class="hero-acts" id="hacts">
       <a href="https://orbitalhealth.app/app" class="btn-p" onclick="track('web_app_click',{location:'hero'})">Try it free &rarr;</a>
       <a href="#status" class="btn-g">Get notified</a>
@@ -293,7 +291,7 @@ if(window.matchMedia('(hover:hover)').matches){
   (function aC(){cx+=(tx-cx)*.13;cy+=(ty-cy)*.13;cur.style.left=cx+'px';cur.style.top=cy+'px';requestAnimationFrame(aC);})();
 }
 const tickT=document.getElementById('tick-t'),tickC=document.getElementById('tick-c');
-setInterval(()=>{tickT.textContent=new Date().toTimeString().slice(0,8);},1000);
+if(tickT)setInterval(()=>{tickT.textContent=new Date().toTimeString().slice(0,8);},1000);
 const VERT=`varying vec2 vUv;varying vec3 vN;varying vec3 vPos;varying vec3 vVD;
 void main(){vUv=uv;vN=normalize(normalMatrix*normal);vPos=position;
 vec4 mv=modelViewMatrix*vec4(position,1.0);vVD=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}`;
@@ -320,7 +318,7 @@ float al=(0.76+0.24*fr)*(.87+.13*br);gl_FragColor=vec4(col,al);}`;
 function mkOrb(canvas){
   const R=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance'});
   R.setPixelRatio(Math.min(devicePixelRatio,2));
-  const S=new THREE.Scene(),C=new THREE.PerspectiveCamera(42,1,0.1,100);C.position.z=5.0;
+  const S=new THREE.Scene(),C=new THREE.PerspectiveCamera(42,1,0.1,100);C.position.z=2.8;
   const mat=new THREE.ShaderMaterial({vertexShader:VERT,fragmentShader:FRAG,uniforms:{uT:{value:0},uC:{value:0.28}},transparent:true});
   S.add(new THREE.Mesh(new THREE.SphereGeometry(1,96,96),mat));
   function rsz(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;R.setSize(w,h,false);C.aspect=w/h;C.updateProjectionMatrix();}
@@ -331,7 +329,7 @@ let hT0=Date.now(),hCap=0.28,hTC=0.28,hMx=0,hMy=0,hDrag=false,hDY=0,hDC=0.28;
 document.getElementById('hero').addEventListener('mousemove',e=>{hMx=(e.clientX/innerWidth-.5)*.09;hMy=(e.clientY/innerHeight-.5)*-.09;},{passive:true});
 document.getElementById('orb-canvas').addEventListener('mousedown',e=>{hDrag=true;hDY=e.clientY;hDC=hCap;cur.classList.add('grab');});
 document.getElementById('orb-canvas').addEventListener('touchstart',e=>{hDrag=true;hDY=e.touches[0].clientY;hDC=hCap;},{passive:true});
-window.addEventListener('mousemove',e=>{if(!hDrag)return;hTC=Math.max(0,Math.min(1,hDC+(hDY-e.clientY)/(innerHeight*.4)));tickC.textContent=Math.round(hTC*100)+'%';},{passive:true});
+window.addEventListener('mousemove',e=>{if(!hDrag)return;hTC=Math.max(0,Math.min(1,hDC+(hDY-e.clientY)/(innerHeight*.4)));if(tickC)tickC.textContent=Math.round(hTC*100)+'%';},{passive:true});
 window.addEventListener('touchmove',e=>{if(!hDrag)return;hTC=Math.max(0,Math.min(1,hDC+(hDY-e.touches[0].clientY)/(innerHeight*.4)));},{passive:true});
 window.addEventListener('mouseup',()=>{hDrag=false;cur.classList.remove('grab');});
 window.addEventListener('touchend',()=>{hDrag=false;});
@@ -359,8 +357,7 @@ function charSplit(el){
 }
 const hChars=charSplit(document.getElementById('hh1'));
 gsap.timeline({delay:.3})
-  .to('#orb-canvas',{opacity:1,duration:1.8,ease:'power2.out'},.3)
-  .to('#sp',{opacity:1,duration:.5,ease:'power2.out'},.7)
+  .to('#orb-canvas',{opacity:0.85,duration:1.8,ease:'power2.out'},.3)
   .to('#hey',{opacity:1,duration:.4,ease:'power2.out'},.95)
   .to(hChars,{opacity:1,y:0,duration:.45,ease:'power2.out',stagger:.016},1.15)
   .to('#hsub',{opacity:1,duration:.6,ease:'power2.out'},2.3)
