@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbital — Your nervous system has a signature.</title>
+<meta name="description" content="Capacity intelligence for high-performance professionals and their care teams. Your nervous system has a signature. Orbital reads it.">
+<meta name="theme-color" content="#01020A">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://orbitalhealth.app/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://orbitalhealth.app/">
+<meta property="og:title" content="Orbital — Your nervous system has a signature.">
+<meta property="og:description" content="Capacity intelligence for high-performance professionals and their care teams.">
+<meta property="og:image" content="https://orbitalhealth.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Orbital — Your nervous system has a signature.">
+<meta name="twitter:image" content="https://orbitalhealth.app/og-image.png">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Three.js + GSAP -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+<!-- GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FHEH76Q0JZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FHEH76Q0JZ');
+</script>
+
+<style>
+/* ================================================================
+   CUSTOM PROPERTIES
+   ================================================================ */
+:root {
+  --void: #01020A;
+  --cyan: #00D7FF;
+  --cyan-dim: rgba(0,215,255,0.12);
+  --cyan-glow: rgba(0,215,255,0.25);
+  --amber: #F5B700;
+  --crimson: #FF3B30;
+  --teal: #2DD4BF;
+  --text: rgba(255,255,255,0.88);
+  --text-dim: rgba(255,255,255,0.5);
+  --text-faint: rgba(255,255,255,0.25);
+  --surface: rgba(255,255,255,0.03);
+  --border: rgba(255,255,255,0.06);
+  --font-heading: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Space Mono', 'SF Mono', monospace;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ================================================================
+   RESET
+   ================================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  cursor: none;
+}
+a { color: inherit; text-decoration: none; }
+button { cursor: none; }
+
+/* ================================================================
+   CUSTOM CURSOR
+   ================================================================ */
+.cursor-dot {
+  position: fixed;
+  width: 8px; height: 8px;
+  background: var(--cyan);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  mix-blend-mode: screen;
+  transition: transform 0.1s ease;
+  box-shadow: 0 0 12px var(--cyan), 0 0 24px rgba(0,215,255,0.3);
+}
+.cursor-ring {
+  position: fixed;
+  width: 32px; height: 32px;
+  border: 1px solid rgba(0,215,255,0.4);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.15s ease, width 0.2s, height 0.2s, border-color 0.2s;
+}
+
+/* ================================================================
+   NAV
+   ================================================================ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(1,2,10,0.6);
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+  opacity: 0;
+}
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 1100px; margin: 0 auto; padding: 16px 32px;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-heading);
+  font-size: 18px; font-weight: 700; color: #fff;
+  letter-spacing: 0.5px;
+}
+.nav-logo img { width: 28px; height: 28px; border-radius: 50%; }
+.nav-badge {
+  font-family: var(--font-mono);
+  font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  color: var(--amber); background: rgba(245,183,0,0.08);
+  border: 1px solid rgba(245,183,0,0.2);
+  border-radius: 100px; padding: 3px 10px;
+  position: relative;
+}
+.nav-badge::before {
+  content: ''; position: absolute; left: -6px; top: 50%; transform: translateY(-50%);
+  width: 5px; height: 5px; border-radius: 50%; background: var(--amber);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.nav-links { display: flex; gap: 28px; align-items: center; }
+.nav-links a {
+  font-size: 13px; font-weight: 500; color: var(--text-dim);
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: #fff; }
+.nav-cta {
+  background: var(--cyan); color: var(--void);
+  border-radius: 8px; padding: 8px 20px;
+  font-family: var(--font-heading);
+  font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
+  transition: all 0.3s;
+  box-shadow: 0 0 20px rgba(0,215,255,0.15);
+}
+.nav-cta:hover { box-shadow: 0 0 30px rgba(0,215,255,0.35); transform: translateY(-1px); }
+
+/* ================================================================
+   HERO
+   ================================================================ */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  position: relative;
+  text-align: center;
+  padding: 0 32px;
+}
+#orb-canvas {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 600px;
+  pointer-events: auto;
+  z-index: 1;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+.hero-content > * { pointer-events: auto; }
+.hero-tagline {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 32px;
+  opacity: 0;
+}
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 700; color: #fff;
+  line-height: 1.1; letter-spacing: -1px;
+  max-width: 800px;
+  margin-bottom: 24px;
+}
+.hero h1 .gradient-text {
+  background: linear-gradient(135deg, #fff 0%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero .subtitle {
+  font-size: clamp(16px, 2vw, 20px);
+  color: var(--text-dim);
+  max-width: 520px; margin: 0 auto 48px;
+  line-height: 1.7;
+  opacity: 0;
+}
+
+/* Cycling sentences */
+.cycle-container {
+  height: 32px; overflow: hidden;
+  margin-bottom: 48px;
+}
+.cycle-sentence {
+  font-family: var(--font-body);
+  font-size: 16px; font-style: italic;
+  color: var(--text-dim);
+  opacity: 0;
+  transform: translateY(20px);
+  position: absolute;
+  width: 100%; text-align: center;
+}
+
+/* Status badge */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--amber);
+  background: rgba(245,183,0,0.06);
+  border: 1px solid rgba(245,183,0,0.15);
+  border-radius: 100px; padding: 10px 24px;
+  opacity: 0;
+}
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--amber);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ================================================================
+   WAITLIST SECTION
+   ================================================================ */
+.waitlist-section {
+  padding: 120px 32px;
+  text-align: center;
+  position: relative;
+}
+.waitlist-section::before {
+  content: ''; position: absolute;
+  top: 0; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 600px;
+  background: radial-gradient(ellipse, rgba(0,215,255,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+.waitlist-section h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 700; color: #fff;
+  margin-bottom: 16px; letter-spacing: -0.5px;
+}
+.waitlist-section .section-sub {
+  color: var(--text-dim);
+  font-size: 17px; max-width: 480px;
+  margin: 0 auto 48px; line-height: 1.7;
+}
+.waitlist-form {
+  display: flex; gap: 12px;
+  max-width: 440px; margin: 0 auto;
+  position: relative; z-index: 2;
+}
+.waitlist-form input {
+  flex: 1;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 20px;
+  color: #fff; font-size: 15px;
+  font-family: var(--font-body);
+  outline: none; transition: border-color 0.3s;
+  cursor: none;
+}
+.waitlist-form input:focus { border-color: var(--cyan-glow); }
+.waitlist-form input::placeholder { color: var(--text-faint); }
+.waitlist-form button {
+  background: var(--cyan); color: var(--void);
+  border: none; border-radius: 12px;
+  padding: 16px 28px;
+  font-family: var(--font-heading);
+  font-size: 14px; font-weight: 700;
+  transition: all 0.3s;
+  white-space: nowrap;
+  box-shadow: 0 0 24px rgba(0,215,255,0.2);
+}
+.waitlist-form button:hover {
+  box-shadow: 0 0 40px rgba(0,215,255,0.4);
+  transform: translateY(-1px);
+}
+.waitlist-success {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 13px; color: var(--teal);
+  margin-top: 16px;
+}
+
+/* ================================================================
+   CONSTELLATION SECTION
+   ================================================================ */
+.constellation-section {
+  padding: 80px 0;
+  position: relative;
+  text-align: center;
+}
+.constellation-section h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(24px, 3.5vw, 36px);
+  font-weight: 700; color: #fff;
+  margin-bottom: 8px;
+}
+.constellation-section .section-sub {
+  color: var(--text-dim);
+  font-size: 15px; margin-bottom: 32px;
+}
+#constellation-canvas {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  touch-action: none;
+}
+
+/* ================================================================
+   FOOTER
+   ================================================================ */
+footer {
+  padding: 48px 32px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+footer p {
+  font-size: 12px; color: var(--text-faint);
+}
+footer a { color: var(--text-dim); transition: color 0.2s; }
+footer a:hover { color: #fff; }
+.footer-links {
+  display: flex; gap: 24px; justify-content: center;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.footer-disclaimer {
+  font-size: 11px; color: var(--text-faint);
+  max-width: 600px; margin: 16px auto 0;
+  line-height: 1.5;
+}
+
+/* ================================================================
+   MOBILE
+   ================================================================ */
+@media (max-width: 768px) {
+  .cursor-dot, .cursor-ring { display: none; }
+  body { cursor: auto; }
+  button, a, input { cursor: auto; }
+  #orb-canvas { width: 360px; height: 360px; }
+  .nav-links a:not(.nav-cta) { display: none; }
+  .waitlist-form { flex-direction: column; }
+  .hero h1 { font-size: 32px; }
+}
+
+/* ================================================================
+   REVEAL ANIMATIONS
+   ================================================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor-dot" id="cursor-dot"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<!-- Nav -->
+<nav id="main-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <img src="/Orbital.png?v=2" alt="Orbital" width="28" height="28">
+      Orbital
+    </a>
+    <div class="nav-links">
+      <a href="#waitlist">Join Waitlist</a>
+      <a href="/privacy">Privacy</a>
+      <span class="nav-badge">IN REVIEW — iOS 1.0</span>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="hero">
+  <canvas id="orb-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-tagline">CAPACITY INTELLIGENCE</div>
+    <h1><span class="gradient-text">Your nervous system has a signature.</span></h1>
+    <p class="subtitle">One daily check-in. Three capacity states. 90 days of data becomes a clinical-grade longitudinal record for your care team.</p>
+
+    <div class="cycle-container" id="cycle-container">
+      <div class="cycle-sentence">The executive who has everything and feels nothing.</div>
+      <div class="cycle-sentence">The therapist who sees everyone but herself.</div>
+      <div class="cycle-sentence">The athlete who trains through the warning signs.</div>
+      <div class="cycle-sentence">The parent who carries it all and tracks none of it.</div>
+      <div class="cycle-sentence">The founder who builds for others and forgets to breathe.</div>
+    </div>
+
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      IN REVIEW — iOS 1.0
+    </div>
+  </div>
+</section>
+
+<!-- Constellation -->
+<section class="constellation-section reveal" id="constellation">
+  <h2>90 days of capacity. One living map.</h2>
+  <p class="section-sub">Drag to explore. Each point is a day. Color is your state.</p>
+  <canvas id="constellation-canvas" width="700" height="500"></canvas>
+</section>
+
+<!-- Waitlist -->
+<section class="waitlist-section reveal" id="waitlist">
+  <h2>Get early access.</h2>
+  <p class="section-sub">Orbital is in review. Join the waitlist — we'll notify you the moment it's live.</p>
+  <form class="waitlist-form" id="waitlist-form">
+    <input type="email" id="waitlist-email" placeholder="your@email.com" required autocomplete="email">
+    <button type="submit">Join Waitlist</button>
+  </form>
+  <div class="waitlist-success" id="waitlist-success">You're on the list. We'll be in touch.</div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-links">
+    <a href="/privacy">Privacy</a>
+    <a href="/support">Support</a>
+    <a href="/terms">Terms</a>
+  </div>
+  <p>&copy; 2026 Orbital Health Intelligence, Inc.</p>
+  <p class="footer-disclaimer">Orbital is not a medical device and does not provide medical advice, diagnosis, or treatment.</p>
+</footer>
+
+<script>
+// =========================================================================
+// CUSTOM CURSOR
+// =========================================================================
+const dot = document.getElementById('cursor-dot');
+const ring = document.getElementById('cursor-ring');
+let mouseX = 0, mouseY = 0, dotX = 0, dotY = 0, ringX = 0, ringY = 0;
+
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX; mouseY = e.clientY;
+});
+
+function animateCursor() {
+  dotX += (mouseX - dotX) * 0.2;
+  dotY += (mouseY - dotY) * 0.2;
+  ringX += (mouseX - ringX) * 0.08;
+  ringY += (mouseY - ringY) * 0.08;
+  dot.style.transform = `translate(${dotX - 4}px, ${dotY - 4}px)`;
+  ring.style.transform = `translate(${ringX - 16}px, ${ringY - 16}px)`;
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
+
+// =========================================================================
+// THREE.JS NEBULA ORB
+// =========================================================================
+const canvas = document.getElementById('orb-canvas');
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+  alpha: true,
+  antialias: true,
+  powerPreference: 'high-performance'
+});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(600, 600);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+camera.position.z = 3.5;
+
+// Orb geometry + shader material
+const orbGeometry = new THREE.SphereGeometry(1.2, 128, 128);
+const orbMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    u_time: { value: 0 },
+    u_drag: { value: 0.5 },
+    u_resolution: { value: new THREE.Vector2(600, 600) }
+  },
+  vertexShader: `
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+    varying vec2 vUv;
+    uniform float u_time;
+
+    // Simplex-style noise helper
+    vec3 mod289(vec3 x){ return x - floor(x*(1.0/289.0))*289.0; }
+    vec4 mod289(vec4 x){ return x - floor(x*(1.0/289.0))*289.0; }
+    vec4 permute(vec4 x){ return mod289(((x*34.0)+1.0)*x); }
+    vec4 taylorInvSqrt(vec4 r){ return 1.79284291400159 - 0.85373472095314*r; }
+
+    float snoise(vec3 v){
+      const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+      const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+      vec3 i = floor(v + dot(v, C.yyy));
+      vec3 x0 = v - i + dot(i, C.xxx);
+      vec3 g = step(x0.yzx, x0.xyz);
+      vec3 l = 1.0 - g;
+      vec3 i1 = min(g, l.zxy);
+      vec3 i2 = max(g, l.zxy);
+      vec3 x1 = x0 - i1 + C.xxx;
+      vec3 x2 = x0 - i2 + C.yyy;
+      vec3 x3 = x0 - D.yyy;
+      i = mod289(i);
+      vec4 p = permute(permute(permute(
+        i.z + vec4(0.0, i1.z, i2.z, 1.0))
+        + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+        + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+      float n_ = 0.142857142857;
+      vec3 ns = n_ * D.wyz - D.xzx;
+      vec4 j = p - 49.0*floor(p*ns.z*ns.z);
+      vec4 x_ = floor(j*ns.z);
+      vec4 y_ = floor(j - 7.0*x_);
+      vec4 x = x_*ns.x + ns.yyyy;
+      vec4 y = y_*ns.x + ns.yyyy;
+      vec4 h = 1.0 - abs(x) - abs(y);
+      vec4 b0 = vec4(x.xy, y.xy);
+      vec4 b1 = vec4(x.zw, y.zw);
+      vec4 s0 = floor(b0)*2.0 + 1.0;
+      vec4 s1 = floor(b1)*2.0 + 1.0;
+      vec4 sh = -step(h, vec4(0.0));
+      vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+      vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+      vec3 p0 = vec3(a0.xy, h.x);
+      vec3 p1 = vec3(a0.zw, h.y);
+      vec3 p2 = vec3(a1.xy, h.z);
+      vec3 p3 = vec3(a1.zw, h.w);
+      vec4 norm = taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+      p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+      vec4 m = max(0.6 - vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)), 0.0);
+      m = m*m;
+      return 42.0*dot(m*m, vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+    }
+
+    void main() {
+      vUv = uv;
+      vNormal = normalize(normalMatrix * normal);
+      vPosition = position;
+
+      // 5-octave FBM displacement
+      float n = 0.0;
+      float amp = 0.12;
+      float freq = 1.5;
+      vec3 p = position + u_time * 0.08;
+      for(int i = 0; i < 5; i++) {
+        n += amp * snoise(p * freq);
+        freq *= 2.0;
+        amp *= 0.5;
+      }
+
+      vec3 displaced = position + normal * n;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(displaced, 1.0);
+    }
+  `,
+  fragmentShader: `
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+    varying vec2 vUv;
+    uniform float u_time;
+    uniform float u_drag;
+
+    vec3 mod289(vec3 x){ return x - floor(x*(1.0/289.0))*289.0; }
+    vec4 mod289(vec4 x){ return x - floor(x*(1.0/289.0))*289.0; }
+    vec4 permute(vec4 x){ return mod289(((x*34.0)+1.0)*x); }
+    vec4 taylorInvSqrt(vec4 r){ return 1.79284291400159 - 0.85373472095314*r; }
+
+    float snoise(vec3 v){
+      const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+      const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+      vec3 i = floor(v + dot(v, C.yyy));
+      vec3 x0 = v - i + dot(i, C.xxx);
+      vec3 g = step(x0.yzx, x0.xyz);
+      vec3 l = 1.0 - g;
+      vec3 i1 = min(g, l.zxy);
+      vec3 i2 = max(g, l.zxy);
+      vec3 x1 = x0 - i1 + C.xxx;
+      vec3 x2 = x0 - i2 + C.yyy;
+      vec3 x3 = x0 - D.yyy;
+      i = mod289(i);
+      vec4 p = permute(permute(permute(
+        i.z + vec4(0.0, i1.z, i2.z, 1.0))
+        + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+        + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+      float n_ = 0.142857142857;
+      vec3 ns = n_ * D.wyz - D.xzx;
+      vec4 j = p - 49.0*floor(p*ns.z*ns.z);
+      vec4 x_ = floor(j*ns.z);
+      vec4 y_ = floor(j - 7.0*x_);
+      vec4 x = x_*ns.x + ns.yyyy;
+      vec4 y = y_*ns.x + ns.yyyy;
+      vec4 h = 1.0 - abs(x) - abs(y);
+      vec4 b0 = vec4(x.xy, y.xy);
+      vec4 b1 = vec4(x.zw, y.zw);
+      vec4 s0 = floor(b0)*2.0 + 1.0;
+      vec4 s1 = floor(b1)*2.0 + 1.0;
+      vec4 sh = -step(h, vec4(0.0));
+      vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+      vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+      vec3 p0 = vec3(a0.xy, h.x);
+      vec3 p1 = vec3(a0.zw, h.y);
+      vec3 p2 = vec3(a1.xy, h.z);
+      vec3 p3 = vec3(a1.zw, h.w);
+      vec4 norm = taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+      p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+      vec4 m = max(0.6 - vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)), 0.0);
+      m = m*m;
+      return 42.0*dot(m*m, vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+    }
+
+    float fbm(vec3 p) {
+      float val = 0.0;
+      float amp = 0.5;
+      float freq = 1.0;
+      for(int i = 0; i < 5; i++) {
+        val += amp * snoise(p * freq + u_time * 0.1);
+        freq *= 2.0;
+        amp *= 0.5;
+      }
+      return val;
+    }
+
+    void main() {
+      vec3 viewDir = normalize(cameraPosition - vPosition);
+      float fresnel = pow(1.0 - max(dot(viewDir, vNormal), 0.0), 3.0);
+
+      // Interior nebula — crimson to amber based on FBM noise
+      float n = fbm(vPosition * 2.0 + u_time * 0.05);
+      vec3 crimson = vec3(0.86, 0.15, 0.07);  // #DC2626
+      vec3 amber = vec3(0.96, 0.72, 0.0);     // #F5B700
+      vec3 deep = vec3(0.15, 0.02, 0.08);
+
+      // Mix based on drag state: 0=depleted(crimson), 0.5=stretched(amber), 1=resourced(cyan)
+      vec3 cyanCol = vec3(0.0, 0.84, 1.0);    // #00D7FF
+      vec3 baseColor = mix(crimson, amber, smoothstep(-0.3, 0.3, n));
+      baseColor = mix(baseColor, cyanCol, u_drag * fresnel);
+      baseColor = mix(deep, baseColor, smoothstep(-0.5, 0.5, n));
+
+      // Cyan Fresnel rim
+      vec3 rimColor = cyanCol;
+      float rimIntensity = fresnel * (0.5 + u_drag * 0.5);
+
+      // Compose
+      vec3 col = baseColor + rimColor * rimIntensity * 0.8;
+
+      // Inner glow
+      float glow = pow(fresnel, 1.5) * 0.3;
+      col += cyanCol * glow;
+
+      // Subtle pulse
+      col *= 0.9 + 0.1 * sin(u_time * 0.5);
+
+      gl_FragColor = vec4(col, 0.92 + fresnel * 0.08);
+    }
+  `,
+  transparent: true,
+  side: THREE.FrontSide,
+});
+
+const orb = new THREE.Mesh(orbGeometry, orbMaterial);
+scene.add(orb);
+
+// Ambient light glow (point light behind)
+const glowGeo = new THREE.SphereGeometry(1.6, 32, 32);
+const glowMat = new THREE.ShaderMaterial({
+  uniforms: { u_time: { value: 0 }, u_drag: { value: 0.5 } },
+  vertexShader: `
+    varying vec3 vNormal;
+    void main() {
+      vNormal = normalize(normalMatrix * normal);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    varying vec3 vNormal;
+    uniform float u_time;
+    uniform float u_drag;
+    void main() {
+      vec3 viewDir = vec3(0.0, 0.0, 1.0);
+      float rim = 1.0 - max(dot(viewDir, vNormal), 0.0);
+      rim = pow(rim, 3.0);
+      vec3 cyanCol = vec3(0.0, 0.84, 1.0);
+      vec3 crimsonCol = vec3(0.86, 0.15, 0.07);
+      vec3 col = mix(crimsonCol, cyanCol, u_drag);
+      gl_FragColor = vec4(col, rim * 0.15 * (0.8 + 0.2 * sin(u_time * 0.3)));
+    }
+  `,
+  transparent: true,
+  side: THREE.BackSide,
+  depthWrite: false,
+});
+const glowMesh = new THREE.Mesh(glowGeo, glowMat);
+scene.add(glowMesh);
+
+// Drag interaction
+let isDragging = false, dragStartY = 0, dragValue = 0.5;
+canvas.addEventListener('pointerdown', e => { isDragging = true; dragStartY = e.clientY; e.preventDefault(); });
+window.addEventListener('pointermove', e => {
+  if (!isDragging) return;
+  const delta = (dragStartY - e.clientY) * 0.003;
+  dragValue = Math.max(0, Math.min(1, dragValue + delta));
+  dragStartY = e.clientY;
+  orbMaterial.uniforms.u_drag.value = dragValue;
+  glowMat.uniforms.u_drag.value = dragValue;
+});
+window.addEventListener('pointerup', () => { isDragging = false; });
+
+// Render loop
+function animate(time) {
+  requestAnimationFrame(animate);
+  const t = time * 0.001;
+  orbMaterial.uniforms.u_time.value = t;
+  glowMat.uniforms.u_time.value = t;
+  orb.rotation.y = t * 0.1;
+  orb.rotation.x = Math.sin(t * 0.05) * 0.1;
+  renderer.render(scene, camera);
+}
+animate(0);
+
+// Resize
+function resizeOrb() {
+  const w = window.innerWidth < 768 ? 360 : 600;
+  renderer.setSize(w, w);
+  canvas.style.width = w + 'px';
+  canvas.style.height = w + 'px';
+}
+window.addEventListener('resize', resizeOrb);
+
+// =========================================================================
+// GSAP ANIMATIONS
+// =========================================================================
+gsap.registerPlugin(ScrollTrigger);
+
+// Nav fade in
+gsap.to('#main-nav', { opacity: 1, duration: 1, delay: 0.5 });
+
+// Hero stagger
+gsap.timeline({ delay: 0.8 })
+  .to('.hero-tagline', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' })
+  .to('.hero h1', { opacity: 1, duration: 1, ease: 'power2.out' }, '-=0.4')
+  .to('.hero .subtitle', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, '-=0.5')
+  .to('.status-badge', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '-=0.3');
+
+// Scroll reveals
+gsap.utils.toArray('.reveal').forEach(el => {
+  gsap.to(el, {
+    opacity: 1, y: 0, duration: 0.8, ease: 'power2.out',
+    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+  });
+});
+
+// =========================================================================
+// CYCLING SENTENCES
+// =========================================================================
+const sentences = document.querySelectorAll('.cycle-sentence');
+let currentSentence = 0;
+
+function cycleSentences() {
+  const current = sentences[currentSentence];
+  const next = sentences[(currentSentence + 1) % sentences.length];
+
+  gsap.to(current, { opacity: 0, y: -20, duration: 0.6, ease: 'power2.in' });
+  gsap.fromTo(next,
+    { opacity: 0, y: 20 },
+    { opacity: 0.7, y: 0, duration: 0.6, delay: 0.3, ease: 'power2.out' }
+  );
+
+  currentSentence = (currentSentence + 1) % sentences.length;
+}
+
+// Start cycling
+gsap.fromTo(sentences[0], { opacity: 0, y: 20 }, { opacity: 0.7, y: 0, duration: 0.8, delay: 2.5 });
+setInterval(cycleSentences, 4000);
+
+// =========================================================================
+// CONSTELLATION (2D Canvas — 90 data points)
+// =========================================================================
+const cCanvas = document.getElementById('constellation-canvas');
+const cCtx = cCanvas.getContext('2d');
+const cSize = { w: 700, h: 500 };
+
+function capColor(c) {
+  if (c > 0.66) return '#00D7FF';
+  if (c > 0.33) return '#F5B700';
+  return '#FF3B30';
+}
+
+// Generate 90 days
+const cPoints = [];
+const rng = () => Math.random();
+for (let i = 0; i < 90; i++) {
+  const t = i / 89;
+  const angle = t * Math.PI * 4;
+  const r = 0.3 + rng() * 0.5;
+  const x = Math.cos(angle) * r + (rng() - 0.5) * 0.3;
+  const y = (rng() - 0.5) * 0.8;
+  const z = Math.sin(angle) * r + (rng() - 0.5) * 0.3;
+  const cap = Math.max(0, Math.min(1, 0.5 + Math.sin(t * Math.PI * 3) * 0.3 + (rng() - 0.5) * 0.3));
+  cPoints.push({ ox: x, oy: y, oz: z, cap, size: 2 + rng() * 2, phase: rng() * Math.PI * 2, speed: 0.2 + rng() * 0.3 });
+}
+
+let cRotY = 0, cRotX = 0.15, cVelY = 0.003, cVelX = 0;
+let cDrag = false, cpx = 0, cpy = 0;
+
+cCanvas.addEventListener('pointerdown', e => { cDrag = true; cpx = e.clientX; cpy = e.clientY; e.preventDefault(); });
+cCanvas.addEventListener('pointermove', e => {
+  if (!cDrag) return;
+  cVelY = (e.clientX - cpx) * 0.005;
+  cVelX = (e.clientY - cpy) * 0.005;
+  cRotY += cVelY; cRotX += cVelX;
+  cpx = e.clientX; cpy = e.clientY;
+});
+window.addEventListener('pointerup', () => cDrag = false);
+
+function drawConstellation(ts) {
+  requestAnimationFrame(drawConstellation);
+  const t = ts * 0.001;
+
+  if (!cDrag) { cVelY *= 0.97; cVelX *= 0.97; cVelY += 0.001; cRotY += cVelY; cRotX += cVelX; }
+
+  cCtx.clearRect(0, 0, cSize.w, cSize.h);
+
+  const projected = cPoints.map(p => {
+    const cy = Math.cos(cRotY), sy = Math.sin(cRotY);
+    let rx = p.ox * cy + p.oz * sy, rz = -p.ox * sy + p.oz * cy;
+    const cx = Math.cos(cRotX), sx = Math.sin(cRotX);
+    let ry = p.oy * cx - rz * sx, rz2 = p.oy * sx + rz * cx;
+    const pulse = 1 + Math.sin(t * p.speed + p.phase) * 0.06;
+    const fov = 400, scale = fov / (fov + rz2 * 120);
+    return {
+      sx: cSize.w / 2 + rx * scale * 300 * pulse,
+      sy: cSize.h / 2 + ry * scale * 300 * pulse,
+      scale, cap: p.cap, size: p.size * scale, z: rz2
+    };
+  }).sort((a, b) => a.z - b.z);
+
+  // Draw connections
+  for (let i = 0; i < projected.length; i++) {
+    for (let j = i + 1; j < projected.length; j++) {
+      const dx = projected[i].sx - projected[j].sx;
+      const dy = projected[i].sy - projected[j].sy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 80) {
+        cCtx.strokeStyle = `rgba(0,215,255,${(1 - dist / 80) * 0.08})`;
+        cCtx.lineWidth = 0.5;
+        cCtx.beginPath();
+        cCtx.moveTo(projected[i].sx, projected[i].sy);
+        cCtx.lineTo(projected[j].sx, projected[j].sy);
+        cCtx.stroke();
+      }
+    }
+  }
+
+  // Draw points
+  projected.forEach(p => {
+    const col = capColor(p.cap);
+    const grd = cCtx.createRadialGradient(p.sx, p.sy, 0, p.sx, p.sy, p.size * 3);
+    grd.addColorStop(0, col.replace('#', 'rgba(') ? col : col);
+    // Simple glow
+    cCtx.globalAlpha = 0.3;
+    cCtx.fillStyle = col;
+    cCtx.beginPath();
+    cCtx.arc(p.sx, p.sy, p.size * 2.5, 0, Math.PI * 2);
+    cCtx.fill();
+
+    cCtx.globalAlpha = 1;
+    cCtx.fillStyle = col;
+    cCtx.beginPath();
+    cCtx.arc(p.sx, p.sy, p.size * 0.8, 0, Math.PI * 2);
+    cCtx.fill();
+  });
+}
+drawConstellation(0);
+
+// =========================================================================
+// WAITLIST → SUPABASE
+// =========================================================================
+document.getElementById('waitlist-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('waitlist-email').value.trim();
+  if (!email) return;
+
+  const btn = this.querySelector('button');
+  btn.textContent = 'Joining...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('https://tenfwzjccqfecctxdbpi.supabase.co/rest/v1/waitlist', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlbmZ3empjY3FmZWNjdHhkYnBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA0MTY0MTQsImV4cCI6MjA0NTk5MjQxNH0.GjFEV6JzNqpS2aTCcFjrikHr0mPATODOEhtNMRwJo00',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ email: email })
+    });
+
+    if (res.ok || res.status === 409) {
+      this.style.display = 'none';
+      document.getElementById('waitlist-success').style.display = 'block';
+      if (typeof gtag === 'function') gtag('event', 'waitlist_signup', { email_domain: email.split('@')[1] });
+    } else {
+      throw new Error('Failed');
+    }
+  } catch(err) {
+    btn.textContent = 'Join Waitlist';
+    btn.disabled = false;
+    alert('Something went wrong. Try again or email contact@orbitalhealth.app');
+  }
+});
+</script>
+
+</body>
+</html>
