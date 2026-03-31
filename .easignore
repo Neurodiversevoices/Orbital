@@ -4,3 +4,11 @@ node_modules/.cache
 *.log
 fastlane/screenshots
 fastlane/logs
+orbital-os/
+audit/
+public/
+*.html
+*.png
+*.ipa
+memory/
+outlook-mcp/
