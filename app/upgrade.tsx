@@ -80,25 +80,8 @@ const IS_REVIEW_MODE =
   process.env.EXPO_PUBLIC_IS_REVIEW_MODE === 'true';
 
 // =============================================================================
-// PURCHASE HANDLER (Mock Checkout)
+// PURCHASE HANDLER
 // =============================================================================
-
-async function handleMockPurchase(
-  productId: string,
-  onSuccess: () => void,
-  onError: (error: string) => void
-): Promise<void> {
-  try {
-    const result = await executePurchase(productId as any);
-    if (result.success) {
-      onSuccess();
-    } else {
-      onError(result.error || 'Purchase failed');
-    }
-  } catch (error) {
-    onError(error instanceof Error ? error.message : 'Purchase failed');
-  }
-}
 
 // =============================================================================
 // TIER CARD COMPONENT
@@ -159,7 +142,7 @@ function TierCard({
         <Text style={styles.priceAmount}>${annualPrice}</Text>
         <Text style={styles.pricePeriod}>/year</Text>
       </View>
-      <Text style={styles.monthlyAvailable}>Monthly available for continuity testing</Text>
+      <Text style={styles.monthlyAvailable}>or pay monthly</Text>
 
       <View style={styles.featuresContainer}>
         {features.map((feature, idx) => (
@@ -471,18 +454,8 @@ export default function UpgradeScreen() {
       return;
     }
 
-    await handleMockPurchase(
-      productId,
-      () => {
-        window.alert(`Success! ${productName} has been activated.`);
-        loadEntitlements();
-        setIsPurchasing(false);
-      },
-      (error) => {
-        window.alert(`Purchase Failed: ${error}`);
-        setIsPurchasing(false);
-      },
-    );
+    setIsPurchasing(false);
+    window.alert('Purchases are not available. Please use the iOS app to subscribe.');
   }, [auth.isAuthenticated, router, revenueCatAvailable, purchaseViaRevenueCat]);
 
   const handleRestore = useCallback(async () => {
@@ -905,14 +878,6 @@ export default function UpgradeScreen() {
         {/* FOOTER */}
         {/* =============================================================== */}
         <Animated.View entering={FadeInDown.delay(450).duration(400)} style={styles.footerSection}>
-          {!PAYMENTS_ENABLED && (
-            <View style={styles.stubNotice}>
-              <Text style={styles.stubNoticeText}>
-                Payments are in demo mode. Purchases are simulated.
-              </Text>
-            </View>
-          )}
-
           <Text style={styles.footerText}>
             Payment will be charged to your Apple ID account at confirmation of purchase.
             Subscriptions automatically renew unless auto-renew is turned off at least
@@ -921,6 +886,12 @@ export default function UpgradeScreen() {
             You can manage and cancel your subscriptions by going to your App Store
             account settings after purchase.
           </Text>
+
+          <Pressable onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}>
+            <Text style={styles.eulaLink}>
+              Licensed under Apple's Standard End User License Agreement (EULA)
+            </Text>
+          </Pressable>
         </Animated.View>
 
         <View style={{ height: 24 }} />
@@ -1009,6 +980,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollView: {
     flex: 1,
@@ -1811,6 +1786,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 14,
     marginBottom: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  eulaLink: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.4)',
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+    marginTop: spacing.xs,
     paddingHorizontal: spacing.md,
   },
   footerLinks: {

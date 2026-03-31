@@ -12,6 +12,8 @@ import {
   StyleSheet,
   Pressable,
   ScrollView,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,25 +23,50 @@ import {
   UserCheck,
   ExternalLink,
   Shield,
+  LogOut,
 } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { colors, spacing, borderRadius } from '../theme';
-import { getUserEntitlements, type UserEntitlements } from '../lib/entitlements';
+import { getUserEntitlements, leaveCircle, type UserEntitlements } from '../lib/entitlements';
+import { cloudGetMyCircles } from '../lib/circles/cloud';
 
 export default function CircleSettingsScreen() {
   const router = useRouter();
   const [entitlements, setEntitlements] = useState<UserEntitlements | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const [circleName, setCircleName] = useState<string>('My Circle');
+  const [circleRole, setCircleRole] = useState<string>('Member');
+  const [memberCount, setMemberCount] = useState<number>(0);
 
   useEffect(() => {
-    loadEntitlements();
+    loadCircleData();
   }, []);
 
-  const loadEntitlements = async () => {
+  const loadCircleData = async () => {
     setIsLoading(true);
     try {
       const ent = await getUserEntitlements();
       setEntitlements(ent);
+
+      // Fetch real circle name from Supabase
+      if (ent?.hasCircle) {
+        setMemberCount(ent.circleMemberCount || 0);
+
+        try {
+          const circles = await cloudGetMyCircles();
+          if (circles.length > 0) {
+            const myCircle = circles[0];
+            setCircleName(myCircle.name || 'My Circle');
+            if (myCircle.createdBy) {
+              // Check if current user is the creator (coordinator)
+              setCircleRole('Member');
+            }
+          }
+        } catch {
+          // Non-fatal — keep defaults
+        }
+      }
     } catch {
       setEntitlements(null);
     }
@@ -47,14 +74,38 @@ export default function CircleSettingsScreen() {
   };
 
   const handleViewCircle = () => {
-    // Navigate to Briefings tab with Circles view
     router.push('/(tabs)/brief');
   };
 
-  // Demo data - in production, this would come from Circle membership
-  const circleName = 'Sensory Support Group';
-  const circleRole = 'Member'; // or 'Circle Coordinator'
-  const memberCount = 5;
+  const handleLeaveCircle = () => {
+    Alert.alert(
+      'Leave Circle',
+      `Are you sure you want to leave "${circleName}"? You will lose access to shared capacity insights.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Leave Circle',
+          style: 'destructive',
+          onPress: async () => {
+            setIsLeaving(true);
+            try {
+              const result = await leaveCircle();
+              if (result.success) {
+                Alert.alert('Done', 'You have left the circle.', [
+                  { text: 'OK', onPress: () => router.back() },
+                ]);
+              } else {
+                Alert.alert('Error', result.error || 'Could not leave circle.');
+              }
+            } catch {
+              Alert.alert('Error', 'Something went wrong. Please try again.');
+            }
+            setIsLeaving(false);
+          },
+        },
+      ]
+    );
+  };
 
   if (!entitlements?.hasCircle) {
     return (
@@ -103,7 +154,7 @@ export default function CircleSettingsScreen() {
               </View>
               <View style={styles.circleInfo}>
                 <Text style={styles.circleName}>{circleName}</Text>
-                <Text style={styles.circleMeta}>{memberCount} members</Text>
+                <Text style={styles.circleMeta}>{memberCount} member{memberCount !== 1 ? 's' : ''}</Text>
               </View>
             </View>
 
@@ -144,6 +195,31 @@ export default function CircleSettingsScreen() {
           </View>
         </Animated.View>
 
+        {/* Leave Circle — Danger Zone */}
+        <Animated.View entering={FadeInDown.delay(200).duration(400)}>
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>MEMBERSHIP</Text>
+
+            <Pressable
+              style={styles.dangerRow}
+              onPress={handleLeaveCircle}
+              disabled={isLeaving}
+            >
+              <View style={styles.dangerIconContainer}>
+                {isLeaving ? (
+                  <ActivityIndicator size="small" color="#F44336" />
+                ) : (
+                  <LogOut color="#F44336" size={18} />
+                )}
+              </View>
+              <View style={styles.actionContent}>
+                <Text style={styles.dangerLabel}>Leave Circle</Text>
+                <Text style={styles.dangerSublabel}>Remove yourself from this circle</Text>
+              </View>
+            </Pressable>
+          </View>
+        </Animated.View>
+
         {/* Info Box */}
         <Animated.View entering={FadeInDown.delay(300).duration(400)}>
           <View style={styles.infoBox}>
@@ -174,7 +250,11 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.1)',
   },
   closeButton: {
-    padding: spacing.xs,
+    padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 17,

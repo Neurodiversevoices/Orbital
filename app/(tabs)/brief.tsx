@@ -221,13 +221,13 @@ function CirclesCCIBrief() {
         <LayoutGrid color="rgba(255,255,255,0.5)" size={14} />
         <Text style={styles.breadcrumbText}>Admin</Text>
         <Text style={styles.breadcrumbSeparator}>/</Text>
-        <Text style={styles.breadcrumbActive}>Sensory Support Group</Text>
+        <Text style={styles.breadcrumbActive}>Circle Overview</Text>
       </View>
 
       {/* Circle Header */}
       <View style={styles.circleHeader}>
         <View style={styles.circleHeaderLeft}>
-          <Text style={styles.circleTitle}>SENSORY SUPPORT GROUP</Text>
+          <Text style={styles.circleTitle}>CIRCLE OVERVIEW</Text>
           <Text style={styles.circleSubtitle}>Circle Coordinator: Emily Zhang</Text>
         </View>
         <View style={styles.circleHeaderRight}>
@@ -504,6 +504,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.03)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
+    minHeight: 44,
   },
   tabActive: {
     backgroundColor: 'rgba(0,215,255,0.1)',
