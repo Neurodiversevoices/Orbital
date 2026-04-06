@@ -359,17 +359,24 @@ Amendment requires board + legal review.
 
 ---
 
-## 20. MODULES STATUS
+## 20. NOVA EMPIRE (Operations Layer)
 
-### Existing Modules
-All modules under `lib/` — see Section 11 for key files.
+### In Repo
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| Architecture spec | `nova/EMPIRE.md` | Full empire design, $0 budget |
+| Memory system | `nova/memory/*.jsonl` | Compound AI learning (7 JSONL files) |
+| n8n workflows | `nova/divisions/*.json` | 4 workflows: Creative, R&D, Ops, CEO Brief |
+| Media output | `nova/media/` | Generated images and video |
 
-### Not Yet Implemented
-- **nova-intelligence.ts** — Does not exist in codebase. No Nova intelligence module has been created.
-- **CFO module** — No CFO/financial module exists in the codebase. Revenue forecasting is manual (see ORBITAL_TASK_BOARD.md).
+### Planned by Cursor (NOT in repo)
+- `orbital-nexus/` — Bun server (Cursor designed, never committed)
+- `nova-intelligence.ts` — Intelligence pulse (designed, not written)
+- CFO endpoint — `GET /nova/cfo` (designed, not written)
 
-> If these modules are planned, they need to be spec'd and built. This section
-> will be updated when they are implemented.
+### App Modules
+All app modules under `lib/` — see Section 11 for key files.
+Native module: `modules/orbital-widget/` (iOS widget).
 
 ---
 

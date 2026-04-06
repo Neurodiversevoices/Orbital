@@ -1,0 +1,4 @@
+{"ts":"2026-04-06T00:00:00Z","decision":"Use JSONL (not JSON) for all memory files","reasoning":"Append-only, no merge conflicts, grep-friendly, each line is independent. Scales to millions of entries without parsing overhead.","reversible":true}
+{"ts":"2026-04-06T00:00:00Z","decision":"Pollinations.ai as primary image gen","reasoning":"Zero config, no API key, no install. Just a URL. GET https://image.pollinations.ai/prompt/... returns PNG. ComfyUI as upgrade path for quality.","reversible":true}
+{"ts":"2026-04-06T00:00:00Z","decision":"Piper TTS + Whisper.cpp for voice stack","reasoning":"Both run locally, both free, both fast (<200ms). No cloud dependency, no API limits. Mac Mini has enough power.","reversible":true}
+{"ts":"2026-04-06T00:00:00Z","decision":"All memory lives in nova/memory/ as JSONL files","reasoning":"Git-tracked, version-controlled, readable by any session. Every session reads at start, writes at end. Compound intelligence.","reversible":true}

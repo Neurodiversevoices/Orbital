@@ -1,0 +1,57 @@
+{
+  "name": "Nova CEO Daily Brief",
+  "nodes": [
+    {
+      "name": "Daily 7am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [250, 300],
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 7 * * *" }] }
+      }
+    },
+    {
+      "name": "Gather Intel",
+      "type": "n8n-nodes-base.code",
+      "position": [450, 300],
+      "parameters": {
+        "jsCode": "const fs = require('fs');\nconst brief = { ts: new Date().toISOString() };\n\n// Read empire state\ntry {\n  brief.empire = JSON.parse(fs.readFileSync('/home/user/Orbital/nova/memory/empire_state.json', 'utf8'));\n} catch { brief.empire = { status: 'unknown' }; }\n\n// Count today's media\ntry {\n  const files = fs.readdirSync('/home/user/Orbital/nova/media/');\n  brief.media_total = files.filter(f => f.endsWith('.png') || f.endsWith('.mp4')).length;\n} catch { brief.media_total = 0; }\n\n// Read latest suggestions\ntry {\n  const suggestions = fs.readFileSync('/home/user/Orbital/nova/memory/ceo_suggestions.jsonl', 'utf8').trim().split('\\n');\n  const pending = suggestions.map(s => JSON.parse(s)).filter(s => s.status === 'pending');\n  brief.pending_suggestions = pending.length;\n  brief.top_suggestion = pending[0] || null;\n} catch { brief.pending_suggestions = 0; }\n\n// Latest research\ntry {\n  const research = fs.readFileSync('/home/user/Orbital/nova/memory/research.jsonl', 'utf8').trim().split('\\n');\n  const latest = JSON.parse(research[research.length - 1]);\n  brief.latest_research = latest.topic;\n} catch { brief.latest_research = 'none'; }\n\n// Memory depth\ntry {\n  const learnings = fs.readFileSync('/home/user/Orbital/nova/memory/learnings.jsonl', 'utf8').trim().split('\\n').length;\n  const decisions = fs.readFileSync('/home/user/Orbital/nova/memory/decisions.jsonl', 'utf8').trim().split('\\n').length;\n  brief.memory_depth = { learnings, decisions };\n} catch { brief.memory_depth = { learnings: 0, decisions: 0 }; }\n\nreturn [{ json: brief }];"
+      }
+    },
+    {
+      "name": "Format Email",
+      "type": "n8n-nodes-base.code",
+      "position": [650, 300],
+      "parameters": {
+        "jsCode": "const b = $json;\nconst html = `\n<div style=\"font-family: monospace; background: #01020A; color: #fff; padding: 24px;\">\n  <h1 style=\"color: #2DD4BF;\">NOVA EMPIRE — Daily Brief</h1>\n  <p style=\"color: #9CA3AF;\">${b.ts}</p>\n  <hr style=\"border-color: rgba(255,255,255,0.15);\">\n  \n  <h2 style=\"color: #00D7FF;\">Empire Health: ${b.empire?.health || 'unknown'}</h2>\n  \n  <table style=\"color: #fff; width: 100%;\">\n    <tr><td>Media Assets</td><td style=\"text-align:right;\">${b.media_total}</td></tr>\n    <tr><td>Memory Depth</td><td style=\"text-align:right;\">${b.memory_depth?.learnings || 0} learnings, ${b.memory_depth?.decisions || 0} decisions</td></tr>\n    <tr><td>Pending CEO Suggestions</td><td style=\"text-align:right;\">${b.pending_suggestions}</td></tr>\n    <tr><td>Latest Research</td><td style=\"text-align:right;\">${b.latest_research}</td></tr>\n  </table>\n  \n  ${b.top_suggestion ? '<h3 style=\"color: #F5B700;\">Top Suggestion: ' + b.top_suggestion.suggestion + '</h3>' : ''}\n  \n  <hr style=\"border-color: rgba(255,255,255,0.15);\">\n  <p style=\"color: #9CA3AF;\">Nova Empire — Zero dollars. Compound intelligence.</p>\n</div>`;\n\nreturn [{ json: { html, subject: `Nova Brief — ${b.empire?.health || 'unknown'} — ${b.media_total} assets` } }];"
+      }
+    },
+    {
+      "name": "Send Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 300],
+      "parameters": {
+        "url": "https://api.resend.com/emails",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Content-Type", "value": "application/json" }] },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "from", "value": "nova@orbitalhealth.app" },
+            { "name": "to", "value": "eric133@hotmail.com" },
+            { "name": "subject", "value": "={{ $json.subject }}" },
+            { "name": "html", "value": "={{ $json.html }}" }
+          ]
+        },
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Daily 7am": { "main": [[{ "node": "Gather Intel", "type": "main", "index": 0 }]] },
+    "Gather Intel": { "main": [[{ "node": "Format Email", "type": "main", "index": 0 }]] },
+    "Format Email": { "main": [[{ "node": "Send Email", "type": "main", "index": 0 }]] }
+  }
+}

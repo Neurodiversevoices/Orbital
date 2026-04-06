@@ -1,0 +1,56 @@
+{
+  "name": "Nova Creative Division",
+  "nodes": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [250, 300],
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "hours", "hoursInterval": 1 }]
+        }
+      }
+    },
+    {
+      "name": "Generate Prompt",
+      "type": "n8n-nodes-base.code",
+      "position": [450, 300],
+      "parameters": {
+        "jsCode": "const themes = [\n  'futuristic orbital space station with teal lighting, dark background, cinematic',\n  'abstract neural network visualization, cyan and amber nodes, dark void',\n  'glass orb floating in space emitting capacity spectrum light, photorealistic',\n  'minimalist capacity dashboard hologram, dark theme, enterprise grade',\n  'neurodivergent brain as beautiful constellation map, clinical aesthetic',\n  'data streams forming human silhouette, teal cyan palette, 2026 aesthetic',\n  'privacy shield protecting individual data, geometric, dark background',\n  'longitudinal time crystal showing 10 years of human capacity data'\n];\nconst theme = themes[Math.floor(Math.random() * themes.length)];\nconst timestamp = new Date().toISOString().replace(/[:.]/g, '-');\nreturn [{ json: { prompt: theme, filename: `nova_${timestamp}.png` } }];"
+      }
+    },
+    {
+      "name": "Generate Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 300],
+      "parameters": {
+        "url": "=https://image.pollinations.ai/prompt/{{ encodeURIComponent($json.prompt) }}?width=1024&height=1024&nologo=true",
+        "method": "GET",
+        "options": { "response": { "response": { "responseFormat": "file" } } }
+      }
+    },
+    {
+      "name": "Save to Disk",
+      "type": "n8n-nodes-base.writeFile",
+      "position": [850, 300],
+      "parameters": {
+        "fileName": "=/home/user/Orbital/nova/media/{{ $('Generate Prompt').item.json.filename }}",
+        "options": {}
+      }
+    },
+    {
+      "name": "Log Result",
+      "type": "n8n-nodes-base.code",
+      "position": [1050, 300],
+      "parameters": {
+        "jsCode": "const fs = require('fs');\nconst entry = JSON.stringify({\n  ts: new Date().toISOString(),\n  type: 'image',\n  prompt: $('Generate Prompt').item.json.prompt,\n  filename: $('Generate Prompt').item.json.filename,\n  status: 'completed'\n});\nfs.appendFileSync('/home/user/Orbital/nova/memory/outcomes.jsonl', entry + '\\n');\nreturn [{ json: { logged: true } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": { "main": [[{ "node": "Generate Prompt", "type": "main", "index": 0 }]] },
+    "Generate Prompt": { "main": [[{ "node": "Generate Image", "type": "main", "index": 0 }]] },
+    "Generate Image": { "main": [[{ "node": "Save to Disk", "type": "main", "index": 0 }]] },
+    "Save to Disk": { "main": [[{ "node": "Log Result", "type": "main", "index": 0 }]] }
+  }
+}

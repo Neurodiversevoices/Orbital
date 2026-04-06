@@ -1,6 +1,12 @@
 # Orbital — Development Guide
 > Canonical source of truth: [master_brief.md](master_brief.md)
 > This file is a concise dev reference. If conflicts exist, master_brief.md wins.
+
+## Session Protocol
+1. **START:** Read `master_brief.md` + `memory_bank/activeContext.md` + `nova/memory/empire_state.json` (if exists)
+2. **DURING:** Append learnings to `nova/memory/learnings.jsonl`, decisions to `nova/memory/decisions.jsonl`
+3. **END:** Update `memory_bank/activeContext.md` with what changed, what's next
+4. **CEO DUTY:** Suggest one improvement (leaner/smarter/faster) per session -> `nova/memory/ceo_suggestions.jsonl`
 ## Stack
 - Expo SDK 54, React Native 0.81.5
 - react-native-reanimated 4.1.x, react-native-worklets 0.5.1

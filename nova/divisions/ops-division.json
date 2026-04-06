@@ -1,0 +1,33 @@
+{
+  "name": "Nova Ops Division",
+  "nodes": [
+    {
+      "name": "Every 5 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [250, 300],
+      "parameters": {
+        "rule": { "interval": [{ "field": "minutes", "minutesInterval": 5 }] }
+      }
+    },
+    {
+      "name": "Health Checks",
+      "type": "n8n-nodes-base.code",
+      "position": [450, 300],
+      "parameters": {
+        "jsCode": "const checks = {};\n\n// Check if key files exist\nconst fs = require('fs');\nconst criticalFiles = [\n  '/home/user/Orbital/master_brief.md',\n  '/home/user/Orbital/CLAUDE.md',\n  '/home/user/Orbital/package.json',\n  '/home/user/Orbital/nova/EMPIRE.md'\n];\n\nchecks.files = criticalFiles.every(f => {\n  try { fs.accessSync(f); return true; } catch { return false; }\n});\n\n// Check git status\nconst { execSync } = require('child_process');\ntry {\n  const status = execSync('cd /home/user/Orbital && git status --porcelain', { encoding: 'utf8' });\n  checks.git_clean = status.trim().length === 0;\n  checks.git_dirty_files = status.trim().split('\\n').filter(Boolean).length;\n} catch (e) {\n  checks.git_clean = false;\n  checks.git_error = e.message;\n}\n\n// Count media files\ntry {\n  const media = fs.readdirSync('/home/user/Orbital/nova/media/').filter(f => f.endsWith('.png') || f.endsWith('.mp4'));\n  checks.media_count = media.length;\n} catch { checks.media_count = 0; }\n\n// Count memory entries\ntry {\n  const learnings = fs.readFileSync('/home/user/Orbital/nova/memory/learnings.jsonl', 'utf8').trim().split('\\n').length;\n  checks.memory_entries = learnings;\n} catch { checks.memory_entries = 0; }\n\nchecks.ts = new Date().toISOString();\nchecks.status = checks.files ? 'healthy' : 'degraded';\n\nreturn [{ json: checks }];"
+      }
+    },
+    {
+      "name": "Write Empire State",
+      "type": "n8n-nodes-base.code",
+      "position": [650, 300],
+      "parameters": {
+        "jsCode": "const fs = require('fs');\nconst state = {\n  lastUpdated: $json.ts,\n  health: $json.status,\n  git: { clean: $json.git_clean, dirtyFiles: $json.git_dirty_files || 0 },\n  media: { totalAssets: $json.media_count },\n  memory: { totalEntries: $json.memory_entries },\n  divisions: {\n    creative: { status: 'configured', lastCheck: $json.ts },\n    rd: { status: 'configured', lastCheck: $json.ts },\n    ops: { status: 'running', lastCheck: $json.ts },\n    cfo: { status: 'configured', lastCheck: $json.ts },\n    media: { status: 'configured', lastCheck: $json.ts }\n  }\n};\nfs.writeFileSync('/home/user/Orbital/nova/memory/empire_state.json', JSON.stringify(state, null, 2));\nreturn [{ json: { written: true } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Every 5 Minutes": { "main": [[{ "node": "Health Checks", "type": "main", "index": 0 }]] },
+    "Health Checks": { "main": [[{ "node": "Write Empire State", "type": "main", "index": 0 }]] }
+  }
+}

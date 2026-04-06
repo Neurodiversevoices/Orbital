@@ -41,20 +41,28 @@ No `service_role` bypass exists.
 - Zero overlap at schema level
 - K-anonymity threshold: 5
 
-## Nova Empire — Planned Tech (NOT YET IN REPO)
+## Nova Empire — Tech Stack
 
-Cursor designed but has not committed the following infrastructure:
+### In Repo (REAL)
+| Component | Location | Status |
+|-----------|----------|--------|
+| Empire spec | `nova/EMPIRE.md` | Complete |
+| Memory system | `nova/memory/*.jsonl` | 7 files, active |
+| n8n workflows | `nova/divisions/*.json` | 4 workflows, ready to import |
+| Media output | `nova/media/` | Directory ready |
 
-| Component | Tech | Port | Status |
-|-----------|------|------|--------|
-| Nova Nexus | Bun server | 3847 | **NOT IN REPO** |
-| n8n workflows | Docker containers | 5678+ | **NOT IN REPO** |
-| nova-intelligence.ts | 5-min pulse interval | — | **NOT IN REPO** |
-| CFO endpoint | GET /nova/cfo | 3847 | **NOT IN REPO** |
-| VR briefing | TTS via nova-vr-browser.ts | — | **NOT IN REPO** |
-| Empire dashboard | SSE + HTML | 3847 | **NOT IN REPO** |
+### Free-Tier Tools (to install on Mac Mini)
+| Tool | Purpose | Install |
+|------|---------|---------|
+| n8n (Docker) | Workflow automation | `docker run n8nio/n8n` |
+| Ollama | Local LLM | `brew install ollama` |
+| Piper TTS | Voice output | `pip install piper-tts` |
+| Whisper.cpp | Voice input | `brew install whisper-cpp` |
+| FFmpeg | Video processing | `brew install ffmpeg` |
+| Tailscale | Remote access | `brew install tailscale` |
 
-Key env vars (planned): `NOVA_EXPERIENCE_HUB`, `NOVA_INTELLIGENCE_PULSE_MS`,
-`NOVA_CLIENT_CONFIG_TRUST_LAN`, `INTERNAL_SERVICE_TOKEN`.
+### Cursor-Planned (NOT in repo yet)
+- `orbital-nexus/` (Bun server, port 3847)
+- `nova-intelligence.ts`, `routes-nova-surface.ts`, `nova-vr-browser.ts`
 
-See `memory_bank/activeContext.md` for full planned-vs-real breakdown.
+See `nova/EMPIRE.md` for full architecture and `memory_bank/activeContext.md` for status.

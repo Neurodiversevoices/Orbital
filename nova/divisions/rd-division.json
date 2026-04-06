@@ -1,0 +1,53 @@
+{
+  "name": "Nova R&D Division",
+  "nodes": [
+    {
+      "name": "Daily 6am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [250, 300],
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 6 * * *" }] }
+      }
+    },
+    {
+      "name": "Research Topics",
+      "type": "n8n-nodes-base.code",
+      "position": [450, 300],
+      "parameters": {
+        "jsCode": "const topics = [\n  { query: 'site:huggingface.co trending models', category: 'ai_models' },\n  { query: 'free text to video AI 2026', category: 'video_gen' },\n  { query: 'local LLM optimization techniques', category: 'ai_physics' },\n  { query: 'free image generation API no signup', category: 'image_gen' },\n  { query: 'Web Speech API advanced features', category: 'voice' },\n  { query: 'n8n workflow optimization patterns', category: 'automation' },\n  { query: 'avatar animation three.js lip sync', category: 'avatar' },\n  { query: 'capacity intelligence enterprise software', category: 'market' }\n];\nconst today = new Date().getDay();\nconst topic = topics[today % topics.length];\nreturn [{ json: topic }];"
+      }
+    },
+    {
+      "name": "Web Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 300],
+      "parameters": {
+        "url": "=https://html.duckduckgo.com/html/?q={{ encodeURIComponent($json.query) }}",
+        "method": "GET",
+        "options": { "response": { "response": { "responseFormat": "text" } } }
+      }
+    },
+    {
+      "name": "Extract Findings",
+      "type": "n8n-nodes-base.code",
+      "position": [850, 300],
+      "parameters": {
+        "jsCode": "const html = $input.first().json.data || '';\n// Extract result snippets (basic extraction from DDG HTML)\nconst snippets = html.match(/class=\"result__snippet\">(.*?)<\\/a>/g) || [];\nconst findings = snippets.slice(0, 5).map(s => s.replace(/<[^>]*>/g, '').trim());\nreturn [{ json: {\n  category: $('Research Topics').item.json.category,\n  query: $('Research Topics').item.json.query,\n  findings: findings.join(' | ') || 'No results extracted',\n  ts: new Date().toISOString()\n} }];"
+      }
+    },
+    {
+      "name": "Log Research",
+      "type": "n8n-nodes-base.code",
+      "position": [1050, 300],
+      "parameters": {
+        "jsCode": "const fs = require('fs');\nconst entry = JSON.stringify({\n  ts: $json.ts,\n  topic: $json.query,\n  finding: $json.findings,\n  source: 'duckduckgo',\n  category: $json.category,\n  actionable: true\n});\nfs.appendFileSync('/home/user/Orbital/nova/memory/research.jsonl', entry + '\\n');\nreturn [{ json: { logged: true } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Daily 6am": { "main": [[{ "node": "Research Topics", "type": "main", "index": 0 }]] },
+    "Research Topics": { "main": [[{ "node": "Web Search", "type": "main", "index": 0 }]] },
+    "Web Search": { "main": [[{ "node": "Extract Findings", "type": "main", "index": 0 }]] },
+    "Extract Findings": { "main": [[{ "node": "Log Research", "type": "main", "index": 0 }]] }
+  }
+}

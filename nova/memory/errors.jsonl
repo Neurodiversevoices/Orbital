@@ -1,0 +1,2 @@
+{"ts":"2026-04-06T00:00:00Z","error":"Trusted Cursor status report without verifying files existed","lesson":"Always glob/grep for files before trusting any report that claims code was written","severity":"medium"}
+{"ts":"2026-04-06T00:00:00Z","error":"Multiple docs had different hex values for the same color token","lesson":"Never define the same constant in more than one file. One definition, all others reference it.","severity":"high"}
