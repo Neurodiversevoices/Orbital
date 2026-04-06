@@ -1,3 +1,7 @@
 {"ts":"2026-04-06T00:00:00Z","skill":"Consolidated multi-file documentation into single source of truth","domain":"architecture","reusable":true}
 {"ts":"2026-04-06T00:00:00Z","skill":"Audit Cursor-planned vs repo-actual state","domain":"operations","reusable":true}
 {"ts":"2026-04-06T00:00:00Z","skill":"JSONL append-only memory system for compound AI learning","domain":"ai","reusable":true}
+{"ts":"2026-04-06T12:00:00Z","skill":"One-command sprint script: image gen + video + memory + git commit","domain":"automation","reusable":true}
+{"ts":"2026-04-06T12:00:00Z","skill":"Pollinations.ai URL pattern for free image generation","domain":"media","reusable":true}
+{"ts":"2026-04-06T12:00:00Z","skill":"n8n workflow JSON format for importable automation","domain":"automation","reusable":true}
+{"ts":"2026-04-06T12:00:00Z","skill":"Sprint protocol: 1hr timebox, parallel projects, artifact-or-nothing","domain":"process","reusable":true}

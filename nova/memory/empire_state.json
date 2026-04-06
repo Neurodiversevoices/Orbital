@@ -1,0 +1,87 @@
+{
+  "lastUpdated": "2026-04-06T12:00:00Z",
+  "sprint": "001",
+  "empire_score": 42,
+  "divisions": {
+    "nova_core": {
+      "status": "active_on_mac_mini",
+      "percent_complete": 60,
+      "artifact": "Nexus server running on 3847 (Cursor-managed)",
+      "blocked": false,
+      "rd_queue": []
+    },
+    "avatar": {
+      "status": "needs_mac_mini",
+      "percent_complete": 30,
+      "artifact": "Michelle GLB loaded, textures need fix",
+      "blocked": false,
+      "rd_queue": ["Three.js lip-sync pipeline"]
+    },
+    "vr_lab": {
+      "status": "active_on_mac_mini",
+      "percent_complete": 70,
+      "artifact": "WebXR scene live, 7/7 Playwright green",
+      "blocked": false,
+      "rd_queue": ["Full hand tracking"]
+    },
+    "custom_ai": {
+      "status": "active",
+      "percent_complete": 80,
+      "artifact": "7 JSONL memory files with real data, 35+ entries total",
+      "blocked": false,
+      "rd_queue": ["Ollama fine-tuning on memory data"]
+    },
+    "movie_studio": {
+      "status": "script_ready",
+      "percent_complete": 40,
+      "artifact": "nova/sprint.sh generates 5 images + stitches video. Needs Mac Mini to execute.",
+      "blocked": false,
+      "rd_queue": ["AI video via Hugging Face Spaces"]
+    },
+    "physical_projects": {
+      "status": "needs_mac_mini",
+      "percent_complete": 20,
+      "artifact": "progress.json tracking exists on Mac Mini",
+      "blocked": false,
+      "rd_queue": []
+    },
+    "voice_intelligence": {
+      "status": "ready_to_activate",
+      "percent_complete": 50,
+      "artifact": "Web Speech API + Kokoro TTS wired on Mac Mini",
+      "blocked": false,
+      "rd_queue": ["Ollama conversational loop"]
+    },
+    "cfo": {
+      "status": "needs_mac_mini",
+      "percent_complete": 25,
+      "artifact": "Route structure ready, bills.json defined",
+      "blocked": false,
+      "rd_queue": []
+    },
+    "ops_automation": {
+      "status": "workflows_ready",
+      "percent_complete": 50,
+      "artifact": "4 n8n workflow JSONs in nova/divisions/. Need import on Mac Mini.",
+      "blocked": false,
+      "rd_queue": ["Self-healing workflows"]
+    }
+  },
+  "artifacts_this_sprint": {
+    "from_claude_code": [
+      "nova/sprint.sh — one-command factory script",
+      "nova/memory/*.jsonl — 35+ real entries across 7 files",
+      "nova/memory/empire_state.json — this file",
+      "nova/divisions/*.json — 4 importable n8n workflows"
+    ],
+    "needs_mac_mini": [
+      "5 PNG images via Pollinations.ai (run: bash nova/sprint.sh)",
+      "1 MP4 video via FFmpeg (run: bash nova/sprint.sh)",
+      "Avatar texture fix (Cursor)",
+      "VR HUD empire score (Cursor)",
+      "n8n workflow activation"
+    ]
+  },
+  "cost": "$0",
+  "next_sprint": "Run bash nova/sprint.sh on Mac Mini, then start sprint 002"
+}
