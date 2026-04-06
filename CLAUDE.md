@@ -1,4 +1,6 @@
 # Orbital — Development Guide
+> Canonical source of truth: [master_brief.md](master_brief.md)
+> This file is a concise dev reference. If conflicts exist, master_brief.md wins.
 ## Stack
 - Expo SDK 54, React Native 0.81.5
 - react-native-reanimated 4.1.x, react-native-worklets 0.5.1

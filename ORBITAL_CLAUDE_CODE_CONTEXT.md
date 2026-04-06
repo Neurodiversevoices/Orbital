@@ -1,4 +1,6 @@
 ## Paste this at the start of every Claude Code session
+> Canonical source of truth: [master_brief.md](master_brief.md)
+> This file is a session bootstrap. If conflicts exist, master_brief.md wins.
 ---
 ## WHO I AM
 I am Eric Parrish, founder of Orbital Health Intelligence Inc.
