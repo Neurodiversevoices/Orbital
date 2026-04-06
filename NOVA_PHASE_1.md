@@ -1,286 +1,190 @@
-# NOVA PHASE 1 — Intelligence Push to iPhone
+# NOVA PHASE 1 — Reach the CEO's iPhone
 ## Status: ACTIVE
-## Objective: CEO receives proactive intelligence on iPhone without touching a computer
+## Prerequisite: Nova server boots clean on Mac Mini
 
 ---
 
-## Definition of Done
+## Done When
 
-Phase 1 is complete when ALL of these are true:
-
-1. CEO's iPhone receives ntfy push notifications with empire intelligence
-2. `https://<tunnel>.cfargotunnel.com/nova/dashboard` loads on iPhone Safari
-3. Nova pushes a morning briefing automatically (calendar + empire status + alerts)
-4. Nova pushes an evening summary automatically
-5. Nova pushes immediately on: division stall, error spike, bill due, calendar conflict
-6. Dashboard shows all 9 divisions, active alerts, and last briefing — one page
-7. Server survives Mac Mini reboot (launchd) and is reachable from outside LAN
+1. CEO's iPhone buzzes with a Nova briefing (ntfy) — no computer open
+2. CEO taps a URL on iPhone and sees Nova's dashboard with live status
+3. This happens every morning at 8 AM and evening at 8 PM automatically
+4. This survives a Mac Mini reboot
 
 ---
 
-## Architecture (Minimal — No New Dependencies)
+## Tasks
+
+### 1. Tunnel — Nova goes public
+
+Make Nova reachable from the internet. CEO should never need to be on the
+same WiFi as the Mac Mini.
 
 ```
-Mac Mini (always on)
-  orbital-nexus (Bun, port 3847)
-    /nova/dashboard        — single-page empire dashboard (mobile-first)
-    /api/v1/nova/briefing  — generates current briefing JSON
-    /api/v1/nova/push      — triggers manual push to ntfy
-    nova-intelligence.ts   — rebuilt: real intelligence, not file counting
-  
-  cloudflared tunnel       — exposes :3847 to public HTTPS URL
-  n8n (:5678)              — schedule triggers only (morning, evening, hourly)
-  Ollama (:11434)          — local LLM for briefing generation (already installed)
+DO:
+  cloudflared tunnel create nova
+  Write ~/.cloudflared/config.yml routing to localhost:3847
+  cloudflared tunnel run nova
+  Record URL in .env as NOVA_PUBLIC_URL
+  Create launchd plist: ops/launchd/com.nova.tunnel.plist
 
-CEO iPhone
-  ntfy app                 — receives all push notifications
-  Safari bookmark          — dashboard URL (PWA optional, not required)
-```
-
-**No new bun/npm dependencies.** Ollama, n8n, ntfy, cloudflared are already
-installed or referenced. If cloudflared is not installed: `brew install cloudflared`.
-
----
-
-## Task List (Execute in Order)
-
-### TASK 1: Cloudflare Tunnel — Nova Goes Public
-
-```
-TASK: Create persistent Cloudflare tunnel exposing port 3847
-SCOPE:
-  - scripts/nova-tunnel-setup.sh (new)
-  - ops/launchd/com.nova.tunnel.plist (new, optional)
-  - .env (add NOVA_PUBLIC_URL)
 VERIFY:
-  curl -sf https://<tunnel-url>/healthz  (from phone or external network)
-BLOCKED_BY: nothing
+  From iPhone (not on home WiFi):
+  curl -sf https://<NOVA_PUBLIC_URL>/healthz
+
+SCOPE: scripts/nova-tunnel-setup.sh, ops/launchd/com.nova.tunnel.plist, .env
 ```
 
-Steps:
-1. `cloudflared tunnel create nova-empire`
-2. `cloudflared tunnel route dns nova-empire nova.orbital.health` (or subdomain you own)
-3. Write config: `~/.cloudflared/config.yml` pointing `nova-empire` tunnel to `http://localhost:3847`
-4. Test: `cloudflared tunnel run nova-empire`
-5. Create launchd plist for auto-start on reboot
-6. Record public URL in `.env` as `NOVA_PUBLIC_URL`
+### 2. Push — Nova reaches the phone
 
-### TASK 2: Rebuild nova-intelligence.ts — Real Intelligence
+Wire ntfy so Nova can push any message to the CEO's iPhone.
 
 ```
-TASK: Rewrite nova-intelligence.ts to generate actual CEO briefings
-SCOPE:
-  - src/lib/nova-intelligence.ts (rewrite)
-  - src/lib/nova-briefing.ts (new)
+DO:
+  Create src/lib/nova-push.ts with pushToNova(title, body, priority, tags)
+  Default topic: process.env.NTFY_TOPIC || 'nova-empire'
+  Add POST /api/v1/nova/push route to src/app.ts
+  Create scripts/nova-push-test.sh that sends a test notification
+
+VERIFY:
+  bun run scripts/nova-push-test.sh
+  iPhone ntfy app shows "Nova Push Test" notification
+
+SCOPE: src/lib/nova-push.ts, src/app.ts, scripts/nova-push-test.sh
+```
+
+### 3. Briefing — Nova thinks before she speaks
+
+Generate real briefings from actual data, not file counts.
+
+```
+DO:
+  Create src/lib/nova-briefing.ts
+  Reads: projects/*/progress.json, nova/memory/errors.jsonl (last 24h),
+         projects/cfo/bills.json, memory_bank/activeContext.md
+  Calls Ollama (localhost:11434) with collected data + system prompt:
+    "You are Nova. Generate a 3-sentence CEO briefing. Lead with what
+     needs attention. Be direct. No fluff."
+  Returns: { summary, alerts[], divisions_needing_attention[], recommendations[] }
+  Add GET /api/v1/nova/briefing route
+
 VERIFY:
   curl -sf http://localhost:3847/api/v1/nova/briefing | jq .summary
-BLOCKED_BY: nothing (can run parallel with Task 1)
+  (returns actual English briefing, not an error)
+
+SCOPE: src/lib/nova-briefing.ts, src/app.ts
 ```
 
-The current pulse counts files and flags stalls. Replace with:
+### 4. Auto-push — Nova briefs the CEO on schedule
 
-**Data sources for briefing:**
-- `projects/*/progress.json` — division status (read, don't modify)
-- `nova/memory/errors.jsonl` — recent errors (last 24h)
-- `nova/memory/solutions.jsonl` — applied solutions
-- Google Calendar (via MCP or direct API if available)
-- `projects/cfo/bills.json` — upcoming bills
-- `memory_bank/activeContext.md` — current context
-
-**Briefing output (JSON):**
-```json
-{
-  "summary": "One paragraph TTS-ready briefing",
-  "divisions": {
-    "stalled": ["avatar-engine", "movie-studio"],
-    "progressing": ["ops-automation"],
-    "blocked": []
-  },
-  "alerts": [
-    { "type": "error", "msg": "Avatar engineering still banned — need Blender pipeline" },
-    { "type": "bill", "msg": "Cloudflare domain renewal due April 15" }
-  ],
-  "calendar_today": [
-    { "time": "10:00", "title": "Team sync" }
-  ],
-  "recommendations": [
-    "Unfreeze avatar-engine after sourcing Meshy API key",
-    "Movie studio needs a brief before any agent touches it"
-  ]
-}
-```
-
-**Ollama integration:** Pass collected data to Ollama (model: whatever is pulled
-locally, e.g. `llama3.2` or `mistral`) with a system prompt:
+Wire briefing generation to ntfy on a schedule via n8n.
 
 ```
-You are Nova, the Digital Twin Executive for Nova Empire.
-Generate a concise morning/evening briefing for the CEO.
-Be direct. No fluff. Lead with what needs attention.
-Format: one paragraph summary, then bullet alerts.
-```
+DO:
+  Create n8n/nova-morning-briefing.json:
+    Schedule (cron 0 8 * * *) → HTTP GET /api/v1/nova/briefing → HTTP POST /api/v1/nova/push
+  Create n8n/nova-evening-summary.json:
+    Schedule (cron 0 20 * * *) → same flow
+  Create n8n/nova-alert-check.json:
+    Schedule (every 15 min) → GET /briefing → IF alerts.length > 0 → POST /push
+  Import and activate all three via n8n REST API (not UI)
 
-### TASK 3: ntfy Push System
-
-```
-TASK: Wire ntfy push notifications for briefings and alerts
-SCOPE:
-  - src/lib/nova-push.ts (new)
-  - scripts/nova-push-test.sh (new)
 VERIFY:
-  bun run scripts/nova-push-test.sh  (CEO iPhone receives notification)
-BLOCKED_BY: nothing
+  curl -sf http://localhost:5678/api/v1/workflows \
+    -H "X-N8N-API-KEY: $N8N_API_KEY" | jq '[.data[] | select(.active) | .name]'
+  (shows all three workflows active)
+  Manually trigger morning workflow → iPhone gets briefing notification
+
+SCOPE: n8n/nova-morning-briefing.json, n8n/nova-evening-summary.json, n8n/nova-alert-check.json
 ```
 
-**Push function:**
-```typescript
-async function pushToNova(title: string, body: string, priority?: number, tags?: string[]) {
-  await fetch(process.env.NTFY_URL || 'https://ntfy.sh/nova-empire', {
-    method: 'POST',
-    headers: {
-      'Title': title,
-      'Priority': String(priority || 3),
-      'Tags': (tags || ['nova']).join(','),
-    },
-    body,
-  });
-}
-```
+### 5. Dashboard — Nova at a glance
 
-**Push triggers:**
-- Morning briefing (8:00 AM local) — full briefing from Task 2
-- Evening summary (8:00 PM local) — day recap + tomorrow preview
-- Immediate: any new error in errors.jsonl with kind = "critical"
-- Immediate: division drops below 30% or goes STALL for >2 hours
-- Immediate: bill due within 3 days (from CFO bills.json)
-- On CEO request: `POST /api/v1/nova/push` with `{ "type": "briefing" }`
-
-### TASK 4: n8n Schedule Wiring
+One mobile-first page the CEO bookmarks on iPhone.
 
 ```
-TASK: Create/update n8n workflows for morning and evening push schedules
-SCOPE:
-  - n8n/nova-morning-briefing.json (new)
-  - n8n/nova-evening-summary.json (new)
-  - n8n/nova-hourly-check.json (new or update existing)
+DO:
+  Rewrite or create src/lib/nova-dashboard-mobile.ts
+  Serves at GET /nova/command (or /nova/dashboard — pick one, kill the other)
+  Design:
+    - Black bg (#05050d), teal accents (#2DD4BF)
+    - Top: "NOVA" + last briefing summary (2-3 sentences)
+    - Middle: 5 capability status bars (Intelligence, Voice, Presence, Vision, Action)
+      pulled from GET /api/v1/nova/projects (consolidated, not 9 separate rows)
+    - Bottom: active alerts, newest first
+    - PWA meta tags (Add to Home Screen on iPhone)
+    - Auto-refresh every 60s via fetch, no full page reload
+    - NO chat input. NO text field. Read-only intelligence.
+  Vanilla HTML + CSS + JS. No dependencies. Inline everything.
+  Mobile-first: iPhone 15 Pro width (393px)
+
 VERIFY:
-  curl -sf http://localhost:5678/api/v1/workflows -H "X-N8N-API-KEY: $N8N_API_KEY" | jq '.[].name'
-  (should list all three workflows as active)
-BLOCKED_BY: Task 2, Task 3
+  Open https://<NOVA_PUBLIC_URL>/nova/command on iPhone Safari
+  See Nova branding, briefing summary, capability bars, alerts
+  Add to Home Screen works (icon appears)
+
+SCOPE: src/lib/nova-dashboard-mobile.ts, src/app.ts
 ```
 
-Each workflow is simple (3 nodes max):
-1. **Schedule Trigger** (cron: 0 8 * * * for morning, 0 20 * * * for evening)
-2. **HTTP Request** to `http://localhost:3847/api/v1/nova/briefing`
-3. **HTTP Request** to `http://localhost:3847/api/v1/nova/push` with briefing body
+### 6. Survive reboot
 
-No executeCommand. No complexity. Clock fires, HTTP flows, phone buzzes.
-
-### TASK 5: Mobile Dashboard — One Page
+Nova must come back automatically after Mac Mini restart.
 
 ```
-TASK: Build single-page mobile-first dashboard at /nova/dashboard
-SCOPE:
-  - src/lib/nova-dashboard-mobile.ts (new — serves HTML)
-  - src/app.ts (add route)
-VERIFY:
-  Open https://<NOVA_PUBLIC_URL>/nova/dashboard on iPhone Safari
-  All 9 divisions visible with status, last briefing shown, alerts listed
-BLOCKED_BY: Task 1, Task 2
-```
+DO:
+  Update ops/launchd/com.nova.nexus.plist:
+    - Runs ops/nova-empire-start.sh
+    - Starts docker compose (redis, n8n, kokoro)
+    - Starts bun run dev with NOVA_EXPERIENCE_HUB=1
+    - Waits for /healthz, then pushes "Nova Empire online" to ntfy
+  Ensure com.nova.tunnel.plist auto-starts cloudflared
+  Create scripts/nova-health-loop.sh (runs every 60s):
+    - Check :3847 /healthz — restart if dead
+    - Check :5678 n8n — restart if dead
+    - Check cloudflared running — restart if dead
+    - Push ntfy alert on any restart
 
-**Design constraints:**
-- Black background (#0a0a0a), white text, teal accents (#2DD4BF)
-- No framework. Vanilla HTML + CSS + JS. Inline everything.
-- Mobile-first: designed for iPhone 15 Pro viewport (393px wide)
-- Top section: "NOVA EMPIRE" + last briefing timestamp + summary paragraph
-- Middle: 9 division cards (3x3 grid on desktop, single column on mobile)
-  - Each card: name, percentage bar, status badge (RUNNING/STALLED/BLOCKED)
-  - Color: teal bar for >60%, amber for 30-60%, red for <30%
-- Bottom: alerts list (scrollable, newest first)
-- Pull-to-refresh (or auto-refresh every 60s)
-- Add to Home Screen meta tags (PWA-lite: icon, theme-color, standalone)
-- NO chat input. NO text field. This is read-only intelligence.
-
-### TASK 6: launchd Hardening
-
-```
-TASK: Ensure server + tunnel survive reboot and self-heal
-SCOPE:
-  - ops/launchd/com.nova.nexus.plist (update)
-  - ops/launchd/com.nova.tunnel.plist (new or update)
-  - ops/nova-empire-start.sh (update)
-  - scripts/nova-health-loop.sh (new)
 VERIFY:
   Reboot Mac Mini. Wait 2 minutes.
-  curl -sf https://<NOVA_PUBLIC_URL>/healthz  (from phone)
-  iPhone receives "Nova Empire online" ntfy notification
-BLOCKED_BY: Task 1, Task 3
+  From iPhone: curl -sf https://<NOVA_PUBLIC_URL>/healthz
+  iPhone should have received "Nova Empire online" notification
+
+SCOPE: ops/launchd/*.plist, ops/nova-empire-start.sh, scripts/nova-health-loop.sh
 ```
 
-**Health loop (runs every 60s via launchd):**
-1. `curl -sf http://localhost:3847/healthz` — if fail, restart Nexus
-2. `curl -sf http://localhost:5678/healthz` — if fail, restart n8n
-3. Check tunnel is running (`pgrep cloudflared`) — if not, restart
-4. If any restart happened, push ntfy alert to CEO
-
-### TASK 7: Integration Test
+### 7. Integration test
 
 ```
-TASK: End-to-end test of the complete Phase 1 system
-SCOPE: no new files — verification only
-VERIFY: all 7 Definition of Done items pass
-BLOCKED_BY: Tasks 1-6
-```
+VERIFY (all must pass):
+  1. curl -sf https://$NOVA_PUBLIC_URL/healthz
+  2. curl -sf https://$NOVA_PUBLIC_URL/nova/command | grep "NOVA"
+  3. curl -sf http://localhost:3847/api/v1/nova/briefing | jq .summary
+  4. POST /api/v1/nova/push sends notification to iPhone
+  5. n8n has 3 active briefing workflows
+  6. Mac Mini reboot → Nova recovers → iPhone notified
 
-Test script:
-```bash
-#!/bin/bash
-set -e
-echo "1. Tunnel reachable..."
-curl -sf https://$NOVA_PUBLIC_URL/healthz
-
-echo "2. Dashboard loads..."
-curl -sf https://$NOVA_PUBLIC_URL/nova/dashboard | grep "NOVA EMPIRE"
-
-echo "3. Briefing generates..."
-curl -sf http://localhost:3847/api/v1/nova/briefing | jq .summary
-
-echo "4. Push works..."
-curl -X POST http://localhost:3847/api/v1/nova/push \
-  -H "Content-Type: application/json" \
-  -d '{"type":"test","message":"Phase 1 integration test"}'
-
-echo "5. n8n workflows active..."
-curl -sf http://localhost:5678/api/v1/workflows \
-  -H "X-N8N-API-KEY: $N8N_API_KEY" | jq 'map(select(.active)) | length'
-
-echo "6. Survives restart..."
-echo "(Manual: reboot Mac Mini, wait 2 min, re-run steps 1-5)"
-
-echo "PHASE 1 COMPLETE"
+When all 6 pass: Phase 1 is done. Push "PHASE 1 COMPLETE" to ntfy.
+CEO activates Phase 2.
 ```
 
 ---
 
-## What Phase 1 Does NOT Include
+## Phase 2 Preview: Voice + Commands (NOT ACTIVE)
 
-- Avatar/GLB/3D work (frozen)
-- VR/WebXR/TalkingHead (frozen)
-- Chat/conversation interface (not the product)
-- New industry verticals (frozen)
-- Film studio (frozen)
-- R&D autonomous loop (paused)
-- Any new dependencies
+- CEO talks to Nova from iPhone (voice endpoint + Siri Shortcut)
+- Nova responds via TTS audio
+- Nova can execute commands ("check on movie studio", "push the latest avatar")
 
-## What Phase 2 Will Be (Preview Only — Not Active)
+## Phase 3 Preview: Hologram (NOT ACTIVE)
 
-Voice command: CEO speaks to Nova via phone (Siri Shortcut or dedicated
-endpoint). Nova processes via Ollama, executes via n8n, pushes result.
-Still no avatar. Intelligence first, presentation later.
+- Custom Nova avatar via Meshy/TripoSG
+- GLB → USDZ for native iOS AR Quick Look
+- Nova appears in CEO's physical space on iPhone
+- Lip-synced speech in AR
+- This is the real digital twin moment
 
 ---
 
-*Phase 1 is the foundation. When the CEO's phone buzzes with a morning
-briefing and they can glance at a dashboard URL, Nova is real. Everything
-after that is upgrade.*
+*Phase 1 is infrastructure. When your phone buzzes at 8 AM with Nova's
+briefing and you can glance at a dashboard URL from anywhere, the
+foundation is set. Everything after compounds.*
