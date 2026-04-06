@@ -41,9 +41,20 @@ No `service_role` bypass exists.
 - Zero overlap at schema level
 - K-anonymity threshold: 5
 
-## Modules Not Yet Implemented
+## Nova Empire — Planned Tech (NOT YET IN REPO)
 
-- `nova-intelligence.ts` — does not exist in codebase
-- CFO module — does not exist in codebase
+Cursor designed but has not committed the following infrastructure:
 
-See master_brief.md Section 20 for details.
+| Component | Tech | Port | Status |
+|-----------|------|------|--------|
+| Nova Nexus | Bun server | 3847 | **NOT IN REPO** |
+| n8n workflows | Docker containers | 5678+ | **NOT IN REPO** |
+| nova-intelligence.ts | 5-min pulse interval | — | **NOT IN REPO** |
+| CFO endpoint | GET /nova/cfo | 3847 | **NOT IN REPO** |
+| VR briefing | TTS via nova-vr-browser.ts | — | **NOT IN REPO** |
+| Empire dashboard | SSE + HTML | 3847 | **NOT IN REPO** |
+
+Key env vars (planned): `NOVA_EXPERIENCE_HUB`, `NOVA_INTELLIGENCE_PULSE_MS`,
+`NOVA_CLIENT_CONFIG_TRUST_LAN`, `INTERNAL_SERVICE_TOKEN`.
+
+See `memory_bank/activeContext.md` for full planned-vs-real breakdown.

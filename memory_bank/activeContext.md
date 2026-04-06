@@ -29,7 +29,39 @@ See [ORBITAL_TASK_BOARD.md](../ORBITAL_TASK_BOARD.md) for current task list.
 - Data Trust: master_brief.md Section 9
 - Capacity Model: master_brief.md Section 5
 
-## Not Yet Implemented
+## Nova Empire — Status (April 6, 2026)
 
-- `nova-intelligence.ts` — not in codebase (see master_brief.md Section 20)
-- CFO module — not in codebase (see master_brief.md Section 20)
+Cursor designed the full Nova Empire architecture but **has not committed
+or pushed any of it**. The following is PLANNED, not LANDED:
+
+### Planned Architecture (from Cursor, not yet in repo)
+
+| Component | File | Status |
+|-----------|------|--------|
+| Nova Nexus server | `orbital-nexus/` | **NOT IN REPO** — directory doesn't exist |
+| Intelligence pulse | `nova-intelligence.ts` | **NOT IN REPO** — designed, 5-min interval |
+| CFO dashboard | `GET /nova/cfo` via `routes-nova-surface.ts` | **NOT IN REPO** |
+| Empire score | `buildNovaVisibilityBundle()` | **NOT IN REPO** |
+| VR browser briefing | `nova-vr-browser.ts` + `public/nova/vr/` | **NOT IN REPO** |
+| Git commit webhook | `POST /webhook/nova-git-commit` | **NOT IN REPO** — requires n8n |
+| Division heartbeat | `bun run nova:team-run` | **NOT IN REPO** |
+
+### Planned Nova Stack (when Cursor executes)
+- Runtime: Bun
+- Server: orbital-nexus/ (port 3847)
+- Workflows: n8n containers (port 5678+)
+- Dashboard: SSE + loadOnce pattern
+- VR: TTS empire briefing every 5 min
+- Git: resolveGitRepoRoot() scoped to orbital-nexus/
+
+### Blockers Before Cursor Can Execute
+1. `orbital-nexus/` directory must be created or exist on Mac Mini
+2. n8n containers must be running with INTERNAL_SERVICE_TOKEN
+3. Any stuck `.git/index.lock` must be cleared first
+4. Nexus must be restarted with `NOVA_EXPERIENCE_HUB=1`
+
+### What DOES exist in this repo
+- `master_brief.md` — consolidated source of truth (done)
+- `memory_bank/` — context files (done)
+- `CLAUDE.md` — references master_brief (done)
+- The Orbital app itself (Expo/React Native) — fully functional
