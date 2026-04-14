@@ -40,7 +40,7 @@ Orbital 1.0 — the first public release. Log your capacity state, see patterns 
 ### Description (4000 chars max)
 
 ```
-Orbital is a clinical-grade capacity tracking instrument for adults who need to understand how their capacity shifts day to day.
+Orbital is a precision capacity tracking instrument for adults who need to understand how their capacity shifts day to day.
 
 LOG IN SECONDS
 Record your capacity with a single gesture. No typing, no journaling — just a quick daily signal that takes under 30 seconds.

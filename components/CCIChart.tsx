@@ -22,7 +22,7 @@
  * - Capacity-colored dots at key data points
  * - Matching legend for all views
  *
- * NOT diagnostic. NOT symptom scoring. Complements clinical judgment.
+ * NOT diagnostic. NOT severity scoring. Complements professional judgment.
  */
 
 import React from 'react';
@@ -408,7 +408,7 @@ export function CCIChart({
       {/* Disclaimer footer */}
       {showDisclaimer && (
         <Text style={styles.disclaimer}>
-          Not diagnostic. Not symptom scoring. Complements clinical judgment.
+          Not diagnostic. Not severity scoring. Complements professional judgment.
         </Text>
       )}
     </View>

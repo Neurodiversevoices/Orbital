@@ -14,7 +14,7 @@
  * - No CCI-specific or Circle-specific rendering code
  * - Data input only, no styling configuration
  *
- * NOT diagnostic. NOT symptom scoring. Complements clinical judgment.
+ * NOT diagnostic. NOT severity scoring. Complements professional judgment.
  */
 
 import React from 'react';
@@ -221,7 +221,7 @@ export function CCI90DayChart({
       {/* Disclaimer footer */}
       {showDisclaimer && (
         <Text style={styles.disclaimer}>
-          Not diagnostic. Not symptom scoring. Complements clinical judgment.
+          Not diagnostic. Not severity scoring. Complements professional judgment.
         </Text>
       )}
     </View>

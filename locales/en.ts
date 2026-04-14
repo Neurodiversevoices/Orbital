@@ -279,7 +279,7 @@ export const en = {
   // ============================================
   disclaimer: {
     short: 'Non-diagnostic',
-    full: 'This tool records self-reported functional capacity. It does not constitute clinical evaluation or diagnosis.',
+    full: 'This tool records self-reported functional capacity. It does not constitute clinical evaluation or assessment.',
     dataDescription: 'Normalized capacity signals over time.',
     purpose: 'Longitudinal record of available capacity for personal or shared use.',
   },
