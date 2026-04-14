@@ -11,7 +11,8 @@
     "jsEngine": "hermes",
     "scheme": "orbital",
     "assets": [
-      "./assets/orb_interior.png"
+      "./assets/orb_interior.png",
+      "./assets/nova-avatar.png"
     ],
     "assetBundlePatterns": [
       "./assets/**/*"
@@ -25,19 +26,23 @@
       "supportsTablet": true,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "96",
+      "buildNumber": "109",
       "appleTeamId": "2KM3QL4UMV",
       "icon": "./assets/icon.png",
       "infoPlist": {
         "LSApplicationCategoryType": "public.app-category.healthcare-fitness",
         "ITSAppUsesNonExemptEncryption": false,
-        "NSUserTrackingUsageDescription": "This identifier will be used to measure the effectiveness of advertising campaigns and improve your experience."
+        "NSMicrophoneUsageDescription": "NOVA needs the microphone so you can speak to your assistant.",
+        "NSSpeechRecognitionUsageDescription": "NOVA uses speech recognition to turn your voice into text."
       },
       "runtimeVersion": "1.0.0"
     },
     "android": {
       "package": "com.erparris.orbital",
       "versionCode": 1,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0A0A1A"
@@ -79,7 +84,14 @@
           "project": "react-native"
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "NOVA needs the microphone so you can speak to your assistant.",
+          "speechRecognitionPermission": "NOVA uses speech recognition to turn your voice into text."
+        }
+      ]
     ],
     "extra": {
       "router": {},
