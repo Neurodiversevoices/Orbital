@@ -5,7 +5,7 @@
   "scripts": {
     "start": "expo start --web",
     "web": "expo start --web",
-    "build:web": "expo export -p web && mv dist/index.html dist/_app.html && node scripts/inject-dashboard-config.js",
+    "build:web": "expo export --platform web && cp public/*.html dist/",
     "doctor": "node scripts/doctor.js",
     "preflight": "node scripts/preflight.js",
     "test": "npx playwright test",
@@ -27,7 +27,9 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "marketing": "node scripts/marketing-agent.js",
-    "creative": "node scripts/marketing-agent.js campaign"
+    "creative": "node scripts/marketing-agent.js campaign",
+    "web:lan": "expo start --web --port 19006 --host",
+    "gateway": "node infra/local-gateway/gateway.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.4.2",
