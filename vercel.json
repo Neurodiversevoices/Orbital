@@ -16,7 +16,7 @@
     { "source": "/blog", "destination": "/blog.html" },
     { "source": "/landing", "destination": "/landing.html" },
     { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/", "destination": "/landing.html" },
+    { "source": "/", "destination": "/home.html" },
     { "source": "/app", "destination": "/_app.html" },
     { "source": "/((?!api/)(?!.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|woff|woff2|ttf|pdf|html)).*)", "destination": "/_app.html" }
   ],
