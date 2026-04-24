@@ -352,6 +352,87 @@
       font-size: 0.8rem;
       color: rgba(255, 255, 255, 0.35);
     }
+
+    /* Product preview */
+    .preview-section {
+      position: relative;
+      z-index: 1;
+      padding: 0 1.5rem 5rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .preview-img {
+      width: 100%;
+      max-width: 960px;
+      height: auto;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 32px 96px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255,255,255,0.06);
+      display: block;
+    }
+
+    /* Feature cards */
+    .features-section {
+      position: relative;
+      z-index: 1;
+      padding: 0 2rem 5rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+
+    .feature-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 1.75rem 1.5rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .feature-title {
+      font-family: var(--sans);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-body {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Trust line */
+    .trust-section {
+      position: relative;
+      z-index: 1;
+      padding: 0 2rem 5rem;
+      text-align: center;
+    }
+
+    .trust-line {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      color: rgba(255, 255, 255, 0.38);
+    }
   </style>
 </head>
 <body>
@@ -371,15 +452,49 @@
       </div>
     </div>
 
-    <h1>Know your capacity before it slips away</h1>
-    <p class="sub">Signal-aware capacity intelligence — built for minds that run hot, fast, and deep.</p>
+    <h1>Know Your Capacity Before It Breaks</h1>
+    <p class="sub">Orbital helps you recognize patterns before overload happens.</p>
 
     <div class="cta-row">
-      <a href="https://apps.apple.com/app/orbital-capacity-intelligence/id6738980081" class="cta-button" onclick="gtag('event','hero_cta')">Download on the App Store</a>
-      <a href="/privacy" class="cta-ghost">Privacy</a>
-      <a href="/terms" class="cta-ghost">Terms</a>
+      <a href="/app#patterns" class="cta-button" onclick="gtag('event','hero_cta_patterns')">View Your Patterns</a>
+      <a href="https://apps.apple.com/app/orbital-capacity-intelligence/id6738980081" class="cta-ghost" onclick="gtag('event','hero_cta_appstore')">Download on the App Store</a>
     </div>
   </main>
+
+  <!-- Product preview -->
+  <section id="patterns" class="preview-section">
+    <img
+      src="/images/patterns-preview.png"
+      alt="Orbital Patterns screen"
+      width="1200"
+      height="750"
+      class="preview-img"
+      loading="lazy"
+    />
+  </section>
+
+  <!-- Feature cards -->
+  <section class="features-section">
+    <div class="features-grid">
+      <div class="feature-card">
+        <h3 class="feature-title">Capacity Awareness</h3>
+        <p class="feature-body">See your current nervous-system state at a glance.</p>
+      </div>
+      <div class="feature-card">
+        <h3 class="feature-title">Pattern Recognition</h3>
+        <p class="feature-body">Spot the weekly rhythms that precede overload.</p>
+      </div>
+      <div class="feature-card">
+        <h3 class="feature-title">Risk Timing</h3>
+        <p class="feature-body">Know which days and hours carry the most load.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust line -->
+  <section class="trust-section">
+    <p class="trust-line">Built for clarity, not overwhelm.</p>
+  </section>
 
   <footer>
     <div class="footer-logo">ORBITAL</div>
