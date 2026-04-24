@@ -1,0 +1,10 @@
+name: Deploy Web
+on:
+  push:
+    branches: ['dev', 'master']
+jobs:
+  deploy_web:
+    name: Deploy web to EAS Hosting
+    type: deploy
+    params:
+      prod: true
