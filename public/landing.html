@@ -573,7 +573,7 @@
       font-family: 'Space Mono', monospace;
       font-size: 64px;
       font-weight: 700;
-      color: var(--cyan);
+      color: #5DD9D4;
       line-height: 1;
     }
     .cci-score-label {
@@ -1672,9 +1672,9 @@ setTimeout(() => {
   var ARC_SWEEP = 270 * Math.PI / 180;
 
   function gaugeColor(score) {
-    if (score < 40) return '#FF3D5A';
-    if (score < 70) return '#FFB830';
-    return '#00E5FF';
+    if (score < 40) return '#E5484D';
+    if (score < 70) return '#F5B547';
+    return '#5DD9D4';
   }
   function stateLabel(score) {
     if (score < 40) return 'DEPLETED';
@@ -1711,9 +1711,9 @@ setTimeout(() => {
       var gx0 = cx + r * Math.cos(ARC_START), gy0 = cy + r * Math.sin(ARC_START);
       var gx1 = cx + r * Math.cos(ARC_START + ARC_SWEEP), gy1 = cy + r * Math.sin(ARC_START + ARC_SWEEP);
       var grad = ctx.createLinearGradient(gx0, gy0, gx1, gy1);
-      grad.addColorStop(0, '#FF3D5A');
-      grad.addColorStop(0.5, '#FFB830');
-      grad.addColorStop(1, '#00E5FF');
+      grad.addColorStop(0, '#E5484D');
+      grad.addColorStop(0.5, '#F5B547');
+      grad.addColorStop(1, '#5DD9D4');
       ctx.beginPath();
       ctx.arc(cx, cy, r, ARC_START, endAng);
       ctx.strokeStyle = grad; ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.stroke();
@@ -1722,8 +1722,8 @@ setTimeout(() => {
     /* glow dot */
     var tx = cx + r * Math.cos(endAng), ty = cy + r * Math.sin(endAng);
     var glow = ctx.createRadialGradient(tx, ty, 0, tx, ty, w * 1.4);
-    glow.addColorStop(0, 'rgba(0,229,255,0.45)');
-    glow.addColorStop(1, 'rgba(0,229,255,0)');
+    glow.addColorStop(0, 'rgba(93,217,212,0.45)');
+    glow.addColorStop(1, 'rgba(93,217,212,0)');
     ctx.beginPath(); ctx.arc(tx, ty, w * 1.4, 0, Math.PI * 2);
     ctx.fillStyle = glow; ctx.fill();
     ctx.beginPath(); ctx.arc(tx, ty, w * 0.72, 0, Math.PI * 2);
