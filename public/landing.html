@@ -408,48 +408,54 @@
     margin-bottom: 28px;
     justify-content: center;
   }
+  /* Arc gauge — replaces circular SVG ring */
   .cci-score-ring {
     position: relative;
-    width: 140px; height: 140px;
+    width: 200px; height: 200px;
     flex-shrink: 0;
   }
-  .cci-score-ring svg {
-    width: 140px; height: 140px;
-    transform: rotate(-90deg);
-  }
-  .cci-score-ring .ring-bg {
-    fill: none;
-    stroke: rgba(255,255,255,0.06);
-    stroke-width: 8;
-  }
-  .cci-score-ring .ring-fg {
-    fill: none;
-    stroke-width: 8;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 0.6s ease, stroke 0.4s ease;
+  .cci-score-ring canvas {
+    display: block;
   }
   .cci-score-value {
     position: absolute;
     top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -40%);
     text-align: center;
+    pointer-events: none;
   }
   .cci-score-num {
     font-family: var(--font-heading);
-    font-size: 38px; font-weight: 700;
+    font-size: 44px; font-weight: 700;
     color: #fff; line-height: 1;
     transition: color 0.3s;
   }
   .cci-score-of {
     font-family: var(--font-mono);
-    font-size: 12px; color: var(--text-faint);
+    font-size: 11px; color: var(--text-faint);
   }
   .cci-score-label-text {
     font-family: var(--font-mono);
-    font-size: 10px; font-weight: 700;
+    font-size: 9px; font-weight: 700;
     letter-spacing: 1.5px;
     color: var(--text-dim);
-    margin-top: 2px;
+    margin-top: 3px;
+    text-transform: uppercase;
+  }
+  /* Hero gauge demo */
+  .hero-gauge-wrap {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .hero-gauge-label {
+    font-family: var(--font-mono);
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 2px; color: var(--text-dim);
+    text-transform: uppercase;
+    margin-top: 6px;
   }
   .cci-score-meta {
     text-align: left;
@@ -977,6 +983,12 @@
 
     <p class="subtitle">One daily check-in. Three capacity states. 90 days of signals become a clinical-grade Clinical Capacity Instrument — a longitudinal record that informs clinical decisions.</p>
 
+    <!-- Live arc gauge demo -->
+    <div class="hero-gauge-wrap">
+      <canvas id="hero-arc-canvas" width="240" height="240" style="cursor:pointer" aria-label="Capacity gauge demo — click to animate"></canvas>
+      <div class="hero-gauge-label" id="hero-gauge-label">ELEVATED</div>
+    </div>
+
     <button class="hero-cta cta-founding" type="button">Claim Founding Access &mdash; $199</button>
 
     <p class="hero-fine">Includes 3 months Pro free. First 100 only.</p>
@@ -1049,10 +1061,7 @@
 
       <div class="cci-score-section">
         <div class="cci-score-ring">
-          <svg viewBox="0 0 140 140">
-            <circle class="ring-bg" cx="70" cy="70" r="58"/>
-            <circle class="ring-fg" id="cci-ring-fg" cx="70" cy="70" r="58" stroke="#00D7FF" stroke-dasharray="364.42" stroke-dashoffset="364.42"/>
-          </svg>
+          <canvas id="cci-arc-canvas" width="200" height="200"></canvas>
           <div class="cci-score-value">
             <div class="cci-score-num" id="cci-score-num">72</div>
             <div class="cci-score-of">/100</div>
@@ -1711,6 +1720,157 @@ document.querySelectorAll('.pricing-cta').forEach(function(btn) {
     trackEvent('pricing_card_clicked', { tier: tier });
   });
 });
+
+// =========================================================================
+// ORBITAL ARC GAUGE — matches iOS/web Gauge component exactly
+// ARC_START=225°, ARC_SWEEP=270°, gradient crimson→amber→teal
+// =========================================================================
+(function() {
+  var ARC_START = 225 * Math.PI / 180;
+  var ARC_SWEEP = 270 * Math.PI / 180;
+
+  function gaugeColor(score) {
+    if (score < 40) return '#E5484D';
+    if (score < 70) return '#F5B547';
+    return '#5DD9D4';
+  }
+
+  function drawArcGauge(canvas, score, size) {
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    canvas.style.width = size + 'px';
+    canvas.style.height = size + 'px';
+    var ctx = canvas.getContext('2d');
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    var cx = size / 2, cy = size / 2;
+    var r = size * 0.375;
+    var w = size * 0.044;
+    var s = Math.max(0, Math.min(100, score));
+    var endAngle = ARC_START + (s / 100) * ARC_SWEEP;
+
+    // Track
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, ARC_START, ARC_START + ARC_SWEEP);
+    ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+    ctx.lineWidth = w;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // Active arc with gradient
+    if (s > 0.5) {
+      var gx0 = cx + r * Math.cos(ARC_START);
+      var gy0 = cy + r * Math.sin(ARC_START);
+      var gx1 = cx + r * Math.cos(ARC_START + ARC_SWEEP);
+      var gy1 = cy + r * Math.sin(ARC_START + ARC_SWEEP);
+      var grad = ctx.createLinearGradient(gx0, gy0, gx1, gy1);
+      grad.addColorStop(0, '#E5484D');
+      grad.addColorStop(0.5, '#F5B547');
+      grad.addColorStop(1, '#5DD9D4');
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, ARC_START, endAngle);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = w;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+
+    // Glow dot at tip
+    var tx = cx + r * Math.cos(endAngle);
+    var ty = cy + r * Math.sin(endAngle);
+    var glow = ctx.createRadialGradient(tx, ty, 0, tx, ty, w * 1.2);
+    glow.addColorStop(0, 'rgba(93,217,212,0.40)');
+    glow.addColorStop(1, 'rgba(93,217,212,0)');
+    ctx.beginPath();
+    ctx.arc(tx, ty, w * 1.2, 0, Math.PI * 2);
+    ctx.fillStyle = glow;
+    ctx.fill();
+
+    // White tip dot
+    ctx.beginPath();
+    ctx.arc(tx, ty, w * 0.72, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function stateLabel(score) {
+    if (score < 40) return 'DEPLETED';
+    if (score < 70) return 'ELEVATED';
+    return 'RESOURCED';
+  }
+
+  // ── Hero gauge (animated demo) ──────────────────────────────────────
+  var heroCanvas = document.getElementById('hero-arc-canvas');
+  var heroLabelEl = document.getElementById('hero-gauge-label');
+  if (heroCanvas) {
+    var heroScore = 60;
+    var heroTarget = 60;
+    var heroDir = 1;
+    var heroAnimId = null;
+
+    function drawHero() {
+      drawArcGauge(heroCanvas, heroScore, 240);
+      if (heroLabelEl) {
+        heroLabelEl.textContent = stateLabel(heroScore);
+        heroLabelEl.style.color = gaugeColor(heroScore);
+      }
+    }
+
+    function heroAnimate() {
+      heroScore += (heroTarget - heroScore) * 0.06;
+      if (Math.abs(heroScore - heroTarget) < 0.3) {
+        heroScore = heroTarget;
+        // Pick next target
+        var targets = [25, 50, 75, 100, 60, 40, 80, 30];
+        heroTarget = targets[Math.floor(Math.random() * targets.length)];
+      }
+      drawHero();
+      heroAnimId = requestAnimationFrame(heroAnimate);
+    }
+
+    drawHero();
+    heroAnimId = requestAnimationFrame(heroAnimate);
+
+    // Click to set score
+    heroCanvas.addEventListener('click', function(e) {
+      var rect = heroCanvas.getBoundingClientRect();
+      var mx = e.clientX - rect.left - rect.width / 2;
+      var my = e.clientY - rect.top - rect.height / 2;
+      var angle = Math.atan2(my, mx);
+      var deg = ((angle * 180 / Math.PI) + 360) % 360;
+      var cw = (deg + 90) % 360;
+      var onArc = (cw - 225 + 360) % 360;
+      if (onArc > 270) onArc = onArc - 270 < 360 - onArc ? 270 : 0;
+      heroTarget = (onArc / 270) * 100;
+    });
+  }
+
+  // ── CCI section arc gauge ────────────────────────────────────────────
+  var cciCanvas = document.getElementById('cci-arc-canvas');
+  if (cciCanvas) {
+    window._drawCciArc = function(score) {
+      drawArcGauge(cciCanvas, score, 200);
+    };
+    window._drawCciArc(72);
+  }
+}());
+
+// Patch renderCciDemo to also update the arc canvas
+var _origRenderCciDemo = typeof renderCciDemo === 'function' ? renderCciDemo : null;
+if (_origRenderCciDemo) {
+  renderCciDemo = function(period) {
+    _origRenderCciDemo(period);
+    var numEl = document.getElementById('cci-score-num');
+    if (numEl && window._drawCciArc) {
+      setTimeout(function() {
+        window._drawCciArc(parseInt(numEl.textContent) || 72);
+      }, 50);
+    }
+  };
+}
 
 // =========================================================================
 // FAQ ACCORDION

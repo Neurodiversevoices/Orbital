@@ -5,7 +5,6 @@ import { Gauge } from '../../components/instrument/Gauge';
 import { TypicalRangeChip } from '../../components/instrument/TypicalRangeChip';
 import { MetricCard } from '../../components/instrument/MetricCard';
 import { SignalCard } from '../../components/instrument/SignalCard';
-import { scoreFromSignals } from '../../lib/capacity/score';
 import { typicalRange } from '../../lib/capacity/typical';
 import { generateInsight } from '../../lib/capacity/insight';
 import { calculateCapacity } from '../../lib/capacity/calculateCapacity';
@@ -21,7 +20,7 @@ import {
 } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useRouter, Redirect } from 'expo-router';
-import { Settings, Sparkles, TrendingUp, TrendingDown, Minus } from 'lucide-react-native';
+import { Settings, Sparkles } from 'lucide-react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ModeInsightsPanel,
@@ -30,12 +29,9 @@ import {
 import { colors, spacing } from '../../theme';
 import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
 import { useLocale } from '../../lib/hooks/useLocale';
-import { useDemoMode } from '../../lib/hooks/useDemoMode';
 import { useAppMode } from '../../lib/hooks/useAppMode';
 import { useTutorial } from '../../lib/hooks/useTutorial';
-import { useSubscription } from '../../lib/subscription';
 import { Locale } from '../../locales';
-import type { CapacityState } from '../../types';
 
 function formatDate(locale: Locale): string {
   const localeCode = locale === 'es' ? 'es-MX' : 'en-US';
@@ -57,57 +53,7 @@ export default function HomeScreen() {
   const { hasSeenTutorial, isLoading: tutorialLoading } = useTutorial();
   const { logs } = useEnergyLogs();
   const { t, locale } = useLocale();
-  const { isDemoMode } = useDemoMode();
   const { modeConfig, currentMode } = useAppMode();
-
-  const signalData = useMemo(() => {
-    const now = Date.now();
-    const todayStart = new Date().setHours(0, 0, 0, 0);
-    const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
-    const prevWeekStart = weekAgo - 7 * 24 * 60 * 60 * 1000;
-
-    const todayLogs = logs.filter((log) => log.timestamp >= todayStart);
-    const weekLogs = logs.filter((log) => log.timestamp >= weekAgo);
-    const prevWeekLogs = logs.filter(
-      (log) => log.timestamp >= prevWeekStart && log.timestamp < weekAgo,
-    );
-
-    const stateToPercent = (state: CapacityState) => {
-      if (state === 'resourced') return 100;
-      if (state === 'stretched') return 50;
-      return 0;
-    };
-
-    const todayAvg =
-      todayLogs.length > 0
-        ? Math.round(
-            todayLogs.reduce((sum, log) => sum + stateToPercent(log.state), 0) /
-              todayLogs.length,
-          )
-        : null;
-
-    const weekAvg =
-      weekLogs.length > 0
-        ? weekLogs.reduce((sum, log) => sum + stateToPercent(log.state), 0) / weekLogs.length
-        : null;
-    const prevWeekAvg =
-      prevWeekLogs.length > 0
-        ? prevWeekLogs.reduce((sum, log) => sum + stateToPercent(log.state), 0) /
-          prevWeekLogs.length
-        : null;
-
-    let trend: 'up' | 'down' | 'stable' | null = null;
-    if (logs.length >= 14 && weekAvg !== null && prevWeekAvg !== null) {
-      const diff = weekAvg - prevWeekAvg;
-      if (diff > 8) trend = 'up';
-      else if (diff < -8) trend = 'down';
-      else trend = 'stable';
-    }
-
-    const totalSignals = logs.length;
-
-    return { todayAvg, trend, totalSignals };
-  }, [logs]);
 
   // ─── Capacity reading ─────────────────────────────────────────────
   const reading = useMemo(() => {
@@ -220,58 +166,7 @@ export default function HomeScreen() {
           <OrgRoleBanner mode={currentMode} compact />
           {currentMode !== 'personal' && <ModeInsightsPanel logs={logs} />}
 
-          {/* Signal stats bar */}
-          <Animated.View
-            entering={FadeIn.delay(100).duration(350)}
-            style={styles.signalBar}
-          >
-            <View style={styles.signalItem}>
-              <Text style={styles.signalLabel}>{t.core.today.toUpperCase()}</Text>
-              <Text
-                style={[
-                  styles.signalValue,
-                  signalData.todayAvg !== null && {
-                    color:
-                      signalData.todayAvg >= 70
-                        ? modeConfig.accentColor
-                        : signalData.todayAvg >= 40
-                          ? '#F59E0B'
-                          : '#DC2626',
-                  },
-                ]}
-              >
-                {signalData.todayAvg !== null ? signalData.todayAvg + '%' : '—'}
-              </Text>
-            </View>
-            <View style={styles.signalDivider} />
-            <View style={styles.signalItem}>
-              <Text style={styles.signalLabel}>{t.core.trend.toUpperCase()}</Text>
-              <View style={styles.signalIconRow}>
-                {signalData.trend === 'up' && (
-                  <TrendingUp size={16} color={modeConfig.accentColor} />
-                )}
-                {signalData.trend === 'down' && <TrendingDown size={16} color="#DC2626" />}
-                {signalData.trend === 'stable' && <Minus size={16} color="#F59E0B" />}
-                {signalData.trend === null && (
-                  <Minus size={16} color="rgba(255,255,255,0.3)" />
-                )}
-              </View>
-            </View>
-            <View style={styles.signalDivider} />
-            <View style={styles.signalItem}>
-              <Text style={styles.signalLabel}>{t.core.signals.toUpperCase()}</Text>
-              <Text
-                style={[
-                  styles.signalValue,
-                  signalData.totalSignals > 0 && { color: 'rgba(255,255,255,0.85)' },
-                ]}
-              >
-                {signalData.totalSignals}
-              </Text>
-            </View>
-          </Animated.View>
-
-          {/* Pattern 1: Focal gauge (text-only, no orb) */}
+          {/* Pattern 1: Focal gauge */}
           <Animated.View
             entering={FadeIn.delay(150).duration(400)}
             style={styles.focalSection}
@@ -366,44 +261,6 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: 'rgba(255,255,255,0.4)',
     marginTop: 4,
-  },
-  signalBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  signalItem: {
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    minWidth: 70,
-  },
-  signalLabel: {
-    fontSize: 9,
-    color: 'rgba(255,255,255,0.4)',
-    fontWeight: '600',
-    letterSpacing: 1,
-    marginBottom: 4,
-  },
-  signalValue: {
-    fontSize: 16,
-    fontWeight: '300',
-    color: 'rgba(255,255,255,0.5)',
-  },
-  signalIconRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  signalDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: 'rgba(255,255,255,0.08)',
   },
   focalSection: {
     alignItems: 'center',
