@@ -24,16 +24,10 @@
 
   <link rel="icon" type="image/png" href="/icon.png">
 
-  <!-- Performance: font preload + DNS prefetch -->
-  <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/dmsans/v15/rP2Hp2ywxg089UriCZ2IHTWEBlwu8Q.woff2" crossorigin>
-  <meta http-equiv="x-dns-prefetch-control" content="on">
-  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-
-  <!-- Fonts (async) -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-  <noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"></noscript>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -55,39 +49,6 @@
   </script>
 
   <style>
-    /* ─── Accessibility ──────────────────────────────────────── */
-    .skip-to-content {
-      position: absolute; left: -9999px; top: 0;
-      background: #00E5FF; color: #01020A; padding: 12px 16px;
-      font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 1.5px;
-      text-decoration: none; z-index: 10000;
-    }
-    .skip-to-content:focus { left: 8px; top: 8px; }
-    a:focus-visible, button:focus-visible { outline: 2px solid #00E5FF; outline-offset: 3px; }
-    /* Hard Rule 10 — motion-free baseline, motion layered in only in no-preference */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-      }
-    }
-
-    /* ─── Scroll progress bar ────────────────────────────────── */
-    @supports (animation-timeline: scroll(root)) {
-      @media (prefers-reduced-motion: no-preference) {
-        .scroll-progress {
-          position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 300;
-          background: linear-gradient(90deg, #E5484D, #F5B547, #5DD9D4);
-          transform-origin: 0 50%; transform: scaleX(0);
-          animation: scroll-progress-grow linear;
-          animation-timeline: scroll(root);
-        }
-        @keyframes scroll-progress-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-      }
-    }
-
     /* ─── Reset ─────────────────────────────────────────────── */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
@@ -239,7 +200,7 @@
     .hero {
       position: relative;
       z-index: 10;
-      min-height: 200vh;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -247,25 +208,6 @@
       padding: 130px 32px 100px;
       text-align: center;
       overflow: hidden;
-    }
-
-    /* Hero sticky gauge */
-    .hero-sticky-gauge {
-      position: sticky; top: 12vh;
-      width: 260px; height: 260px; margin: 0 auto 32px;
-    }
-    @supports (animation-timeline: view()) {
-      @media (prefers-reduced-motion: no-preference) {
-        .hero-sticky-gauge {
-          animation: hero-gauge-shrink linear both;
-          animation-timeline: view();
-          animation-range: cover 0% cover 80%;
-        }
-        @keyframes hero-gauge-shrink {
-          from { transform: scale(1); opacity: 1; }
-          to   { transform: scale(0.35); opacity: 0.6; }
-        }
-      }
     }
 
     /* Radial atmospheric glow */
@@ -373,23 +315,15 @@
 
     .hero-headline {
       font-family: 'DM Sans', sans-serif;
-      font-size: clamp(2.2rem, 5.5vw, 4.5rem);
-      font-weight: 700; line-height: 1.08; letter-spacing: -0.02em;
-      color: #fff; max-width: 20ch; text-align: center; margin: 0 auto 24px;
+      font-weight: 700;
+      font-size: clamp(38px, 6.5vw, 72px);
+      line-height: 1.07;
+      letter-spacing: -2px;
+      color: var(--text);
+      max-width: 820px;
+      margin: 0 auto 28px;
     }
-    @supports (animation-timeline: view()) {
-      @media (prefers-reduced-motion: no-preference) {
-        .hero-headline.variant-fallback {
-          animation: headline-rise linear both;
-          animation-timeline: view();
-          animation-range: entry 20% cover 50%;
-        }
-        @keyframes headline-rise {
-          from { opacity: 0.6; transform: translateY(20px); }
-          to   { opacity: 1;   transform: translateY(0); }
-        }
-      }
-    }
+    @media (max-width: 640px) { .hero-headline { letter-spacing: -1.2px; } }
 
     .hero-headline .gradient-text {
       background: linear-gradient(90deg, var(--cyan) 0%, #00BFFF 50%, var(--teal) 100%);
@@ -1238,68 +1172,12 @@
       display: none;
     }
     .form-error.visible { display: block; }
-
-    /* ─── Trust sections ─────────────────────────────────────── */
-    .section-trust {
-      min-height: 90vh; display: grid; place-items: center;
-      padding: 80px 32px; position: relative; z-index: 10;
-    }
-    .section-trust .trust-eyebrow {
-      font-family: 'Space Mono', monospace; font-size: 11px;
-      color: #7A8593; letter-spacing: 2.5px; margin: 0 0 16px; text-transform: uppercase;
-    }
-    .section-trust .trust-lead {
-      font-family: 'DM Sans', sans-serif;
-      font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 700;
-      max-width: 20ch; margin: 0 0 24px; line-height: 1.1; color: #fff;
-    }
-    .section-trust .trust-body {
-      font-family: 'DM Sans', sans-serif; font-size: 1.125rem;
-      color: #B8C0CC; max-width: 54ch; line-height: 1.55; margin: 0;
-    }
-    .trust-inner { max-width: 700px; width: 100%; }
-    /* Scroll-reveal for trust items — motion added in no-preference only */
-    @supports (animation-timeline: view()) {
-      @media (prefers-reduced-motion: no-preference) {
-        .section-trust .trust-inner > * {
-          animation: trust-reveal linear both;
-          animation-timeline: view();
-          animation-range: entry 0% cover 35%;
-        }
-        .section-trust .trust-inner .trust-eyebrow { animation-delay: 0ms; }
-        .section-trust .trust-inner .trust-lead    { animation-delay: 80ms; }
-        .section-trust .trust-inner .trust-body    { animation-delay: 160ms; }
-        @keyframes trust-reveal {
-          from { opacity: 0; transform: translateY(28px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      }
-    }
-
-    /* ─── Demo section ───────────────────────────────────────── */
-    .section-demo {
-      padding: 100px 32px; text-align: center; position: relative; z-index: 10;
-    }
-    .demo-stage { display: grid; place-items: center; gap: 24px; margin-top: 40px; }
-    .demo-arc-wrap { position: relative; }
-    .demo-cta-link {
-      display: inline-block; margin-top: 8px;
-      padding: 14px 28px; border-radius: 999px;
-      background: #00E5FF; color: #01020A;
-      font-family: 'DM Sans', sans-serif; font-weight: 700;
-      text-decoration: none; font-size: 15px;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-    .demo-cta-link:hover { opacity: 0.88; transform: translateY(-1px); }
   </style>
 </head>
 
-<body data-conic="true">
-
-<a class="skip-to-content" href="#main">Skip to content</a>
+<body>
 
 <canvas id="starfield"></canvas>
-<div class="scroll-progress" aria-hidden="true"></div>
 
 <!-- ─── Navigation ─────────────────────────────────────────── -->
 <nav id="nav">
@@ -1314,19 +1192,21 @@
 </nav>
 
 <!-- ─── Hero ───────────────────────────────────────────────── -->
-<span id="home" style="position:absolute;top:0;"></span>
-<section class="hero" id="main">
+<section class="hero" id="home">
   <div class="hero-glow"></div>
 
-  <!-- Arc gauge — sticky wrapper for scroll animation -->
-  <div class="hero-sticky-gauge" data-testid="hero-gauge">
-    <div class="hero-gauge-outer reveal">
-      <canvas id="hero-arc-canvas" width="260" height="260" aria-label="Capacity gauge demo"></canvas>
-      <div class="hero-gauge-state" id="hero-gauge-state">ELEVATED</div>
-    </div>
+  <!-- Arc gauge — replaces CSS orb rings as hero visual -->
+  <div class="hero-gauge-outer reveal">
+    <canvas id="hero-arc-canvas" width="260" height="260" aria-label="Capacity gauge demo"></canvas>
+    <div class="hero-gauge-state" id="hero-gauge-state">ELEVATED</div>
   </div>
 
-  <h1 class="hero-headline variant-fallback reveal reveal-d1" data-testid="hero-headline">Your capacity. Read like a clinical instrument.</h1>
+  <p class="hero-eyebrow reveal reveal-d1">Capacity Intelligence · Built for Neurodivergent Minds</p>
+
+  <h1 class="hero-headline reveal reveal-d1">
+    Your capacity is real.<br>
+    <span class="gradient-text">Now it has a number.</span>
+  </h1>
 
   <p class="hero-sub reveal reveal-d2">
     Orbital measures your cognitive and emotional capacity each day —
@@ -1528,148 +1408,6 @@
     </div>
   </div>
 </section>
-
-<div class="divider"></div>
-
-<!-- Trust sequence — Capture → Intelligence → Proof → Together → Trust -->
-<section class="section-trust" data-testid="trust-capture" data-block="1">
-  <div class="trust-inner">
-    <div class="trust-eyebrow">Capture</div>
-    <p class="trust-lead">One 60-second check-in. That's it.</p>
-    <p class="trust-body">A few calibrated questions — no journaling, no homework, no 10-minute forms. Orbital captures your capacity state the moment you open it. Your nervous system can hold that.</p>
-  </div>
-</section>
-
-<section class="section-trust" data-testid="trust-intelligence" data-block="2">
-  <div class="trust-inner">
-    <div class="trust-eyebrow">Intelligence</div>
-    <p class="trust-lead">Your number. Not a mood. Not a vibe.</p>
-    <p class="trust-body">Your CCI score puts a real number on how much cognitive and emotional capacity you actually have available right now — from depleted to resourced. Finally, data that matches what you feel.</p>
-  </div>
-</section>
-
-<section class="section-trust" data-testid="trust-proof" data-block="3">
-  <div class="trust-inner">
-    <div class="trust-eyebrow">Proof</div>
-    <p class="trust-lead">90 days of data become a clinical instrument.</p>
-    <p class="trust-body">Over 30, 60, 90 days, Orbital reveals your triggers, recovery patterns, and baseline capacity. Data you can show a doctor, therapist, or just yourself.</p>
-  </div>
-</section>
-
-<section class="section-trust" data-testid="trust-together" data-block="4">
-  <div class="trust-inner">
-    <div class="trust-eyebrow">Together</div>
-    <p class="trust-lead">Built for variable brains. Not productivity culture.</p>
-    <p class="trust-body">Missing a day doesn't reset anything. The UI does the work — no decisions, no choices, no streak pressure. Low cognitive load by design.</p>
-  </div>
-</section>
-
-<section class="section-trust" data-testid="trust-trust" data-block="5">
-  <div class="trust-inner">
-    <div class="trust-eyebrow">Trust</div>
-    <p class="trust-lead">Your data belongs to you. Always.</p>
-    <p class="trust-body">Export your full CCI record anytime, in any format. Share with your provider. Real data that translates into appointments. No lock-in.</p>
-  </div>
-</section>
-
-<!-- Interactive demo -->
-<section class="section-demo" data-testid="demo-section">
-  <div style="font-family:'Space Mono',monospace;font-size:11px;color:#7A8593;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:12px;">TRY IT NOW</div>
-  <p style="font-family:'DM Sans',sans-serif;font-size:clamp(1.75rem,4vw,2.5rem);font-weight:700;max-width:22ch;margin:0 auto 40px;line-height:1.15;color:#fff;">Drag the dial. See what Orbital would say.</p>
-  <div class="demo-stage">
-    <div class="demo-arc-wrap">
-      <canvas id="demo-arc" width="280" height="280"
-              data-testid="demo-arc"
-              tabindex="0" role="slider"
-              aria-label="Drag to set your current capacity"
-              aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-valuetext="50, ELEVATED"
-              style="touch-action:none;cursor:grab;display:block;"></canvas>
-    </div>
-    <div id="demo-readout" data-testid="demo-readout" aria-live="polite">
-      <div id="demo-score" style="font-size:64px;font-weight:700;color:#fff;line-height:1;font-family:'DM Sans',sans-serif;">50</div>
-      <div id="demo-state" style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2.5px;color:#F5B547;margin-top:8px;text-transform:uppercase;">ELEVATED</div>
-    </div>
-    <div id="demo-insight" data-testid="demo-insight"
-         style="padding:14px 18px;border:1px solid rgba(0,229,255,0.25);border-radius:14px;background:rgba(0,229,255,0.04);max-width:36ch;text-align:center;">
-      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:#00E5FF;margin-bottom:6px;text-transform:uppercase;">One thing today</div>
-      <div id="demo-rec" style="font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.45;color:#fff;">You&rsquo;re in your typical range. Use it.</div>
-    </div>
-    <a href="#waitlist" class="demo-cta-link" data-testid="demo-cta">If that resonated, join the waitlist</a>
-  </div>
-</section>
-
-<script defer>
-(function() {
-  var c = document.getElementById('demo-arc'); if (!c) return;
-  var ctx = c.getContext('2d');
-  var SIZE=280, R=110, W=14, CX=140, CY=140;
-  var ARC_START=225, ARC_SWEEP=270;
-  var score=50;
-  var USE_CONIC = (document.body.getAttribute('data-conic') === 'true');
-
-  function stateOf(s){ return s<40?'DEPLETED':s<70?'ELEVATED':'RESOURCED'; }
-  function colorOf(s){ return s<40?'#E5484D':s<70?'#F5B547':'#5DD9D4'; }
-  function insightOf(s){
-    if(s<40) return '20 minutes of low-stim time before 4 PM.';
-    if(s<70) return "Protect tomorrow's morning block, no meetings before 10 AM.";
-    return "You're in your typical range. Use it.";
-  }
-  function pointToScore(x,y){
-    var dx=x-CX, dy=y-CY;
-    var deg=(Math.atan2(dy,dx)*180/Math.PI+360)%360;
-    var cw=(deg+90)%360;
-    var onArc=(cw-ARC_START+360)%360;
-    if(onArc>ARC_SWEEP) onArc=(onArc-ARC_SWEEP<360-onArc)?ARC_SWEEP:0;
-    return (onArc/ARC_SWEEP)*100;
-  }
-  function buildGradient(){
-    if(USE_CONIC){
-      var g=ctx.createConicGradient((ARC_START+ARC_SWEEP/2)*Math.PI/180,CX,CY);
-      g.addColorStop(0,'#E5484D'); g.addColorStop(0.5,'#F5B547'); g.addColorStop(1,'#5DD9D4');
-      return g;
-    }
-    var lg=ctx.createLinearGradient(CX-R,CY+R,CX+R,CY-R);
-    lg.addColorStop(0,'#E5484D'); lg.addColorStop(0.5,'#F5B547'); lg.addColorStop(1,'#5DD9D4');
-    return lg;
-  }
-  function draw(){
-    var dpr=window.devicePixelRatio||1;
-    if(c.width!==SIZE*dpr){ c.width=SIZE*dpr; c.height=SIZE*dpr; c.style.width=SIZE+'px'; c.style.height=SIZE+'px'; }
-    ctx.save(); ctx.scale(dpr,dpr);
-    ctx.clearRect(0,0,SIZE,SIZE);
-    ctx.lineWidth=W; ctx.lineCap='round';
-    ctx.strokeStyle='rgba(255,255,255,0.10)';
-    ctx.beginPath(); ctx.arc(CX,CY,R,ARC_START*Math.PI/180,(ARC_START+ARC_SWEEP)*Math.PI/180); ctx.stroke();
-    var endA=ARC_START+(score/100)*ARC_SWEEP;
-    ctx.strokeStyle=buildGradient();
-    ctx.beginPath(); ctx.arc(CX,CY,R,ARC_START*Math.PI/180,endA*Math.PI/180); ctx.stroke();
-    var tipA=endA*Math.PI/180, tx=CX+R*Math.cos(tipA), ty=CY+R*Math.sin(tipA);
-    var glow=ctx.createRadialGradient(tx,ty,0,tx,ty,W*1.4);
-    glow.addColorStop(0,'rgba(93,217,212,0.45)'); glow.addColorStop(1,'rgba(93,217,212,0)');
-    ctx.beginPath(); ctx.arc(tx,ty,W*1.4,0,Math.PI*2); ctx.fillStyle=glow; ctx.fill();
-    ctx.beginPath(); ctx.arc(tx,ty,W*0.72,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fill();
-    ctx.restore();
-    var rounded=Math.round(score);
-    var st=stateOf(score), cl=colorOf(score);
-    document.getElementById('demo-score').textContent=rounded;
-    var stEl=document.getElementById('demo-state'); stEl.textContent=st; stEl.style.color=cl;
-    document.getElementById('demo-rec').textContent=insightOf(score);
-    c.setAttribute('aria-valuenow',String(rounded));
-    c.setAttribute('aria-valuetext',rounded+', '+st);
-  }
-  var dragging=false;
-  function fromEvent(e){ var r=c.getBoundingClientRect(), p=e.touches?e.touches[0]:e;
-    return {x:(p.clientX-r.left)*(SIZE/r.width), y:(p.clientY-r.top)*(SIZE/r.height)}; }
-  c.addEventListener('pointerdown',function(e){ dragging=true; c.setPointerCapture(e.pointerId); var p=fromEvent(e); score=pointToScore(p.x,p.y); draw(); });
-  c.addEventListener('pointermove',function(e){ if(!dragging) return; var p=fromEvent(e); score=pointToScore(p.x,p.y); draw(); });
-  c.addEventListener('pointerup',function(){ dragging=false; });
-  c.addEventListener('keydown',function(e){
-    if(e.key==='ArrowUp'||e.key==='ArrowRight'){ score=Math.min(100,score+5); draw(); e.preventDefault(); }
-    if(e.key==='ArrowDown'||e.key==='ArrowLeft'){ score=Math.max(0,score-5); draw(); e.preventDefault(); }
-  });
-  draw();
-})();
-</script>
 
 <div class="divider"></div>
 
@@ -2113,24 +1851,6 @@ async function submitWaitlist(source) {
     });
   }
 });
-</script>
-
-<script>
-(function(){
-  var qs=new URLSearchParams(location.search);
-  var v=(qs.get('for')||'').toLowerCase();
-  var h=document.querySelector('[data-testid="hero-headline"]'); if(!h) return;
-  var variants={
-    therapist:'A clinical instrument your clients can actually use.',
-    adhd:'Your ADHD capacity. Tracked like a clinical instrument.',
-    audhd:'Your AuDHD capacity. Tracked like a clinical instrument.',
-    'default':'Your capacity. Read like a clinical instrument.'
-  };
-  var key=(v&&variants[v])?v:'default';
-  h.textContent=variants[key];
-  h.setAttribute('data-variant',key);
-  document.body.setAttribute('data-audience',key);
-})();
 </script>
 
 </body>
