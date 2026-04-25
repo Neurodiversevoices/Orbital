@@ -620,6 +620,40 @@
       margin-bottom: 28px;
     }
 
+    /* Arc gauge */
+    .cci-arc-wrap {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .cci-arc-wrap canvas { display: block; }
+    .cci-arc-overlay {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -48%);
+      text-align: center;
+      pointer-events: none;
+    }
+    /* Hero gauge */
+    .hero-gauge-outer {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 24px auto 0;
+    }
+    .hero-gauge-state {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
     .cci-stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1161,15 +1195,13 @@
 <section class="hero" id="home">
   <div class="hero-glow"></div>
 
-  <!-- CSS Orb -->
-  <div class="orb-wrap">
-    <div class="orb-ring"></div>
-    <div class="orb-ring"></div>
-    <div class="orb-ring"></div>
-    <div class="orb"></div>
+  <!-- Arc gauge — replaces CSS orb rings as hero visual -->
+  <div class="hero-gauge-outer reveal">
+    <canvas id="hero-arc-canvas" width="260" height="260" aria-label="Capacity gauge demo"></canvas>
+    <div class="hero-gauge-state" id="hero-gauge-state">ELEVATED</div>
   </div>
 
-  <p class="hero-eyebrow reveal">Capacity Intelligence · Built for Neurodivergent Minds</p>
+  <p class="hero-eyebrow reveal reveal-d1">Capacity Intelligence · Built for Neurodivergent Minds</p>
 
   <h1 class="hero-headline reveal reveal-d1">
     Your capacity is real.<br>
@@ -1259,21 +1291,15 @@
             <span style="font-family:'Space Mono',monospace; font-size:10px; color:var(--cyan); opacity:0.7;">Today</span>
           </div>
 
-          <div class="cci-score-row">
-            <span class="cci-score-num" id="cci-demo-num">72</span>
-            <div>
-              <div class="cci-score-label">Resourced</div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">↑ +8 from yesterday</div>
+          <div class="cci-arc-wrap">
+            <canvas id="cci-arc-canvas" width="280" height="280"></canvas>
+            <div class="cci-arc-overlay">
+              <span class="cci-score-num" id="cci-demo-num" style="font-size:56px;">72</span>
+              <div style="margin-top:2px;">
+                <div class="cci-score-label" id="cci-demo-label">Resourced</div>
+                <div style="font-size:10px; color:var(--text-muted); margin-top:2px;" id="cci-demo-delta">↑ +8 from yesterday</div>
+              </div>
             </div>
-          </div>
-
-          <div class="cci-bar-wrap">
-            <div class="cci-bar-fill" id="cci-demo-bar" style="width:72%;"></div>
-          </div>
-          <div class="cci-bar-labels">
-            <span style="color:var(--crimson);">Depleted</span>
-            <span>Elevated</span>
-            <span style="color:var(--cyan);">Resourced</span>
           </div>
 
           <div class="cci-stats">
@@ -1640,28 +1666,128 @@ setTimeout(() => {
 }, 80);
 
 /* ─── CCI demo animation ───────────────────────────────── */
+/* ─── Orbital arc gauge — matches iOS/web Gauge exactly ─────── */
 (function() {
-  const numEl  = document.getElementById('cci-demo-num');
-  const barEl  = document.getElementById('cci-demo-bar');
-  if (!numEl || !barEl) return;
+  var ARC_START = 225 * Math.PI / 180;
+  var ARC_SWEEP = 270 * Math.PI / 180;
 
-  const scores = [72, 58, 81, 44, 67, 88, 53];
-  const labels = ['Resourced', 'Elevated', 'Resourced', 'Depleted', 'Elevated', 'Resourced', 'Elevated'];
-  const colors = ['#00E5FF', '#FFB830', '#00E5FF', '#FF3D5A', '#FFB830', '#00E5FF', '#FFB830'];
-  let idx = 0;
+  function gaugeColor(score) {
+    if (score < 40) return '#FF3D5A';
+    if (score < 70) return '#FFB830';
+    return '#00E5FF';
+  }
+  function stateLabel(score) {
+    if (score < 40) return 'DEPLETED';
+    if (score < 70) return 'ELEVATED';
+    return 'RESOURCED';
+  }
 
-  setInterval(() => {
-    idx = (idx + 1) % scores.length;
-    const score = scores[idx];
-    numEl.textContent = score;
-    numEl.style.color = colors[idx];
-    barEl.style.width = score + '%';
-    const labelEl = numEl.nextElementSibling.firstElementChild;
-    if (labelEl) {
-      labelEl.textContent = labels[idx];
-      labelEl.style.color = colors[idx];
+  function drawArc(canvas, score, size) {
+    var dpr = window.devicePixelRatio || 1;
+    if (canvas.width !== size * dpr) {
+      canvas.width = size * dpr;
+      canvas.height = size * dpr;
+      canvas.style.width = size + 'px';
+      canvas.style.height = size + 'px';
     }
-  }, 2800);
+    var ctx = canvas.getContext('2d');
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    var cx = size / 2, cy = size / 2;
+    var r = size * 0.375, w = Math.max(8, size * 0.044);
+    var s = Math.max(0, Math.min(100, score));
+    var endAng = ARC_START + (s / 100) * ARC_SWEEP;
+
+    ctx.clearRect(0, 0, size, size);
+
+    /* track */
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, ARC_START, ARC_START + ARC_SWEEP);
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.stroke();
+
+    /* active arc */
+    if (s > 0.5) {
+      var gx0 = cx + r * Math.cos(ARC_START), gy0 = cy + r * Math.sin(ARC_START);
+      var gx1 = cx + r * Math.cos(ARC_START + ARC_SWEEP), gy1 = cy + r * Math.sin(ARC_START + ARC_SWEEP);
+      var grad = ctx.createLinearGradient(gx0, gy0, gx1, gy1);
+      grad.addColorStop(0, '#FF3D5A');
+      grad.addColorStop(0.5, '#FFB830');
+      grad.addColorStop(1, '#00E5FF');
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, ARC_START, endAng);
+      ctx.strokeStyle = grad; ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.stroke();
+    }
+
+    /* glow dot */
+    var tx = cx + r * Math.cos(endAng), ty = cy + r * Math.sin(endAng);
+    var glow = ctx.createRadialGradient(tx, ty, 0, tx, ty, w * 1.4);
+    glow.addColorStop(0, 'rgba(0,229,255,0.45)');
+    glow.addColorStop(1, 'rgba(0,229,255,0)');
+    ctx.beginPath(); ctx.arc(tx, ty, w * 1.4, 0, Math.PI * 2);
+    ctx.fillStyle = glow; ctx.fill();
+    ctx.beginPath(); ctx.arc(tx, ty, w * 0.72, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.fill();
+
+    ctx.restore();
+  }
+
+  /* ── CCI demo card ─────────────────────────────────────── */
+  var cciCanvas = document.getElementById('cci-arc-canvas');
+  var numEl     = document.getElementById('cci-demo-num');
+  var labelEl   = document.getElementById('cci-demo-label');
+  var deltaEl   = document.getElementById('cci-demo-delta');
+
+  var scores  = [72, 58, 81, 44, 67, 88, 53];
+  var deltas  = ['↑ +8 from yesterday','↓ −3 from yesterday','↑ +23 from yesterday','↓ −14 from yesterday','↑ +5 from yesterday','↑ +21 from yesterday','↓ −8 from yesterday'];
+  var cciIdx  = 0;
+  var cciCur  = 72, cciTarget = 72;
+
+  function animCci() {
+    cciCur += (cciTarget - cciCur) * 0.08;
+    if (cciCanvas) drawArc(cciCanvas, cciCur, 280);
+    if (Math.abs(cciCur - cciTarget) > 0.3) { requestAnimationFrame(animCci); }
+  }
+
+  if (cciCanvas) {
+    drawArc(cciCanvas, 72, 280);
+    setInterval(function() {
+      cciIdx = (cciIdx + 1) % scores.length;
+      cciTarget = scores[cciIdx];
+      var color = gaugeColor(cciTarget);
+      if (numEl) { numEl.textContent = cciTarget; numEl.style.color = color; }
+      if (labelEl) { labelEl.textContent = stateLabel(cciTarget); labelEl.style.color = color; }
+      if (deltaEl) deltaEl.textContent = deltas[cciIdx];
+      requestAnimationFrame(animCci);
+    }, 2800);
+  }
+
+  /* ── Hero gauge ────────────────────────────────────────── */
+  var heroCanvas = document.getElementById('hero-arc-canvas');
+  var heroState  = document.getElementById('hero-gauge-state');
+  var heroCur = 60, heroTarget = 60;
+
+  function animHero() {
+    heroCur += (heroTarget - heroCur) * 0.05;
+    if (heroCanvas) drawArc(heroCanvas, heroCur, 260);
+    if (heroState) {
+      var lbl = stateLabel(heroCur);
+      heroState.textContent = lbl;
+      heroState.style.color = gaugeColor(heroCur);
+    }
+    if (Math.abs(heroCur - heroTarget) > 0.2) requestAnimationFrame(animHero);
+  }
+
+  if (heroCanvas) {
+    drawArc(heroCanvas, 60, 260);
+    var heroSeq = [60, 80, 25, 75, 45, 90, 35, 65];
+    var heroIdx = 0;
+    setInterval(function() {
+      heroIdx = (heroIdx + 1) % heroSeq.length;
+      heroTarget = heroSeq[heroIdx];
+      requestAnimationFrame(animHero);
+    }, 3200);
+  }
 })();
 
 /* ─── Email validation ─────────────────────────────────── */
