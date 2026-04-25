@@ -32,7 +32,7 @@ import {
   DMSans_700Bold,
 } from '@expo-google-fonts/dm-sans';
 import { SpaceMono_400Regular } from '@expo-google-fonts/space-mono';
-import { useAuth, validatePassword, isSupabaseConfigured } from '../../lib/supabase';
+import { useAuth, validatePassword, isSupabaseConfigured, getSupabase } from '../../lib/supabase';
 import { getLogs } from '../../lib/storage';
 import { enqueueLog } from '../../lib/cloud/outbox';
 import { pushToCloud, localToCloudUpsert } from '../../lib/cloud/syncEngine';
@@ -100,10 +100,25 @@ export default function AuthScreen() {
   const passwordValidation = validatePassword(password);
   const isConfigured = isSupabaseConfigured();
 
-  // Called after any successful sign-in (not sign-up, which may need email confirmation).
-  // Starts local log migration in background, then navigates immediately.
-  const onSuccess = useCallback(() => {
+  // Called after any successful sign-in. Checks for first-time onboarding.
+  // Migrates local logs in background while routing decision is made.
+  const onSuccess = useCallback(async () => {
     migrateLocalLogs(); // fire-and-forget
+    try {
+      const sb = getSupabase();
+      const { data: { user } } = await sb.auth.getUser();
+      if (user) {
+        const { data: profile } = await sb
+          .from('user_profiles')
+          .select('orb_tuning')
+          .eq('user_id', user.id)
+          .single();
+        if (!profile?.orb_tuning) {
+          router.replace('/(onboarding)/avatar');
+          return;
+        }
+      }
+    } catch { /* on error proceed to tabs */ }
     router.replace('/(tabs)');
   }, [router]);
 

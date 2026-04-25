@@ -1,0 +1,395 @@
+{
+  "identifier": "80C5BC67-9DB9-4515-9AAA-7D96F100D0F1",
+  "nonSubscriptionProducts": [
+    {
+      "displayPrice": "99.99",
+      "familySharable": false,
+      "internalID": "F92C7758-961F-4AC1-9375-A17F30782608",
+      "localizations": [
+        {
+          "description": "CCI 30-Day Report",
+          "displayName": "CCI 30-Day Report",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_cci_30",
+      "referenceName": "CCI 30-Day Report",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "149.99",
+      "familySharable": false,
+      "internalID": "2AA67C41-EE08-4A09-B003-4185F3E46495",
+      "localizations": [
+        {
+          "description": "CCI 60-Day Report",
+          "displayName": "CCI 60-Day Report",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_cci_60",
+      "referenceName": "CCI 60-Day Report",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "199.99",
+      "familySharable": false,
+      "internalID": "C25349DC-6432-4158-B94E-B153B46F8072",
+      "localizations": [
+        {
+          "description": "CCI 90-Day Report",
+          "displayName": "CCI 90-Day Report",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_cci_90",
+      "referenceName": "CCI 90-Day Report",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "349.99",
+      "familySharable": false,
+      "internalID": "023234C5-7520-4D32-8209-C702B7806303",
+      "localizations": [
+        {
+          "description": "CCI Bundle",
+          "displayName": "CCI Bundle",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_cci_bundle",
+      "referenceName": "CCI Bundle",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "399.99",
+      "familySharable": false,
+      "internalID": "5F6EC1A5-9F25-4325-9A95-11D1257CA133",
+      "localizations": [
+        {
+          "description": "CCI Circle All",
+          "displayName": "CCI Circle All",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_cci_circle_all",
+      "referenceName": "CCI Circle All",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "999.99",
+      "familySharable": false,
+      "internalID": "9113CD31-D233-456B-BB75-A32A3F5C27C2",
+      "localizations": [
+        {
+          "description": "CCI Bundle All",
+          "displayName": "CCI Bundle All",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_cci_bundle_all",
+      "referenceName": "CCI Bundle All",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "79.99",
+      "familySharable": false,
+      "internalID": "33254CE8-0AFF-428F-AD7B-D77D523966F5",
+      "localizations": [
+        {
+          "description": "QCR Circle",
+          "displayName": "QCR Circle",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_qcr_circle",
+      "referenceName": "QCR Circle",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "149.99",
+      "familySharable": false,
+      "internalID": "608BE658-D9D7-4DEF-98AA-E19E516DC11E",
+      "localizations": [
+        {
+          "description": "QCR Bundle",
+          "displayName": "QCR Bundle",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_qcr_bundle",
+      "referenceName": "QCR Bundle",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "0.00",
+      "familySharable": false,
+      "internalID": "BFA5A8E6-642B-4D38-8F75-C92CF6EAF5B1",
+      "localizations": [
+        {
+          "description": "CCI Free (Legacy)",
+          "displayName": "CCI Free (Legacy)",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_cci_free",
+      "referenceName": "CCI Free (Legacy)",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "99.99",
+      "familySharable": false,
+      "internalID": "D6B1D5B8-2517-4D08-B00C-5288A0CC15B6",
+      "localizations": [
+        {
+          "description": "CCI Pro (Legacy)",
+          "displayName": "CCI Pro (Legacy)",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_cci_pro",
+      "referenceName": "CCI Pro (Legacy)",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "9999.99",
+      "familySharable": false,
+      "internalID": "92487C01-EF00-40DE-8797-7205DB3B5DED",
+      "localizations": [
+        {
+          "description": "Bundle 25 Annual (Legacy)",
+          "displayName": "Bundle 25 Annual (Legacy)",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "orbital_bundle_25_annual",
+      "referenceName": "Bundle 25 Annual (Legacy)",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_failTransactionsEnabled": false,
+    "_interruptedPurchasesEnabled": false,
+    "_locale": "en_US",
+    "_storefront": "USA",
+    "_storeKitErrors": []
+  },
+  "subscriptionGroups": [
+    {
+      "id": "1B3E2D60-9A69-4068-9078-32863E3C3C7B",
+      "localizations": [],
+      "name": "Orbital Subscriptions",
+      "subscriptions": [
+        {
+          "displayPrice": "29.99",
+          "familySharable": false,
+          "groupNumber": 1,
+          "introductoryOffer": null,
+          "internalID": "D78D947D-0BE7-4928-A02C-B93F69E9B600",
+          "localizations": [
+            {
+              "description": "Pro Monthly",
+              "displayName": "Pro Monthly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_pro_monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "Pro Monthly",
+          "subscriptionGroupID": "1B3E2D60-9A69-4068-9078-32863E3C3C7B",
+          "type": "RecurringSubscription"
+        },
+        {
+          "displayPrice": "289.99",
+          "familySharable": false,
+          "groupNumber": 2,
+          "introductoryOffer": null,
+          "internalID": "40E27A44-D715-46FA-A3F7-41ACDD596AC7",
+          "localizations": [
+            {
+              "description": "Pro Annual",
+              "displayName": "Pro Annual",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_pro_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Pro Annual",
+          "subscriptionGroupID": "1B3E2D60-9A69-4068-9078-32863E3C3C7B",
+          "type": "RecurringSubscription"
+        },
+        {
+          "displayPrice": "49.99",
+          "familySharable": false,
+          "groupNumber": 3,
+          "introductoryOffer": null,
+          "internalID": "2872B463-F901-499C-9672-E5B904A2025C",
+          "localizations": [
+            {
+              "description": "Family Monthly",
+              "displayName": "Family Monthly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_family_monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "Family Monthly",
+          "subscriptionGroupID": "1B3E2D60-9A69-4068-9078-32863E3C3C7B",
+          "type": "RecurringSubscription"
+        },
+        {
+          "displayPrice": "489.99",
+          "familySharable": false,
+          "groupNumber": 4,
+          "introductoryOffer": null,
+          "internalID": "64D5B8D7-38C5-43AD-B302-3F3227C830F3",
+          "localizations": [
+            {
+              "description": "Family Annual",
+              "displayName": "Family Annual",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_family_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Family Annual",
+          "subscriptionGroupID": "1B3E2D60-9A69-4068-9078-32863E3C3C7B",
+          "type": "RecurringSubscription"
+        },
+        {
+          "displayPrice": "69.99",
+          "familySharable": false,
+          "groupNumber": 5,
+          "introductoryOffer": null,
+          "internalID": "C865FCEB-D8D2-4CD7-9050-B6646CB3A6FE",
+          "localizations": [
+            {
+              "description": "Family+ Monthly",
+              "displayName": "Family+ Monthly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_family_plus_monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "Family+ Monthly",
+          "subscriptionGroupID": "1B3E2D60-9A69-4068-9078-32863E3C3C7B",
+          "type": "RecurringSubscription"
+        },
+        {
+          "displayPrice": "689.99",
+          "familySharable": false,
+          "groupNumber": 6,
+          "introductoryOffer": null,
+          "internalID": "7ACDF4AD-88A4-4A40-BB10-A228780AEA3C",
+          "localizations": [
+            {
+              "description": "Family+ Annual",
+              "displayName": "Family+ Annual",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_family_plus_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Family+ Annual",
+          "subscriptionGroupID": "1B3E2D60-9A69-4068-9078-32863E3C3C7B",
+          "type": "RecurringSubscription"
+        },
+        {
+          "displayPrice": "79.99",
+          "familySharable": false,
+          "groupNumber": 7,
+          "introductoryOffer": null,
+          "internalID": "A3BCE5DE-C2D4-45B8-9A45-4989DE100404",
+          "localizations": [
+            {
+              "description": "Circle Monthly",
+              "displayName": "Circle Monthly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_circle_monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "Circle Monthly",
+          "subscriptionGroupID": "1B3E2D60-9A69-4068-9078-32863E3C3C7B",
+          "type": "RecurringSubscription"
+        },
+        {
+          "displayPrice": "789.99",
+          "familySharable": false,
+          "groupNumber": 8,
+          "introductoryOffer": null,
+          "internalID": "4B0C3B88-5EFE-4520-8E7E-D3279E1508B7",
+          "localizations": [
+            {
+              "description": "Circle Annual",
+              "displayName": "Circle Annual",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_circle_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Circle Annual",
+          "subscriptionGroupID": "1B3E2D60-9A69-4068-9078-32863E3C3C7B",
+          "type": "RecurringSubscription"
+        },
+        {
+          "displayPrice": "2699.99",
+          "familySharable": false,
+          "groupNumber": 9,
+          "introductoryOffer": null,
+          "internalID": "DEF3E9DD-DA63-4940-8D56-CDC3AB7F4DE3",
+          "localizations": [
+            {
+              "description": "Bundle 10 Annual",
+              "displayName": "Bundle 10 Annual",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_bundle_10_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Bundle 10 Annual",
+          "subscriptionGroupID": "1B3E2D60-9A69-4068-9078-32863E3C3C7B",
+          "type": "RecurringSubscription"
+        },
+        {
+          "displayPrice": "3999.99",
+          "familySharable": false,
+          "groupNumber": 10,
+          "introductoryOffer": null,
+          "internalID": "7C56C2D9-9EE0-4C3F-9C3A-13E4CACD06F0",
+          "localizations": [
+            {
+              "description": "Bundle 15 Annual",
+              "displayName": "Bundle 15 Annual",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_bundle_15_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Bundle 15 Annual",
+          "subscriptionGroupID": "1B3E2D60-9A69-4068-9078-32863E3C3C7B",
+          "type": "RecurringSubscription"
+        },
+        {
+          "displayPrice": "5199.99",
+          "familySharable": false,
+          "groupNumber": 11,
+          "introductoryOffer": null,
+          "internalID": "34EF053E-CACB-4070-8D4D-3CD173DAF7BC",
+          "localizations": [
+            {
+              "description": "Bundle 20 Annual",
+              "displayName": "Bundle 20 Annual",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "orbital_bundle_20_annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Bundle 20 Annual",
+          "subscriptionGroupID": "1B3E2D60-9A69-4068-9078-32863E3C3C7B",
+          "type": "RecurringSubscription"
+        }
+      ]
+    }
+  ]
+}
