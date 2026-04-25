@@ -731,11 +731,11 @@ export default function HomeScreen() {
               </View>
             </Animated.View>
 
-            {/* Capacity Gauge — web only (canvas API not available on native) */}
-            {Platform.OS === 'web' && (() => {
+            {/* Capacity Gauge — native uses Skia via .native.jsx resolver */}
+            {(() => {
               const demoReading = (() => { try { return calculateCapacity(DEMO_INPUT); } catch { return null; } })();
               return (
-                <View style={{ height: 360, marginBottom: 16, position: 'relative' }}>
+                <View style={{ height: 320, marginBottom: 8, position: 'relative' }}>
                   <CapacityGaugeLive
                     data={demoReading}
                     inputBreakdown={{ calendar: 0.55, inbox: 0.40, deepWork: 0.62, sleep: 0.85 }}
