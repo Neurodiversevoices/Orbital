@@ -23,13 +23,14 @@ export function MetricCard({ label, value, trend, baselineDay, baselineTarget }:
   const isCalibrating = value === null;
 
   return (
-    <View
-      style={styles.card}
-      testID={`metric-card-${label.toLowerCase()}`}
-      accessibilityLabel={`${label}: ${displayValue}`}
-    >
+    <View style={styles.card} testID={`metric-card-${label.toLowerCase()}`}>
       <Text style={styles.label}>{label.toUpperCase()}</Text>
-      <Text style={[styles.value, isCalibrating && styles.valueDim]} numberOfLines={2}>
+      <Text
+        style={[styles.value, isCalibrating && styles.valueDim]}
+        numberOfLines={2}
+        testID={`metric-card-${label.toLowerCase()}-value`}
+        accessibilityLabel={displayValue}
+      >
         {displayValue}
       </Text>
       {trend !== null && !isCalibrating && (

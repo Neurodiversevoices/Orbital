@@ -1,0 +1,160 @@
+# Orbital v4.1 — Today Screen 7-Pattern Behavioral Test
+# Tests all 7 patterns using accessibility tree (behavioral) + screenshots (OCR evidence).
+# No ShaderOrb, no Skia canvas, no grep-based assertions.
+#
+# Run from repo root:
+#   export PATH="$HOME/.maestro/bin:$PATH"
+#   maestro test maestro/tests/v4_1_today_screen.yaml \
+#     -e REVIEW_EMAIL='review@orbital.health' \
+#     -e REVIEW_PASSWORD='Review2026!'
+#
+appId: com.erparris.orbital
+---
+- launchApp:
+    appId: com.erparris.orbital
+    clearState: false
+
+# ── Gates ──────────────────────────────────────────────────────────────────────
+
+- runFlow:
+    when:
+      visible: "Terms of Service"
+    commands:
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - scroll
+      - tapOn:
+          text: "I Accept"
+          optional: true
+      - tapOn:
+          text: "Scroll to Accept"
+          optional: true
+      - waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible: "Age Verification"
+    commands:
+      - tapOn: "YYYY"
+      - inputText: "1990"
+      - tapOn: "I confirm that I am at least 13 years old."
+      - tapOn: "Continue"
+      - waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible: "Sign in with email"
+    commands:
+      - tapOn: "Sign in with email"
+      - tapOn: "Email"
+      - inputText: ${REVIEW_EMAIL}
+      - tapOn: "Password"
+      - inputText: ${REVIEW_PASSWORD}
+      - tapOn: "Sign in"
+      - waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible: "Skip for now"
+    commands:
+      - tapOn: "Skip for now"
+      - waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible: "Welcome to Orbital"
+    commands:
+      - tapOn: "Skip"
+      - waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible: "Why Orbital Exists"
+    commands:
+      - tapOn: "I understand"
+      - waitForAnimationToEnd
+
+# ── Wait for Today screen ──────────────────────────────────────────────────────
+
+- extendedWaitUntil:
+    visible:
+      text: "Today's Capacity State"
+    timeout: 180000
+
+- waitForAnimationToEnd
+
+# Navigate to Today tab (first tab — Activity icon, ~12% x, ~96% y)
+- tapOn:
+    point: "12%, 96%"
+- waitForAnimationToEnd
+
+# ── Screenshot 1: Full Today screen ────────────────────────────────────────────
+- takeScreenshot: "v4_1_01_today_full"
+
+# ── PATTERN 7: Date header + screen root visible ───────────────────────────────
+- assertVisible: "Today's Capacity State"
+- assertVisible:
+    id: "today-screen"
+
+# ── PATTERN 1: Gauge renders — testID gauge-root + score + state ───────────────
+- assertVisible:
+    id: "gauge-root"
+- assertVisible:
+    id: "gauge-value"
+- assertVisible:
+    id: "gauge-state"
+- takeScreenshot: "v4_1_02_gauge_focal"
+
+# ── PATTERN 2: TypicalRangeChip — testID visible ──────────────────────────────
+- assertVisible:
+    id: "typical-range-chip"
+- takeScreenshot: "v4_1_03_typical_chip"
+
+# ── Scroll to ensure metric cards are in viewport ─────────────────────────────
+- scrollUntilVisible:
+    element:
+      id: "metrics-row"
+    direction: DOWN
+    timeout: 5000
+- waitForAnimationToEnd
+
+# ── PATTERN 3: Metric card row ─────────────────────────────────────────────────
+- assertVisible:
+    id: "metrics-row"
+- assertVisible:
+    id: "metric-card-sleep"
+- assertVisible:
+    id: "metric-card-hrv"
+- assertVisible:
+    id: "metric-card-rhr"
+# Rule 2.11: calibrating fallback renders via Text testID (not em-dash, not empty string)
+- assertVisible:
+    id: "metric-card-sleep-value"
+- takeScreenshot: "v4_1_04_metric_cards"
+
+# ── PATTERN 4: SignalCard / insight ───────────────────────────────────────────
+- scrollUntilVisible:
+    element:
+      id: "signal-card"
+    direction: DOWN
+    timeout: 5000
+- assertVisible:
+    id: "signal-card"
+- assertVisible: "ONE THING TODAY"
+- takeScreenshot: "v4_1_05_signal_card"
+
+# ── PATTERN 5: No orphan instruction text ─────────────────────────────────────
+- assertNotVisible: "Adjust to reflect"
+- assertNotVisible: "Move the slider"
+
+# ── PATTERN 6: ShaderOrb removed — old orb-screen testID absent ───────────────
+- assertNotVisible:
+    id: "orb-screen"
+
+# ── Final screenshot with all elements settled ────────────────────────────────
+- scroll
+- waitForAnimationToEnd
+- takeScreenshot: "v4_1_06_final"
