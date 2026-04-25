@@ -1,11 +1,11 @@
 // Orbital Capacity Engine — formula v1, deterministic. No medical claims.
-import type { CapacityInput, CapacityReading, CapacityState, FactorWeight } from './types';
+import type { CapacityInput, CapacityReading, CapacityStateV1, FactorWeight } from './types';
 
-const STATE_BANDS: Array<[number, CapacityState]> = [
+const STATE_BANDS: Array<[number, CapacityStateV1]> = [
   [40, 'Low'], [65, 'Stable'], [85, 'Elevated'], [Infinity, 'Near Limit'],
 ];
 
-function bandFor(score: number): CapacityState {
+function bandFor(score: number): CapacityStateV1 {
   for (const [ceiling, state] of STATE_BANDS) if (score < ceiling) return state;
   return 'Near Limit';
 }

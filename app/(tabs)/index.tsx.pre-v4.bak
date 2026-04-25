@@ -1,7 +1,4 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { OrbitalCapacityInstrument } from '../../components/instrument/OrbitalCapacityInstrument';
-import { scoreFromSignals } from '../../lib/capacity/score';
-import { typicalRange } from '../../lib/capacity/typical';
 // @ts-ignore — JSX component, web-only canvas gauge
 import { CapacityGaugeLive } from '../../components/orbital/CapacityGaugeLive';
 import { calculateCapacity } from '../../lib/capacity/calculateCapacity';
@@ -734,20 +731,17 @@ export default function HomeScreen() {
               </View>
             </Animated.View>
 
-            {/* v4 OrbitalCapacityInstrument — Gauge + typical-range chip */}
+            {/* Capacity Gauge — native uses Skia via .native.jsx resolver */}
             {(() => {
               const demoReading = (() => { try { return calculateCapacity(DEMO_INPUT); } catch { return null; } })();
-              const demoScore = demoReading?.capacityScore ?? 60;
-              const demoState = (demoReading?.state === 'Low' ? 'DEPLETED' : demoReading?.state === 'Near Limit' ? 'RESOURCED' : demoReading?.state === 'Elevated' ? 'RESOURCED' : 'ELEVATED') as 'RESOURCED' | 'ELEVATED' | 'DEPLETED';
-              const typical = typicalRange([58, 62, 60, 64, 61, 63, 59, 65, 60, 62]);
               return (
-                <OrbitalCapacityInstrument
-                  score={demoScore}
-                  state={demoState}
-                  typicalLow={typical.low}
-                  typicalHigh={typical.high}
-                  accent="#F2B134"
-                />
+                <View style={{ height: 320, marginBottom: 8, position: 'relative' }}>
+                  <CapacityGaugeLive
+                    data={demoReading}
+                    inputBreakdown={{ calendar: 0.55, inbox: 0.40, deepWork: 0.62, sleep: 0.85 }}
+                    accent="#F2B134" accentHue={42} motion="subtle" paletteName="Ink"
+                  />
+                </View>
               );
             })()}
 

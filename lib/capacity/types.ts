@@ -1,10 +1,33 @@
-export type CapacityState = 'Low' | 'Stable' | 'Elevated' | 'Near Limit';
+// v4 state names (used by OrbitalCapacityInstrument + Gauge)
+export type CapacityState = 'RESOURCED' | 'ELEVATED' | 'DEPLETED';
+
+export interface CapacityScore {
+  value: number;
+  state: CapacityState;
+  computedAt: string;
+}
+
+export interface ContextualRange {
+  low: number;
+  high: number;
+  windowDays: number;
+}
+
+export interface SignalDaily {
+  day: string;
+  key: string;
+  zValue: number | null;
+  imputed: boolean;
+}
+
+// v1 engine types (preserved for calculateCapacity compatibility)
+export type CapacityStateV1 = 'Low' | 'Stable' | 'Elevated' | 'Near Limit';
 
 export interface ManualFactors {
-  calendarDensity?: number;  // 0..1
-  inboxBacklog?: number;     // 0..1
-  deepWorkBlocks?: number;   // 0..1 (protected focus time)
-  memoryPressure?: number;   // 0..1
+  calendarDensity?: number;
+  inboxBacklog?: number;
+  deepWorkBlocks?: number;
+  memoryPressure?: number;
 }
 
 export interface HealthInputs {
@@ -41,12 +64,12 @@ export interface FactorWeight {
 }
 
 export interface CapacityReading {
-  capacityScore: number;     // 0..100
-  state: CapacityState;
+  capacityScore: number;
+  state: CapacityStateV1;
   drift: number;
   rolling24hAvg: number;
   factorWeights: FactorWeight[];
   explanation: string;
-  confidence: number;        // 0..1
+  confidence: number;
   timestamp: string;
 }
