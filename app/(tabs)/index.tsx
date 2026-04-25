@@ -1,4 +1,8 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+// @ts-ignore — JSX component, web-only canvas gauge
+import { CapacityGaugeLive } from '../../components/orbital/CapacityGaugeLive';
+import { calculateCapacity } from '../../lib/capacity/calculateCapacity';
+import { DEMO_INPUT } from '../../lib/capacity/demoData';
 import {
   View,
   StyleSheet,
@@ -726,6 +730,20 @@ export default function HomeScreen() {
                 </Text>
               </View>
             </Animated.View>
+
+            {/* Capacity Gauge — web only (canvas API not available on native) */}
+            {Platform.OS === 'web' && (() => {
+              const demoReading = (() => { try { return calculateCapacity(DEMO_INPUT); } catch { return null; } })();
+              return (
+                <View style={{ height: 360, marginBottom: 16, position: 'relative' }}>
+                  <CapacityGaugeLive
+                    data={demoReading}
+                    inputBreakdown={{ calendar: 0.55, inbox: 0.40, deepWork: 0.62, sleep: 0.85 }}
+                    accent="#F2B134" accentHue={42} motion="subtle" paletteName="Ink"
+                  />
+                </View>
+              );
+            })()}
 
             <Animated.Text entering={FadeIn.delay(200).duration(400)} style={styles.instruction}>
               {!currentState ? t.home.adjustPrompt : t.home.driversLabel}

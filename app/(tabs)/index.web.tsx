@@ -1,8 +1,15 @@
 import React from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import CapacityGaugeWeb from '../../components/web/CapacityGaugeWeb';
+// @ts-ignore — JSX component
+import { CapacityGaugeLive } from '../../components/orbital/CapacityGaugeLive';
+// @ts-ignore — JSX component
+import { GaugeHUD } from '../../components/orbital/GaugeHUD';
+import { calculateCapacity } from '../../lib/capacity/calculateCapacity';
+import { DEMO_INPUT } from '../../lib/capacity/demoData';
 import CapacityAvatar from '../../components/avatar/CapacityAvatar.web';
+
+const demoReading = (() => { try { return calculateCapacity(DEMO_INPUT); } catch { return null; } })();
 
 export default function TodayWeb() {
   const router = useRouter();
@@ -12,7 +19,20 @@ export default function TodayWeb() {
         <CapacityAvatar userId="demo-user" capacity="RESOURCED" size={40} />
         <Text testID="screen-today" style={s.eyebrow}>YOUR CAPACITY · LIVE</Text>
       </View>
-      <CapacityGaugeWeb size={340} />
+
+      {/* Capacity Gauge */}
+      <View style={s.gaugeContainer}>
+        <CapacityGaugeLive
+          data={demoReading}
+          inputBreakdown={{ calendar: 0.55, inbox: 0.40, deepWork: 0.62, sleep: 0.85 }}
+          accent="#F2B134"
+          accentHue={42}
+          motion="subtle"
+          paletteName="Ink"
+        />
+        <GaugeHUD data={demoReading} accent="#F2B134" />
+      </View>
+
       <Text style={s.label}>Right now</Text>
       <Text style={s.headline}>Your nervous system has a signature.</Text>
       <Text style={s.body}>Live demo — sign in to log your real capacity.</Text>
@@ -33,7 +53,8 @@ const s = StyleSheet.create({
   content: { alignItems: 'center', padding: 24, paddingTop: 40, paddingBottom: 100 },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 32 },
   eyebrow: { color: '#8A94AA', fontSize: 11, letterSpacing: 4, fontWeight: '600' },
-  label: { color: '#8A94AA', fontSize: 12, letterSpacing: 2, marginTop: 16, marginBottom: 32 },
+  gaugeContainer: { width: '100%', maxWidth: 560, aspectRatio: 1.2, position: 'relative', marginBottom: 16 } as any,
+  label: { color: '#8A94AA', fontSize: 12, letterSpacing: 2, marginTop: 8, marginBottom: 16 },
   headline: { color: '#E9EEF8', fontSize: 28, fontWeight: '600', textAlign: 'center', maxWidth: 480, lineHeight: 34, marginBottom: 16 },
   body: { color: '#8A94AA', fontSize: 16, textAlign: 'center', maxWidth: 420, lineHeight: 24, marginBottom: 40 },
   ctaRow: { flexDirection: 'row', gap: 12, flexWrap: 'wrap', justifyContent: 'center' },
