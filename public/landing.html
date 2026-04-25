@@ -1,395 +1,883 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Orbital — Capacity Intelligence for Neurodivergent Adults</title>
-  <meta name="description" content="Know your capacity before it's gone. Real-time capacity intelligence for neurodivergent adults.">
-  <meta name="theme-color" content="#01020A">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://orbitalhealth.app/">
-  <meta property="og:title" content="Orbital — Know your capacity before it's gone">
-  <meta property="og:description" content="Capacity intelligence for neurodivergent adults. Real-time signals. No guessing.">
-  <meta property="og:image" content="https://orbitalhealth.app/og-image.png">
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:title" content="Orbital">
-  <meta property="twitter:image" content="https://orbitalhealth.app/og-image.png">
-  <link rel="canonical" href="https://orbitalhealth.app/">
-  <link rel="icon" href="/favicon.ico">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FHEH76Q0JZ"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-FHEH76Q0JZ');
-  </script>
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Orbital — Know your capacity before it breaks.</title>
+<meta name="description" content="Capacity intelligence for neurodivergent adults. Live now on iOS, Android, web.">
+<meta name="theme-color" content="#01020A">
+<meta property="og:title" content="Orbital — Know your capacity before it breaks.">
+<meta property="og:description" content="Most crashes are scheduled three weeks in advance. Orbital can see them.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #01020A;
+  --void-2: #050714;
+  --ink: #E9EEF8;
+  --ink-2: #C8D0E0;
+  --dim: #8A94AA;
+  --cyan: #4FD1E8;
+  --cyan-glow: rgba(79,209,232,0.5);
+  --amber: #F2B134;
+  --crimson: #E5484D;
+  --glass-1: rgba(20,24,38,0.45);
+  --glass-2: rgba(30,36,54,0.65);
+  --stroke: rgba(150,175,220,0.08);
+  --stroke-hi: rgba(150,175,220,0.18);
+  --inset: rgba(255,255,255,0.06);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+html, body {
+  background: var(--void);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  overflow-x: hidden;
+  cursor: none;
+}
+@media (max-width: 900px) { html, body { cursor: auto; } }
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--cyan); color: var(--void); }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(150,175,220,0.15); border-radius: 4px; }
 
-    :root {
-      --void: #01020A;
-      --cyan: #06B6D4;
-      --cyan-glow: rgba(6, 182, 212, 0.55);
-      --amber: #F59E0B;
-      --amber-glow: rgba(245, 158, 11, 0.55);
-      --crimson: #DC2626;
-      --crimson-glow: rgba(220, 38, 38, 0.55);
-      --glass: rgba(255, 255, 255, 0.06);
-      --glass-border: rgba(255, 255, 255, 0.18);
-      --text: #F4F4F5;
-      --muted: rgba(255, 255, 255, 0.52);
-      --sans: 'DM Sans', system-ui, sans-serif;
-      --mono: 'Space Mono', ui-monospace, monospace;
-    }
+/* --- WebGL shader canvas --- */
+#shader {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  width: 100vw; height: 100vh;
+}
 
-    html { scroll-behavior: smooth; }
+/* --- Noise grain overlay --- */
+.grain {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  opacity: 0.05; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
 
-    body {
-      background: var(--void);
-      color: var(--text);
-      font-family: var(--sans);
-      min-height: 100vh;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
+/* --- Cursor-follow glow --- */
+.cursor {
+  position: fixed; top: 0; left: 0; z-index: 99; pointer-events: none;
+  width: 360px; height: 360px;
+  margin: -180px 0 0 -180px;
+  background: radial-gradient(circle, var(--cyan-glow) 0%, transparent 60%);
+  filter: blur(40px); opacity: 0.6;
+  transition: transform 0.18s var(--ease), opacity 0.3s var(--ease);
+  will-change: transform;
+}
+.cursor-dot {
+  position: fixed; top: 0; left: 0; z-index: 100; pointer-events: none;
+  width: 8px; height: 8px; margin: -4px 0 0 -4px;
+  background: var(--cyan); border-radius: 50%;
+  box-shadow: 0 0 12px var(--cyan-glow);
+  transition: transform 0.08s linear, width 0.2s var(--ease), height 0.2s var(--ease);
+  will-change: transform;
+  mix-blend-mode: difference;
+}
+.cursor-dot.hover { width: 32px; height: 32px; margin: -16px 0 0 -16px; opacity: 0.5; }
+@media (max-width: 900px) { .cursor, .cursor-dot { display: none; } }
 
-    /* Cinematic vignette + subtle noise */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      background:
-        radial-gradient(ellipse 90% 70% at 50% 20%, rgba(6, 182, 212, 0.07), transparent 55%),
-        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(220, 38, 38, 0.05), transparent 50%),
-        radial-gradient(ellipse 50% 40% at 10% 70%, rgba(245, 158, 11, 0.04), transparent 45%),
-        radial-gradient(circle at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.75) 100%);
-    }
+.wrap { position: relative; z-index: 2; max-width: 1320px; margin: 0 auto; padding: 0 32px; }
 
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      padding: 1.25rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: linear-gradient(180deg, rgba(1, 2, 10, 0.92) 0%, rgba(1, 2, 10, 0) 100%);
-    }
+/* --- Liquid glass --- */
+.glass {
+  background: var(--glass-1);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid var(--stroke);
+  box-shadow:
+    inset 0 1px 0 var(--inset),
+    inset 0 0 0 1px rgba(255,255,255,0.02),
+    0 24px 48px -12px rgba(0,0,0,0.5);
+  border-radius: 18px;
+}
+.glass-elev {
+  background: var(--glass-2);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid var(--stroke-hi);
+  box-shadow:
+    inset 0 1px 0 var(--inset),
+    inset 0 0 0 1px rgba(255,255,255,0.04),
+    0 32px 64px -16px rgba(0,0,0,0.7),
+    0 0 80px -20px rgba(79,209,232,0.18);
+  border-radius: 24px;
+}
+.tilt {
+  transition: transform 0.18s var(--ease);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
 
-    .nav-logo {
-      font-family: var(--mono);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      color: var(--cyan);
-      text-transform: uppercase;
-    }
+/* --- Buttons --- */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 26px; border-radius: 12px;
+  font-weight: 600; font-size: 15px;
+  font-family: inherit; border: none; cursor: pointer;
+  transition: all 0.25s var(--ease);
+  text-decoration: none;
+  position: relative; overflow: hidden;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--cyan) 0%, #7DDFEE 100%);
+  color: var(--void); font-weight: 700;
+}
+.btn-primary::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%);
+  opacity: 0; transition: opacity 0.25s var(--ease);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -8px var(--cyan-glow); }
+.btn-primary:hover::after { opacity: 1; }
+.btn-ghost {
+  background: rgba(20,24,38,0.4);
+  color: var(--ink);
+  border: 1px solid var(--stroke-hi);
+  backdrop-filter: blur(20px);
+}
+.btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); transform: translateY(-1px); }
 
-    .nav-cta {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      color: var(--text);
-      text-decoration: none;
-      padding: 10px 22px;
-      border: 1px solid var(--glass-border);
-      border-radius: 999px;
-      background: var(--glass);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      transition: border-color 0.35s ease, box-shadow 0.35s ease;
-    }
+/* --- Type --- */
+.eyebrow {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px; letter-spacing: 4px;
+  color: var(--dim); text-transform: uppercase;
+  font-weight: 500;
+}
+.mono { font-family: 'Geist Mono', monospace; font-feature-settings: "tnum"; }
 
-    .nav-cta:hover {
-      border-color: var(--cyan);
-      box-shadow: 0 0 24px var(--cyan-glow);
-    }
+.display {
+  font-size: clamp(56px, 9vw, 144px);
+  font-weight: 600; line-height: 0.92;
+  letter-spacing: -0.045em;
+  font-variation-settings: "wght" 600;
+}
+.display em {
+  color: var(--cyan); font-style: normal; font-weight: 400;
+  font-variation-settings: "wght" 400;
+  background: linear-gradient(135deg, var(--cyan) 0%, #B8F0FA 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.display-md {
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 600; line-height: 1.0;
+  letter-spacing: -0.03em;
+}
 
-    .hero {
-      position: relative;
-      z-index: 1;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 6rem 1.75rem 4rem;
-      text-align: center;
-    }
+/* --- Sticky access bar --- */
+.access {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 32px;
+  background: rgba(1,2,10,0.6);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--stroke);
+  transform: translateY(-100%);
+  transition: transform 0.4s var(--ease);
+}
+.access.show { transform: translateY(0); }
+.access-logo { font-family: 'Geist Mono', monospace; font-size: 13px; letter-spacing: 4px; font-weight: 700; }
+.access-actions { display: flex; gap: 10px; align-items: center; }
+.access-pill { font-size: 13px; padding: 9px 16px; border-radius: 10px; font-weight: 500; transition: all 0.2s var(--ease); }
+.access-pill.ghost { color: var(--ink); border: 1px solid var(--stroke-hi); background: rgba(20,24,38,0.4); }
+.access-pill.primary { background: var(--cyan); color: var(--void); font-weight: 600; }
+.kbd-hint { font-family: 'Geist Mono'; font-size: 11px; color: var(--dim); padding: 4px 8px; border: 1px solid var(--stroke-hi); border-radius: 6px; }
 
-    /* Glass orb — continuous spectral cycle cyan → amber → crimson */
-    #orb-canvas {
-      width: min(88vw, 340px);
-      height: min(88vw, 340px);
-      margin: 0 auto 2.5rem;
-      position: relative;
-      border-radius: 50%;
-      isolation: isolate;
-    }
+nav.top {
+  position: relative; z-index: 10;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 24px 32px;
+}
+.logo { font-family: 'Geist Mono', monospace; font-size: 14px; letter-spacing: 4px; font-weight: 700; }
 
-    #orb-canvas::before {
-      content: '';
-      position: absolute;
-      inset: -18%;
-      border-radius: 50%;
-      background: conic-gradient(
-        from var(--spin, 0deg),
-        var(--cyan),
-        var(--amber),
-        var(--crimson),
-        var(--cyan)
-      );
-      opacity: 0.35;
-      filter: blur(28px);
-      animation: spinGlow 14s linear infinite;
-      z-index: -1;
-    }
+/* --- Hero --- */
+.hero {
+  display: grid; grid-template-columns: 1.15fr 1fr;
+  gap: 80px; align-items: center;
+  padding: 100px 0 80px;
+  min-height: 88vh;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 14px;
+  background: rgba(79,209,232,0.06);
+  border: 1px solid rgba(79,209,232,0.18);
+  border-radius: 99px;
+}
+.hero-eyebrow .dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan-glow);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+.hero p {
+  font-size: clamp(18px, 1.6vw, 22px);
+  color: var(--ink-2); margin-top: 28px;
+  max-width: 540px; line-height: 1.55;
+}
+.cta-row { display: flex; gap: 14px; margin-top: 44px; flex-wrap: wrap; }
+.live-indicator {
+  display: inline-flex; align-items: center; gap: 12px;
+  margin-top: 28px;
+  font-family: 'Geist Mono'; font-size: 11px; letter-spacing: 2px;
+  color: var(--dim);
+}
+.live-indicator .pulse {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--cyan);
+  animation: pulse 1.6s ease-in-out infinite;
+  box-shadow: 0 0 10px var(--cyan-glow);
+}
 
-    @keyframes spinGlow {
-      to { transform: rotate(360deg); }
-    }
+.hero-card {
+  padding: 48px;
+  display: flex; flex-direction: column; align-items: center; gap: 24px;
+  cursor: pointer;
+}
 
-    .orb-glass {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.22) 0%, transparent 42%),
-        radial-gradient(circle at 70% 72%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-        linear-gradient(145deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(0, 0, 0, 0.25) 100%);
-      backdrop-filter: blur(20px) saturate(160%);
-      -webkit-backdrop-filter: blur(20px) saturate(160%);
-      border: 1px solid var(--glass-border);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        0 0 0 1px rgba(0, 0, 0, 0.35),
-        0 24px 80px rgba(0, 0, 0, 0.55);
-      animation: orbSpectrum 12s ease-in-out infinite;
-    }
+/* --- Platform tri-buttons --- */
+.platforms {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 12px; max-width: 800px; margin: 24px auto 80px;
+  padding: 0 32px;
+}
+.platform {
+  padding: 22px 26px;
+  display: flex; align-items: center; gap: 14px; justify-content: center;
+  font-size: 14px; color: var(--ink);
+  transition: all 0.3s var(--ease);
+  text-decoration: none;
+}
+.platform:hover {
+  border-color: var(--cyan); color: var(--cyan);
+  transform: translateY(-3px);
+  box-shadow: inset 0 1px 0 var(--inset), 0 32px 64px -16px rgba(0,0,0,0.6), 0 0 60px -20px var(--cyan-glow);
+}
+.platform-icon { width: 22px; height: 22px; flex-shrink: 0; }
+.platform-label { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.platform-tag { font-family: 'Geist Mono'; font-size: 9px; letter-spacing: 2px; color: var(--dim); }
+.platform-name { font-size: 15px; font-weight: 600; }
 
-    @keyframes orbSpectrum {
-      0%, 100% {
-        border-color: rgba(6, 182, 212, 0.45);
-        box-shadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.2),
-          0 0 60px var(--cyan-glow),
-          0 0 120px rgba(6, 182, 212, 0.15);
-      }
-      33% {
-        border-color: rgba(245, 158, 11, 0.5);
-        box-shadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.2),
-          0 0 60px var(--amber-glow),
-          0 0 120px rgba(245, 158, 11, 0.12);
-      }
-      66% {
-        border-color: rgba(220, 38, 38, 0.48);
-        box-shadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.18),
-          0 0 60px var(--crimson-glow),
-          0 0 120px rgba(220, 38, 38, 0.12);
-      }
-    }
+/* --- Stats with animated counters --- */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 60px 0; }
+.stat { padding: 36px; transition: all 0.4s var(--ease); }
+.stat:hover { transform: translateY(-2px); border-color: var(--stroke-hi); }
+.stat-num { font-size: clamp(48px, 5vw, 72px); font-weight: 700; line-height: 1; font-variation-settings: "wght" 700; }
+.stat-label { color: var(--dim); margin-top: 14px; font-size: 15px; line-height: 1.5; }
 
-    .orb-core {
-      position: absolute;
-      inset: 18%;
-      border-radius: 50%;
-      background: radial-gradient(circle at 40% 35%, rgba(255, 255, 255, 0.15), transparent 55%);
-      animation: corePulse 12s ease-in-out infinite;
-    }
+/* --- Bento --- */
+.bento { display: grid; gap: 16px; grid-template-columns: repeat(12, 1fr); container-type: inline-size; }
+.bento > * { grid-column: span 12; }
+@container (min-width: 720px) {
+  .bento .span-6 { grid-column: span 6; }
+  .bento .span-4 { grid-column: span 4; }
+  .bento .span-8 { grid-column: span 8; }
+}
+@media (min-width: 900px) {
+  .span-6 { grid-column: span 6 !important; }
+  .span-4 { grid-column: span 4 !important; }
+  .span-8 { grid-column: span 8 !important; }
+}
 
-    @keyframes corePulse {
-      0%, 100% { opacity: 0.9; }
-      33% { opacity: 0.75; }
-      66% { opacity: 0.85; }
-    }
+/* --- How section --- */
+.section { padding: 140px 0; position: relative; }
+.section-head { margin-bottom: 64px; }
+.feature-card {
+  padding: 44px;
+  text-decoration: none; color: inherit;
+  display: flex; flex-direction: column; justify-content: space-between;
+  min-height: 360px;
+  transition: all 0.35s var(--ease);
+}
+.feature-tag { font-family: 'Geist Mono'; font-size: 11px; letter-spacing: 2px; margin-bottom: 16px; display: inline-block; }
+.feature-card h3 { font-size: clamp(24px, 2vw, 32px); font-weight: 600; line-height: 1.1; margin-bottom: 14px; letter-spacing: -0.02em; }
+.feature-card p { font-size: 16px; color: var(--ink-2); line-height: 1.6; }
+.feature-arrow {
+  margin-top: 28px; font-family: 'Geist Mono'; font-size: 11px; letter-spacing: 2px;
+  color: var(--cyan); display: flex; align-items: center; gap: 8px;
+  transition: gap 0.3s var(--ease);
+}
+.feature-card:hover .feature-arrow { gap: 14px; }
 
-    .orb-label {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--mono);
-      font-size: clamp(9px, 2.4vw, 11px);
-      letter-spacing: 0.28em;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.88);
-      text-shadow: 0 0 40px rgba(6, 182, 212, 0.4);
-      animation: labelTint 12s ease-in-out infinite;
-    }
+/* --- Who cards --- */
+.who-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 48px; }
+@media (max-width: 900px) { .who-grid { grid-template-columns: 1fr; } }
+.who-card {
+  padding: 36px;
+  text-decoration: none; color: inherit;
+  transition: all 0.35s var(--ease);
+}
+.who-card h3 { font-size: 22px; font-weight: 600; line-height: 1.2; margin: 12px 0; }
+.who-card p { font-size: 15px; color: var(--ink-2); line-height: 1.6; }
+.who-cta {
+  margin-top: 24px;
+  font-family: 'Geist Mono'; font-size: 11px; letter-spacing: 2px;
+  color: var(--cyan); opacity: 0;
+  transition: opacity 0.25s var(--ease);
+}
+.who-card:hover .who-cta { opacity: 1; }
 
-    @keyframes labelTint {
-      0%, 100% { color: #CFFAFE; text-shadow: 0 0 36px var(--cyan-glow); }
-      33% { color: #FEF3C7; text-shadow: 0 0 36px var(--amber-glow); }
-      66% { color: #FECACA; text-shadow: 0 0 36px var(--crimson-glow); }
-    }
+/* --- Founder --- */
+.founder { max-width: 920px; margin: 0 auto; padding: 140px 32px; text-align: center; }
+.founder p {
+  font-size: clamp(24px, 3.2vw, 38px);
+  line-height: 1.35; font-weight: 500; letter-spacing: -0.01em;
+}
+.founder-meta { margin-top: 36px; font-family: 'Geist Mono'; font-size: 12px; letter-spacing: 2px; color: var(--dim); }
 
-    /* 72px headline — scales down on narrow viewports */
-    .hero h1 {
-      font-size: 72px;
-      font-weight: 700;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-      max-width: 14ch;
-      margin: 0 auto 1.25rem;
-      background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0.76) 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+/* --- Trust --- */
+.trust-grid { padding: 44px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+@media (max-width: 900px) { .trust-grid { grid-template-columns: 1fr; gap: 24px; } }
+.trust-item h4 { font-family: 'Geist Mono'; font-size: 11px; letter-spacing: 2px; color: var(--cyan); margin-bottom: 12px; }
+.trust-item p { font-size: 14px; color: var(--ink-2); line-height: 1.6; }
 
-    @media (max-width: 900px) {
-      .hero h1 { font-size: clamp(40px, 10vw, 56px); }
-    }
+/* --- Final CTA --- */
+.cta-final { max-width: 880px; margin: 0 auto; padding: 140px 32px; text-align: center; }
+.cta-final h2 { margin-bottom: 28px; }
+.cta-final p { font-size: 18px; color: var(--ink-2); margin-bottom: 40px; }
 
-    @media (max-width: 480px) {
-      .hero h1 { font-size: clamp(32px, 9vw, 44px); }
-    }
+/* --- Float CTA --- */
+.float {
+  position: fixed; bottom: 24px; right: 24px; z-index: 50;
+  background: linear-gradient(135deg, var(--cyan) 0%, #7DDFEE 100%);
+  color: var(--void);
+  padding: 14px 24px; border-radius: 999px;
+  font-weight: 700; font-size: 14px;
+  box-shadow: 0 16px 40px -8px var(--cyan-glow);
+  transform: translateY(150%);
+  transition: transform 0.35s var(--ease);
+  display: flex; align-items: center; gap: 8px;
+  text-decoration: none;
+}
+.float.show { transform: translateY(0); }
+.float:hover { transform: translateY(-4px); }
 
-    .hero .sub {
-      font-size: 1.125rem;
-      color: var(--muted);
-      max-width: 36rem;
-      margin: 0 auto 2rem;
-      line-height: 1.55;
-    }
+/* --- Command palette --- */
+.cmdk-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(1,2,10,0.7); backdrop-filter: blur(24px);
+  display: none; align-items: flex-start; justify-content: center;
+  padding-top: 18vh;
+}
+.cmdk-overlay.show { display: flex; animation: fadeIn 0.18s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.cmdk {
+  width: 92%; max-width: 600px;
+  background: var(--glass-2); backdrop-filter: blur(60px) saturate(200%);
+  border: 1px solid var(--stroke-hi);
+  border-radius: 18px;
+  box-shadow: 0 64px 128px -32px rgba(0,0,0,0.8), inset 0 1px 0 var(--inset);
+  overflow: hidden;
+  animation: scaleIn 0.22s var(--ease-bounce);
+}
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.96) translateY(-12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.cmdk input {
+  width: 100%; padding: 20px 24px;
+  background: transparent; border: none; outline: none;
+  color: var(--ink); font-size: 18px; font-family: inherit;
+  border-bottom: 1px solid var(--stroke);
+}
+.cmdk input::placeholder { color: var(--dim); }
+.cmdk-list { padding: 8px; max-height: 50vh; overflow-y: auto; }
+.cmdk-item {
+  padding: 14px 18px; border-radius: 10px;
+  display: flex; align-items: center; gap: 14px;
+  cursor: pointer; transition: background 0.15s ease;
+  font-size: 15px;
+}
+.cmdk-item:hover, .cmdk-item.active { background: rgba(79,209,232,0.10); color: var(--cyan); }
+.cmdk-icon { width: 20px; height: 20px; opacity: 0.7; }
+.cmdk-shortcut { margin-left: auto; font-family: 'Geist Mono'; font-size: 11px; color: var(--dim); }
 
-    .cta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      justify-content: center;
-      align-items: center;
-    }
+/* --- Footer --- */
+footer {
+  border-top: 1px solid var(--stroke);
+  padding: 56px 32px;
+  display: grid; grid-template-columns: 2fr 1fr 1fr;
+  gap: 32px;
+  font-size: 13px; color: var(--dim);
+  position: relative; z-index: 2;
+}
+.foot-h { font-family: 'Geist Mono'; font-size: 11px; letter-spacing: 2px; color: var(--ink); margin-bottom: 16px; font-weight: 700; }
+footer a { display: block; color: var(--dim); margin-bottom: 8px; transition: color 0.15s; }
+footer a:hover { color: var(--cyan); }
 
-    .cta-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem 2.25rem;
-      border-radius: 14px;
-      font-family: var(--sans);
-      font-weight: 700;
-      font-size: 1rem;
-      text-decoration: none;
-      color: var(--void);
-      background: linear-gradient(135deg, #2DD4BF 0%, #06B6D4 100%);
-      border: 1px solid rgba(45, 212, 191, 0.6);
-      box-shadow: 0 0 32px rgba(6, 182, 212, 0.35);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+@media (max-width: 900px) {
+  .access { padding: 10px 16px; }
+  .access-logo { font-size: 11px; letter-spacing: 3px; }
+  .hero { grid-template-columns: 1fr; gap: 40px; padding: 60px 0; }
+  .hero-card { padding: 32px; }
+  .stats { grid-template-columns: 1fr; }
+  .platforms { grid-template-columns: 1fr; padding: 0 16px; gap: 8px; margin-top: 24px; }
+  .wrap { padding: 0 20px; }
+  nav.top { padding: 16px 20px; }
+  .section { padding: 80px 0; }
+  footer { grid-template-columns: 1fr; padding: 32px 20px; }
+  .float { bottom: 16px; right: 16px; padding: 12px 18px; }
+}
 
-    .cta-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 48px rgba(6, 182, 212, 0.5);
-    }
-
-    .cta-ghost {
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      text-decoration: none;
-      padding: 0.75rem 1.25rem;
-      border: 1px solid var(--glass-border);
-      border-radius: 999px;
-      background: var(--glass);
-      backdrop-filter: blur(10px);
-    }
-
-    .cta-ghost:hover { color: var(--text); border-color: rgba(255, 255, 255, 0.28); }
-
-    .film-bar {
-      position: fixed;
-      left: 0;
-      right: 0;
-      height: 12vh;
-      min-height: 48px;
-      max-height: 100px;
-      background: #000;
-      z-index: 50;
-      pointer-events: none;
-    }
-    .film-bar.top { top: 0; }
-    .film-bar.bottom { bottom: 0; }
-
-    footer {
-      position: relative;
-      z-index: 1;
-      padding: 3rem 1.5rem;
-      text-align: center;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .footer-logo {
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      color: var(--cyan);
-      margin-bottom: 1rem;
-    }
-
-    .footer-link {
-      color: var(--muted);
-      text-decoration: none;
-      margin: 0 1rem;
-      font-size: 0.9rem;
-    }
-    .footer-link:hover { color: var(--text); }
-
-    .footer-copy {
-      margin-top: 1.5rem;
-      font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.35);
-    }
-  </style>
+/* --- Reduced motion --- */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+  #shader { display: none; }
+  .cursor, .cursor-dot { display: none; }
+}
+</style>
 </head>
 <body>
-  <div class="film-bar top" aria-hidden="true"></div>
-  <div class="film-bar bottom" aria-hidden="true"></div>
 
-  <nav>
-    <div class="nav-logo">Orbital</div>
-    <a href="https://apps.apple.com/app/orbital-capacity-intelligence/id6738980081" class="nav-cta" onclick="gtag('event','nav_cta')">Download</a>
-  </nav>
+<!-- WebGL shader hero background -->
+<canvas id="shader" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
 
-  <main class="hero">
-    <div id="orb-canvas" role="img" aria-label="Animated capacity orb">
-      <div class="orb-glass">
-        <div class="orb-core"></div>
-        <span class="orb-label">Capacity</span>
-      </div>
+<!-- Sticky access bar -->
+<div class="access" id="access">
+  <div class="access-logo">ORBITAL</div>
+  <div class="access-actions">
+    <span class="kbd-hint">&#8984; K</span>
+    <a href="https://orbital-health-orbital.expo.app/signin" class="access-pill ghost">Sign In</a>
+    <a href="https://orbital-health-orbital.expo.app" class="access-pill primary">Open App &#8599;</a>
+  </div>
+</div>
+
+<nav class="top">
+  <div class="logo">ORBITAL</div>
+  <a href="https://orbital-health-orbital.expo.app" class="btn btn-ghost" style="padding:10px 20px;font-size:13px">Open App &#8599;</a>
+</nav>
+
+<!-- HERO -->
+<section class="wrap hero">
+  <div>
+    <div class="hero-eyebrow">
+      <span class="dot"></span>
+      <span class="eyebrow" style="color:var(--cyan);font-size:10px">Live &middot; Capacity intelligence</span>
     </div>
-
-    <h1>Know your capacity before it slips away</h1>
-    <p class="sub">Signal-aware capacity intelligence — built for minds that run hot, fast, and deep.</p>
-
+    <h1 class="display" style="margin-top:32px">Know your<br>capacity before<br><em>it breaks.</em></h1>
+    <p>Most crashes are scheduled three weeks in advance. You just can't see them from inside the week. Orbital can.</p>
     <div class="cta-row">
-      <a href="https://apps.apple.com/app/orbital-capacity-intelligence/id6738980081" class="cta-button" onclick="gtag('event','hero_cta')">Download on the App Store</a>
-      <a href="/privacy" class="cta-ghost">Privacy</a>
-      <a href="/terms" class="cta-ghost">Terms</a>
+      <a href="https://orbital-health-orbital.expo.app" class="btn btn-primary">Open Orbital &rarr;</a>
+      <a href="#how" class="btn btn-ghost">How it works</a>
     </div>
-  </main>
+    <div class="live-indicator">
+      <span class="pulse"></span>
+      <span>LIVE NOW &middot; iOS &middot; ANDROID &middot; WEB &middot; FREE TO TRY</span>
+    </div>
+  </div>
+  <a href="https://orbital-health-orbital.expo.app" class="hero-card glass-elev tilt" id="heroCard" data-tilt>
+    <div id="gauge"></div>
+    <div class="eyebrow" style="color:var(--cyan)">Click to open app &rarr;</div>
+  </a>
+</section>
 
-  <footer>
-    <div class="footer-logo">ORBITAL</div>
-    <div>
-      <a href="https://apps.apple.com/app/orbital-capacity-intelligence/id6738980081" class="footer-link">App Store</a>
-      <a href="/privacy" class="footer-link">Privacy</a>
-      <a href="/terms" class="footer-link">Terms</a>
-      <a href="mailto:eric@orbitalhealth.app" class="footer-link">Contact</a>
-    </div>
-    <div class="footer-copy">© 2026 Orbital. All rights reserved.</div>
-  </footer>
+<!-- Platform tri-row -->
+<div class="platforms">
+  <a href="https://apps.apple.com/us/app/orbital-health/id6736812345" class="glass platform" data-tilt>
+    <svg class="platform-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+    <div class="platform-label"><span class="platform-tag">DOWNLOAD</span><span class="platform-name">App Store</span></div>
+  </a>
+  <a href="https://play.google.com/store/apps/details?id=com.erparris.orbital" class="glass platform" data-tilt>
+    <svg class="platform-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5V3.5c0-.83.67-1.5 1.5-1.5.18 0 .35.04.51.09l11.59 8.41-11.59 8.41c-.16.05-.33.09-.51.09-.83 0-1.5-.67-1.5-1.5z"/></svg>
+    <div class="platform-label"><span class="platform-tag">GET IT ON</span><span class="platform-name">Google Play</span></div>
+  </a>
+  <a href="https://orbital-health-orbital.expo.app" class="glass platform" data-tilt>
+    <svg class="platform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c2.5 3 4 7 4 10s-1.5 7-4 10c-2.5-3-4-7-4-10s1.5-7 4-10z"/></svg>
+    <div class="platform-label"><span class="platform-tag">USE NOW</span><span class="platform-name">Web App</span></div>
+  </a>
+</div>
+
+<!-- Stats -->
+<section class="wrap stats">
+  <div class="glass stat">
+    <div class="stat-num mono" data-counter data-target="20" data-suffix="%" style="color:var(--cyan)">0%</div>
+    <div class="stat-label">of adults are neurodivergent</div>
+  </div>
+  <div class="glass stat">
+    <div class="stat-num mono" data-counter data-target="73" data-suffix="%" style="color:var(--amber)">0%</div>
+    <div class="stat-label">report chronic burnout from masking</div>
+  </div>
+  <div class="glass stat">
+    <div class="stat-num mono" style="color:var(--crimson)">0</div>
+    <div class="stat-label">tools built around their actual nervous system &mdash; until now</div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how" class="wrap section">
+  <div class="section-head">
+    <span class="eyebrow">How it works</span>
+    <h2 class="display-md" style="margin-top:16px;max-width:880px">Three signals.<br>One clear picture.</h2>
+  </div>
+  <div class="bento">
+    <a href="https://orbital-health-orbital.expo.app" class="span-6 glass-elev feature-card" data-tilt>
+      <div>
+        <span class="feature-tag" style="color:var(--cyan)">01 / LOG</span>
+        <h3>Track how you actually feel.</h3>
+        <p>A 30-second check-in across five dimensions: cognitive, emotional, sensory, social, physical. Not mood tracking &mdash; a precise read of right now.</p>
+      </div>
+      <div class="feature-arrow">TRY IT &rarr;</div>
+    </a>
+    <a href="https://orbital-health-orbital.expo.app/patterns" class="span-6 glass-elev feature-card" data-tilt>
+      <div>
+        <span class="feature-tag" style="color:var(--amber)">02 / PATTERN</span>
+        <h3>Surface your system's rhythms.</h3>
+        <p>Orbital learns the hidden structure of your week. Circadian patterns, trigger chains, recovery windows &mdash; visible from outside the week for the first time.</p>
+      </div>
+      <div class="feature-arrow" style="color:var(--amber)">SEE YOUR PATTERNS &rarr;</div>
+    </a>
+    <a href="https://orbital-health-orbital.expo.app" class="span-12 glass-elev feature-card" style="min-height:auto" data-tilt>
+      <div>
+        <span class="feature-tag" style="color:var(--crimson)">03 / NAVIGATE</span>
+        <h3 style="max-width:600px">Make decisions from data.</h3>
+        <p style="max-width:600px">Know before you crash. Schedule from your real available capacity. Predict high-output windows.</p>
+        <div style="margin-top:24px;padding:18px 22px;background:rgba(229,72,77,0.08);border:1px solid rgba(229,72,77,0.20);border-radius:12px;display:inline-block;font-size:15px"><span style="color:var(--crimson);font-weight:600">Thursday 12p&ndash;3p</span> will cost you <span style="color:var(--crimson);font-weight:600">84%</span> of capacity. <span style="color:var(--cyan)">Move the 1pm sync to Tuesday &rarr; -60% recovery cost.</span></div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- WHO -->
+<section class="wrap section">
+  <div class="section-head">
+    <span class="eyebrow">Who it's for</span>
+    <h2 class="display-md" style="margin-top:16px;max-width:880px">Built for people whose nervous system runs differently.</h2>
+  </div>
+  <div class="who-grid">
+    <a href="https://orbital-health-orbital.expo.app" class="glass who-card" data-tilt>
+      <span class="feature-tag" style="color:var(--cyan)">ADHD</span>
+      <h3>You're not scattered. You're running a different clock.</h3>
+      <p>Orbital maps your actual attention cycles, helping you build schedules around your real capacity instead of fighting it.</p>
+      <div class="who-cta">OPEN APP &rarr;</div>
+    </a>
+    <a href="https://orbital-health-orbital.expo.app" class="glass who-card" data-tilt>
+      <span class="feature-tag" style="color:var(--amber)">AUTISTIC</span>
+      <h3>Burnout isn't inevitable. It's predictable.</h3>
+      <p>Track sensory load, social cost, and recovery time. Build a precise model of your limits before you hit them.</p>
+      <div class="who-cta">OPEN APP &rarr;</div>
+    </a>
+    <a href="https://orbital-health-orbital.expo.app" class="glass who-card" data-tilt>
+      <span class="feature-tag" style="color:var(--crimson)">HIGH-MASKING</span>
+      <h3>What it costs to seem fine.</h3>
+      <p>Quantify the masking tax. Decide when &mdash; and how much &mdash; it's worth it.</p>
+      <div class="who-cta">OPEN APP &rarr;</div>
+    </a>
+    <a href="https://orbital-health-orbital.expo.app" class="glass who-card" data-tilt>
+      <span class="feature-tag" style="color:var(--cyan)">LATE-DIAGNOSED</span>
+      <h3>Finally making sense of 30 years of data.</h3>
+      <p>Retrospective pattern tools to reframe your history through the lens of capacity.</p>
+      <div class="who-cta">OPEN APP &rarr;</div>
+    </a>
+  </div>
+</section>
+
+<!-- FOUNDER -->
+<section class="founder">
+  <span class="eyebrow">Why this exists</span>
+  <p style="margin-top:24px">"I built Orbital because every productivity tool I tried was designed for someone whose nervous system worked differently than mine. After my third burnout, I stopped looking for one. I built it."</p>
+  <div class="founder-meta">ERIC PARRISH &middot; FOUNDER &middot; AuDHD &middot; BUILT IN PUBLIC</div>
+</section>
+
+<!-- TRUST -->
+<section class="wrap" style="padding:60px 0">
+  <div class="glass trust-grid">
+    <div class="trust-item"><h4>LOCAL-FIRST</h4><p>Your signals are derived on device. Not a wellness data broker.</p></div>
+    <div class="trust-item"><h4>CLINICAL-GRADE SIGNAL</h4><p>Built as an instrument, not a wellness app. Provider-compatible export.</p></div>
+    <div class="trust-item"><h4>NOT MEDICAL ADVICE</h4><p>Orbital surfaces patterns. It doesn't diagnose, treat, or replace your clinician.</p></div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="cta-final">
+  <h2 class="display-md">Stop managing symptoms.<br>Start reading your system.</h2>
+  <p>Live now. Free to try. Built for clarity, not overwhelm.</p>
+  <a href="https://orbital-health-orbital.expo.app" class="btn btn-primary" style="font-size:17px;padding:20px 40px">Open Orbital &rarr;</a>
+</section>
+
+<!-- Float CTA -->
+<a href="https://orbital-health-orbital.expo.app" class="float" id="float">
+  <span>Open App</span><span>&#8599;</span>
+</a>
+
+<!-- Command palette -->
+<div class="cmdk-overlay" id="cmdk">
+  <div class="cmdk">
+    <input type="text" id="cmdkInput" placeholder="Search Orbital&#8230; try 'open patterns'" autocomplete="off">
+    <div class="cmdk-list" id="cmdkList"></div>
+  </div>
+</div>
+
+<footer>
+  <div>
+    <div class="foot-h">ORBITAL</div>
+    <div style="line-height:1.6;max-width:300px">Capacity intelligence for neurodivergent adults. Built for clarity, not overwhelm.</div>
+    <div style="margin-top:16px;font-size:12px">&copy; 2026 Orbital Health, Inc.</div>
+  </div>
+  <div>
+    <div class="foot-h">OPEN ORBITAL</div>
+    <a href="https://orbital-health-orbital.expo.app">Web app</a>
+    <a href="https://apps.apple.com/us/app/orbital-health/id6736812345">iOS</a>
+    <a href="https://play.google.com/store/apps/details?id=com.erparris.orbital">Android</a>
+    <a href="https://orbital-health-orbital.expo.app/signin">Sign in</a>
+  </div>
+  <div>
+    <div class="foot-h">COMPANY</div>
+    <a href="/privacy.html">Privacy</a>
+    <a href="/terms.html">Terms</a>
+    <a href="mailto:hi@orbitalhealth.app">Contact</a>
+    <span style="display:block;margin-top:16px;font-size:11px;color:var(--dim)"><span class="kbd-hint" style="font-size:10px">&#8984; K</span> for command palette</span>
+  </div>
+</footer>
+
+<script>
+// ============== WebGL Shader Hero ==============
+(function(){
+  var canvas = document.getElementById('shader');
+  var gl = canvas.getContext('webgl', { premultipliedAlpha: false, antialias: true });
+  if (!gl) { canvas.style.display = 'none'; return; }
+
+  var vs = 'attribute vec2 a_position; void main() { gl_Position = vec4(a_position, 0.0, 1.0); }';
+
+  var fs = [
+    'precision highp float;',
+    'uniform vec2 u_resolution;',
+    'uniform vec2 u_mouse;',
+    'uniform float u_time;',
+    'float hash(vec2 p) { p = fract(p * vec2(123.34, 234.34)); p += dot(p, p + 34.45); return fract(p.x * p.y); }',
+    'float noise(vec2 p) {',
+    '  vec2 i = floor(p), f = fract(p);',
+    '  float a = hash(i), b = hash(i + vec2(1.,0.));',
+    '  float c = hash(i + vec2(0.,1.)), d = hash(i + vec2(1.,1.));',
+    '  vec2 u = f * f * (3.0 - 2.0 * f);',
+    '  return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;',
+    '}',
+    'float fbm(vec2 p) {',
+    '  float v = 0.0, a = 0.5;',
+    '  for (int i = 0; i < 5; i++) { v += a * noise(p); p *= 2.03; a *= 0.5; }',
+    '  return v;',
+    '}',
+    'void main() {',
+    '  vec2 p = (gl_FragCoord.xy - 0.5 * u_resolution.xy) / min(u_resolution.x, u_resolution.y);',
+    '  vec2 mouse = (u_mouse - 0.5 * u_resolution.xy) / min(u_resolution.x, u_resolution.y);',
+    '  float t = u_time * 0.06;',
+    '  vec2 q = vec2(fbm(p + t), fbm(p + vec2(1.0) + t));',
+    '  vec2 r = vec2(fbm(p + q + vec2(1.7, 9.2) + 0.15 * t), fbm(p + q + vec2(8.3, 2.8) + 0.126 * t));',
+    '  float f = fbm(p + r * 1.5 + mouse * 0.3);',
+    '  vec3 cyan = vec3(0.31, 0.82, 0.91);',
+    '  vec3 amber = vec3(0.95, 0.69, 0.20);',
+    '  vec3 crimson = vec3(0.90, 0.28, 0.30);',
+    '  vec3 voidc = vec3(0.004, 0.008, 0.039);',
+    '  vec3 col = voidc;',
+    '  col = mix(col, cyan, smoothstep(0.0, 1.0, f) * 0.55);',
+    '  col = mix(col, amber, smoothstep(0.4, 1.2, dot(r, r)) * 0.30);',
+    '  col = mix(col, crimson, smoothstep(0.55, 0.9, length(q)) * 0.28);',
+    '  float vig = smoothstep(1.4, 0.3, length(p));',
+    '  col *= 0.45 + 0.55 * vig;',
+    '  col = pow(col, vec3(1.05));',
+    '  gl_FragColor = vec4(col, 1.0);',
+    '}'
+  ].join('\n');
+
+  function compile(type, src) {
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn('shader err', gl.getShaderInfoLog(s)); return null; }
+    return s;
+  }
+  var v = compile(gl.VERTEX_SHADER, vs);
+  var f = compile(gl.FRAGMENT_SHADER, fs);
+  if (!v || !f) { canvas.style.display = 'none'; return; }
+  var prog = gl.createProgram();
+  gl.attachShader(prog, v); gl.attachShader(prog, f); gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { canvas.style.display = 'none'; return; }
+  gl.useProgram(prog);
+
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
+  var posLoc = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(posLoc);
+  gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+  var uRes = gl.getUniformLocation(prog, 'u_resolution');
+  var uMouse = gl.getUniformLocation(prog, 'u_mouse');
+  var uTime = gl.getUniformLocation(prog, 'u_time');
+
+  var mouse = { x: 0, y: 0 }, mouseTarget = { x: 0, y: 0 };
+  window.addEventListener('mousemove', function(e) { mouseTarget.x = e.clientX; mouseTarget.y = window.innerHeight - e.clientY; });
+
+  function resize() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  }
+  resize(); window.addEventListener('resize', resize);
+
+  var start = performance.now();
+  function frame() {
+    mouse.x += (mouseTarget.x - mouse.x) * 0.04;
+    mouse.y += (mouseTarget.y - mouse.y) * 0.04;
+    var dpr = window.devicePixelRatio || 1;
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+    gl.uniform2f(uMouse, mouse.x * dpr, mouse.y * dpr);
+    gl.uniform1f(uTime, (performance.now() - start) / 1000);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+// ============== Gauge animation ==============
+var DEMO=[0.62,0.71,0.55,0.48,0.42,0.38,0.45,0.58,0.66,0.71,0.59,0.51,0.43,0.49,0.64,0.78,0.52,0.41,0.32,0.28,0.36,0.47,0.61,0.69,0.55,0.44,0.37,0.31,0.42,0.58];
+function stateOf(v) { return v < 0.40 ? {c:'#E5484D',l:'DEPLETED'} : v > 0.70 ? {c:'#4FD1E8',l:'RESOURCED'} : {c:'#F2B134',l:'ELEVATED'}; }
+function gauge(target, size) {
+  var cx = size/2, cy = size/2, r = size/2 - 28;
+  var sa = -135 * Math.PI / 180, ea = 135 * Math.PI / 180;
+  target.innerHTML = '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'"><defs><radialGradient id="gbg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="rgba(20,24,38,0.9)"/><stop offset="100%" stop-color="rgba(1,2,10,0.95)"/></radialGradient><linearGradient id="grim" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="rgba(229,72,77,0.4)"/><stop offset="50%" stop-color="rgba(242,177,52,0.4)"/><stop offset="100%" stop-color="rgba(79,209,232,0.5)"/></linearGradient></defs><circle cx="'+cx+'" cy="'+cy+'" r="'+(r+16)+'" fill="url(#gbg)" stroke="url(#grim)" stroke-width="1.5"/><path d="M '+(cx+r*Math.cos(sa))+' '+(cy+r*Math.sin(sa))+' A '+r+' '+r+' 0 1 1 '+(cx+r*Math.cos(ea))+' '+(cy+r*Math.sin(ea))+'" fill="none" stroke="rgba(150,175,220,0.10)" stroke-width="3" stroke-linecap="round"/><path id="garc" fill="none" stroke-width="4" stroke-linecap="round" style="transition:all 1.4s cubic-bezier(0.16,1,0.3,1)"/><text id="gnum" x="'+cx+'" y="'+(cy+size*0.04)+'" text-anchor="middle" fill="#E9EEF8" font-size="'+(size*0.20)+'" font-weight="500" font-family="Inter"></text><text id="glbl" x="'+cx+'" y="'+(cy+size*0.16)+'" text-anchor="middle" font-size="'+(size*0.044)+'" font-weight="500" font-family="Geist Mono" letter-spacing="3"></text><g id="gticks" opacity="0.8"></g></svg>';
+  var arc = target.querySelector('#garc'), num = target.querySelector('#gnum'), lbl = target.querySelector('#glbl'), ticks = target.querySelector('#gticks');
+  var gi = 0;
+  function up() {
+    var v = DEMO[gi], s = stateOf(v), c = s.c, l = s.l;
+    var sweep = sa + (ea - sa) * v;
+    var ax = cx + r*Math.cos(sweep), ay = cy + r*Math.sin(sweep);
+    var sx = cx + r*Math.cos(sa), sy = cy + r*Math.sin(sa);
+    var la = (sweep - sa) > Math.PI ? 1 : 0;
+    arc.setAttribute('d', 'M '+sx+' '+sy+' A '+r+' '+r+' 0 '+la+' 1 '+ax+' '+ay);
+    arc.setAttribute('stroke', c); arc.style.filter = 'drop-shadow(0 0 16px '+c+')';
+    num.textContent = Math.round(v * 100); lbl.textContent = l; lbl.setAttribute('fill', c);
+    var h = '';
+    for (var t = 0; t < 33; t++) {
+      var a = sa + (ea - sa) * (t / 32);
+      var x1 = cx + (r+6)*Math.cos(a), y1 = cy + (r+6)*Math.sin(a);
+      var x2 = cx + (r+14)*Math.cos(a), y2 = cy + (r+14)*Math.sin(a);
+      var tc = t/32 < v ? c : 'rgba(150,175,220,0.18)';
+      h += '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+tc+'" stroke-width="1.5" stroke-linecap="round"/>';
+    }
+    ticks.innerHTML = h;
+    gi = (gi + 1) % DEMO.length;
+  }
+  up(); setInterval(up, 1400);
+}
+gauge(document.getElementById('gauge'), 340);
+
+// ============== Cursor ==============
+var cursor = document.getElementById('cursor');
+var cursorDot = document.getElementById('cursorDot');
+var cxt = 0, cyt = 0, cxd = 0, cyd = 0;
+window.addEventListener('mousemove', function(e) {
+  cxt = e.clientX; cyt = e.clientY;
+  cursorDot.style.transform = 'translate('+e.clientX+'px, '+e.clientY+'px)';
+});
+function cursorFrame() {
+  cxd += (cxt - cxd) * 0.12;
+  cyd += (cyt - cyd) * 0.12;
+  cursor.style.transform = 'translate('+cxd+'px, '+cyd+'px)';
+  requestAnimationFrame(cursorFrame);
+}
+cursorFrame();
+document.querySelectorAll('a, button, [role="button"]').forEach(function(el) {
+  el.addEventListener('mouseenter', function() { cursorDot.classList.add('hover'); });
+  el.addEventListener('mouseleave', function() { cursorDot.classList.remove('hover'); });
+});
+
+// ============== 3D mouse-tilt cards ==============
+document.querySelectorAll('[data-tilt]').forEach(function(el) {
+  el.addEventListener('mousemove', function(e) {
+    var rect = el.getBoundingClientRect();
+    var cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+    var ry = ((e.clientX - cx) / (rect.width/2)) * 6;
+    var rx = ((cy - e.clientY) / (rect.height/2)) * 4;
+    el.style.transform = 'perspective(1200px) rotateX('+rx+'deg) rotateY('+ry+'deg) translateZ(0)';
+  });
+  el.addEventListener('mouseleave', function() {
+    el.style.transform = 'perspective(1200px) rotateX(0) rotateY(0)';
+  });
+});
+
+// ============== Stat counters ==============
+var counters = document.querySelectorAll('[data-counter]');
+var counterObs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (!entry.isIntersecting) return;
+    var el = entry.target;
+    if (el.dataset.counted) return;
+    el.dataset.counted = '1';
+    var target = parseInt(el.dataset.target, 10);
+    var suffix = el.dataset.suffix || '';
+    var start = performance.now(), dur = 1400;
+    function tick(now) {
+      var t = Math.min((now - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(target * eased) + suffix;
+      if (t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}, { threshold: 0.4 });
+counters.forEach(function(c) { counterObs.observe(c); });
+
+// ============== Scroll-triggered access bar + float ==============
+var access = document.getElementById('access'), floatBtn = document.getElementById('float');
+window.addEventListener('scroll', function() {
+  var y = window.scrollY;
+  if (y > 500) access.classList.add('show'); else access.classList.remove('show');
+  if (y > window.innerHeight * 1.5) floatBtn.classList.add('show'); else floatBtn.classList.remove('show');
+}, { passive: true });
+
+// ============== Command palette (CMD+K) ==============
+var cmdkOverlay = document.getElementById('cmdk');
+var cmdkInput = document.getElementById('cmdkInput');
+var cmdkList = document.getElementById('cmdkList');
+var COMMANDS = [
+  { label: 'Open Today', sub: 'See your live capacity', shortcut: '\u21b5', href: 'https://orbital-health-orbital.expo.app' },
+  { label: 'Open Patterns', sub: 'Your weekly rhythm', shortcut: 'P', href: 'https://orbital-health-orbital.expo.app/patterns' },
+  { label: 'Sign In', sub: 'Existing account', shortcut: 'S', href: 'https://orbital-health-orbital.expo.app/signin' },
+  { label: 'Create Account', sub: 'Start tracking your capacity', shortcut: 'N', href: 'https://orbital-health-orbital.expo.app/signup' },
+  { label: 'Download iOS', sub: 'App Store', shortcut: 'I', href: 'https://apps.apple.com/us/app/orbital-health/id6736812345' },
+  { label: 'Download Android', sub: 'Google Play', shortcut: 'A', href: 'https://play.google.com/store/apps/details?id=com.erparris.orbital' },
+  { label: 'How it works', sub: 'Three signals, one picture', href: '#how' },
+  { label: 'Contact', sub: 'hi@orbitalhealth.app', href: 'mailto:hi@orbitalhealth.app' }
+];
+function renderCmdk(filter) {
+  filter = (filter || '').toLowerCase();
+  var items = COMMANDS.filter(function(c) { return !filter || c.label.toLowerCase().indexOf(filter) >= 0 || c.sub.toLowerCase().indexOf(filter) >= 0; });
+  cmdkList.innerHTML = items.map(function(c, i) {
+    return '<div class="cmdk-item'+(i===0?' active':'')+'" data-href="'+c.href+'"><div><div>'+c.label+'</div><div style="font-size:12px;color:var(--dim);margin-top:2px">'+c.sub+'</div></div>'+(c.shortcut?'<span class="cmdk-shortcut">'+c.shortcut+'</span>':'')+'</div>';
+  }).join('');
+  cmdkList.querySelectorAll('.cmdk-item').forEach(function(el) {
+    el.addEventListener('click', function() { window.location.href = el.dataset.href; });
+  });
+}
+window.addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    cmdkOverlay.classList.toggle('show');
+    if (cmdkOverlay.classList.contains('show')) { renderCmdk(''); setTimeout(function() { cmdkInput.focus(); }, 50); }
+  }
+  if (e.key === 'Escape') { cmdkOverlay.classList.remove('show'); }
+  if (cmdkOverlay.classList.contains('show') && e.key === 'Enter') {
+    var active = cmdkList.querySelector('.cmdk-item.active');
+    if (active) window.location.href = active.dataset.href;
+  }
+});
+cmdkInput.addEventListener('input', function(e) { renderCmdk(e.target.value); });
+cmdkOverlay.addEventListener('click', function(e) { if (e.target === cmdkOverlay) cmdkOverlay.classList.remove('show'); });
+</script>
 </body>
 </html>
