@@ -1,9 +1,13 @@
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { OrbitalCapacityInstrument } from '../../components/instrument/OrbitalCapacityInstrument';
+// Rule 2.1: View+Text only, no HTML elements. Rule 2.2: no CSS shorthand strings.
+// Rule 2.12: no <Image> in focal area. Rule 2.13: no orphan instruction text.
+import React, { useMemo } from 'react';
+import { Gauge } from '../../components/instrument/Gauge';
+import { TypicalRangeChip } from '../../components/instrument/TypicalRangeChip';
+import { MetricCard } from '../../components/instrument/MetricCard';
+import { SignalCard } from '../../components/instrument/SignalCard';
 import { scoreFromSignals } from '../../lib/capacity/score';
 import { typicalRange } from '../../lib/capacity/typical';
-// @ts-ignore — JSX component, web-only canvas gauge
-import { CapacityGaugeLive } from '../../components/orbital/CapacityGaugeLive';
+import { generateInsight } from '../../lib/capacity/insight';
 import { calculateCapacity } from '../../lib/capacity/calculateCapacity';
 import { DEMO_INPUT } from '../../lib/capacity/demoData';
 import {
@@ -11,57 +15,27 @@ import {
   StyleSheet,
   Text,
   Pressable,
-  Keyboard,
   ActivityIndicator,
   ScrollView,
-  KeyboardAvoidingView,
   Platform,
-  Dimensions,
-  AccessibilityActionEvent,
 } from 'react-native';
-import Animated, {
-  FadeIn,
-  FadeOut,
-  SlideInDown,
-  useAnimatedStyle,
-  withSequence,
-  withSpring,
-  withTiming,
-  useSharedValue,
-  useFrameCallback,
-  useAnimatedReaction,
-  interpolate,
-  interpolateColor,
-  Extrapolation,
-  runOnJS,
-} from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { useRouter, useLocalSearchParams, Redirect } from 'expo-router';
+import Animated, { FadeIn } from 'react-native-reanimated';
+import { useRouter, Redirect } from 'expo-router';
 import { Settings, Sparkles, TrendingUp, TrendingDown, Minus } from 'lucide-react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
 import {
-  CategorySelector,
-  Composer,
-  COMPOSER_HEIGHT,
   ModeInsightsPanel,
   OrgRoleBanner,
 } from '../../components';
-import ShaderOrb, {
-  useOrbTouchGesture,
-  useSoulLongPress,
-  type ShaderOrbRef,
-} from '../../components/orb/ShaderOrb';
-import ShaderTherm from '../../components/orb/ShaderTherm';
-import { colors, commonStyles, spacing } from '../../theme';
-import { CapacityState, Category } from '../../types';
+import { colors, spacing } from '../../theme';
 import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
 import { useLocale } from '../../lib/hooks/useLocale';
-import { useDemoMode, FOUNDER_DEMO_ENABLED } from '../../lib/hooks/useDemoMode';
+import { useDemoMode } from '../../lib/hooks/useDemoMode';
 import { useAppMode } from '../../lib/hooks/useAppMode';
 import { useTutorial } from '../../lib/hooks/useTutorial';
-import { useSubscription, shouldBypassSubscription } from '../../lib/subscription';
+import { useSubscription } from '../../lib/subscription';
 import { Locale } from '../../locales';
+import type { CapacityState } from '../../types';
 
 function formatDate(locale: Locale): string {
   const localeCode = locale === 'es' ? 'es-MX' : 'en-US';
@@ -72,287 +46,19 @@ function formatDate(locale: Locale): string {
   });
 }
 
-// =============================================================================
-// CONSTANTS
-// =============================================================================
-
-const INITIAL_CAPACITY = 0.82;
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-/** Orb scaled to fit header → stats → orb → label → tags → composer on one screen (iPhone class). */
-const ORB_SIZE = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT) * 0.65;
-const ORB_HIT_PADDING = 16; // Touch slop around orb (keeps hit target without inflating layout)
-const ORB_HIT_SIZE = ORB_SIZE + ORB_HIT_PADDING * 2; // 320x320
-
-// Drag range: 40% of screen width for full 0→1 traversal
-const DRAG_RANGE = Dimensions.get('window').width * 0.4;
-
-// Three-detent snap positions
-const DETENT_RESOURCED = 1.0;
-const DETENT_STRETCHED = 0.5;
-const DETENT_DEPLETED = 0.0;
-
-// State thresholds (equal thirds)
-const THRESHOLD_RESOURCED = 0.67;
-const THRESHOLD_STRETCHED = 0.33;
-
-// Spring physics for detent settlement
-const SETTLE_SPRING = {
-  damping: 20,
-  stiffness: 180,
-  mass: 1,
-  overshootClamping: true,
-};
-
-const stateColors: Record<CapacityState, string> = {
-  resourced: '#00E5FF',
-  stretched: '#E8A830',
-  depleted: '#F44336',
-};
-
-// Display labels — "ELEVATED" is the visual label for internal 'stretched' state
-const stateLabels: Record<CapacityState, string> = {
-  resourced: 'RESOURCED',
-  stretched: 'ELEVATED',
-  depleted: 'DEPLETED',
-};
-
-// =============================================================================
-// HELPERS
-// =============================================================================
-
-/** Derive CapacityState from a capacity value using equal-thirds thresholds */
-function capacityToState(cap: number): CapacityState {
-  'worklet';
-  if (cap >= THRESHOLD_RESOURCED) return 'resourced';
-  if (cap >= THRESHOLD_STRETCHED) return 'stretched';
-  return 'depleted';
-}
-
-/** Find nearest detent for a given capacity value */
-function nearestDetent(cap: number): number {
-  'worklet';
-  const detents = [DETENT_DEPLETED, DETENT_STRETCHED, DETENT_RESOURCED];
-  let nearest = detents[0];
-  let minDist = Math.abs(cap - detents[0]);
-  for (let i = 1; i < detents.length; i++) {
-    const d = Math.abs(cap - detents[i]);
-    if (d < minDist) {
-      minDist = d;
-      nearest = detents[i];
-    }
-  }
-  return nearest;
-}
-
-/** Rubberband resistance when dragging past bounds */
-function rubberband(raw: number): number {
-  'worklet';
-  if (raw < 0.0) {
-    return -0.1 * (1 - Math.exp(raw));
-  } else if (raw > 1.0) {
-    return 1.0 + 0.1 * (1 - Math.exp(-(raw - 1.0)));
-  }
-  return raw;
-}
-
-// =============================================================================
-// COMPONENT
-// =============================================================================
+// Baseline day counter — will eventually come from user_capacity_baseline table
+const BASELINE_DAY = 3;
+const BASELINE_TARGET = 14;
 
 export default function HomeScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams();
-  const forceDemo = FOUNDER_DEMO_ENABLED && params.demo === '1';
   const insets = useSafeAreaInsets();
-  const scrollViewRef = useRef<ScrollView>(null);
 
   const { hasSeenTutorial, isLoading: tutorialLoading } = useTutorial();
-  const { logs, saveEntry, refresh, hasHitSignalLimit } = useEnergyLogs();
+  const { logs } = useEnergyLogs();
   const { t, locale } = useLocale();
-  const { isDemoMode, enableDemoMode, reseedDemoData } = useDemoMode();
+  const { isDemoMode } = useDemoMode();
   const { modeConfig, currentMode } = useAppMode();
-  const { isPro } = useSubscription();
-  const bypassesSubscription = shouldBypassSubscription(currentMode);
-  const canLogSignal = bypassesSubscription || isPro || !hasHitSignalLimit;
-
-  // ─── State ──────────────────────────────────────────────────────────
-  const [currentState, setCurrentState] = useState<CapacityState | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [note, setNote] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
-
-  // ─── Shared Values ──────────────────────────────────────────────────
-  const headerScale = useSharedValue(1);
-  const headerOpacity = useSharedValue(1);
-  const capacityShared = useSharedValue(INITIAL_CAPACITY);
-  const dragStartCapacity = useSharedValue(INITIAL_CAPACITY);
-  const labelOpacity = useSharedValue(1);
-  const stateLabelScale = useSharedValue(1);
-
-  // Track previous "zone" for haptic threshold crossing (0, 1, or 2)
-  const prevZone = useSharedValue(-1); // -1 = uninitialized
-  const lastCapHapticBucket = useSharedValue(-999);
-  const lastCapHapticTime = useSharedValue(-999);
-
-  const orbRef = useRef<ShaderOrbRef>(null);
-  const rotationImpulse = useSharedValue(0);
-  const soulReveal = useSharedValue(0);
-  const soulRipple = useSharedValue(0);
-
-  const orbTouch = useOrbTouchGesture({
-    orbSize: ORB_SIZE,
-    hitOffsetX: ORB_HIT_PADDING,
-    hitOffsetY: ORB_HIT_PADDING,
-  });
-
-  const soulGesture = useSoulLongPress(soulReveal, soulRipple);
-
-  // ─── Orb↔Therm mode switching ─────────────────────────────────────
-  const orbClock = useSharedValue(0);
-  const mode = useSharedValue(0.0); // 0.0 = orb, 1.0 = therm
-  const crossfadeOrb = useSharedValue(1.0);
-  const crossfadeTherm = useSharedValue(0.0);
-  const modeDragStart = useSharedValue(0.0);
-  const lastModeHapticTime = useSharedValue(0);
-
-  // ═══════════════════════════════════════════════════════════════════
-  // HAPTIC CALLBACKS (must run on JS thread, defined before animated reactions)
-  // ═══════════════════════════════════════════════════════════════════
-
-  const fireThresholdHaptic = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-  }, []);
-
-  const fireCapTextureHaptic = useCallback(() => {
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }, []);
-
-  const fireDetentHeavy = useCallback(() => {
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-  }, []);
-
-  const fireSettleNotification = useCallback((target: number) => {
-    if (target >= 0.99) {
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } else if (Math.abs(target - 0.5) < 0.01) {
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-    } else {
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-    }
-  }, []);
-
-  const fireModeHaptic = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-  }, []);
-
-  // ─── Lifted clock — single render loop for Orb + Therm ─────────────
-  useFrameCallback((info) => {
-    orbClock.value = (info.timeSinceFirstFrame ?? 0) / 1000;
-  });
-
-  // ─── Crossfade derivation — driven by mode ────────────────────────
-  useAnimatedReaction(
-    () => mode.value,
-    (modeVal) => {
-      crossfadeOrb.value = 1.0 - modeVal;
-      crossfadeTherm.value = modeVal;
-    },
-  );
-
-  const [thermLayerMounted, setThermLayerMounted] = useState(false);
-  const syncThermLayerMounted = useCallback((mounted: boolean) => {
-    setThermLayerMounted(mounted);
-  }, []);
-  useAnimatedReaction(
-    () => crossfadeTherm.value,
-    (v, prev) => {
-      const on = v > 0.02;
-      if (prev === null || prev === undefined) {
-        if (on) runOnJS(syncThermLayerMounted)(true);
-        return;
-      }
-      const wasOn = prev > 0.02;
-      if (on !== wasOn) runOnJS(syncThermLayerMounted)(on);
-    },
-  );
-
-  // ─── Mode haptic — fires at 0.75 crossing, 200ms cooldown ────────
-  useAnimatedReaction(
-    () => mode.value,
-    (current, previous) => {
-      if (previous === null || previous === undefined) return;
-
-      const crossedUp = previous < 0.75 && current >= 0.75;
-      const crossedDown = previous >= 0.75 && current < 0.75;
-
-      if (crossedUp || crossedDown) {
-        // Suppress during settle (abs(mode - target) < 0.005)
-        const target = current > 0.5 ? 1.0 : 0.0;
-        if (Math.abs(current - target) < 0.005) return;
-
-        // 200ms cooldown via orbClock (seconds)
-        const now = orbClock.value;
-        if (now - lastModeHapticTime.value > 0.2) {
-          lastModeHapticTime.value = now;
-          runOnJS(fireModeHaptic)();
-        }
-      }
-    },
-  );
-
-  // ─── Keyboard handling ──────────────────────────────────────────────
-  useEffect(() => {
-    const keyboardWillShow = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-      () => {
-        setKeyboardVisible(true);
-        headerScale.value = withTiming(0.85, { duration: 250 });
-        headerOpacity.value = withTiming(0.4, { duration: 250 });
-      },
-    );
-    const keyboardWillHide = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-      () => {
-        setKeyboardVisible(false);
-        headerScale.value = withTiming(1, { duration: 250 });
-        headerOpacity.value = withTiming(1, { duration: 250 });
-      },
-    );
-    return () => {
-      keyboardWillShow.remove();
-      keyboardWillHide.remove();
-    };
-  }, []);
-
-  const headerAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: headerScale.value }],
-    opacity: headerOpacity.value,
-  }));
-
-  const welcomeAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(headerOpacity.value, [0.4, 1], [0, 1], Extrapolation.CLAMP),
-    transform: [
-      {
-        translateY: interpolate(headerScale.value, [0.85, 1], [-20, 0], Extrapolation.CLAMP),
-      },
-    ],
-  }));
-
-  // ─── Demo mode seeding ──────────────────────────────────────────────
-  useEffect(() => {
-    if (forceDemo) {
-      const seedDemo = async () => {
-        if (!isDemoMode) {
-          await enableDemoMode('90d');
-        } else {
-          await reseedDemoData('90d');
-        }
-        await refresh();
-      };
-      seedDemo();
-    }
-  }, [forceDemo]);
 
   const signalData = useMemo(() => {
     const now = Date.now();
@@ -362,7 +68,9 @@ export default function HomeScreen() {
 
     const todayLogs = logs.filter((log) => log.timestamp >= todayStart);
     const weekLogs = logs.filter((log) => log.timestamp >= weekAgo);
-    const prevWeekLogs = logs.filter((log) => log.timestamp >= prevWeekStart && log.timestamp < weekAgo);
+    const prevWeekLogs = logs.filter(
+      (log) => log.timestamp >= prevWeekStart && log.timestamp < weekAgo,
+    );
 
     const stateToPercent = (state: CapacityState) => {
       if (state === 'resourced') return 100;
@@ -373,7 +81,8 @@ export default function HomeScreen() {
     const todayAvg =
       todayLogs.length > 0
         ? Math.round(
-            todayLogs.reduce((sum, log) => sum + stateToPercent(log.state), 0) / todayLogs.length,
+            todayLogs.reduce((sum, log) => sum + stateToPercent(log.state), 0) /
+              todayLogs.length,
           )
         : null;
 
@@ -383,7 +92,8 @@ export default function HomeScreen() {
         : null;
     const prevWeekAvg =
       prevWeekLogs.length > 0
-        ? prevWeekLogs.reduce((sum, log) => sum + stateToPercent(log.state), 0) / prevWeekLogs.length
+        ? prevWeekLogs.reduce((sum, log) => sum + stateToPercent(log.state), 0) /
+          prevWeekLogs.length
         : null;
 
     let trend: 'up' | 'down' | 'stable' | null = null;
@@ -394,225 +104,64 @@ export default function HomeScreen() {
       else trend = 'stable';
     }
 
-    const todayDepletedCount = todayLogs.filter((log) => log.state === 'depleted').length;
-    const hasAlert = todayDepletedCount >= 2;
     const totalSignals = logs.length;
 
-    return { todayAvg, trend, hasAlert, totalSignals };
+    return { todayAvg, trend, totalSignals };
   }, [logs]);
 
-  // ═══════════════════════════════════════════════════════════════════
-  // DIRECT MANIPULATION GESTURE — Orb is the input
-  // ═══════════════════════════════════════════════════════════════════
+  // ─── Capacity reading ─────────────────────────────────────────────
+  const reading = useMemo(() => {
+    try {
+      return calculateCapacity(DEMO_INPUT);
+    } catch {
+      return null;
+    }
+  }, []);
 
-  const orbGesture = Gesture.Pan()
-    // Only activate on horizontal movement — let vertical scroll through
-    .activeOffsetX([-10, 10])
-    .failOffsetY([-15, 15])
-    .onBegin(() => {
-      'worklet';
-      dragStartCapacity.value = capacityShared.value;
+  const capacityScore = useMemo((): import('../../lib/capacity/types').CapacityScore => {
+    if (reading) {
+      const v1State = reading.state;
+      const mappedState =
+        v1State === 'Low'
+          ? 'DEPLETED'
+          : v1State === 'Near Limit' || v1State === 'Elevated'
+            ? 'RESOURCED'
+            : 'ELEVATED';
+      return {
+        value: reading.capacityScore,
+        state: mappedState as import('../../lib/capacity/types').CapacityState,
+        computedAt: reading.timestamp,
+      };
+    }
+    return { value: 60, state: 'ELEVATED', computedAt: new Date().toISOString() };
+  }, [reading]);
 
-      // Initialize zone tracking
-      const cap = capacityShared.value;
-      if (cap >= THRESHOLD_RESOURCED) prevZone.value = 2;
-      else if (cap >= THRESHOLD_STRETCHED) prevZone.value = 1;
-      else prevZone.value = 0;
-
-      const c0 = Math.max(0, Math.min(1, capacityShared.value));
-      lastCapHapticBucket.value = Math.floor(c0 / 0.05);
-      lastCapHapticTime.value = orbClock.value;
-    })
-    .onUpdate((e) => {
-      'worklet';
-      // Drag LEFT = increase capacity, drag RIGHT = decrease capacity
-      const rawCapacity = dragStartCapacity.value - (e.translationX / DRAG_RANGE);
-
-      // Apply rubberband at bounds
-      capacityShared.value = rubberband(rawCapacity);
-
-      rotationImpulse.value += (e.velocityX / 4500) * (1 + Math.abs(e.velocityX) / 8000);
-      rotationImpulse.value = Math.max(-2.8, Math.min(2.8, rotationImpulse.value));
-
-      // Check for zone crossing → haptic
-      const clamped = Math.max(0, Math.min(1, rawCapacity));
-      let currentZone: number;
-      if (clamped >= THRESHOLD_RESOURCED) currentZone = 2;
-      else if (clamped >= THRESHOLD_STRETCHED) currentZone = 1;
-      else currentZone = 0;
-
-      if (currentZone !== prevZone.value && prevZone.value >= 0) {
-        runOnJS(fireThresholdHaptic)();
-      }
-      prevZone.value = currentZone;
-
-      const displayed = Math.max(0, Math.min(1, capacityShared.value));
-      const bucket = Math.floor(displayed / 0.05);
-      if (bucket !== lastCapHapticBucket.value) {
-        const now = orbClock.value;
-        if (now - lastCapHapticTime.value >= 0.08) {
-          lastCapHapticTime.value = now;
-          runOnJS(fireCapTextureHaptic)();
-        }
-        lastCapHapticBucket.value = bucket;
-      }
-    })
-    .onEnd((e) => {
-      'worklet';
-      // Clamp back from rubberband and snap to nearest detent
-      const clamped = Math.max(0, Math.min(1, capacityShared.value));
-      const target = nearestDetent(clamped);
-
-      runOnJS(fireDetentHeavy)();
-      capacityShared.value = withSpring(target, SETTLE_SPRING);
-
-      const flick = e.velocityX / 2200;
-      rotationImpulse.value = Math.max(-2.8, Math.min(2.8, rotationImpulse.value + flick));
-
-      labelOpacity.value = withSpring(1, { damping: 15, stiffness: 140 });
-      stateLabelScale.value = withSequence(
-        withSpring(1.1, { damping: 12, stiffness: 260 }),
-        withSpring(1, { damping: 16, stiffness: 200 }),
-      );
-
-      // Derive discrete state for saving
-      const state = capacityToState(target) as CapacityState;
-      runOnJS(setCurrentState)(state);
-      runOnJS(fireSettleNotification)(target);
-    });
-
-  // ═══════════════════════════════════════════════════════════════════
-  // MODE SWITCH GESTURE — vertical drag toggles Orb↔Therm
-  // ═══════════════════════════════════════════════════════════════════
-
-  const MODE_DRAG_DISTANCE = 150; // pixels for full 0→1 traversal
-
-  const modeGesture = Gesture.Pan()
-    .activeOffsetY([-20, 20])
-    .failOffsetX([-15, 15])
-    .onBegin(() => {
-      'worklet';
-      modeDragStart.value = mode.value;
-    })
-    .onUpdate((e) => {
-      'worklet';
-      // Drag UP (negative translationY) → therm (1.0)
-      // Drag DOWN (positive translationY) → orb (0.0)
-      const raw = modeDragStart.value - (e.translationY / MODE_DRAG_DISTANCE);
-      mode.value = Math.max(0, Math.min(1, raw));
-    })
-    .onEnd(() => {
-      'worklet';
-      const target = mode.value > 0.5 ? 1.0 : 0.0;
-      mode.value = withSpring(target, {
-        damping: 20,
-        stiffness: 180,
-        mass: 1,
-        overshootClamping: true,
-      });
-    });
-
-  // Compose: capacity pan + touch overlay + long-press soul (simultaneous); vertical = mode (race)
-  const composedGesture = useMemo(
+  const range = useMemo(
     () =>
-      Gesture.Race(
-        Gesture.Simultaneous(
-          Gesture.Simultaneous(orbGesture, orbTouch.gesture),
-          soulGesture,
-        ),
-        modeGesture,
+      typicalRange(
+        [58, 62, 60, 64, 61, 63, 59, 65, 60, 62],
+        BASELINE_DAY,
+        BASELINE_TARGET,
       ),
-    [orbGesture, modeGesture, orbTouch.gesture, soulGesture],
+    [],
   );
 
-  // ─── State label animated style ───────────────────────────────────
-  const labelAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: labelOpacity.value,
-    transform: [{ scale: stateLabelScale.value }],
-  }));
+  const insight = useMemo(() => generateInsight(capacityScore), [capacityScore]);
 
-  // ─── State label color (driven by capacity) ──────────────────────
-  const labelColorStyle = useAnimatedStyle(() => {
-    const c = interpolateColor(
-      capacityShared.value,
-      [0, 0.33, 0.67, 1],
-      ['#F44336', '#E8A830', '#E8A830', '#00E5FF'],
-    );
-    return { color: c as string };
-  });
-
-  /** Hides thermometer Skia layer entirely when in orb mode (avoids opaque Canvas / column leak). */
-  const thermLayerOpacityStyle = useAnimatedStyle(() => ({
-    opacity: crossfadeTherm.value,
-  }));
-
-  // ─── Handlers ──────────────────────────────────────────────────────
-
-  const handleCategorySelect = useCallback((category: Category) => {
-    setSelectedCategory((prev) => (prev === category ? null : category));
-  }, []);
-
-  const canSave = currentState !== null;
-  const accentColor = currentState ? stateColors[currentState] : colors.good;
-
-  const handleSave = useCallback(async () => {
-    if (currentState && !isSaving && canLogSignal) {
-      Keyboard.dismiss();
-      setIsSaving(true);
-
-      try {
-        const tags = selectedCategory ? [selectedCategory] : [];
-        const trimmedNote = note.trim() || undefined;
-        await saveEntry(currentState, tags, trimmedNote, trimmedNote);
-        orbRef.current?.pulseSave();
-        setTimeout(() => {
-          setCurrentState(null);
-          setSelectedCategory(null);
-          setNote('');
-          setIsSaving(false);
-          // Hide label after save
-          labelOpacity.value = withTiming(0, { duration: 200 });
-        }, 600);
-      } catch (error) {
-        if (__DEV__) console.error('Failed to save:', error);
-        setIsSaving(false);
-      }
-    }
-  }, [currentState, selectedCategory, note, isSaving, saveEntry, canLogSignal]);
-
-  // ─── Accessibility: increment/decrement by one state ──────────────
-  const handleAccessibilityAction = useCallback((event: AccessibilityActionEvent) => {
-    const action = event.nativeEvent.actionName;
-    const current = capacityShared.value;
-    let target: number;
-
-    if (action === 'increment') {
-      // Step up by 0.5 (one state toward resourced)
-      target = Math.min(1.0, nearestDetent(current) + 0.5);
-    } else if (action === 'decrement') {
-      // Step down by 0.5 (one state toward depleted)
-      target = Math.max(0.0, nearestDetent(current) - 0.5);
-    } else {
-      return;
-    }
-
-    capacityShared.value = withSpring(target, SETTLE_SPRING);
-    labelOpacity.value = withTiming(1, { duration: 200 });
-    const state = capacityToState(target);
-    setCurrentState(state);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }, []);
+  // Health metrics — stubs until HealthKit/Apple Health integration
+  const healthMetrics = useMemo(
+    () => [
+      { label: 'Sleep', value: null as string | null, trend: null as 'up' | 'down' | 'flat' | null },
+      { label: 'HRV', value: null as string | null, trend: null as 'up' | 'down' | 'flat' | null },
+      { label: 'RHR', value: null as string | null, trend: null as 'up' | 'down' | 'flat' | null },
+    ],
+    [],
+  );
 
   // ─── Loading / Tutorial gates ──────────────────────────────────────
-
   if (tutorialLoading) {
     return (
-      <SafeAreaView
-        style={[
-          commonStyles.screen,
-          { justifyContent: 'center', alignItems: 'center' },
-        ]}
-      >
+      <SafeAreaView style={[styles.screen, styles.centered]}>
         <ActivityIndicator color="#00E5FF" size="large" />
       </SafeAreaView>
     );
@@ -622,33 +171,19 @@ export default function HomeScreen() {
     return <Redirect href="/tutorial" />;
   }
 
-  const composerBottomPadding = currentState
-    ? COMPOSER_HEIGHT + insets.bottom + spacing.sm
-    : spacing.sm;
-
-  // ═══════════════════════════════════════════════════════════════════
-  // RENDER
-  // ═══════════════════════════════════════════════════════════════════
   return (
-    <SafeAreaView style={commonStyles.screen} edges={['top', 'left', 'right']}>
-      {/* Maestro/iOS: testID on SafeAreaView often missing from a11y tree — use inner View */}
-      <View style={styles.orbScreenRoot} testID="orb-screen" collapsable={false}>
-      <KeyboardAvoidingView
-        style={styles.keyboardAvoid}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={0}
-      >
-        {/* ─── HEADER (minimal) ─── */}
-        <Animated.View style={[styles.header, headerAnimatedStyle]}>
+    <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
+      <View style={styles.root} testID="today-screen" collapsable={false}>
+        {/* ─── HEADER ─── */}
+        <Animated.View style={styles.header}>
           <Pressable
             onPress={() => router.push('/upgrade')}
-            style={styles.plansButton}
+            style={styles.iconButton}
             accessible
             accessibilityRole="button"
             accessibilityLabel="Plans"
             testID="open-plans"
           >
-            {/* Hide SVG subtree from a11y so Pressable label is the only element (Maestro / VoiceOver). */}
             <View accessibilityElementsHidden>
               <Sparkles color="#FFD700" size={22} />
             </View>
@@ -656,7 +191,7 @@ export default function HomeScreen() {
           <Text style={[styles.title, { color: `${modeConfig.accentColor}CC` }]}>Orbital</Text>
           <Pressable
             onPress={() => router.push('/settings')}
-            style={styles.settingsButton}
+            style={styles.iconButton}
             accessible
             accessibilityRole="button"
             accessibilityLabel="Settings"
@@ -669,200 +204,127 @@ export default function HomeScreen() {
         </Animated.View>
 
         <ScrollView
-          ref={scrollViewRef}
           style={styles.scrollView}
-          contentContainerStyle={[
-            styles.scrollContent,
-            { paddingBottom: composerBottomPadding },
-          ]}
-          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 24 }]}
           showsVerticalScrollIndicator={false}
-          bounces={!keyboardVisible}
         >
-          <View style={styles.content}>
-            <Animated.View style={[styles.welcomeSection, welcomeAnimatedStyle]}>
-              <Text style={styles.welcomeText}>{t.home.title}</Text>
-              <Text style={styles.dateText}>{formatDate(locale)}</Text>
-            </Animated.View>
-
-            <OrgRoleBanner mode={currentMode} compact />
-
-            {currentMode !== 'personal' && <ModeInsightsPanel logs={logs} />}
-
-            <Animated.View
-              style={[styles.signalBar, { borderColor: `${modeConfig.accentColor}20` }]}
-            >
-              <View style={styles.signalItem}>
-                <Text style={styles.signalLabel}>{t.core.today.toUpperCase()}</Text>
-                <Text
-                  style={[
-                    styles.signalValue,
-                    signalData.todayAvg !== null && {
-                      color:
-                        signalData.todayAvg >= 70
-                          ? modeConfig.accentColor
-                          : signalData.todayAvg >= 40
-                            ? '#E8A830'
-                            : '#F44336',
-                    },
-                  ]}
-                >
-                  {signalData.todayAvg !== null ? signalData.todayAvg + '%' : '—'}
-                </Text>
-              </View>
-              <View style={styles.signalDivider} />
-              <View style={styles.signalItem}>
-                <Text style={styles.signalLabel}>{t.core.trend.toUpperCase()}</Text>
-                <View style={styles.signalIconRow}>
-                  {signalData.trend === 'up' && <TrendingUp size={16} color={modeConfig.accentColor} />}
-                  {signalData.trend === 'down' && <TrendingDown size={16} color="#F44336" />}
-                  {signalData.trend === 'stable' && <Minus size={16} color="#E8A830" />}
-                  {signalData.trend === null && <Minus size={16} color="rgba(255,255,255,0.3)" />}
-                </View>
-              </View>
-              <View style={styles.signalDivider} />
-              <View style={styles.signalItem}>
-                <Text style={styles.signalLabel}>{t.core.signals.toUpperCase()}</Text>
-                <Text
-                  style={[
-                    styles.signalValue,
-                    signalData.totalSignals > 0 && { color: 'rgba(255,255,255,0.85)' },
-                  ]}
-                >
-                  {signalData.totalSignals}
-                </Text>
-              </View>
-            </Animated.View>
-
-            {/* v4 OrbitalCapacityInstrument — Gauge + typical-range chip */}
-            {(() => {
-              const demoReading = (() => { try { return calculateCapacity(DEMO_INPUT); } catch { return null; } })();
-              const demoScore = demoReading?.capacityScore ?? 60;
-              const demoState = (demoReading?.state === 'Low' ? 'DEPLETED' : demoReading?.state === 'Near Limit' ? 'RESOURCED' : demoReading?.state === 'Elevated' ? 'RESOURCED' : 'ELEVATED') as 'RESOURCED' | 'ELEVATED' | 'DEPLETED';
-              const typical = typicalRange([58, 62, 60, 64, 61, 63, 59, 65, 60, 62]);
-              return (
-                <OrbitalCapacityInstrument
-                  score={demoScore}
-                  state={demoState}
-                  typicalLow={typical.low}
-                  typicalHigh={typical.high}
-                  accent="#F2B134"
-                />
-              );
-            })()}
-
-            <Animated.Text entering={FadeIn.delay(200).duration(400)} style={styles.instruction}>
-              {!currentState ? t.home.adjustPrompt : t.home.driversLabel}
-            </Animated.Text>
-
-            {/* ─── ORB — hero element + direct manipulation input ─── */}
-            <GestureDetector gesture={composedGesture}>
-              <Animated.View
-                style={styles.orbGestureTarget}
-                accessible
-                accessibilityRole="adjustable"
-                accessibilityLabel="Capacity input. Swipe left for resourced, right for depleted. Long press for numeric percent. Swipe up for thermometer view."
-                accessibilityValue={{
-                  min: 0,
-                  max: 100,
-                  now: Math.round((currentState === 'resourced' ? 1.0 : currentState === 'stretched' ? 0.5 : currentState === 'depleted' ? 0.0 : INITIAL_CAPACITY) * 100),
-                }}
-                accessibilityActions={[
-                  { name: 'increment' },
-                  { name: 'decrement' },
-                ]}
-                onAccessibilityAction={handleAccessibilityAction}
-              >
-                <View style={styles.orbInstrumentWrap}>
-                  <ShaderOrb
-                    ref={orbRef}
-                    size={ORB_SIZE}
-                    capacity={capacityShared}
-                    externalClock={orbClock}
-                    uCrossfade={crossfadeOrb}
-                    soulReveal={soulReveal}
-                    soulRipple={soulRipple}
-                    touchX={orbTouch.touchX}
-                    touchY={orbTouch.touchY}
-                    touchActive={orbTouch.touchActive}
-                    touchPressure={orbTouch.touchPressure}
-                    touchVelocity={orbTouch.touchVelocity}
-                    rotationImpulse={rotationImpulse}
-                  />
-                  {thermLayerMounted ? (
-                    <Animated.View
-                      pointerEvents="none"
-                      style={[styles.thermOverlay, thermLayerOpacityStyle]}
-                    >
-                      <ShaderTherm
-                        size={ORB_SIZE}
-                        capacity={capacityShared}
-                        externalClock={orbClock}
-                        uCrossfade={crossfadeTherm}
-                      />
-                    </Animated.View>
-                  ) : null}
-                </View>
-              </Animated.View>
-            </GestureDetector>
-
-            {/* ─── STATE LABEL ─── */}
-            <Animated.View style={[styles.stateLabelWrap, labelAnimatedStyle]}>
-              <Animated.Text style={[styles.stateLabel, labelColorStyle]}>
-                {currentState ? stateLabels[currentState] : stateLabels.resourced}
-              </Animated.Text>
-            </Animated.View>
-
-            {/* ─── DRIVER TAGS ─── */}
-            {currentState && (
-              <Animated.View
-                entering={SlideInDown.duration(300).springify()}
-                exiting={FadeOut.duration(200)}
-                style={styles.categoryContainer}
-              >
-                <CategorySelector
-                  selected={selectedCategory}
-                  onSelect={handleCategorySelect}
-                  accentColor={accentColor}
-                />
-              </Animated.View>
-            )}
-          </View>
-        </ScrollView>
-
-        {/* ─── COMPOSER (note + submit) — fixed at bottom ─── */}
-        {currentState && (
+          {/* Pattern 7: date header */}
           <Animated.View
-            entering={SlideInDown.duration(300).springify()}
-            exiting={FadeOut.duration(200)}
+            entering={FadeIn.delay(60).duration(350)}
+            style={styles.welcomeSection}
           >
-            <Composer
-              value={note}
-              onChangeText={setNote}
-              onSubmit={handleSave}
-              placeholder={t.home.addDetails}
-              accentColor={accentColor}
-              canSubmit={canSave}
-              isSubmitting={isSaving}
-              keyboardVisible={keyboardVisible}
-            />
+            <Text style={styles.welcomeText}>{t.home.title}</Text>
+            <Text style={styles.dateText}>{formatDate(locale)}</Text>
           </Animated.View>
-        )}
-      </KeyboardAvoidingView>
+
+          <OrgRoleBanner mode={currentMode} compact />
+          {currentMode !== 'personal' && <ModeInsightsPanel logs={logs} />}
+
+          {/* Signal stats bar */}
+          <Animated.View
+            entering={FadeIn.delay(100).duration(350)}
+            style={styles.signalBar}
+          >
+            <View style={styles.signalItem}>
+              <Text style={styles.signalLabel}>{t.core.today.toUpperCase()}</Text>
+              <Text
+                style={[
+                  styles.signalValue,
+                  signalData.todayAvg !== null && {
+                    color:
+                      signalData.todayAvg >= 70
+                        ? modeConfig.accentColor
+                        : signalData.todayAvg >= 40
+                          ? '#F59E0B'
+                          : '#DC2626',
+                  },
+                ]}
+              >
+                {signalData.todayAvg !== null ? signalData.todayAvg + '%' : '—'}
+              </Text>
+            </View>
+            <View style={styles.signalDivider} />
+            <View style={styles.signalItem}>
+              <Text style={styles.signalLabel}>{t.core.trend.toUpperCase()}</Text>
+              <View style={styles.signalIconRow}>
+                {signalData.trend === 'up' && (
+                  <TrendingUp size={16} color={modeConfig.accentColor} />
+                )}
+                {signalData.trend === 'down' && <TrendingDown size={16} color="#DC2626" />}
+                {signalData.trend === 'stable' && <Minus size={16} color="#F59E0B" />}
+                {signalData.trend === null && (
+                  <Minus size={16} color="rgba(255,255,255,0.3)" />
+                )}
+              </View>
+            </View>
+            <View style={styles.signalDivider} />
+            <View style={styles.signalItem}>
+              <Text style={styles.signalLabel}>{t.core.signals.toUpperCase()}</Text>
+              <Text
+                style={[
+                  styles.signalValue,
+                  signalData.totalSignals > 0 && { color: 'rgba(255,255,255,0.85)' },
+                ]}
+              >
+                {signalData.totalSignals}
+              </Text>
+            </View>
+          </Animated.View>
+
+          {/* Pattern 1: Focal gauge (text-only, no orb) */}
+          <Animated.View
+            entering={FadeIn.delay(150).duration(400)}
+            style={styles.focalSection}
+            testID="focal-section"
+          >
+            <Gauge score={capacityScore.value} state={capacityScore.state} />
+            {/* Pattern 2: Typical range chip */}
+            <TypicalRangeChip range={range} />
+          </Animated.View>
+
+          {/* Pattern 3: Metric card row */}
+          <Animated.View
+            entering={FadeIn.delay(200).duration(400)}
+            style={styles.metricsRow}
+            testID="metrics-row"
+          >
+            {healthMetrics.map((m) => (
+              <MetricCard
+                key={m.label}
+                label={m.label}
+                value={m.value}
+                trend={m.trend}
+                baselineDay={BASELINE_DAY}
+                baselineTarget={BASELINE_TARGET}
+              />
+            ))}
+          </Animated.View>
+
+          {/* Pattern 4: Signal / insight card */}
+          <Animated.View
+            entering={FadeIn.delay(250).duration(400)}
+            style={styles.signalCardWrap}
+          >
+            <SignalCard insight={insight} />
+          </Animated.View>
+        </ScrollView>
       </View>
     </SafeAreaView>
   );
 }
 
-// =============================================================================
-// STYLES
-// =============================================================================
-
 const styles = StyleSheet.create({
-  orbScreenRoot: { flex: 1, position: 'relative', backgroundColor: 'transparent' },
-  keyboardAvoid: { flex: 1, backgroundColor: 'transparent' },
-  scrollView: { flex: 1, backgroundColor: 'transparent' },
-  scrollContent: { flexGrow: 1, backgroundColor: 'transparent' },
+  screen: {
+    flex: 1,
+    backgroundColor: '#01020A',
+  },
+  centered: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  root: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -871,32 +333,40 @@ const styles = StyleSheet.create({
     paddingTop: 0,
     paddingBottom: 0,
   },
-  plansButton: { padding: spacing.sm },
+  iconButton: {
+    padding: spacing.sm,
+  },
   title: {
     fontSize: 22,
     fontWeight: '200',
-    color: 'rgba(255, 255, 255, 0.85)',
+    color: 'rgba(255,255,255,0.85)',
     letterSpacing: 6,
     textTransform: 'uppercase',
-    textShadowColor: 'rgba(0, 229, 255, 0.4)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 12,
   },
-  settingsButton: { padding: spacing.sm },
-  content: {
+  scrollView: {
     flex: 1,
-    alignItems: 'center',
-    paddingTop: spacing.xs,
-    backgroundColor: 'transparent',
   },
-  welcomeSection: { alignItems: 'center', marginBottom: spacing.sm },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingTop: 4,
+  },
+  welcomeSection: {
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
   welcomeText: {
     fontSize: 18,
     fontWeight: '300',
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: 'rgba(255,255,255,0.9)',
     letterSpacing: 0.5,
   },
-  dateText: { fontSize: 12, fontWeight: '400', color: 'rgba(255, 255, 255, 0.4)', marginTop: 4 },
+  dateText: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: 'rgba(255,255,255,0.4)',
+    marginTop: 4,
+  },
   signalBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -909,7 +379,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     marginBottom: spacing.sm,
   },
-  signalItem: { alignItems: 'center', paddingHorizontal: spacing.md, minWidth: 70 },
+  signalItem: {
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    minWidth: 70,
+  },
   signalLabel: {
     fontSize: 9,
     color: 'rgba(255,255,255,0.4)',
@@ -917,59 +391,32 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginBottom: 4,
   },
-  signalValue: { fontSize: 16, fontWeight: '300', color: 'rgba(255,255,255,0.5)' },
-  signalIconRow: { flexDirection: 'row', alignItems: 'center' },
-  signalDivider: { width: 1, height: 28, backgroundColor: 'rgba(255,255,255,0.08)' },
-  instruction: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: 'rgba(255, 255, 255, 0.5)',
-    letterSpacing: 0.5,
-    marginBottom: spacing.xs,
-    textAlign: 'center',
+  signalValue: {
+    fontSize: 16,
+    fontWeight: '300',
+    color: 'rgba(255,255,255,0.5)',
   },
-  // ─── Orb gesture target ───
-  orbGestureTarget: {
-    width: ORB_HIT_SIZE,
-    height: ORB_HIT_SIZE,
-    justifyContent: 'center',
+  signalIconRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.sm,
-    overflow: 'visible',
-    backgroundColor: 'transparent',
   },
-  orbInstrumentWrap: {
-    width: ORB_SIZE,
-    height: ORB_SIZE,
-    position: 'relative' as const,
+  signalDivider: {
+    width: 1,
+    height: 28,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  focalSection: {
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
+    paddingVertical: 12,
   },
-  thermOverlay: {
-    position: 'absolute' as const,
-    top: 0,
-    left: 0,
-    width: ORB_SIZE,
-    height: ORB_SIZE,
-    backgroundColor: 'transparent',
-    // Skia Canvas sits above the static orb image; without this it steals pans from GestureDetector.
-    pointerEvents: 'none' as const,
+  metricsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 12,
+    marginBottom: 12,
   },
-  stateLabelWrap: {
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-    minHeight: 18,
-  },
-  stateLabel: {
-    fontSize: 13,
-    fontWeight: '500',
-    letterSpacing: 4,
-    textTransform: 'uppercase',
-  },
-  // ─── Category / Tags ───
-  categoryContainer: {
-    marginTop: spacing.xs,
-    zIndex: 10,
+  signalCardWrap: {
+    marginTop: 4,
+    marginBottom: 8,
   },
 });

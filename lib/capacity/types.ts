@@ -11,6 +11,20 @@ export interface ContextualRange {
   low: number;
   high: number;
   windowDays: number;
+  baselineDay: number;
+  baselineTarget: number;
+  ready: boolean;
+}
+
+export interface MetricSnapshot {
+  label: string;
+  value: string | null;
+  trend: 'up' | 'down' | 'flat' | null;
+}
+
+export interface Insight {
+  title: string;
+  recommendation: string;
 }
 
 export interface SignalDaily {

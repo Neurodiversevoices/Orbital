@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { Tabs, useRouter } from 'expo-router';
-import { Home, BarChart2, FileText } from 'lucide-react-native';
+import { Activity, TrendingUp, Heart, User } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../theme';
 import { useAuth } from '../../lib/supabase';
 import { isProfileSetupComplete } from '../profile-setup';
@@ -8,15 +10,16 @@ import { isProfileSetupComplete } from '../profile-setup';
 export default function TabLayout() {
   const router = useRouter();
   const auth = useAuth();
+  const insets = useSafeAreaInsets();
   const [checkingSetup, setCheckingSetup] = useState(true);
 
-  // Check if B2C user needs profile setup
   useEffect(() => {
+    if (auth.isLoading) return;
+
     const checkProfileSetup = async () => {
       if (auth.isAuthenticated) {
         const isComplete = await isProfileSetupComplete();
         if (!isComplete) {
-          // Redirect to profile setup — must clear gate or tabs stay `null` forever (Maestro/orb-screen never appears)
           setCheckingSetup(false);
           router.replace('/profile-setup');
           return;
@@ -25,12 +28,25 @@ export default function TabLayout() {
       setCheckingSetup(false);
     };
 
-    checkProfileSetup();
-  }, [auth.isAuthenticated, router]);
+    void checkProfileSetup();
+  }, [auth.isAuthenticated, auth.isLoading, router]);
 
-  // Don't render tabs while checking setup
-  if (checkingSetup && auth.isAuthenticated) {
-    return null;
+  const showProfileGate = auth.isLoading || (checkingSetup && auth.isAuthenticated);
+  if (showProfileGate) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        testID="tabs-profile-gate"
+        accessibilityLabel="Preparing your workspace"
+      >
+        <ActivityIndicator color={colors.accent} size="large" />
+      </View>
+    );
   }
 
   return (
@@ -39,41 +55,47 @@ export default function TabLayout() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: colors.background,
-          borderTopColor: colors.cardBorder,
+          borderTopColor: 'rgba(255,255,255,0.10)',
           borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
+          height: 60 + insets.bottom,
+          paddingBottom: Math.max(insets.bottom, 8),
           paddingTop: 8,
         },
-        tabBarActiveTintColor: colors.accent,
-        tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.4)',
+        tabBarActiveTintColor: '#FFFFFF',
+        tabBarInactiveTintColor: '#7A8593',
         tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <Home color={color} size={size} />
-          ),
+          tabBarIcon: ({ color }) => <Activity color={color} size={26} />,
+          tabBarAccessibilityLabel: 'Today',
         }}
       />
       <Tabs.Screen
         name="patterns"
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <BarChart2 color={color} size={size} />
-          ),
+          tabBarIcon: ({ color }) => <TrendingUp color={color} size={26} />,
+          tabBarAccessibilityLabel: 'Patterns',
         }}
       />
       <Tabs.Screen
         name="brief"
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <FileText color={color} size={size} />
-          ),
+          tabBarIcon: ({ color }) => <Heart color={color} size={26} />,
+          tabBarAccessibilityLabel: 'Health',
         }}
       />
+      <Tabs.Screen
+        name="nova"
+        options={{
+          tabBarIcon: ({ color }) => <User color={color} size={26} />,
+          tabBarAccessibilityLabel: 'Profile',
+        }}
+      />
+      {/* Hidden screens — not shown in tab bar */}
+      <Tabs.Screen name="empire-missions" options={{ href: null }} />
     </Tabs>
   );
 }
