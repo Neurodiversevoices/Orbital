@@ -18,8 +18,9 @@
       },
       "env": {
         "EXPO_PUBLIC_IS_REVIEW_MODE": "true",
+        "EXPO_PUBLIC_REVENUECAT_IOS_KEY": "sk_vnoNPfKYHiLYEjniqnVOWRfqguyCw",
         "SENTRY_ALLOW_FAILURE": "true",
-        "EAS_USE_CACHE": "0"
+        "EAS_USE_CACHE": "1"
       }
     },
     "review": {
@@ -36,6 +37,7 @@
       },
       "env": {
         "EXPO_PUBLIC_APP_STORE_REVIEW": "1",
+        "EXPO_PUBLIC_REVENUECAT_IOS_KEY": "sk_vnoNPfKYHiLYEjniqnVOWRfqguyCw",
         "SENTRY_ALLOW_FAILURE": "true"
       }
     },
@@ -50,6 +52,7 @@
         "buildType": "apk"
       },
       "env": {
+        "EXPO_PUBLIC_REVENUECAT_IOS_KEY": "sk_vnoNPfKYHiLYEjniqnVOWRfqguyCw",
         "SENTRY_ALLOW_FAILURE": "true"
       }
     },
@@ -65,6 +68,7 @@
       },
       "env": {
         "EXPO_PUBLIC_FOUNDER_DEMO": "1",
+        "EXPO_PUBLIC_REVENUECAT_IOS_KEY": "sk_vnoNPfKYHiLYEjniqnVOWRfqguyCw",
         "SENTRY_ALLOW_FAILURE": "true"
       }
     }
