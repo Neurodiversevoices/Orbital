@@ -10,7 +10,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Platform } from 'react-native';
-import { Session, User, AuthError } from '@supabase/supabase-js';
+import {Session, User} from '@supabase/supabase-js';
 import * as Crypto from 'expo-crypto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // Lazy-load AppleAuthentication only on iOS (crashes on web)
@@ -53,7 +53,7 @@ export function validatePassword(password: string): PasswordValidation {
   if (!/[0-9]/.test(password)) {
     errors.push('At least one number required');
   }
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+  if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
     errors.push('At least one special character required');
   }
 
@@ -65,7 +65,7 @@ export function validatePassword(password: string): PasswordValidation {
     /[A-Z]/.test(password),
     /[a-z]/.test(password),
     /[0-9]/.test(password),
-    /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+    /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
     password.length >= 20,
   ];
   const passed = checks.filter(Boolean).length;
@@ -488,10 +488,10 @@ export function useAuth(): AuthContext {
     try {
       const supabase = getSupabase();
 
-      // Call the delete-user edge function which:
-      // 1. Deletes user data from all 15 tables
-      // 2. Deletes the auth.users row via admin API
-      const { data, error: fnError } = await supabase.functions.invoke('delete-user', {
+      // Call delete-account edge function which:
+      // 1. Revokes Apple identity token via Apple REST API (if Apple sign-in)
+      // 2. Deletes the auth.users row via admin API (cascades all FK-bound tables)
+      const { data, error: fnError } = await supabase.functions.invoke('delete-account', {
         body: {},
       });
 
@@ -499,8 +499,8 @@ export function useAuth(): AuthContext {
         return { success: false, error: fnError.message };
       }
 
-      if (data && !data.success) {
-        return { success: false, error: data.error || 'Account deletion failed' };
+      if (data && !data.deleted) {
+        return { success: false, error: 'Account deletion failed' };
       }
 
       // Clear all local data

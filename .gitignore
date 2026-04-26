@@ -87,3 +87,4 @@ fastlane/fastlane/
 
 # Maestro local smoke screenshots (repo root)
 smoke_*.png
+.env

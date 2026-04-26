@@ -26,9 +26,15 @@
       "supportsTablet": true,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "110",
+      "buildNumber": "112",
+      "deploymentTarget": "15.1",
       "appleTeamId": "2KM3QL4UMV",
       "icon": "./assets/icon.png",
+      "entitlements": {
+        "com.apple.developer.applesignin": [
+          "Default"
+        ]
+      },
       "infoPlist": {
         "LSApplicationCategoryType": "public.app-category.healthcare-fitness",
         "ITSAppUsesNonExemptEncryption": false,
