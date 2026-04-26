@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { Tabs, useRouter } from 'expo-router';
-import { Activity, TrendingUp, Heart, User } from 'lucide-react-native';
+import { Activity, TrendingUp } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../theme';
 import { useAuth } from '../../lib/supabase';
@@ -80,20 +80,8 @@ export default function TabLayout() {
           tabBarAccessibilityLabel: 'Patterns',
         }}
       />
-      <Tabs.Screen
-        name="brief"
-        options={{
-          tabBarIcon: ({ color }) => <Heart color={color} size={26} />,
-          tabBarAccessibilityLabel: 'Health',
-        }}
-      />
-      <Tabs.Screen
-        name="nova"
-        options={{
-          tabBarIcon: ({ color }) => <User color={color} size={26} />,
-          tabBarAccessibilityLabel: 'Profile',
-        }}
-      />
+      {/* Nova tab removed from Orbital app */}
+      <Tabs.Screen name="nova" options={{ href: null }} />
       {/* Hidden screens — not shown in tab bar */}
       <Tabs.Screen name="empire-missions" options={{ href: null }} />
     </Tabs>
