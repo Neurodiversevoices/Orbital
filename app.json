@@ -26,7 +26,7 @@
       "supportsTablet": true,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "112",
+      "buildNumber": "117",
       "deploymentTarget": "15.1",
       "appleTeamId": "2KM3QL4UMV",
       "icon": "./assets/icon.png",
