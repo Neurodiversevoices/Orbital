@@ -4,6 +4,7 @@
     "strict": true,
     "types": ["jest"],
     "paths": {
+      "@/*": ["./*"],
       "orbital-widget": ["./modules/orbital-widget"],
       "orbital-widget/*": ["./modules/orbital-widget/*"]
     }

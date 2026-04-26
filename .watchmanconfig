@@ -1,0 +1,4 @@
+{
+  "ignore_dirs": [".git", "node_modules", "ios/Pods", "ios/build", "build-cache", ".expo"],
+  "settle": 20
+}
