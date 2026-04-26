@@ -9,7 +9,7 @@ import { MetricCard } from '../../components/instrument/MetricCard';
 import { calculateCapacity } from '../../lib/capacity/calculateCapacity';
 import { typicalRange } from '../../lib/capacity/typical';
 import { generateInsight } from '../../lib/capacity/insight';
-import { stateOf } from '../../lib/capacity/gaugeMath';
+import { stateOfUppercase } from '../../lib/capacity/gaugeMath';
 import { DEMO_INPUT } from '../../lib/capacity/demoData';
 
 const demoReading = (() => { try { return calculateCapacity(DEMO_INPUT); } catch { return null; } })();
@@ -23,7 +23,7 @@ const BASELINE_TARGET = 14;
 export default function TodayWeb() {
   const router = useRouter();
   const [liveScore, setLiveScore] = useState(DEMO_SCORE);
-  const liveState = stateOf(liveScore);
+  const liveState = stateOfUppercase(liveScore);
 
   const range = typicalRange([58, 62, 60, 64, 61, 63, 59, 65, 60, 62], BASELINE_DAY, BASELINE_TARGET);
   const insight = generateInsight({ value: liveScore, state: liveState, computedAt: new Date().toISOString() });

@@ -26,8 +26,10 @@ export interface GaugeProps {
 
 const C = GAUGE_SIZE / 2;
 
-const stateColor = (s: CapacityState): string =>
-  s === 'RESOURCED' ? '#5DD9D4' : s === 'ELEVATED' ? '#F5B547' : '#E5484D';
+const stateColor = (s: string): string =>
+  (s === 'RESOURCED' || s === 'resourced') ? '#5DD9D4'
+  : (s === 'ELEVATED' || s === 'elevated') ? '#F5B547'
+  : '#E5484D';
 
 export function Gauge({ score: initialScore, onScoreChange }: GaugeProps) {
   const [displayScore, setDisplayScore] = useState(Math.round(initialScore));
