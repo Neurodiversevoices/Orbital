@@ -41,7 +41,7 @@
       </dict>
     </array>
     <key>CFBundleVersion</key>
-    <string>123</string>
+    <string>125</string>
     <key>ITSAppUsesNonExemptEncryption</key>
     <false/>
     <key>LSApplicationCategoryType</key>
@@ -89,5 +89,14 @@
     <string>Dark</string>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
-  </dict>
+  
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Orbital accesses your photo library to let you set a profile photo.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Orbital uses Face ID to protect access to your capacity data.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Orbital uses motion data to improve gesture responsiveness.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Orbital may use the microphone if you choose to add a voice note.</string>
+</dict>
 </plist>
