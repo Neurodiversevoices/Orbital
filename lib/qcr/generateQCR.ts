@@ -2,7 +2,7 @@
  * QCR Generation Engine
  *
  * Computes Quarterly Capacity Report from capacity logs.
- * Clinical/archival tone — no wellness language.
+ * Archival / documentation tone — no wellness language.
  */
 
 import { CapacityLog, CapacityState, Category, Tag } from '../../types';
@@ -30,7 +30,6 @@ import {
   DAY_NAMES,
   getQuarterDateRange,
   formatDateRange,
-  getQuarterLabel,
   getCurrentQuarterId,
 } from './types';
 
@@ -71,7 +70,7 @@ export function generateQCR(
     : [];
 
   // Chart data for visualization
-  const chartData = computeChartData(quarterLogs, distribution, drivers);
+  const chartData = computeChartData(quarterLogs, distribution);
 
   // Pro Intelligence: Capacity Composition
   const capacityComposition = computeCapacityComposition(quarterLogs, drivers);
@@ -492,8 +491,7 @@ function generateClinicalNotes(
 
 function computeChartData(
   logs: CapacityLog[],
-  distribution: QCRDistribution,
-  drivers: QuarterlyCapacityReport['drivers']
+  distribution: QCRDistribution
 ): QCRChartData {
   return {
     dailyCapacity: computeDailyCapacityData(logs),
@@ -875,7 +873,7 @@ function computeEventCorrelation(
 // =============================================================================
 
 /**
- * Compute Chain of Custody - forensic provenance for clinical artifact.
+ * Compute Chain of Custody - forensic provenance for capacity report artifacts.
  * The integrity hash is computed from all report data (excluding the hash itself).
  */
 function computeChainOfCustody(
@@ -1029,9 +1027,9 @@ function generateFidelityNarrative(
   verdict: QCRSignalFidelity['verdict']
 ): string {
   if (verdict === 'CLINICALLY RELIABLE SIGNAL') {
-    return `This report reflects ${compliance}% observation compliance with consistent input patterns (mean latency ${latency.toFixed(1)}s). Pattern coherence of ${coherence}% indicates low probability of random or reflexive entry. Data quality supports clinical utility.`;
+    return `This report reflects ${compliance}% observation compliance with consistent input patterns (mean latency ${latency.toFixed(1)}s). Pattern coherence of ${coherence}% indicates low probability of random or reflexive entry. Data quality supports documentation utility.`;
   } else if (verdict === 'ACCEPTABLE SIGNAL QUALITY') {
-    return `This report reflects ${compliance}% observation compliance. Input patterns and coherence metrics fall within acceptable ranges for clinical reference. Some gaps in coverage may limit pattern visibility.`;
+    return `This report reflects ${compliance}% observation compliance. Input patterns and coherence metrics fall within acceptable ranges for record reference. Some gaps in coverage may limit pattern visibility.`;
   } else {
     return `This report reflects limited observation compliance (${compliance}%). Signal patterns show elevated variance that may affect reliability. Consider increased observation frequency for subsequent reports.`;
   }
@@ -1043,21 +1041,21 @@ function generateFidelityNarrative(
 
 /**
  * Generate Provider Shield - liability-safe footer content.
- * Static attestation language for clinical/legal compliance.
+ * Static attestation language for legal / documentation compliance.
  */
 function computeProviderShield(): QCRProviderShield {
   return {
     utilityStatement:
-      'This report is provided as a supplementary resource to support clinical dialogue. ' +
+      'This report is provided as a supplementary resource to support care conversations. ' +
       'It reflects client-reported observations and computed pattern metrics. ' +
-      'This document does not constitute a professional evaluation, care recommendation, or clinical assessment.',
+      'This document does not constitute a professional evaluation, care recommendation, or formal health assessment.',
 
     liabilityDisclaimer:
       'IMPORTANT: This report is generated from self-reported data and algorithmic analysis. ' +
-      'It is not a substitute for professional clinical judgment. Healthcare providers should ' +
-      'integrate this information with their own assessments, clinical interviews, and professional expertise. ' +
+      'It is not a substitute for professional judgment. Healthcare providers should ' +
+      'integrate this information with their own assessments, direct interviews, and professional expertise. ' +
       'Orbital Health Intelligence, Inc. makes no warranties regarding the accuracy, completeness, ' +
-      'or clinical applicability of this report for any individual case.',
+      'or applicability of this report for any individual case.',
 
     dataHandlingNotice:
       'Data Processing: All observations are processed locally on the client device. ' +

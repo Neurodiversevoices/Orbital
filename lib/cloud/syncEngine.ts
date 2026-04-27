@@ -11,10 +11,8 @@ import {
   CloudCapacityLog,
   CloudLogUpsert,
   CloudSyncStatus,
-  DEFAULT_CLOUD_SYNC_STATUS,
 } from './types';
 import {
-  loadOutbox,
   getPendingEntries,
   markSyncing,
   markSynced,
@@ -25,7 +23,6 @@ import {
 import {
   loadCloudSettings,
   isCloudBackupEnabled,
-  getDeviceId,
   updateLastPush,
   updateLastPull,
   getLastPullTime,
@@ -102,7 +99,7 @@ export async function pushToCloud(): Promise<{ synced: number; failed: number }>
           driver_data: log.driver_data ?? null,
         }));
 
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('capacity_logs')
           .insert(dbRows as any);
 

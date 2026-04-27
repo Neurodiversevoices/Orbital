@@ -1,5 +1,5 @@
 /**
- * CCI Clinical Artifact v1 — PDF Export
+ * CCI capacity artifact v1 — PDF Export
  *
  * Generates a PDF from CCIV1Data using expo-print and expo-sharing.
  * Follows the same pipeline pattern as generateCCIPdf.ts:
@@ -40,7 +40,7 @@ export interface CCIV1PdfOptions {
 // =============================================================================
 
 /**
- * Generate and export a PDF of the CCI Clinical Artifact v1.
+ * Generate and export a PDF of the CCI capacity artifact v1.
  *
  * @param data - The computed CCIV1Data
  * @param options - Optional configuration
@@ -75,7 +75,7 @@ export async function generateCCIV1Pdf(
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(newUri, {
           mimeType: 'application/pdf',
-          dialogTitle: `Clinical Capacity Instrument — ${data.periodStart} to ${data.periodEnd}`,
+          dialogTitle: `Capacity Instrument (CCI) — ${data.periodStart} to ${data.periodEnd}`,
           UTI: 'com.adobe.pdf',
         });
       } else if (Platform.OS === 'web') {

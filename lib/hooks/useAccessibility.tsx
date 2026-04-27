@@ -21,7 +21,6 @@ import {
   HapticPattern,
   HapticIntensity,
   UndoAction,
-  ColorBlindMode,
 } from '../../types';
 
 interface AccessibilityContextType {
@@ -66,7 +65,7 @@ const UNDO_EXPIRY_MS = 30000; // 30 seconds to undo
 export function AccessibilityProvider({ children }: AccessibilityProviderProps) {
   const [settings, setSettings] = useState<AccessibilitySettings>(DEFAULT_ACCESSIBILITY_SETTINGS);
   const [undoStack, setUndoStack] = useState<UndoAction[]>([]);
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load settings on mount
@@ -256,7 +255,7 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
       const data = await AsyncStorage.getItem(STORAGE_KEYS.OFFLINE_QUEUE);
       if (!data) return;
 
-      const queue = JSON.parse(data);
+      JSON.parse(data);
       // Process queue items here (implementation depends on action types)
       // For now, just clear the queue
       await AsyncStorage.removeItem(STORAGE_KEYS.OFFLINE_QUEUE);

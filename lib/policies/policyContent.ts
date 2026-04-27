@@ -237,10 +237,10 @@ Orbital is a self-reporting tool for tracking personal functional capacity. IT I
 1. NOT MEDICAL ADVICE
 
 The information provided through Orbital:
-- Does not constitute clinical advice
+- Does not constitute professional health advice
 - Does not provide professional evaluation of any condition
-- Should not replace professional clinical consultation
-- Is not validated for clinical decision-making
+- Should not replace consultation with a qualified health professional
+- Is not validated for care or treatment decisions
 
 2. SELF-REPORTED DATA
 
@@ -248,7 +248,7 @@ All data in Orbital is:
 - Self-reported by the user
 - Subjective in nature
 - Not independently verified
-- Not clinically validated
+- Not validated as a medical or diagnostic tool
 
 3. PATTERN RECOGNITION LIMITATIONS
 
@@ -264,7 +264,7 @@ Orbital is intended for:
 - Personal longitudinal capacity awareness
 - Communication support with care providers
 - Pattern observation over time
-- Institutional aggregate monitoring (non-clinical)
+- Institutional aggregate monitoring (non-diagnostic)
 
 5. PROFESSIONAL GUIDANCE
 

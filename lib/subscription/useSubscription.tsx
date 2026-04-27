@@ -37,7 +37,7 @@ import {
   capturePaymentError,
   isUserCancellation,
 } from '../observability';
-// ATT attribution deferred to post-v1 (no NSUserTrackingUsageDescription in v1 binary)
+// ATT / IDFA deferred: no NSUserTrackingUsageDescription in Info.plist (must match: no requestTracking call).
 // import { initAttribution, trackPurchaseAttribution } from '../attribution';
 import type { AttributionEvent } from '../attribution';
 const initAttribution = async () => {};
@@ -48,9 +48,14 @@ let PurchasesMobile: typeof import('react-native-purchases').default | null = nu
 let PurchasesWeb: typeof import('@revenuecat/purchases-js').Purchases | null = null;
 let webPurchasesInstance: import('@revenuecat/purchases-js').Purchases | null = null;
 
-// RevenueCat API keys from environment variables
-// Falls back gracefully to free mode if not configured
-const REVENUECAT_API_KEY_IOS = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY || '';
+// RevenueCat API keys — must be set at build time via env vars.
+// iOS key is required for native builds; Android and Web keys are optional
+// (their respective platforms fall back to free mode when absent).
+// A missing iOS key is a build-time misconfiguration, so we fail loudly.
+// Public iOS key — safe to be in client bundle (appl_ prefix = public key).
+// Never use sk_ keys here; those belong only in server-side tooling.
+const REVENUECAT_API_KEY_IOS =
+  process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY ?? 'appl_bfYGQvAZZtYLnxgrWlMilvmGGWw';
 const REVENUECAT_API_KEY_ANDROID = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY || '';
 const REVENUECAT_API_KEY_WEB = process.env.EXPO_PUBLIC_REVENUECAT_WEB_KEY || '';
 
@@ -98,7 +103,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       try {
         // Skip if API key not configured
         if (!REVENUECAT_API_KEY_WEB || REVENUECAT_API_KEY_WEB.includes('REPLACE_WITH')) {
-          if (__DEV__) console.log('[Subscription] RevenueCat Web API key not configured, running in free mode');
+          if (__DEV__) console.warn('[Subscription] RevenueCat Web API key not configured, running in free mode');
           setState({
             ...DEFAULT_SUBSCRIPTION_STATE,
             isLoading: false,
@@ -127,7 +132,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
           isLoading: false,
         }));
 
-        if (__DEV__) console.log('[Subscription] RevenueCat Web SDK initialized');
+        if (__DEV__) console.warn('[Subscription] RevenueCat Web SDK initialized');
       } catch (error) {
         if (__DEV__) console.error('[Subscription] Failed to initialize RevenueCat Web:', error);
         setState({
@@ -153,7 +158,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
 
       // Skip if API key not configured (empty or placeholder)
       if (!apiKey || apiKey.includes('REPLACE_WITH')) {
-        if (__DEV__) console.log('[Subscription] RevenueCat API key not configured, running in free mode');
+        if (__DEV__) console.warn('[Subscription] RevenueCat API key not configured, running in free mode');
         setState({
           ...DEFAULT_SUBSCRIPTION_STATE,
           isLoading: false,
@@ -488,7 +493,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
 
   // Check if feature is available (considers mode bypass)
   const hasAccess = useCallback(
-    (feature: 'unlimited_signals' | 'full_history'): boolean => {
+    (_feature: 'unlimited_signals' | 'full_history'): boolean => {
       // Org modes always have access
       if (shouldBypassSubscription(currentMode)) {
         return true;

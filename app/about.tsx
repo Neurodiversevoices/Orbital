@@ -73,7 +73,7 @@ export default function AboutScreen() {
           </View>
           <View style={styles.bulletList}>
             <BulletPoint text="Not a regulated health instrument or evaluative tool" warning />
-            <BulletPoint text="Not a substitute for professional medical advice" warning />
+            <BulletPoint text="Not a substitute for professional health guidance" warning />
             <BulletPoint text="Not a wellness or productivity app" warning />
             <BulletPoint text="Not a streak-based gamification system" warning />
             <BulletPoint text="Not a surveillance tool for individuals" warning />
@@ -176,7 +176,7 @@ export default function AboutScreen() {
             />
             <UserTypeCard
               title="Clinicians"
-              description="Read-only shared views to supplement clinical conversations."
+              description="Read-only shared views to supplement care conversations."
             />
             <UserTypeCard
               title="Institutions"
@@ -191,7 +191,7 @@ export default function AboutScreen() {
           <Text style={styles.disclaimerText}>
             Orbital records self-reported functional capacity. It is not a regulated
             health instrument and does not provide professional evaluation, care recommendations, or
-            clinical decision support.
+            guidance for care decisions.
           </Text>
         </View>
 
@@ -280,6 +280,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,

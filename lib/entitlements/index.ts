@@ -15,8 +15,10 @@
  * - CCI can be purchased by anyone, price varies: $199 (Free) | $149 (Pro)
  */
 
-import { getGrantedEntitlements, hasEntitlement } from '../payments/mockCheckout';
+import { Platform } from 'react-native';
+import { getGrantedEntitlements, hasEntitlement } from '../payments/revenueCatCheckout';
 import { ENTITLEMENTS, CCI_PRICING, getCCIPrice, getCCIProductId } from '../subscription/pricing';
+import { getSupabase, isSupabaseConfigured } from '../supabase/client';
 
 // =============================================================================
 // TYPES
@@ -163,17 +165,50 @@ export async function getUserEntitlements(): Promise<UserEntitlements> {
   else if (hasBundle15) bundleSize = 15;
   else if (hasBundle10) bundleSize = 10;
 
+  // Fetch real circle membership from Supabase
+  let circleId: string | null = null;
+  let circleMemberCount = 0;
+  const bundleId: string | null = bundleSize ? `bundle_${bundleSize}` : null;
+
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabase();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        if (hasCircle) {
+          const { data: memberData } = await supabase
+            .from('circle_members')
+            .select('circle_id')
+            .eq('user_id', user.id)
+            .limit(1)
+            .maybeSingle();
+
+          if (memberData?.circle_id) {
+            circleId = memberData.circle_id;
+            const { count } = await supabase
+              .from('circle_members')
+              .select('*', { count: 'exact', head: true })
+              .eq('circle_id', circleId);
+            circleMemberCount = count ?? 0;
+          }
+        }
+      }
+    } catch {
+      // Non-fatal — leave circleId/circleMemberCount as defaults
+    }
+  }
+
   return {
     isFree: !isPro,
     isPro,
     hasFamily,
-    familyMemberCount: hasFamily ? 1 : 0, // TODO: Track actual family members
+    familyMemberCount: hasFamily ? 1 : 0,
     hasCircle,
-    circleId: hasCircle ? 'demo_circle' : null, // TODO: Track actual circle ID
-    circleMemberCount: hasCircle ? 1 : 0, // TODO: Track actual circle members
+    circleId,
+    circleMemberCount,
     maxCircleBuddies: 5,
     hasBundle: hasBundle10 || hasBundle15 || hasBundle20,
-    bundleId: bundleSize ? `demo_bundle_${bundleSize}` : null,
+    bundleId,
     bundleSize,
     hasAdminAddOn,
     hasCCIPurchased,
@@ -283,11 +318,24 @@ export async function canPurchaseCircleCCI(circleId?: string): Promise<{ eligibl
     };
   }
 
-  // TODO: When backend is ready, verify user is member of specific circleId
-  // For now, having any circle membership grants access
-  if (circleId) {
-    // Future: const isMember = await checkIsCircleMember(circleId);
-    // if (!isMember) return { eligible: false, reason: 'Not a member of this Circle' };
+  if (circleId && isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabase();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: membership } = await supabase
+          .from('circle_members')
+          .select('circle_id')
+          .eq('user_id', user.id)
+          .eq('circle_id', circleId)
+          .maybeSingle();
+        if (!membership) {
+          return { eligible: false, reason: 'Not a member of this Circle', price: 399 };
+        }
+      }
+    } catch {
+      // Non-fatal — fall through to eligible
+    }
   }
 
   return { eligible: true, price: 399 };
@@ -390,13 +438,92 @@ export async function canAccessRelationalFeatures(): Promise<{ allowed: boolean;
 }
 
 // =============================================================================
+// CIRCLE MANAGEMENT
+// =============================================================================
+
+/**
+ * Leave the current user's active circle.
+ *
+ * - Removes user from circle_members
+ * - If last member, deletes the circle record
+ * - Refreshes RevenueCat customerInfo to sync entitlement state
+ */
+export async function leaveCircle(): Promise<{ success: boolean; error?: string }> {
+  if (!isSupabaseConfigured()) {
+    return { success: false, error: 'Service not available' };
+  }
+
+  try {
+    const supabase = getSupabase();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    // Find user's active circle
+    const { data: memberData } = await supabase
+      .from('circle_members')
+      .select('circle_id')
+      .eq('user_id', user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (!memberData?.circle_id) {
+      return { success: false, error: 'No active circle membership found' };
+    }
+
+    const activeCircleId = memberData.circle_id;
+
+    // Check current member count before leaving
+    const { count } = await supabase
+      .from('circle_members')
+      .select('*', { count: 'exact', head: true })
+      .eq('circle_id', activeCircleId);
+
+    // Remove user from circle
+    const { error: leaveError } = await supabase
+      .from('circle_members')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('circle_id', activeCircleId);
+
+    if (leaveError) {
+      return { success: false, error: 'Failed to leave circle' };
+    }
+
+    // If this was the last member, delete the circle record
+    if (count === 1) {
+      await supabase
+        .from('circles')
+        .delete()
+        .eq('id', activeCircleId);
+    }
+
+    // Refresh RevenueCat customerInfo to sync entitlement state
+    if (Platform.OS !== 'web') {
+      try {
+        const PurchasesModule = await import('react-native-purchases');
+        await PurchasesModule.default.getCustomerInfo();
+      } catch {
+        // Non-fatal
+      }
+    }
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to leave circle',
+    };
+  }
+}
+
+// =============================================================================
 // EXPORTS
 // =============================================================================
 
 export {
   getGrantedEntitlements,
   hasEntitlement,
-} from '../payments/mockCheckout';
+} from '../payments/revenueCatCheckout';
 
 export {
   ENTITLEMENTS,

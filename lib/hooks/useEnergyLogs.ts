@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { CapacityLog, CapacityState, Tag } from '../../types';
 import { savelog, getLogs, deleteLog, clearAllLogs, generateId } from '../storage';
 import { getLocalDate } from '../baselineUtils';
-import { FREE_TIER_LIMITS } from '../subscription/types';
+
 import { useCloudSync } from '../cloud';
 import { useAuth } from '../supabase/auth';
 import { logCapacityEntry } from '../supabase/auditLog';
@@ -54,6 +54,8 @@ export function useEnergyLogs(): UseCapacityLogsReturn {
   const auth = useAuth();
   const cloudSync = useCloudSync();
   const hasInitialPull = useRef(false);
+  /** Serializes saveEntry so rapid saves / monkey testing cannot interleave writes or reorder setLogs. */
+  const saveTailRef = useRef(Promise.resolve());
 
   const loadLogs = useCallback(async () => {
     setIsLoading(true);
@@ -92,58 +94,69 @@ export function useEnergyLogs(): UseCapacityLogsReturn {
 
   const saveEntry = useCallback(
     async (state: CapacityState, tags: Tag[] = [], note?: string, detailsText?: string) => {
-      const timestamp = Date.now();
-      const newLog: CapacityLog = {
-        id: generateId(),
-        state,
-        timestamp,
-        tags,
-        note,
-        localDate: getLocalDate(timestamp),
-        detailsText: detailsText || note, // Use detailsText if provided, otherwise use note
-        capacity_value: STATE_TO_CAPACITY[state] ?? 0.5,
-        driver_data: buildDriverData(tags),
+      const run = async () => {
+        const timestamp = Date.now();
+        const newLog: CapacityLog = {
+          id: generateId(),
+          state,
+          timestamp,
+          tags,
+          note,
+          localDate: getLocalDate(timestamp),
+          detailsText: detailsText || note, // Use detailsText if provided, otherwise use note
+          capacity_value: STATE_TO_CAPACITY[state] ?? 0.5,
+          driver_data: buildDriverData(tags),
+        };
+
+        if (__DEV__)
+          console.warn('[useEnergyLogs] Log created:', {
+            id: newLog.id,
+            state,
+            capacity_value: newLog.capacity_value,
+            driver_data: newLog.driver_data,
+          });
+
+        await savelog(newLog);
+        setLogs((prev) => [newLog, ...prev]);
+
+        if (auth.isAuthenticated && auth.user?.id) {
+          const userId = auth.user.id;
+
+          logCapacityEntry(
+            userId,
+            newLog.capacity_value ?? null,
+            newLog.state,
+            newLog.driver_data ?? null,
+          ).catch((e) => {
+            if (__DEV__) console.error('[useEnergyLogs] Audit log failed:', e);
+          });
+
+          scoreLogConfidence(userId, {
+            capacity_value: newLog.capacity_value,
+            occurred_at: new Date(newLog.timestamp).toISOString(),
+            created_at: new Date().toISOString(),
+          }).catch((e) => {
+            if (__DEV__) console.error('[useEnergyLogs] Confidence scoring failed:', e);
+          });
+        }
+
+        if (auth.isAuthenticated) {
+          try {
+            await cloudSync.enqueueLogForSync(newLog);
+          } catch (e) {
+            if (__DEV__) console.error('[useEnergyLogs] Cloud enqueue failed:', e);
+          }
+        }
       };
 
-      if (__DEV__) console.log('[useEnergyLogs] Log created:', { id: newLog.id, state, capacity_value: newLog.capacity_value, driver_data: newLog.driver_data });
-
-      await savelog(newLog);
-      setLogs((prev) => [newLog, ...prev]);
-
-      // Fire-and-forget audit log + confidence scoring
-      if (auth.isAuthenticated && auth.user?.id) {
-        const userId = auth.user.id;
-
-        logCapacityEntry(
-          userId,
-          newLog.capacity_value ?? null,
-          newLog.state,
-          newLog.driver_data ?? null,
-        ).catch((e) => {
-          if (__DEV__) console.error('[useEnergyLogs] Audit log failed:', e);
-        });
-
-        // Fire-and-forget confidence flag computation
-        scoreLogConfidence(userId, {
-          capacity_value: newLog.capacity_value,
-          occurred_at: new Date(newLog.timestamp).toISOString(),
-          created_at: new Date().toISOString(),
-        }).catch((e) => {
-          if (__DEV__) console.error('[useEnergyLogs] Confidence scoring failed:', e);
-        });
-      }
-
-      // Cloud sync is automatic when authenticated
-      if (auth.isAuthenticated) {
-        try {
-          await cloudSync.enqueueLogForSync(newLog);
-        } catch (e) {
-          if (__DEV__) console.error('[useEnergyLogs] Cloud enqueue failed:', e);
-          // Local save succeeded, cloud sync will retry
-        }
-      }
+      const next = saveTailRef.current.then(run, run);
+      saveTailRef.current = next.then(
+        () => undefined,
+        () => undefined,
+      );
+      await next;
     },
-    [auth.isAuthenticated, cloudSync.enqueueLogForSync]
+    [auth.isAuthenticated, auth.user?.id, cloudSync.enqueueLogForSync],
   );
 
   const removeLog = useCallback(async (id: string) => {

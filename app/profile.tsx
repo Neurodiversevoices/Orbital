@@ -51,7 +51,7 @@ export default function ProfileScreen() {
   const [selectedGender, setSelectedGender] = useState<GenderChoice | null>(null);
   const [selfDescribedText, setSelfDescribedText] = useState('');
   const [showGenderPicker, setShowGenderPicker] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   // Initialize form from profile
   useEffect(() => {
@@ -325,6 +325,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,

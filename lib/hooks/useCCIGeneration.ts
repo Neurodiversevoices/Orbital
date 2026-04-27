@@ -56,7 +56,7 @@ export function useCCIGeneration(): UseCCIGenerationReturn {
         // =====================================================================
         const entitlement = await canPurchaseCCI();
         if (!entitlement.eligible) {
-          const msg = 'CCI purchase required. Please purchase a CCI to generate your Capacity Clinical Summary.';
+          const msg = 'CCI purchase required. Please purchase a CCI to generate your capacity summary.';
           setError(msg);
           return { success: false, error: msg };
         }

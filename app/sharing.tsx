@@ -9,18 +9,11 @@ import {
   ScrollView,
   Share,
 } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  withSpring,
-  useSharedValue,
-} from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import {
   X,
-  Plus,
   UserPlus,
   Clock,
-  ChevronDown,
 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, commonStyles, spacing } from '../theme';
@@ -30,8 +23,6 @@ import { ShareRecipientRow } from '../components/sharing/ShareRecipientRow';
 import { ShareDurationPicker } from '../components/sharing/ShareDurationPicker';
 import { RecipientRole, AuditAction } from '../types';
 import { ShareDuration } from '../lib/sharing';
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 type AddRecipientStep = 'closed' | 'name' | 'role' | 'duration';
 
@@ -44,11 +35,9 @@ export default function SharingScreen() {
     recipients,
     activeShares,
     auditLog,
-    isLoading,
     addRecipient,
     deleteRecipient,
     createNewShare,
-    revokeShare,
     getShareLink,
   } = useSharing();
 
@@ -83,7 +72,7 @@ export default function SharingScreen() {
     });
   }, [selectedRecipientId, shareDuration, createNewShare, getShareLink, t]);
 
-  const handleDeleteRecipient = useCallback((id: string, name: string) => {
+  const handleDeleteRecipient = useCallback((id: string, _name: string) => {
     Alert.alert(
       t.sharing.deleteRecipientTitle,
       t.sharing.deleteRecipientMessage,
@@ -301,6 +290,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,

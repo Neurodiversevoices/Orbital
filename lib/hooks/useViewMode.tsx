@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { ViewContext, ViewMode } from '../../types';
+import {ViewContext} from '../../types';
 import { validateShareAccess, ValidationResult } from '../sharing';
 
 interface ViewModeContextValue {

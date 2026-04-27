@@ -8,7 +8,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { Database } from './types';
 
@@ -30,28 +30,41 @@ const STORAGE_KEY = 'orbital_supabase_auth';
 
 /**
  * Custom storage adapter for Supabase auth that works with Expo/React Native.
- * Uses AsyncStorage for native platforms and localStorage for web.
+ *
+ * Native (iOS/Android): uses expo-secure-store (encrypted Keychain / Keystore).
+ *   Auth tokens are sensitive credentials — they must not live in AsyncStorage,
+ *   which is plaintext on-disk and readable without root on some devices.
+ *
+ * Web: falls back to localStorage (no Keychain equivalent in browsers).
+ *
+ * expo-secure-store key length is limited to 255 characters and must match
+ * [A-Za-z0-9._-]. Supabase keys contain colons, so we sanitize them.
  */
+function sanitizeSecureStoreKey(key: string): string {
+  // Replace characters not allowed by SecureStore with underscores
+  return key.replace(/[^A-Za-z0-9._-]/g, '_').slice(0, 255);
+}
+
 const customStorage = {
   getItem: async (key: string): Promise<string | null> => {
     if (Platform.OS === 'web') {
       return localStorage.getItem(key);
     }
-    return AsyncStorage.getItem(key);
+    return SecureStore.getItemAsync(sanitizeSecureStoreKey(key));
   },
   setItem: async (key: string, value: string): Promise<void> => {
     if (Platform.OS === 'web') {
       localStorage.setItem(key, value);
       return;
     }
-    await AsyncStorage.setItem(key, value);
+    await SecureStore.setItemAsync(sanitizeSecureStoreKey(key), value);
   },
   removeItem: async (key: string): Promise<void> => {
     if (Platform.OS === 'web') {
       localStorage.removeItem(key);
       return;
     }
-    await AsyncStorage.removeItem(key);
+    await SecureStore.deleteItemAsync(sanitizeSecureStoreKey(key));
   },
 };
 

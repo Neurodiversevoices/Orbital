@@ -4,7 +4,7 @@
  * Types for cloud backup and cross-device sync.
  */
 
-import { CapacityState, Tag } from '../../types';
+import {CapacityState} from '../../types';
 
 // =============================================================================
 // CLOUD LOG TYPES

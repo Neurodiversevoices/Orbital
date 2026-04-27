@@ -4,7 +4,6 @@ import {
   StudyProtocol,
   ProtocolType,
   ProtocolStatus,
-  CohortCriteria,
 } from '../../types';
 
 const PROTOCOL_TEMPLATES_KEY = '@orbital:protocol_templates';

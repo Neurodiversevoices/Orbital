@@ -3,10 +3,9 @@ import {
   RetentionPolicy,
   RetentionSchedule,
   RetentionWindow,
-  RetentionClass,
 } from '../../types';
 import { logImmutableAuditEntry } from './immutableAuditLog';
-import { updatePatternRetentionClass, getPatternRecords } from './dataSeparation';
+import { updatePatternRetentionClass } from './dataSeparation';
 
 const RETENTION_POLICIES_KEY = '@orbital:retention_policies';
 const RETENTION_SCHEDULES_KEY = '@orbital:retention_schedules';
@@ -21,10 +20,6 @@ const RETENTION_WINDOW_MS: Record<RetentionWindow, number> = {
 
 function generatePolicyId(): string {
   return `policy_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-}
-
-function generateScheduleId(): string {
-  return `schedule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
 // ============================================
@@ -234,7 +229,6 @@ export async function processScheduledDeletions(): Promise<{
 }> {
   const now = Date.now();
   const schedules = await getRetentionSchedules();
-  const patterns = await getPatternRecords();
 
   let processed = 0;
   let deleted = 0;

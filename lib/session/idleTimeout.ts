@@ -156,8 +156,7 @@ export function useIdleTimeout(options: UseIdleTimeoutOptions): IdleTimeoutState
       return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
     }
 
-    // Native only: AppState listener (web branch already returned above)
-    if (Platform.OS === 'web') return;
+    // Native: use AppState
     const subscription = AppState.addEventListener('change', (nextState) => {
       const prevState = appStateRef.current;
       appStateRef.current = nextState;

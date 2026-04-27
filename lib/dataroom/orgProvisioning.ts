@@ -5,7 +5,6 @@ import {
   ProvisioningRequest,
   PricingTier,
   JurisdictionCode,
-  RetentionWindow,
 } from '../../types';
 
 const ORGS_KEY = '@orbital:organizations';
@@ -491,7 +490,7 @@ export async function initiateOrgOffboarding(
 
 export async function markExportComplete(
   offboardingId: string,
-  completedBy: string
+  _completedBy: string
 ): Promise<OffboardingRecord | null> {
   const records = await getOffboardingRecords();
   const index = records.findIndex((r) => r.id === offboardingId);

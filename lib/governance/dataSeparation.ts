@@ -12,7 +12,7 @@ const PATTERN_KEY = '@orbital:pattern_records';
 const IDENTITY_REF_MAP_KEY = '@orbital:identity_ref_map';
 
 // Generate opaque reference that cannot be reversed to original ID
-function generateOpaqueRef(id: string): string {
+function generateOpaqueRef(_id: string): string {
   const timestamp = Date.now().toString(36);
   const random = Math.random().toString(36).substr(2, 8);
   return `ref_${timestamp}_${random}`;

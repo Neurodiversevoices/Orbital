@@ -3,7 +3,7 @@
  *
  * Client-side PDF generation for Quarterly Capacity Report.
  * Uses expo-print for HTML-to-PDF conversion.
- * Institutional artifact — suitable for EHR attachment, purchasing workflows.
+ * Institutional artifact — suitable for shareable PDF export and purchasing workflows.
  *
  * Pricing: $149/quarter (institutional tier)
  */
@@ -41,7 +41,7 @@ const CAPACITY_INDEX_DEFINITION = `
 const MULTI_PERSON_STATEMENT = `
 <p><strong>Institutional Use Note:</strong></p>
 <p>When this report is generated for a cohort (e.g., residency program, department, or sponsored group), individual-level data is <strong>never aggregated or visible</strong> to administrators. Cohort-level Strategic Briefs use anonymized, aggregate metrics only.</p>
-<p>This report reflects a single individual's longitudinal record and is intended for that individual's clinical or personal use, or for sharing at their discretion with a provider or advocate.</p>
+<p>This report reflects a single individual's longitudinal record and is intended for that individual's personal use, or for sharing at their discretion with a provider or advocate.</p>
 <p>Orbital does not provide institutional dashboards, comparative rankings, or identifiable cohort analytics.</p>
 `;
 
@@ -111,7 +111,7 @@ export async function exportQCRToPdf(report: QuarterlyCapacityReport): Promise<b
  * 9. Week Structure
  * 10. Driver Frequency
  * 11. Notable Episodes
- * 12. Clinical & Operational Insights
+ * 12. Pattern & operational insights
  * 13. Multi-Person Aggregation Statement
  * 14. Footer
  */
@@ -176,7 +176,7 @@ ${getPdfStyles()}
     <header class="header">
       <h1 class="title">Quarterly Capacity Report</h1>
       <h2 class="quarter">${quarterLabel}</h2>
-      <p class="subtitle">Clinical Capacity Intelligence Summary</p>
+      <p class="subtitle">Quarterly capacity intelligence summary</p>
       ${report.isDemoReport ? '<div class="demo-badge">DEMONSTRATION DATA</div>' : ''}
     </header>
 
@@ -248,7 +248,7 @@ ${getPdfStyles()}
           </div>
         </div>
         <div class="sf-verdict">
-          <span class="sf-verdict-label">Clinical Reliability Verdict</span>
+          <span class="sf-verdict-label">Data reliability verdict</span>
           <span class="sf-verdict-value ${verdictClass}">${report.signalFidelity.verdict}</span>
         </div>
         <div class="sf-narrative">
@@ -383,9 +383,9 @@ ${getPdfStyles()}
     </section>
     ` : ''}
 
-    <!-- Clinical & Operational Insights -->
+    <!-- Pattern & operational insights -->
     <section class="section">
-      <h3 class="section-title">Clinical & Operational Insights</h3>
+      <h3 class="section-title">Pattern &amp; operational insights</h3>
       ${report.clinicalNotes.length > 0
         ? `<ul class="clinical-insights">${report.clinicalNotes.map(note => `
             <li class="insight-item">${note.text}</li>
@@ -417,7 +417,7 @@ ${getPdfStyles()}
       <div class="ps-header">Provider Utility Statement</div>
       <div class="ps-body">
         <div class="ps-section">
-          <span class="ps-label">Clinical Utility</span>
+          <span class="ps-label">Record utility</span>
           <p class="ps-text">${report.providerShield.utilityStatement}</p>
         </div>
         <div class="ps-section">
@@ -448,7 +448,7 @@ ${getPdfStyles()}
 
 /**
  * PDF Styles (inline CSS)
- * Clinical Artifact Design System
+ * Report PDF design system
  * Monochrome palette - medical chart aesthetic
  * Page size: US Letter (8.5 x 11 inches)
  */
@@ -1185,7 +1185,7 @@ function getPdfStyles(): string {
       font-style: italic;
     }
 
-    /* Clinical Insights as bullets */
+    /* Pattern insights as bullets */
     .clinical-insights {
       margin: 0;
       padding-left: 20px;
@@ -1353,7 +1353,7 @@ function generateStateDistributionSvg(report: QuarterlyCapacityReport): string {
   const barH = 20;
   const barGap = 12;
 
-  // Monochrome clinical palette
+  // Monochrome report palette
   const colors: Record<string, string> = {
     resourced: '#333333',
     stretched: '#666666',
@@ -1397,7 +1397,7 @@ function generateDriverFrequencySvg(report: QuarterlyCapacityReport): string {
   const barW = (chartW - 32) / 3;
   const barGap = 16;
 
-  // Monochrome clinical palette for driver frequency
+  // Monochrome report palette for driver frequency
   const colors: Record<string, string> = {
     sensory: '#333333',
     demand: '#555555',
@@ -1455,15 +1455,6 @@ function formatImpact(impact: number): string {
   return `${sign}${impact}% impact`;
 }
 
-function formatEnergyVariance(variance: 'below_baseline' | 'within_baseline' | 'above_baseline'): string {
-  switch (variance) {
-    case 'below_baseline': return 'remained below baseline';
-    case 'within_baseline': return 'remained within baseline';
-    case 'above_baseline': return 'exceeded baseline';
-    default: return 'within baseline';
-  }
-}
-
 function formatEnergyVarianceLabel(variance: 'below_baseline' | 'within_baseline' | 'above_baseline'): string {
   switch (variance) {
     case 'below_baseline': return 'Moderate impact (below baseline)';
@@ -1482,8 +1473,8 @@ function getSocialDemandLabel(report: QuarterlyCapacityReport): string {
 }
 
 /**
- * Generate clinical synthesis paragraph from composition and correlation data.
- * Third-person clinical voice. Derived from actual data, not static copy.
+ * Generate synthesis paragraph from composition and correlation data.
+ * Third-person archival voice. Derived from actual data, not static copy.
  */
 function generateCorrelationSynthesis(report: QuarterlyCapacityReport): string {
   if (!report.eventCorrelation || !report.capacityComposition) {
@@ -1517,15 +1508,6 @@ function generateCorrelationSynthesis(report: QuarterlyCapacityReport): string {
     return `Observed capacity decline during Week ${weekNum} appears primarily associated with ${primary.label}. ${cognitiveStatus}`;
   } else {
     return `Capacity decline during Week ${weekNum} reflects combined low-magnitude contributions across multiple inputs. ${cognitiveStatus}`;
-  }
-}
-
-function formatNoteCategory(category: string): string {
-  switch (category) {
-    case 'observation': return 'Observation';
-    case 'consideration': return 'Consideration';
-    case 'pattern_note': return 'Pattern Note';
-    default: return 'Note';
   }
 }
 

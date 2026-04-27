@@ -24,7 +24,6 @@ import {
   ADMIN_ADDON_PRICING,
   CCI_PRICING,
   CCI_GROUP_PRICING,
-  getCCIPrice,
   ProductId,
 } from '../subscription/pricing';
 import { getSupabase, isSupabaseConfigured } from '../supabase/client';
@@ -203,7 +202,7 @@ export const PRODUCT_CATALOG: Record<string, ProductInfo> = {
   [PRODUCT_IDS.CCI_30]: {
     id: PRODUCT_IDS.CCI_30,
     name: 'CCI — 30-Day Report',
-    description: 'Clinical Capacity Instrument — 30-day milestone report',
+    description: 'Capacity Instrument — 30-day milestone report',
     price: CCI_PRICING.thirtyDay,
     billingCycle: 'one_time',
     entitlementId: 'cci_purchased',
@@ -211,7 +210,7 @@ export const PRODUCT_CATALOG: Record<string, ProductInfo> = {
   [PRODUCT_IDS.CCI_60]: {
     id: PRODUCT_IDS.CCI_60,
     name: 'CCI — 60-Day Report',
-    description: 'Clinical Capacity Instrument — 60-day milestone report',
+    description: 'Capacity Instrument — 60-day milestone report',
     price: CCI_PRICING.sixtyDay,
     billingCycle: 'one_time',
     entitlementId: 'cci_purchased',
@@ -219,7 +218,7 @@ export const PRODUCT_CATALOG: Record<string, ProductInfo> = {
   [PRODUCT_IDS.CCI_90]: {
     id: PRODUCT_IDS.CCI_90,
     name: 'CCI — 90-Day Report',
-    description: 'Clinical Capacity Instrument — 90-day milestone report',
+    description: 'Capacity Instrument — 90-day milestone report',
     price: CCI_PRICING.ninetyDay,
     billingCycle: 'one_time',
     entitlementId: 'cci_purchased',
@@ -227,7 +226,7 @@ export const PRODUCT_CATALOG: Record<string, ProductInfo> = {
   [PRODUCT_IDS.CCI_BUNDLE]: {
     id: PRODUCT_IDS.CCI_BUNDLE,
     name: 'CCI — Full Bundle',
-    description: 'Clinical Capacity Instrument — 30 + 60 + 90-day bundle',
+    description: 'Capacity Instrument — 30 + 60 + 90-day bundle',
     price: CCI_PRICING.bundle,
     billingCycle: 'one_time',
     entitlementId: 'cci_purchased',
@@ -316,14 +315,6 @@ async function getCurrentUserId(): Promise<string | null> {
   }
 }
 
-/**
- * Check if we should use Supabase (configured + authenticated)
- */
-async function shouldUseSupabase(): Promise<boolean> {
-  const userId = await getCurrentUserId();
-  return userId !== null;
-}
-
 // =============================================================================
 // ENTITLEMENT STORAGE (Supabase primary, AsyncStorage fallback)
 // =============================================================================
@@ -355,6 +346,7 @@ async function grantEntitlement(entitlementId: string, purchaseId?: string): Pro
       }
       return;
     } catch (e) {
+      if (__DEV__) console.warn('[mockCheckout] grantEntitlement supabase failed', e);
     }
   }
 
@@ -396,6 +388,7 @@ export async function getGrantedEntitlements(): Promise<string[]> {
         entitlements = data.map(row => row.entitlement_id);
       }
     } catch (e) {
+      if (__DEV__) console.warn('[mockCheckout] list entitlements failed', e);
     }
   }
 
@@ -404,8 +397,6 @@ export async function getGrantedEntitlements(): Promise<string[]> {
     try {
       const existing = await AsyncStorage.getItem(STORAGE_KEYS.GRANTED_ENTITLEMENTS);
       entitlements = existing ? JSON.parse(existing) : [];
-      if (entitlements.length > 0) {
-      }
     } catch {
       entitlements = [];
     }
@@ -464,6 +455,7 @@ async function recordPurchaseIntent(intent: PurchaseIntent): Promise<void> {
         return;
       }
     } catch (e) {
+      if (__DEV__) console.warn('[mockCheckout] recordPurchaseIntent failed', e);
     }
   }
 
@@ -505,6 +497,7 @@ async function updatePurchaseStatus(
         return;
       }
     } catch (e) {
+      if (__DEV__) console.warn('[mockCheckout] updatePurchaseStatus failed', e);
     }
   }
 
@@ -601,7 +594,7 @@ export async function executePurchase(
         // Bundled upgrade: grant Pro as part of the purchase
         await grantEntitlement('pro_access');
         hasPrereq = true; // Continue with purchase
-        if (__DEV__) console.log('[MockCheckout] Bundled upgrade: granted pro_access with', product.entitlementId);
+        if (__DEV__) console.warn('[MockCheckout] Bundled upgrade: granted pro_access with', product.entitlementId);
       }
     }
 
@@ -695,6 +688,7 @@ export async function getPurchaseHistory(): Promise<PurchaseIntent[]> {
         }));
       }
     } catch (e) {
+      if (__DEV__) console.warn('[mockCheckout] getPurchaseHistory failed', e);
     }
   }
 

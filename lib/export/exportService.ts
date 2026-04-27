@@ -1,7 +1,6 @@
 import { Share } from 'react-native';
-import { CapacityLog, ExportConfig, ExportRange, ExportFormat } from '../../types';
-import { getLogs } from '../storage';
-import { logAuditEntry } from '../storage';
+import {CapacityLog, ExportConfig, ExportRange} from '../../types';
+import { getLogs, logAuditEntry } from '../storage';
 import { formatLogsAsCsv } from './csvFormatter';
 import { generateExportSummary, formatSummaryAsText } from './summaryGenerator';
 import { Locale } from '../../locales';
@@ -43,11 +42,12 @@ export async function exportData(
         content = formatLogsAsCsv(logs, { includeNotes: config.includeNotes });
         title = `Orbital Export - ${config.range}`;
         break;
-      case 'summary':
+      case 'summary': {
         const summary = generateExportSummary(logs);
         content = formatSummaryAsText(summary, locale);
         title = locale === 'es' ? 'Resumen Orbital' : 'Orbital Summary';
         break;
+      }
       default:
         return { success: false, error: 'invalid_format' };
     }

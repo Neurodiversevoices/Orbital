@@ -2,7 +2,7 @@
  * QCR Chart Export Utility
  *
  * Generates pure SVG strings matching the in-app EnergyGraph component.
- * Used for embedding charts in Clinical Capacity Instrument PDFs.
+ * Used for embedding charts in Capacity Instrument (CCI) PDFs.
  *
  * Colors match EXACTLY:
  * - Resourced (High):  #00E5FF (Cyan)
@@ -302,8 +302,8 @@ export function generateChartSVG(
 }
 
 /**
- * Generate chart SVG for QCR PDF (90-day view, clinical styling).
- * This is the primary export function for Clinical Capacity Instruments.
+ * Generate chart SVG for QCR PDF (90-day view, institutional styling).
+ * This is the primary export function for Capacity Instrument PDFs.
  */
 export function generateQCRChartSVG(
   logs: CapacityLog[],

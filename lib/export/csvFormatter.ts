@@ -1,4 +1,4 @@
-import { CapacityLog, CapacityState, Category } from '../../types';
+import {CapacityLog} from '../../types';
 
 export interface CsvOptions {
   includeNotes: boolean;

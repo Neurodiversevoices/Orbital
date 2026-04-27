@@ -19,12 +19,9 @@ import {
   AlertTriangle,
   CreditCard,
   Globe2,
-  Check,
 } from 'lucide-react-native';
 import { colors, commonStyles, spacing } from '../theme';
-import { getAllPolicies, PolicyDocument, POLICIES } from '../lib/policies/policyContent';
-import { useLocale } from '../lib/hooks/useLocale';
-
+import {getAllPolicies, PolicyDocument} from '../lib/policies/policyContent';
 const POLICY_ICONS: Record<string, React.ComponentType<{ color: string; size: number }>> = {
   terms_of_service: FileText,
   privacy_policy: Shield,
@@ -45,7 +42,6 @@ const POLICY_COLORS: Record<string, string> = {
 
 export default function LegalScreen() {
   const router = useRouter();
-  const { t } = useLocale();
   const [selectedPolicy, setSelectedPolicy] = useState<PolicyDocument | null>(null);
   const policies = getAllPolicies();
 
@@ -102,16 +98,16 @@ export default function LegalScreen() {
           );
         })}
 
-        {/* PATCH 2: Enhanced Not Medical Advice Disclaimer */}
+        {/* PATCH 2: Enhanced user guidance disclaimer (non-evaluative) */}
         <View style={styles.disclaimerSection}>
           <AlertTriangle color="rgba(255,255,255,0.3)" size={20} />
           <View style={styles.disclaimerContent}>
             <Text style={styles.disclaimerText}>
-              Orbital does not provide clinical advice, professional evaluation, or care recommendations.
+              Orbital does not provide professional health advice, individualized assessment, or care recommendations.
             </Text>
             <Text style={styles.disclaimerTextSecondary}>
-              The Clinical Capacity Instrument (CCI-Q4) is informational and designed to
-              support documentation and provider-compatible record review.
+              The Capacity Instrument (CCI-Q4) is informational and designed to
+              support personal documentation and shareable record review.
             </Text>
           </View>
         </View>
@@ -192,6 +188,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   infoCard: {
     marginHorizontal: spacing.md,

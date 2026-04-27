@@ -6,59 +6,6 @@ const LOGS_KEY = '@orbital:logs';
 
 const categories: Category[] = ['sensory', 'demand', 'social'];
 
-// Realistic notes by category
-const notesByCategory: Record<Category, string[]> = {
-  sensory: [
-    'Loud construction outside',
-    'Crowded grocery store',
-    'Bright fluorescent lights',
-    'Noisy restaurant',
-    'Strong perfume in elevator',
-    'Scratchy clothing tag',
-    'Too many notifications',
-    'Loud music from neighbors',
-    'Overwhelming mall visit',
-    'Sirens outside window',
-  ],
-  demand: [
-    'Back-to-back meetings',
-    'Deadline pressure',
-    'Complex problem solving',
-    'Learning new system',
-    'Too many tasks',
-    'Decision fatigue',
-    'Unexpected urgent request',
-    'Documentation marathon',
-    'Budget planning',
-    'Performance review prep',
-  ],
-  social: [
-    'Family dinner',
-    'Networking event',
-    'Video calls all day',
-    'Unexpected visitors',
-    'Group project meeting',
-    'Birthday party',
-    'Difficult conversation',
-    'Small talk exhaustion',
-    'Crowded social event',
-    'Phone call marathon',
-  ],
-};
-
-const generalNotes: string[] = [
-  'Didn\'t sleep well',
-  'Skipped breakfast',
-  'Forgot medication',
-  'Good rest last night',
-  'Morning meditation helped',
-  'Exercise this morning',
-  'Quiet day at home',
-  'Took a nap',
-  'Went for a walk',
-  'Early bedtime',
-];
-
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
@@ -118,38 +65,6 @@ function determineState(
   if (capacity > 0.6) return 'resourced';
   if (capacity > 0.3) return 'stretched';
   return 'depleted';
-}
-
-function pickNote(category: Category | null, state: CapacityState, date: Date): string {
-  // Always include a note with context
-  const timeOfDay = date.getHours() < 12 ? 'Morning' : date.getHours() < 17 ? 'Afternoon' : 'Evening';
-  const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.getDay()];
-
-  let contextNote = '';
-
-  // Add category-specific note if category exists
-  if (category && Math.random() > 0.3) {
-    const notes = notesByCategory[category];
-    contextNote = notes[Math.floor(Math.random() * notes.length)];
-  } else if (Math.random() > 0.5) {
-    contextNote = generalNotes[Math.floor(Math.random() * generalNotes.length)];
-  }
-
-  // Build the note with time context
-  if (contextNote) {
-    return `${timeOfDay} - ${contextNote}`;
-  }
-
-  // Fallback: just time and day context
-  const timeContexts = [
-    `${timeOfDay} check-in`,
-    `${dayName} ${timeOfDay.toLowerCase()}`,
-    `${timeOfDay} log`,
-    `End of ${timeOfDay.toLowerCase()}`,
-    `${dayName} check-in`,
-  ];
-
-  return timeContexts[Math.floor(Math.random() * timeContexts.length)];
 }
 
 // Detailed notes with richer context
@@ -251,7 +166,6 @@ function pickDetailedNote(
   inRecovery: boolean
 ): string {
   const timeOfDay = date.getHours() < 12 ? 'Morning' : date.getHours() < 17 ? 'Afternoon' : 'Evening';
-  const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.getDay()];
 
   // Pick a template based on state
   const templates = detailedNoteTemplates[state];
@@ -284,12 +198,12 @@ function pickDetailedNote(
 const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 0));
 
 export async function generateFakeData(years: number = 1): Promise<number> {
-  if (__DEV__) console.log('[Orbital] Starting data generation for', years, 'years');
+  if (__DEV__) console.warn('[Orbital] Starting data generation for', years, 'years');
   const logs: CapacityLog[] = [];
   const now = Date.now();
   const msPerDay = 24 * 60 * 60 * 1000;
   const totalDays = Math.floor(years * 365);
-  if (__DEV__) console.log('[Orbital] Will generate', totalDays, 'days of data');
+  if (__DEV__) console.warn('[Orbital] Will generate', totalDays, 'days of data');
 
   // Base capacity level that drifts over time (simulates life phases)
   let baseCapacity = 0.6;
@@ -395,12 +309,12 @@ export async function generateFakeData(years: number = 1): Promise<number> {
   // Sort by timestamp descending (newest first)
   logs.sort((a, b) => b.timestamp - a.timestamp);
 
-  if (__DEV__) console.log('[Orbital] Generated', logs.length, 'entries, saving...');
+  if (__DEV__) console.warn('[Orbital] Generated', logs.length, 'entries, saving...');
 
   // Save to storage
   try {
     await AsyncStorage.setItem(LOGS_KEY, JSON.stringify(logs));
-    if (__DEV__) console.log('[Orbital] Saved successfully!');
+    if (__DEV__) console.warn('[Orbital] Saved successfully!');
   } catch (error) {
     if (__DEV__) console.error('[Orbital] Failed to save:', error);
     throw error;

@@ -143,7 +143,7 @@ function generateCDISCSDTMExport(data: ExportableData): string {
     DM: { // Demographics domain
       STUDYID: 'ORBITAL',
       DOMAIN: 'DM',
-      records: data.members.map((m, i) => ({
+      records: data.members.map((m, _i) => ({
         USUBJID: m.cohortParticipantId,
         SUBJID: m.cohortParticipantId.replace('P-', ''),
         RFSTDTC: new Date(m.firstSignalAt).toISOString().split('T')[0],
@@ -448,7 +448,7 @@ ${pkg.accessLog.length > 0
 DATA USE NOTICE
 ================================================================================
 This data export contains de-identified, self-reported capacity data.
-It does not constitute medical records or clinical data.
+It does not constitute medical records or regulated health data.
 Use is governed by the applicable data access agreement.
 Re-identification of participants is strictly prohibited.
 ================================================================================
@@ -477,12 +477,12 @@ export const RWE_FORMAT_INFO: Record<RWEExportFormat, {
   cdisc_sdtm: {
     name: 'CDISC SDTM',
     description: 'Study Data Tabulation Model format for regulatory submissions',
-    useCase: 'Regulatory submissions, clinical trial integration',
+    useCase: 'Regulatory submissions, research study integration',
   },
   fhir_r4: {
     name: 'FHIR R4',
     description: 'HL7 FHIR Release 4 format for healthcare interoperability',
-    useCase: 'EHR integration, healthcare data exchange',
+    useCase: 'Record system integration, structured data exchange',
   },
   omop_cdm: {
     name: 'OMOP CDM',

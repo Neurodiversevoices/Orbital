@@ -1,7 +1,7 @@
 /**
  * CCI Functional Impact Mapper
  *
- * Maps computed CCI metrics to clinical-adjacent severity labels.
+ * Maps computed CCI metrics to capacity severity labels.
  * Deterministic mapping — no ML, no LLM, no randomness.
  *
  * Severity levels: LOW | MODERATE | ELEVATED | HIGH | CRITICAL

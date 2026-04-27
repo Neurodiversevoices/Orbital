@@ -13,14 +13,12 @@
 import {
   buildCohortSeries,
   AgeCohortBand,
-  AGE_COHORT_BANDS,
   AGE_COHORT_LABELS,
   SentinelVertical,
   CohortSeriesResult,
   getCohortsForVertical,
-  getDefaultCohort,
 } from './engine';
-import { SentinelData, SystemState } from './types';
+import {SentinelData} from './types';
 
 // =============================================================================
 // CONSTANTS

@@ -100,6 +100,7 @@ export async function initializeForcedRoleView(): Promise<ForcedRole> {
     initialized = true;
 
     if (__DEV__ && forcedRole === 'free') {
+      console.warn('[forcedRoleView] Free user view restored from storage');
     }
 
     return forcedRole;
@@ -149,6 +150,7 @@ export async function enableFreeUserView(): Promise<void> {
   await AsyncStorage.setItem(FORCED_ROLE_KEY, 'free');
 
   if (__DEV__) {
+    console.warn('[forcedRoleView] Free user view enabled');
   }
 }
 
@@ -160,6 +162,7 @@ export async function disableFreeUserView(): Promise<void> {
   await AsyncStorage.setItem(FORCED_ROLE_KEY, 'actual');
 
   if (__DEV__) {
+    console.warn('[forcedRoleView] Free user view disabled');
   }
 }
 

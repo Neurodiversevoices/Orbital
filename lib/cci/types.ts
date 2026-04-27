@@ -1,7 +1,7 @@
 /**
  * CCI-Q4 Issuance Types
  *
- * Clinical Capacity Instrument (CCI-Q4) is an IMMUTABLE ARTIFACT.
+ * Capacity Instrument (CCI-Q4) is an immutable documentation artifact.
  * These types define the issuance interface only.
  * The visual representation is locked and must not be modified.
  */

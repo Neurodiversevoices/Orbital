@@ -25,11 +25,9 @@ import {
   AlertTriangle,
   FileText,
   CheckCircle,
-  Clock,
 } from 'lucide-react-native';
 import { colors, commonStyles, spacing } from '../theme';
 import { useEnergyLogs } from '../lib/hooks/useEnergyLogs';
-import { useLocale } from '../lib/hooks/useLocale';
 import { useAuth } from '../lib/supabase/auth';
 import { deleteUserData } from '../lib/supabase/sync';
 
@@ -103,7 +101,6 @@ Non-diagnostic. Data deleted per user request.
 
 export default function DataExitScreen() {
   const router = useRouter();
-  const { t } = useLocale();
   const { logs, clearAll, refresh } = useEnergyLogs();
   const { deleteAccount } = useAuth();
   const [step, setStep] = useState<ExitStep>('overview');
@@ -125,6 +122,7 @@ export default function DataExitScreen() {
       });
       setHasExported(true);
     } catch (error) {
+      if (__DEV__) console.warn('[DataExit] JSON share failed', error);
     }
     setIsProcessing(false);
   }, [logs]);
@@ -144,6 +142,7 @@ export default function DataExitScreen() {
       });
       setHasExported(true);
     } catch (error) {
+      if (__DEV__) console.warn('[DataExit] CSV share failed', error);
     }
     setIsProcessing(false);
   }, [logs]);
@@ -444,6 +443,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,

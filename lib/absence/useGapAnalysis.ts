@@ -14,12 +14,11 @@
 
 import { useMemo } from 'react';
 import type { CapacityLog } from '../../types';
-import type { CoverageMetric, DerivedGap, GapSummary } from './types';
+import type {CoverageMetric, DerivedGap} from './types';
 import { detectGaps, countGapsByCategory, getLongestGap } from './gapDetection';
 import {
   calculateCoverage,
   calculateCoverageFromSignalSpan,
-  getGapSummary,
   formatCoverage,
   formatCoverageShort,
 } from './coverage';

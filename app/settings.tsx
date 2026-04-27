@@ -38,9 +38,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, commonStyles, spacing, borderRadius } from '../theme';
 import { useEnergyLogs } from '../lib/hooks/useEnergyLogs';
 import { useLocale, interpolate } from '../lib/hooks/useLocale';
-import { generateFakeData, clearFakeData } from '../lib/generateFakeData';
+import {generateFakeData} from '../lib/generateFakeData';
 import { localeNames, Locale } from '../locales';
-import { useDemoMode, FOUNDER_DEMO_ENABLED, DemoDuration } from '../lib/hooks/useDemoMode';
+import {useDemoMode, DemoDuration} from '../lib/hooks/useDemoMode';
 import { useAppMode } from '../lib/hooks/useAppMode';
 import { useTutorial } from '../lib/hooks/useTutorial';
 import { useAccess } from '../lib/access';
@@ -48,8 +48,8 @@ import { DELETION_DISCLOSURE } from '../lib/storage';
 import { useAuth } from '../lib/supabase/auth';
 import { ProprietaryFooter } from '../components/legal';
 import ShaderOrb from '../components/orb/ShaderOrb';
-import { APP_MODE_CONFIGS } from '../types';
-import { ModeSelector } from '../components';
+
+
 import { getUserEntitlements, type UserEntitlements } from '../lib/entitlements';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -64,17 +64,14 @@ export default function SettingsScreen() {
     isFounderDemo,
     enableDemoMode,
     disableDemoMode,
-    reseedDemoData,
-    clearDemoData,
   } = useDemoMode();
   const { resetTutorial } = useTutorial();
-  const { currentMode, modeConfig, orgName, orgCode, leaveOrg } = useAppMode();
+  void useAppMode();
   const {
     qaFreeModeEnabled,
     enableQAFreeMode,
     disableQAFreeMode,
     tierLabel,
-    limits,
     // FREE USER VIEW — Hard override
     freeUserViewActive,
     freeUserViewBanner,
@@ -153,6 +150,7 @@ export default function SettingsScreen() {
       await generateFakeData(0.5);
       await refresh();
     } catch (error) {
+      if (__DEV__) console.warn('[settings] generateFakeData failed', error);
     } finally {
       setIsProcessing(false);
     }
@@ -221,7 +219,7 @@ export default function SettingsScreen() {
     : (demoT.demoModeDesc || 'Load sample data');
 
   return (
-    <SafeAreaView style={commonStyles.screen}>
+    <SafeAreaView style={commonStyles.screen} edges={['top', 'left', 'right']}>
       {/* FREE USER VIEW Banner — Always visible when active */}
       {freeUserViewActive && (
         <View style={styles.freeUserViewBanner}>
@@ -604,7 +602,7 @@ export default function SettingsScreen() {
           <View style={styles.languagePickerContainer}>
             <View style={styles.languagePickerHeader}>
               <Text style={styles.languagePickerTitle}>{t.settings.language}</Text>
-              <Pressable onPress={() => setShowLanguagePicker(false)}>
+              <Pressable onPress={() => setShowLanguagePicker(false)} style={styles.modalCloseButton}>
                 <X color={colors.textPrimary} size={20} />
               </Pressable>
             </View>
@@ -651,7 +649,7 @@ export default function SettingsScreen() {
             <View style={styles.languagePickerContainer}>
               <View style={styles.languagePickerHeader}>
                 <Text style={styles.languagePickerTitle}>{demoT.demoMode || 'Demo Mode'}</Text>
-                <Pressable onPress={() => setShowDemoPicker(false)}>
+                <Pressable onPress={() => setShowDemoPicker(false)} style={styles.modalCloseButton}>
                   <X color={colors.textPrimary} size={20} />
                 </Pressable>
               </View>
@@ -840,6 +838,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,
@@ -968,6 +970,12 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     color: 'rgba(255,255,255,0.9)',
+  },
+  modalCloseButton: {
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   languageList: {
     padding: spacing.sm,

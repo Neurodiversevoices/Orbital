@@ -1,5 +1,5 @@
-import { CapacityLog, CapacityState, Category, ExecutiveReportConfig, ExecutiveReportData, ExportSummary } from '../../types';
-import { getLogs, getVaultedLogs, getFullHistoryRange } from '../storage';
+import {CapacityLog, CapacityState, Category, ExecutiveReportConfig, ExecutiveReportData} from '../../types';
+import {getLogs} from '../storage';
 import { generateExportSummary } from './summaryGenerator';
 import { Locale } from '../../locales';
 
@@ -276,7 +276,7 @@ export function formatExecutiveReportAsText(
     social: locale === 'es' ? 'Social' : 'Social',
   };
 
-  let report = `
+  const report = `
 ╔══════════════════════════════════════════════════════════════╗
 ║  ${title.padEnd(60)}║
 ╚══════════════════════════════════════════════════════════════╝

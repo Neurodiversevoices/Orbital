@@ -1,7 +1,7 @@
 /**
  * CCI Power PDF — Premium Dark-Theme Template
  *
- * New generation template for the CCI Capacity Clinical Summary.
+ * New generation template for the CCI capacity summary PDF.
  * Does NOT modify or replace the golden master in artifact.ts.
  *
  * Layout (612×792px US Letter, #080C16 dark background):
@@ -22,7 +22,7 @@ import {
   SEVERITY_COLORS,
 } from './dynamic/impact';
 import { CCIIssuanceMetadata } from './types';
-import { renderSummaryChartSVG, getCapacityColor, CAPACITY_COLORS } from './summaryChart';
+import {getCapacityColor, CAPACITY_COLORS} from './summaryChart';
 
 // =============================================================================
 // TYPES
@@ -72,7 +72,7 @@ function driverBar(label: string, percent: number, color: string): string {
 function generateHeroChartSVG(
   input: CCIPowerTemplateInput,
 ): string {
-  const { dynamicData, projection, formatted } = input;
+  const { dynamicData, projection } = input;
   const values = dynamicData.chartValues;
   const labels = dynamicData.chartXLabels;
 
@@ -285,7 +285,7 @@ function stabilityBar(percent: number): string {
 // =============================================================================
 
 export function generateCCIPowerHTML(input: CCIPowerTemplateInput): string {
-  const { metadata, formatted, dynamicData, projection, narrative, impact, driverStats } = input;
+  const { metadata, formatted, dynamicData, narrative, impact, driverStats } = input;
 
   const heroChart = generateHeroChartSVG(input);
 
@@ -304,7 +304,7 @@ export function generateCCIPowerHTML(input: CCIPowerTemplateInput): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Capacity Clinical Summary</title>
+  <title>Capacity summary</title>
   <style>
     @page { size: 612px 792px; margin: 0; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -339,7 +339,7 @@ export function generateCCIPowerHTML(input: CCIPowerTemplateInput): string {
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
     <div>
       <div style="font-size:7px;font-weight:600;color:${CAPACITY_COLORS.resourced};letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px;">ORBITAL</div>
-      <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.95);letter-spacing:0.5px;">Capacity Clinical Summary</div>
+      <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.95);letter-spacing:0.5px;">Capacity summary</div>
       <div style="font-size:8px;color:rgba(255,255,255,0.4);margin-top:2px;">${formatted.observationWindowDisplay} ${formatted.windowStatus}</div>
     </div>
     <div style="text-align:right;">
@@ -443,7 +443,7 @@ export function generateCCIPowerHTML(input: CCIPowerTemplateInput): string {
   <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);">
     <!-- Methodology -->
     <div style="font-size:6px;color:rgba(255,255,255,0.3);line-height:1.5;margin-bottom:4px;">
-      <strong style="color:rgba(255,255,255,0.4);">Methodology:</strong> Capacity signals derived from structured ecological momentary assessment (EMA). Stability computed via day-to-day volatility normalization. Projections use weighted linear regression on recent 21-day window. This is NOT a diagnostic instrument.
+      <strong style="color:rgba(255,255,255,0.4);">Methodology:</strong> Capacity signals derived from structured ecological momentary assessment (EMA). Stability computed via day-to-day volatility normalization. Projections use weighted linear regression on recent 21-day window. For personal pattern documentation only—not a medical assessment.
     </div>
     <!-- Privacy -->
     <div style="font-size:6px;color:rgba(255,255,255,0.3);line-height:1.5;margin-bottom:6px;">
@@ -458,9 +458,9 @@ export function generateCCIPowerHTML(input: CCIPowerTemplateInput): string {
         Generated ${metadata.generatedAt}
       </div>
     </div>
-    <!-- Clinical use disclaimer -->
+    <!-- Personal documentation disclaimer -->
     <div style="text-align:center;margin-top:4px;">
-      <span style="font-size:5.5px;color:rgba(255,255,255,0.2);letter-spacing:0.5px;text-transform:uppercase;">For clinical documentation support only. Not a professional evaluation. &copy; 2026 Orbital Health Intelligence, Inc.</span>
+      <span style="font-size:5.5px;color:rgba(255,255,255,0.2);letter-spacing:0.5px;text-transform:uppercase;">For personal documentation support only. Not a professional evaluation. &copy; 2026 Orbital Health Intelligence, Inc.</span>
     </div>
   </div>
 

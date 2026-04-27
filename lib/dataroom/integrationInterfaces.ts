@@ -324,7 +324,7 @@ export async function createWebhook(
 export async function updateWebhookEvents(
   webhookId: string,
   events: string[],
-  updatedBy: string
+  _updatedBy: string
 ): Promise<WebhookEndpoint | null> {
   const webhooks = await getWebhooks();
   const index = webhooks.findIndex((w) => w.id === webhookId);
@@ -339,7 +339,7 @@ export async function updateWebhookEvents(
 export async function toggleWebhook(
   webhookId: string,
   isActive: boolean,
-  updatedBy: string
+  _updatedBy: string
 ): Promise<WebhookEndpoint | null> {
   const webhooks = await getWebhooks();
   const index = webhooks.findIndex((w) => w.id === webhookId);

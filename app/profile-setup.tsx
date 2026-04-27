@@ -24,7 +24,7 @@ import { User, ArrowRight, Sparkles } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../theme';
 import { AvatarPicker } from '../components/AvatarPicker';
 import { useIdentity } from '../lib/profile';
-import { type AvatarOption, getAvatarUrl } from '../lib/avatars';
+import {type AvatarOption} from '../lib/avatars';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // =============================================================================
@@ -79,6 +79,7 @@ export default function ProfileSetupScreen() {
       // Navigate to home
       router.replace('/(tabs)');
     } catch (error) {
+      if (__DEV__) console.warn('[profile-setup] Submit failed', error);
     } finally {
       setIsSubmitting(false);
     }

@@ -116,7 +116,6 @@ function samplePeaksAndValleys(data: number[], targetPoints: number): number[] {
   // Sample alternating peaks and valleys
   let lastWasPeak = data[0] > data[Math.min(5, data.length - 1)];
   const middlePoints = targetPoints - 2;
-  const step = extrema.length / middlePoints;
 
   for (let i = 0; i < middlePoints && extrema.length > 0; i++) {
     // Find next extremum of opposite type

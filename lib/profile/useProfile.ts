@@ -16,7 +16,6 @@ import {
 } from './types';
 import {
   loadProfile,
-  saveProfile,
   updateYearOfBirth,
   updateGender,
   clearProfile,

@@ -1,7 +1,7 @@
 /**
- * CCI Clinical Artifact v1 — Shared HTML Builder
+ * CCI capacity artifact v1 — Shared HTML Builder
  *
- * Generates the static HTML layout for the 6-section Clinical Artifact.
+ * Generates the static HTML layout for the 6-section capacity summary artifact.
  * Consumed by both cciToPDF.ts (for expo-print rendering) and
  * cciToFHIR.ts (for the human-readable FHIR attachment).
  *
@@ -69,7 +69,7 @@ function getBaselineBarWidth(baseline: string): string {
 }
 
 /**
- * Build a self-contained HTML document for the CCI Clinical Artifact v1.
+ * Build a self-contained HTML document for the CCI capacity artifact v1.
  *
  * @param data - The computed CCIV1Data
  * @returns Complete HTML string with embedded CSS and Google Fonts
@@ -182,14 +182,14 @@ export function buildCCIV1HTML(data: CCIV1Data): string {
 </head>
 <body>
   <div class="container">
-    <div class="context-label">EHR Sidebar • Clinical Capacity Instrument</div>
+    <div class="context-label">Summary view • Capacity Instrument (CCI)</div>
 
     <div class="card">
       <!-- Section 1: ID Header -->
       <div class="section-header">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
           <div>
-            <div style="font-size:15px;font-weight:600;color:#E8E9ED;letter-spacing:-0.01em;margin-bottom:2px;">Clinical Capacity Instrument</div>
+            <div style="font-size:15px;font-weight:600;color:#E8E9ED;letter-spacing:-0.01em;margin-bottom:2px;">Capacity Instrument (CCI)</div>
             <div class="mono" style="font-size:10px;color:#5A5E72;letter-spacing:0.08em;">${data.instrumentVersion} • ${data.fhirResourceType}</div>
           </div>
           <div class="mono" style="font-size:10px;color:#8B8FA3;text-align:right;line-height:1.6;">

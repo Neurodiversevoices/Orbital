@@ -44,6 +44,7 @@ export function useAppTenure(): AppTenure {
       }
     } catch (error) {
       if (__DEV__) {
+        console.warn('[useAppTenure] storage read failed', error);
       }
       // Fallback to now if storage fails
       setFirstOpenTimestamp(Date.now());

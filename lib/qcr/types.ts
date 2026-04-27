@@ -1,13 +1,13 @@
 /**
  * Quarterly Capacity Report (QCR) Types
  *
- * Clinical-style quarterly summary of capacity patterns.
+ * Archival quarterly summary of capacity patterns.
  * Institutional/archival tone — no wellness language.
  *
  * Pricing: $149/quarter (institutional tier — no consumer discount)
  */
 
-import { CapacityState, Category, Tag } from '../../types';
+import {Category, Tag} from '../../types';
 
 // =============================================================================
 // QCR DATA STRUCTURES
@@ -61,7 +61,7 @@ export interface QCRPatternMetric {
   score: number;
   /** Qualitative level */
   level: 'low' | 'moderate' | 'high';
-  /** Clinical-style description */
+  /** Archival-style description */
   description: string;
 }
 
@@ -242,7 +242,7 @@ export interface QCRChartData {
 
 /**
  * Chain of Custody metadata for forensic-grade artifact provenance.
- * Establishes immutability and auditability for clinical/legal contexts.
+ * Establishes immutability and auditability for legal / documentation contexts.
  */
 export interface QCRChainOfCustody {
   /** SHA-256 hash of report content (excluding this field) */
@@ -306,7 +306,7 @@ export interface QCRSignalFidelity {
   };
 
   /**
-   * Overall verdict on clinical reliability
+   * Overall verdict on data reliability
    */
   verdict: 'CLINICALLY RELIABLE SIGNAL' | 'ACCEPTABLE SIGNAL QUALITY' | 'SIGNAL QUALITY CONCERNS';
 
@@ -320,7 +320,7 @@ export interface QCRSignalFidelity {
  * Provider Shield footer - liability-safe attestation language
  */
 export interface QCRProviderShield {
-  /** Utility statement for clinical context */
+  /** Utility statement for provider-facing context */
   utilityStatement: string;
   /** Liability disclaimer */
   liabilityDisclaimer: string;
@@ -369,7 +369,7 @@ export interface QuarterlyCapacityReport {
   // Notable Episodes
   notableEpisodes: QCRNotableEpisode[];
 
-  // Clinical Notes
+  // Observation notes
   clinicalNotes: QCRClinicalNote[];
 
   // Chart Data for Visualization
@@ -395,7 +395,7 @@ export interface QuarterlyCapacityReport {
   };
 
   // ==========================================================================
-  // FORENSIC INFRASTRUCTURE (Clinical Artifact Compliance)
+  // FORENSIC INFRASTRUCTURE (report provenance)
   // ==========================================================================
 
   /** Chain of Custody - forensic provenance and immutability attestation */
@@ -415,7 +415,7 @@ export interface QuarterlyCapacityReport {
 export interface QCRGenerationConfig {
   /** Quarter to generate (e.g., "2025-Q1") or "current" */
   quarter: string;
-  /** Include clinical notes */
+  /** Include pattern observation notes */
   includeClinicalNotes: boolean;
   /** Include previous quarter comparison */
   includePreviousComparison: boolean;

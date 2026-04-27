@@ -202,7 +202,7 @@ By accessing or using Orbital, you agree to be bound by these Terms of Service.
 Orbital is a capacity tracking tool that records self-reported functional capacity data. It is designed for personal insight and optional sharing with trusted parties.
 
 3. NON-DIAGNOSTIC NATURE
-Orbital does not provide clinical advice, professional evaluation, or care recommendations. The data recorded is self-reported and should not be used as a substitute for professional clinical consultation.
+Orbital does not provide professional health advice, formal evaluation, or care recommendations. The data recorded is self-reported and should not be used as a substitute for consultation with a qualified health professional.
 
 4. DATA OWNERSHIP
 You retain ownership of your data. We process data only as necessary to provide the service.
@@ -419,19 +419,19 @@ Contacte support@orbitalhealth.app para consultas de reembolso.`,
 
 IMPORTANT: READ CAREFULLY
 
-Orbital is NOT a regulated health instrument, evaluative tool, or clinical assessment instrument.
+Orbital is NOT a regulated health instrument, evaluative tool, or formal health assessment instrument.
 
 1. SELF-REPORTED DATA
-All data in Orbital is self-reported by the user. It reflects subjective perception of functional capacity, not objective clinical measurements.
+All data in Orbital is self-reported by the user. It reflects subjective perception of functional capacity, not independent instrumented measurements.
 
 2. NOT MEDICAL ADVICE
-Nothing in Orbital constitutes clinical advice, professional evaluation, or care recommendations. Do not use Orbital data to make clinical decisions.
+Nothing in Orbital constitutes professional health advice, formal evaluation, or care recommendations. Do not use Orbital data to make care decisions on your own.
 
 3. PROFESSIONAL CONSULTATION
 If you have health concerns, consult a qualified healthcare professional. Orbital data may be shared with healthcare providers as supplementary information only.
 
 4. NO WARRANTIES
-We make no warranties regarding the accuracy, completeness, or clinical validity of capacity assessments derived from Orbital data.
+We make no warranties regarding the accuracy, completeness, or fitness for any particular purpose of capacity summaries derived from Orbital data.
 
 5. LIMITATION
 Orbital is designed for personal insight and optional sharing. It should not replace professional evaluation or professional guidance.

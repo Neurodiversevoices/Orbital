@@ -7,7 +7,6 @@ import {
   createShare,
   revokeShareAccess,
   listActiveShares,
-  getSharesForRecipient,
   generateShareLink,
   getRecentAuditEntries,
   ShareDuration,

@@ -27,13 +27,6 @@ const LOCAL_TO_CLOUD_STATE: Record<LocalCapacityState, CloudCapacityState> = {
   depleted: 'red',
 };
 
-const CLOUD_TO_LOCAL_STATE: Record<CloudCapacityState, LocalCapacityState> = {
-  green: 'resourced',
-  yellow: 'stretched',
-  red: 'depleted',
-  black: 'depleted', // black maps to depleted (most severe)
-};
-
 export interface CloudPatternsContext {
   // Data
   logs: LocalCapacityLog[];

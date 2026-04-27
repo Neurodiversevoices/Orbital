@@ -1,5 +1,5 @@
 /**
- * CCI Clinical Artifact v1 — FHIR DocumentReference Serializer
+ * CCI capacity artifact v1 — FHIR DocumentReference Serializer
  *
  * Serializes CCIV1Data into an HL7 FHIR R4 DocumentReference resource
  * with dual content attachments (human-readable HTML + machine-readable JSON).
@@ -20,7 +20,7 @@
  *  - meta.profile: Orbital CCI v1 StructureDefinition
  *  - identifier: reportId for deduplication
  *  - type: LOINC 77576-7
- *  - content[0]: HTML (human-readable EHR sidebar)
+ *  - content[0]: HTML (human-readable summary for record systems)
  *  - content[1]: JSON (machine-readable structured data)
  *  - extension[]: baseline, direction, coverage
  */
@@ -144,7 +144,7 @@ export function serializeCCIV1ToFHIR(data: CCIV1Data): CCIV1FHIRDocumentReferenc
     resourceType: 'DocumentReference',
     id: data.reportId,
 
-    // Profile declaration — tells EHR what to expect
+    // Profile declaration — tells consumers what to expect
     meta: {
       profile: ['https://orbitalhealth.app/fhir/StructureDefinition/cci-v1'],
       lastUpdated: now,
@@ -170,7 +170,7 @@ export function serializeCCIV1ToFHIR(data: CCIV1Data): CCIV1FHIRDocumentReferenc
           display: 'Patient-generated health data document',
         },
       ],
-      text: 'CCI Clinical Artifact v1',
+      text: 'CCI capacity artifact v1',
     },
 
     subject: {
@@ -187,15 +187,15 @@ export function serializeCCIV1ToFHIR(data: CCIV1Data): CCIV1FHIRDocumentReferenc
       },
     ],
 
-    description: 'Clinical Capacity Instrument — 90-Day Clinical Artifact v1',
+    description: 'Capacity Instrument (CCI) — 90-day capacity artifact v1',
 
     content: [
       {
-        // Human-readable — EHR can render this directly in sidebar
+        // Human-readable — record systems can render this in a sidebar view
         attachment: {
           contentType: 'text/html',
           language: 'en-US',
-          title: `Clinical Capacity Instrument — 90-Day Report`,
+          title: `Capacity Instrument (CCI) — 90-day report`,
           data: htmlBase64,
           creation: data.generatedDate,
         },

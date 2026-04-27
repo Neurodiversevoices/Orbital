@@ -13,7 +13,6 @@
 import {
   buildCohortSeries,
   AGE_COHORT_BANDS,
-  validateCohortDifferentiation,
   validateDeterminism,
   AgeCohortBand,
   SentinelVertical,

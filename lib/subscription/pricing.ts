@@ -1,72 +1,3 @@
-// =============================================================================
-// TRIAL + CENTS + HELPER EXPORTS (added April 2026)
-// =============================================================================
-
-export const TRIAL_DAYS = 7;
-
-export type CCIMilestone = '30' | '60' | '90' | 'bundle';
-export type SubscriptionPeriod = 'monthly' | 'annual';
-
-/** Display prices in cents to avoid float math. Used by paywall components. */
-export const PRICES_CENTS = {
-  PRO: { monthly: 2900, annual: 29000 },
-  CIRCLE: { monthly: 7900, annual: 79000 },
-  CIRCLE_EXTRA_SEAT: { monthly: 1000, annual: 10000 },
-  BUNDLE_10: { annual: 270000 },
-  BUNDLE_15: { annual: 400000 },
-  BUNDLE_20: { annual: 520000 },
-  FAMILY: { monthly: 7900, annual: 79000 },
-  FAMILY_EXTRA_SEAT: { monthly: 900, annual: 9000 },
-  ADMIN: { monthly: 2900, annual: 29000 },
-  THERAPIST_SOLO: { monthly: 3900 },
-  THERAPIST_PRACTICE: { monthly: 8900 },
-  THERAPIST_GROUP: { monthly: 15900 },
-  THERAPIST_CLINIC: { monthly: 27900 },
-  CCI_30: 9900,
-  CCI_60: 14900,
-  CCI_90: 19900,
-  CCI_BUNDLE: 34900,
-  CCI_30_PRO: 7900,
-  CCI_60_PRO: 11900,
-  CCI_90_PRO: 14900,
-  CCI_BUNDLE_PRO: 27900,
-} as const;
-
-/** Format cents as display price string: 2900 → "$29", 2950 → "$29.50" */
-export function fmt(cents: number): string {
-  if (cents % 100 === 0) return `$${cents / 100}`;
-  return `$${(cents / 100).toFixed(2)}`;
-}
-
-/** Calculate annual savings percent vs paying monthly */
-export function annualSavings(monthlyCents: number, annualCents: number): number {
-  return Math.round((1 - annualCents / (monthlyCents * 12)) * 100);
-}
-
-export function resolveCCIProductId(milestone: CCIMilestone, isPro: boolean): string {
-  const map: Record<CCIMilestone, string> = {
-    '30': isPro ? 'orbital_cci_30_pro' : 'orbital_cci_30',
-    '60': isPro ? 'orbital_cci_60_pro' : 'orbital_cci_60',
-    '90': isPro ? 'orbital_cci_90_pro' : 'orbital_cci_90',
-    'bundle': isPro ? 'orbital_cci_bundle_pro' : 'orbital_cci_bundle',
-  };
-  return map[milestone];
-}
-
-export function resolveCCIPrice(milestone: CCIMilestone, isPro: boolean): number {
-  const map: Record<CCIMilestone, number> = {
-    '30': isPro ? PRICES_CENTS.CCI_30_PRO : PRICES_CENTS.CCI_30,
-    '60': isPro ? PRICES_CENTS.CCI_60_PRO : PRICES_CENTS.CCI_60,
-    '90': isPro ? PRICES_CENTS.CCI_90_PRO : PRICES_CENTS.CCI_90,
-    'bundle': isPro ? PRICES_CENTS.CCI_BUNDLE_PRO : PRICES_CENTS.CCI_BUNDLE,
-  };
-  return map[milestone];
-}
-
-// =============================================================================
-// END ADDITIONS
-// =============================================================================
-
 /**
  * Orbital Pricing Configuration — FINAL LOCK (February 2026)
  *
@@ -504,8 +435,8 @@ export const QCR_PRODUCTS: Record<string, QCRProduct> = {
       '90-day pattern synthesis',
       'Resilience metrics',
       'Recovery velocity analysis',
-      'Clinical-grade PDF export',
-      'EHR-attachment ready',
+      'Professional PDF export',
+      'Shareable summary for your records',
     ],
     requiredEntitlement: ENTITLEMENTS.INDIVIDUAL,
   },

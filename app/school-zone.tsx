@@ -44,7 +44,6 @@ import {
 import type {
   SchoolZoneModeSettings,
   SchoolZoneConfig,
-  SchoolZoneAggregate,
   SchoolRole,
   SchoolSummaryCard,
   Category,
@@ -165,6 +164,7 @@ export default function SchoolZoneScreen() {
         lastSummaryGeneratedAt: Date.now(),
       });
     } catch (error) {
+      if (__DEV__) console.warn('[school-zone] Share summary failed', error);
     }
   }, [summaryCard]);
 
@@ -520,6 +520,10 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: 18,

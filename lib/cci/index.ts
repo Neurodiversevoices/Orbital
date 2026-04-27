@@ -1,7 +1,7 @@
 /**
  * CCI-Q4 Issuance Module
  *
- * Clinical Capacity Instrument (CCI-Q4) Artifact Issuance
+ * Capacity Instrument (CCI-Q4) artifact issuance
  *
  * GOLDEN MASTER: output/CCI_Q4_2025_Ultra_PatternReadable.pdf
  * This module provides wiring ONLY - visual output is LOCKED.
@@ -23,7 +23,7 @@ export type { CCIFunctionalImpact, SeverityLevel } from './dynamic/impact';
 export type { CCIPowerTemplateInput } from './powerTemplate';
 export type { CCIPdfResult, CCIPdfOptions } from './generateCCIPdf';
 
-// CCI Clinical Artifact v1
+// CCI capacity artifact v1
 export { generateCCIV1Data, getDriverLabel, classifyBaseline, computeDirection, computeAreasOfChange } from './generateCCIV1Data';
 export type { CCIV1Data, BaselineClassification, DirectionClassification, AreaChangeDirection, AreaOfChange } from './generateCCIV1Data';
 export { buildCCIV1HTML } from './cciV1HTML';

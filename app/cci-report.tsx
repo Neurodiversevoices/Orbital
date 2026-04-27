@@ -8,7 +8,7 @@
  *  1. Check entitlement on mount
  *  2. User taps "Generate Report"
  *  3. Edge Function called with user_id + last 90 days
- *  4. Display returned JSON in clinical summary layout
+ *  4. Display returned JSON in capacity summary layout
  *  5. Handle errors (no entitlement, not enough data, network)
  */
 

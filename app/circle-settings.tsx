@@ -33,7 +33,7 @@ import { cloudGetMyCircles } from '../lib/circles/cloud';
 export default function CircleSettingsScreen() {
   const router = useRouter();
   const [entitlements, setEntitlements] = useState<UserEntitlements | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [, setIsLoading] = useState(true);
   const [isLeaving, setIsLeaving] = useState(false);
   const [circleName, setCircleName] = useState<string>('My Circle');
   const [circleRole, setCircleRole] = useState<string>('Member');

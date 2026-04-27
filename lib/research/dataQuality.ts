@@ -4,10 +4,6 @@ import { DataProvenanceRecord, DataQualityScore } from '../../types';
 const PROVENANCE_KEY = '@orbital:data_provenance';
 const QUALITY_SCORES_KEY = '@orbital:data_quality_scores';
 
-function generateId(prefix: string): string {
-  return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-}
-
 // ============================================
 // DATA PROVENANCE TRACKING
 // ============================================

@@ -36,7 +36,7 @@ export default function ExportScreen() {
     exportJson,
     exportCsv,
   } = useExport();
-  const { hasExecutiveReports, isEnterprise, tier } = useInstitutional();
+  const { hasExecutiveReports } = useInstitutional();
 
   const handleExport90d = async () => {
     const success = await exportSummary90d(locale);
@@ -246,6 +246,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,

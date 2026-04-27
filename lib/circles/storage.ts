@@ -30,13 +30,9 @@ import {
   CircleInvite,
   StoredSignal,
   BlockedUser,
-  CirclesStorageKeyPrefix,
   isCirclesKey,
-  toViewerSafe,
-  ViewerSafeSignal,
 } from './types';
 import {
-  CIRCLES_KEY_PREFIX,
   FORBIDDEN_KEY_PREFIXES,
   MAX_CONNECTIONS,
   CirclesLawViolation,
@@ -57,8 +53,6 @@ import {
   assertValidConnectionId,
   assertValidInviteToken,
   CircleId,
-  ConnectionId,
-  InviteToken,
 } from './ids';
 
 // =============================================================================
@@ -152,15 +146,6 @@ async function multiRemove(keys: string[]): Promise<void> {
   }
 
   await AsyncStorage.multiRemove(keys);
-}
-
-/**
- * Get all keys that match a prefix.
- * Only returns keys within the Circles namespace.
- */
-async function getKeysByPrefix(prefix: CirclesStorageKeyPrefix): Promise<string[]> {
-  const allKeys = await AsyncStorage.getAllKeys();
-  return allKeys.filter((key) => key.startsWith(prefix) && isCirclesKey(key));
 }
 
 // =============================================================================

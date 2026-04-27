@@ -22,11 +22,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   X,
   User,
-  Camera,
   Shield,
   ChevronRight,
   Smartphone,
-  Clock,
   Check,
   Pencil,
 } from 'lucide-react-native';
@@ -35,16 +33,16 @@ import { colors, spacing, borderRadius } from '../theme';
 import { useIdentity, getInitials, getAvatarColor } from '../lib/profile';
 import { useAuth } from '../lib/supabase';
 import { AvatarPicker } from '../components/AvatarPicker';
-import { type AvatarOption } from '../lib/avatars';
+import { type AvatarOption, getAvatarById } from '../lib/avatars';
 
 export default function AccountScreen() {
   const router = useRouter();
   const auth = useAuth();
-  const { identity, isLoading, updateName, updateAvatar, refresh } = useIdentity(auth.user?.email);
+  const { identity, isLoading, updateName, updateAvatar } = useIdentity(auth.user?.email);
 
   // Local form state
   const [nameInput, setNameInput] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [selectedAvatarId, setSelectedAvatarId] = useState<string | null>(null);
@@ -218,7 +216,7 @@ export default function AccountScreen() {
             <Pressable
               onPress={async () => {
                 if (selectedAvatarId) {
-                  const avatar = require('../lib/avatars').getAvatarById(selectedAvatarId);
+                  const avatar = getAvatarById(selectedAvatarId);
                   if (avatar) {
                     await updateAvatar(avatar.url, 'preset');
                   }
@@ -266,6 +264,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,

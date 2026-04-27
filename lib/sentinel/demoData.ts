@@ -150,33 +150,6 @@ export const AGE_COHORT_LABELS: Record<AgeCohort, string> = {
 };
 
 /**
- * Cohort-specific seeds for deterministic but varied data
- */
-const COHORT_SEEDS: Record<AgeCohort, number> = {
-  '13-17': 13170,
-  '18-24': 18240,
-  '25-34': 25340,
-  '35-44': 35440,
-  '45-54': 45540,
-  '55-64': 55640,
-  '65+': 65000,
-};
-
-/**
- * Cohort-specific volatility characteristics
- * (Different cohorts show different patterns for demo variety)
- */
-const COHORT_VOLATILITY_PROFILES: Record<AgeCohort, { baseOffset: number; variance: number; triggerDay: number }> = {
-  '13-17': { baseOffset: 15, variance: 25, triggerDay: 5 },  // Students: higher volatility
-  '18-24': { baseOffset: 10, variance: 20, triggerDay: 4 },
-  '25-34': { baseOffset: 5, variance: 18, triggerDay: 5 },   // Default (matches PNG)
-  '35-44': { baseOffset: 0, variance: 15, triggerDay: 6 },
-  '45-54': { baseOffset: -5, variance: 12, triggerDay: 7 },
-  '55-64': { baseOffset: -8, variance: 10, triggerDay: 8 },
-  '65+': { baseOffset: -10, variance: 8, triggerDay: 9 },
-};
-
-/**
  * Deterministic pseudo-random generator
  * Uses a seed for reproducible "random" values
  */
@@ -353,7 +326,7 @@ export const SENTINEL_DEMO_LABELS = {
  */
 function generateSchoolCohortVolatilityTrend(
   ageCohort: SchoolAgeCohort,
-  historyDays: number = 21
+  _historyDays: number = 21
 ): VolatilityDataPoint[] {
   const seed = SCHOOL_COHORT_SEEDS[ageCohort];
   const profile = SCHOOL_COHORT_VOLATILITY_PROFILES[ageCohort];
@@ -397,7 +370,6 @@ function generateSchoolCohortVolatilityTrend(
  * @returns Deterministic demo data for the cohort
  */
 export function getSchoolDistrictSentinelData(ageCohort: SchoolAgeCohort): SentinelData {
-  const profile = SCHOOL_COHORT_VOLATILITY_PROFILES[ageCohort];
   const volatilityTrend = generateSchoolCohortVolatilityTrend(ageCohort);
 
   // Calculate consecutive days above baseline

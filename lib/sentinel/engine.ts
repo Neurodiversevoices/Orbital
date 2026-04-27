@@ -347,8 +347,8 @@ function determineSystemState(
  */
 function generateAssessments(
   systemState: SystemState,
-  consecutiveDays: number,
-  stats: { mean: number; stdDev: number }
+  _consecutiveDays: number,
+  _stats: { mean: number; stdDev: number }
 ): AssessmentItem[] {
   const assessments: AssessmentItem[] = [];
 

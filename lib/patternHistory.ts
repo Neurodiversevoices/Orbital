@@ -18,14 +18,13 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { STORAGE_KEYS, generateId } from './storage';
+import {generateId} from './storage';
 import {
   CapacityLog,
   PatternHistoryRecord,
   PatternHistoryQuery,
   PatternHistoryWriteRequest,
   PatternMode,
-  DeletionState,
   DeidentificationResult,
   createPatternHistoryRecord,
   deidentifyPatternRecord,
@@ -96,7 +95,7 @@ export async function writePatternHistory(
   existing.push(record);
   await savePatternHistory(existing);
 
-  if (__DEV__) console.log('[PatternHistory] Record created:', record.id);
+  if (__DEV__) console.warn('[PatternHistory] Record created:', record.id);
   return record;
 }
 
@@ -182,7 +181,7 @@ export async function softDeletePatternRecord(
   all[index] = deidentifyPatternRecord(all[index], reason);
   await savePatternHistory(all);
 
-  if (__DEV__) console.log('[PatternHistory] Record soft-deleted:', recordId, 'reason:', reason);
+  if (__DEV__) console.warn('[PatternHistory] Record soft-deleted:', recordId, 'reason:', reason);
   return true;
 }
 
@@ -219,7 +218,7 @@ export async function softDeleteUserPatternHistory(
   await savePatternHistory(updated);
   result.completedAt = Date.now();
 
-  if (__DEV__) console.log('[PatternHistory] User history soft-deleted:', userId, result);
+  if (__DEV__) console.warn('[PatternHistory] User history soft-deleted:', userId, result);
   return result;
 }
 

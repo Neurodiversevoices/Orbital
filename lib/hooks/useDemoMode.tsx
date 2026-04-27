@@ -45,6 +45,7 @@ function assertFounderDemo(operation: string): void {
   if (!FOUNDER_DEMO_ENABLED) {
     const error = new Error(`[DemoMode] BLOCKED: ${operation} called without FOUNDER_DEMO_ENABLED`);
     if (__DEV__) {
+      console.warn('[DemoMode]', error.message);
     }
     throw error;
   }
@@ -184,7 +185,7 @@ function generateCrisisEvents(totalDays: number): Array<{ startDay: number; dura
 }
 
 // Generate stability plateaus (periods of reduced volatility)
-function isInPlateau(dayOffset: number, totalDays: number): boolean {
+function isInPlateau(dayOffset: number, _totalDays: number): boolean {
   // Create plateaus roughly every 200-300 days, lasting 60-120 days
   const cyclePosition = dayOffset % 250;
   return cyclePosition > 80 && cyclePosition < 180;
@@ -400,7 +401,7 @@ async function generatePremiumDemoData(duration: DemoDuration = '10y'): Promise<
     for (let entryIndex = 0; entryIndex < entriesPerDay; entryIndex++) {
       const slot = shuffledSlots[entryIndex] || timeSlots[entryIndex % timeSlots.length];
       let hour: number;
-      let minute: number = Math.floor(rng.next() * 60);
+      const minute: number = Math.floor(rng.next() * 60);
 
       if (day === 0) {
         // For today: only create entries for times that have passed
@@ -413,7 +414,7 @@ async function generatePremiumDemoData(duration: DemoDuration = '10y'): Promise<
       }
 
       // Calculate timestamp: midnight of (day days ago) + hour/minute offset
-      let timestamp = midnightToday - (day * 86400000) + (hour * 3600000) + (minute * 60000);
+      const timestamp = midnightToday - (day * 86400000) + (hour * 3600000) + (minute * 60000);
 
       // Ensure timestamp is never in the future
       if (timestamp > now) {
@@ -438,14 +439,6 @@ async function generatePremiumDemoData(duration: DemoDuration = '10y'): Promise<
 
   // Sort newest first
   logs.sort((a, b) => b.timestamp - a.timestamp);
-
-  // Debug: log the timestamp range
-  if (__DEV__ && logs.length > 0) {
-    const oldestLog = logs[logs.length - 1];
-    const newestLog = logs[0];
-    const oldestDaysAgo = Math.round((now - oldestLog.timestamp) / 86400000);
-    const newestDaysAgo = Math.round((now - newestLog.timestamp) / 86400000);
-  }
 
   // Create one fake shared recipient (for demo purposes)
   const recipients: ShareRecipient[] = [
@@ -593,6 +586,7 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
       setIsDemoMode(true);
 
     } catch (error) {
+      if (__DEV__) console.error('[DemoMode] Failed to enable:', error);
     }
     setIsLoading(false);
   }, [backupRealData]);
@@ -608,7 +602,7 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
       await AsyncStorage.setItem(STORAGE_KEYS.DEMO_MODE_ENABLED, 'false');
       setIsDemoMode(false);
 
-      if (__DEV__) console.log('[DemoMode] Disabled, real data restored');
+      if (__DEV__) console.warn('[DemoMode] Disabled, real data restored');
     } catch (error) {
       if (__DEV__) console.error('[DemoMode] Failed to disable:', error);
     }
@@ -640,6 +634,7 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
       await AsyncStorage.setItem(STORAGE_KEYS.AUDIT_LOG, JSON.stringify(audit));
 
     } catch (error) {
+      if (__DEV__) console.warn('[DemoMode] reseed failed', error);
     }
     setIsLoading(false);
   }, [isDemoMode]);
@@ -658,7 +653,7 @@ export function DemoModeProvider({ children }: DemoModeProviderProps) {
       await AsyncStorage.setItem(STORAGE_KEYS.SHARES, '[]');
       await AsyncStorage.setItem(STORAGE_KEYS.AUDIT_LOG, '[]');
 
-      if (__DEV__) console.log('[DemoMode] Cleared to empty state');
+      if (__DEV__) console.warn('[DemoMode] Cleared to empty state');
     } catch (error) {
       if (__DEV__) console.error('[DemoMode] Failed to clear:', error);
     }

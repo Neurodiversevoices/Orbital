@@ -10,8 +10,8 @@
  */
 
 import { CCIArtifact, CCIArtifactJSON, CCIIssuanceMetadata } from './types';
-import { FABRICATED_HISTORIES, DEMO_CIRCLE_MEMBERS, getCapacityState } from './demoData';
-import { renderSummaryChartSVG, CAPACITY_COLORS } from './summaryChart';
+import {FABRICATED_HISTORIES} from './demoData';
+import {renderSummaryChartSVG} from './summaryChart';
 import { CCIFormattedStrings, CCIDynamicData } from './dynamic/types';
 import { CCIProjectionResult } from './dynamic/projection';
 import { CCINarrativeResult } from './dynamic/narrative';
@@ -56,7 +56,7 @@ function generateLegacyCCIArtifactHTML(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clinical Capacity Instrument</title>
+  <title>Capacity Instrument (CCI)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -460,7 +460,7 @@ function generateLegacyCCIArtifactHTML(
 
 <div class="page">
   <!-- HEADER -->
-  <h1 class="artifact-title">Clinical Artifact Record [Locked]</h1>
+  <h1 class="artifact-title">Capacity documentation record [Locked]</h1>
 
   <!-- CHAIN OF CUSTODY - READABLE META -->
   <div class="chain-of-custody">
@@ -493,7 +493,7 @@ function generateLegacyCCIArtifactHTML(
     <div class="capacity-definition-title">What "Capacity" Means in This Report</div>
     <div class="capacity-definition-body">
       <p>Capacity refers to a person's day-to-day functional bandwidth — the amount of emotional, cognitive, sensory, and social load they can manage before regulation begins to degrade.</p>
-      <p class="capacity-definition-emphasis">Capacity is not a clinical evaluation, not a signal checklist, and not a performance score.</p>
+      <p class="capacity-definition-emphasis">Capacity is not a formal medical evaluation, not a signal checklist, and not a performance score.</p>
       <p>Changes in capacity often present as:</p>
       <ul class="capacity-definition-list">
         <li>increased emotional reactivity</li>
@@ -656,7 +656,7 @@ function generateLegacyCCIArtifactHTML(
   <div class="footer-section">
     <div class="provider-title">Provider Utility Statement</div>
     <div class="provider-body">
-      This artifact is an objective summary of user-generated capacity signals. <em>It is provided to assist clinical documentation of functional status and does NOT constitute a professional evaluation.</em> Inclusion of this record in a provider file serves as evidence of data review, not endorsement of subjective claims. Capacity Summary Report — supports documentation and record review.
+      This artifact is an objective summary of user-generated capacity signals. <em>It is provided to assist personal documentation of functional status and does NOT constitute a professional evaluation.</em> Inclusion of this record in a provider file serves as evidence of data review, not endorsement of subjective claims. Capacity Summary Report — supports documentation and record review.
     </div>
 
     <!-- HOW TO USE THIS REPORT -->
@@ -671,14 +671,14 @@ function generateLegacyCCIArtifactHTML(
           <li>tracking response to interventions</li>
           <li>supporting self-awareness and regulation strategies</li>
         </ul>
-        <p class="capacity-definition-footer">This report should be interpreted alongside clinical judgment and client self-report.</p>
+        <p class="capacity-definition-footer">This report should be interpreted alongside professional judgment and client self-report.</p>
       </div>
     </div>
 
     <div class="legal-block">
       <div class="legal-title">Confidential &amp; Proprietary Notice</div>
       <div class="legal-body">
-        This Clinical Capacity Instrument and all underlying methodologies, algorithms, data structures, and presentation formats constitute proprietary intellectual property and trade secrets of Orbital Health Intelligence, Inc. Unauthorized reproduction, distribution, reverse engineering, derivative works, or system emulation is strictly prohibited and may result in civil liability and criminal penalties under applicable trade secret, copyright, and unfair competition laws. This document is provided solely for the confidential use of the intended recipient for clinical documentation purposes. Any disclosure, copying, or distribution to unauthorized parties is expressly forbidden. Orbital Health Intelligence, Inc. reserves the right to seek injunctive relief, actual and consequential damages, and recovery of attorneys' fees for any violation of these terms.
+        This Capacity Instrument (CCI) and all underlying methodologies, algorithms, data structures, and presentation formats constitute proprietary intellectual property and trade secrets of Orbital Health Intelligence, Inc. Unauthorized reproduction, distribution, reverse engineering, derivative works, or system emulation is strictly prohibited and may result in civil liability and criminal penalties under applicable trade secret, copyright, and unfair competition laws. This document is provided solely for the confidential use of the intended recipient for personal documentation purposes. Any disclosure, copying, or distribution to unauthorized parties is expressly forbidden. Orbital Health Intelligence, Inc. reserves the right to seek injunctive relief, actual and consequential damages, and recovery of attorneys' fees for any violation of these terms.
       </div>
       <div class="legal-rights">© 2026 Orbital Health Intelligence, Inc. All Rights Reserved.</div>
     </div>
@@ -765,7 +765,7 @@ function _buildWaveChartSVG(values: number[], labels: [string, string, string]):
  * 1. Header: "ORBITAL" + "Capacity Composite Index" + period + Confidential
  * 2. Score ring (SVG) + state distribution bar + top capacity drivers (2x2)
  * 3. Capacity wave chart (SVG with color gradient)
- * 4. Clinical observations (bullet points from narrative)
+ * 4. Pattern observations (bullet points from narrative)
  * 5. Capacity forecast + functional impact grid (severity pills)
  * 6. Footer: Orbital branding + non-diagnostic disclaimer
  */
@@ -949,7 +949,7 @@ export function generateCCIArtifactHTML(
 
   <!-- CLINICAL OBSERVATIONS -->
   <div style="margin-bottom:12px;padding:10px 14px;border-left:3px solid #00E5FF;background:rgba(0,229,255,0.03);border-radius:0 4px 4px 0;">
-    <div style="font-size:7px;font-weight:600;color:#00E5FF;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Clinical Observations</div>
+    <div style="font-size:7px;font-weight:600;color:#00E5FF;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Recorded observations</div>
     ${observations.map((obs: string) => `
       <div style="font-size:8px;line-height:1.6;color:rgba(255,255,255,0.65);margin-bottom:3px;padding-left:12px;position:relative;">
         <span style="position:absolute;left:1px;top:0;color:rgba(255,255,255,0.3);">&#8226;</span>${obs}
@@ -1006,7 +1006,7 @@ export function generateCCIArtifactHTML(
       <span class="mono" style="font-size:6px;color:rgba(255,255,255,0.2);">${metadata.integrityHash}</span>
     </div>
     <div style="text-align:center;">
-      <span style="font-size:5.5px;color:rgba(255,255,255,0.2);letter-spacing:0.5px;text-transform:uppercase;">This is NOT a diagnostic instrument. For clinical documentation support only. Not a substitute for professional judgment. &copy; 2026 Orbital Health Intelligence, Inc.</span>
+      <span style="font-size:5.5px;color:rgba(255,255,255,0.2);letter-spacing:0.5px;text-transform:uppercase;">Personal documentation only. Not a substitute for professional judgment. &copy; 2026 Orbital Health Intelligence, Inc.</span>
     </div>
   </div>
 
@@ -1108,9 +1108,6 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
   const lilyChart = generateMemberChartSVG('Lily', FABRICATED_HISTORIES.lily);
   const tylerChart = generateMemberChartSVG('Tyler', FABRICATED_HISTORIES.tyler);
   const emmaChart = generateMemberChartSVG('Emma', FABRICATED_HISTORIES.emma);
-
-  // Get capacity states for status badges
-  const getLatestState = (values: number[]) => getCapacityState(values[values.length - 1]);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1334,12 +1331,12 @@ export function getCircleGoldenMasterHTML(): string {
  * Create a machine-readable JSON export of the CCI artifact.
  *
  * DOCTRINE: CCI Artifact vs. Raw Data
- * This provides a structured, signed document format for clinical integrations.
+ * This provides a structured, signed document format for system integrations.
  * The JSON format complements (does not replace) the HTML/PDF artifact.
  *
  * Use cases:
- * - EHR integration
- * - Clinical data exchange
+ * - External record integration
+ * - Structured data exchange
  * - Programmatic verification
  * - Research exports (with consent)
  */
@@ -1391,7 +1388,7 @@ export function createCCIArtifactJSON(
       copyright: '© 2026 Orbital Health Intelligence, Inc. All Rights Reserved.',
       disclaimer:
         'This artifact is an objective summary of user-generated capacity signals. ' +
-        'It does NOT constitute a professional evaluation. Designed to support clinical documentation.',
+        'It does NOT constitute a professional evaluation. Designed to support personal documentation.',
     },
     signature: {
       algorithm: 'sha256',

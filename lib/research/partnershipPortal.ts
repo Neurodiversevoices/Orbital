@@ -4,7 +4,6 @@ import {
   PartnershipAgreement,
   PartnershipType,
   PartnershipStatus,
-  CohortCriteria,
   RWEExportFormat,
 } from '../../types';
 

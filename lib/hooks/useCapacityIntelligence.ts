@@ -45,7 +45,7 @@ export function useCapacityIntelligence(): UseCapacityIntelligenceReturn {
 
   const [showInterstitial, setShowInterstitial] = useState(false);
   const [triggeredFeature, setTriggeredFeature] = useState<ProFeature | null>(null);
-  const [upgradeRequested, setUpgradeRequested] = useState(false);
+  const [, setUpgradeRequested] = useState(false);
 
   // Pro users and demo mode users have full access
   const hasIntelligenceAccess = useMemo(() => {

@@ -26,7 +26,7 @@
       "supportsTablet": true,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "117",
+      "buildNumber": "123",
       "deploymentTarget": "15.1",
       "appleTeamId": "2KM3QL4UMV",
       "icon": "./assets/icon.png",
@@ -37,11 +37,7 @@
       },
       "infoPlist": {
         "LSApplicationCategoryType": "public.app-category.healthcare-fitness",
-        "ITSAppUsesNonExemptEncryption": false,
-        "NSFaceIDUsageDescription": "Orbital uses Face ID to protect access to your capacity data and keep your account secure.",
-        "NSMicrophoneUsageDescription": "NOVA needs the microphone so you can speak to your assistant.",
-        "NSSpeechRecognitionUsageDescription": "NOVA uses speech recognition to turn your voice into text.",
-        "NSHealthShareUsageDescription": "Orbital reads sleep, heart rate variability, resting heart rate, mindful minutes, and workout data to compute your daily capacity reading. Data stays on your device unless you log it."
+        "ITSAppUsesNonExemptEncryption": false
       },
       "runtimeVersion": "1.0.0"
     },
@@ -92,14 +88,7 @@
           "project": "react-native"
         }
       ],
-      "expo-font",
-      [
-        "expo-speech-recognition",
-        {
-          "microphonePermission": "NOVA needs the microphone so you can speak to your assistant.",
-          "speechRecognitionPermission": "NOVA uses speech recognition to turn your voice into text."
-        }
-      ]
+      "expo-font"
     ],
     "extra": {
       "router": {},

@@ -11,7 +11,7 @@
  * Aggregate-only capacity snapshot. NO individual identification.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -22,7 +22,6 @@ import {
   TrendingDown,
   Minus,
   Users,
-  Calendar,
   AlertTriangle,
   BarChart3,
   PieChart,
@@ -30,13 +29,10 @@ import {
 } from 'lucide-react-native';
 import { colors, commonStyles, spacing, DASHBOARD_STATE_COLORS } from '../theme';
 import { generateExecutiveReport, ExecutiveReportData } from '../lib/reports/executiveReportGenerator';
-import { useLocale } from '../lib/hooks/useLocale';
-
 type TimePeriod = '30d' | '90d' | '1y';
 
 export default function DashboardScreen() {
   const router = useRouter();
-  const { t } = useLocale();
   const [period, setPeriod] = useState<TimePeriod>('90d');
   const [reportData, setReportData] = useState<ExecutiveReportData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -329,6 +325,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   demoBanner: {
     backgroundColor: '#7A9AAA',

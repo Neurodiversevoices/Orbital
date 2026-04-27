@@ -46,16 +46,6 @@ const PAGINATION_RULES = {
 } as const;
 
 /**
- * Print complexity budget.
- * Hero chart is ALWAYS rendered; member charts are capped per page.
- */
-const PRINT_COMPLEXITY = {
-  heroChartAlways: true,     // Aggregate chart is mandatory
-  maxChartsPerPage: 10,      // Member charts capped at 10 per page
-  memberChartMode: (seatCount: number) => seatCount <= 10 ? 'full' : 'compact',
-} as const;
-
-/**
  * Determine print density mode based on seat count.
  */
 function getPrintDensityMode(seatCount: number): PrintDensityMode {
@@ -172,7 +162,7 @@ export function generateBundleCCIArtifactHTML(
   const rows: string[] = [];
   for (let i = 0; i < seats.length; i += seatsPerRow) {
     const rowSeats = seats.slice(i, i + seatsPerRow);
-    const rowHTML = rowSeats.map((seat, j) => {
+    const rowHTML = rowSeats.map((seat, _j) => {
       const state = getSeatCapacityState(seat);
       const stateColor = CAPACITY_COLORS[state];
       const chart = generateSeatChartSVG(seat);

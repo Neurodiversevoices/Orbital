@@ -14,29 +14,15 @@ import { isSupabaseConfigured } from '../supabase/client';
 import {
   CloudSyncStatus,
   DEFAULT_CLOUD_SYNC_STATUS,
-  CloudCapacityLog,
 } from './types';
+import { getDeviceId } from './settings';
+import { enqueueLog } from './outbox';
 import {
-  loadCloudSettings,
-  enableCloudBackup,
-  disableCloudBackup,
-  isCloudBackupEnabled,
-  getDeviceId,
-} from './settings';
-import {
-  enqueueLog,
-  getPendingCount,
-  getFailedCount,
-  clearOutbox,
-} from './outbox';
-import {
-  pushToCloud,
   pullFromCloud,
   fullSync,
   getSyncStatus,
   localToCloudUpsert,
   mergeCloudIntoLocal,
-  cloudToLocal,
 } from './syncEngine';
 import { CapacityLog } from '../../types';
 
@@ -124,7 +110,8 @@ export function useCloudSync(): UseCloudSyncReturn {
 
     try {
       const result = await fullSync();
-      if (__DEV__) console.log(`[CloudSync] Pushed: ${result.pushed}, Pulled: ${result.pulled}, Errors: ${result.errors}`);
+      if (__DEV__)
+        console.warn(`[CloudSync] Pushed: ${result.pushed}, Pulled: ${result.pulled}, Errors: ${result.errors}`);
       await loadStatus();
     } catch (e) {
       if (__DEV__) console.error('[CloudSync] Sync failed:', e);

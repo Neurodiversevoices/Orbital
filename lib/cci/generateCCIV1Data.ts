@@ -1,8 +1,8 @@
 /**
- * CCI Clinical Artifact v1 — Data Computation
+ * CCI capacity artifact v1 — Data computation
  *
  * Queries capacity_logs over a 90-day window and computes the structured
- * data object that feeds the Clinical Artifact v1 component, FHIR serializer,
+ * data object that feeds the capacity artifact v1 component, FHIR serializer,
  * and PDF exporter.
  *
  * Pure compute helpers are exported individually for unit testing.
@@ -339,7 +339,7 @@ async function fetchCapacityLogs(
 // =============================================================================
 
 /**
- * Generate all data for the CCI Clinical Artifact v1.
+ * Generate all data for the CCI capacity artifact v1.
  *
  * Returns null if insufficient data (fewer than 7 unique logging days
  * in the 90-day window).

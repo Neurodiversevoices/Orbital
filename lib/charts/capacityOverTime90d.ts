@@ -183,7 +183,8 @@ export function renderCCI90DayToSVG(
 
   // Validate data
   const validation = validateCCIData(data);
-  if (!validation.valid) {
+  if (!validation.valid && __DEV__) {
+    console.warn('[capacityOverTime90d] invalid CCI data for SVG', validation);
   }
 
   const bands = generateBackgroundBands();
@@ -288,7 +289,8 @@ export interface CCI90DayChartProps {
 
 export function generateChartProps(data: CCI90DayChartData): CCI90DayChartProps {
   const validation = validateCCIData(data);
-  if (!validation.valid) {
+  if (!validation.valid && __DEV__) {
+    console.warn('[capacityOverTime90d] invalid CCI data for props', validation);
   }
 
   return {
@@ -450,11 +452,12 @@ export function createIndividualCCIData(
 export function createCircleCCIData(
   members: Array<{ id: string; label: string; values: number[] }>
 ): CCI90DayChartData {
-  if (members.length !== 5) {
+  if (members.length !== 5 && __DEV__) {
+    console.warn('[capacityOverTime90d] createCircleCCIData expected 5 members', members.length);
   }
 
   return {
-    series: members.slice(0, 5).map((member, index) => ({
+    series: members.slice(0, 5).map((member, _index) => ({
       id: member.id,
       label: member.label,
       color: CCI_STATE_COLORS.resourced, // All use same color for consistency

@@ -41,7 +41,7 @@ import { colors, spacing, borderRadius, commonStyles } from '../theme';
 
 const CONTACT_URLS = {
   licensing: 'mailto:contact@orbitalhealth.app?subject=Volatility%20Index%20Licensing%20Inquiry',
-  healthcare: 'mailto:contact@orbitalhealth.app?subject=Nursing%20Sentinel%20%2B%20Clinical%20Briefs%20Inquiry',
+  healthcare: 'mailto:contact@orbitalhealth.app?subject=Nursing%20Sentinel%20%2B%20Capacity%20Briefs%20Inquiry',
   frms: 'mailto:contact@orbitalhealth.app?subject=FRMS%20Safety%20Layer%20Inquiry',
   higherEd: 'mailto:contact@orbitalhealth.app?subject=Higher%20Ed%20Benchmarks%20Inquiry',
   k12: 'mailto:contact@orbitalhealth.app?subject=K-12%20District%20Sentinel%20Inquiry',
@@ -82,7 +82,7 @@ const ADD_ONS: AddOnDefinition[] = [
     id: 'healthcare-sentinel',
     icon: Stethoscope,
     color: '#F44336',
-    title: 'Healthcare Nursing Sentinel\u2122 + Clinical Briefs+\u2122',
+    title: 'Healthcare Nursing Sentinel\u2122 + Capacity Briefs+\u2122',
     subtitle: 'Fastest close, operational + legal relevance',
     demoLabel: 'Sentinel\u2122 Alert (DEMO)',
     sampleAlert: 'Operational strain exceeds historical baseline (DEMO)',

@@ -28,7 +28,7 @@
  * ============================================================================
  */
 
-import { MAX_CONNECTIONS } from './constants';
+
 import {
   assertNoHistory,
   assertNoAggregation,
@@ -445,7 +445,8 @@ export function runCirclesSelfTestWithLogging(): void {
 
   for (const result of report.results) {
     const status = result.passed ? '\u2713' : '\u2717';
-    if (!result.passed && result.error) {
+    if (!result.passed && result.error && __DEV__) {
+      console.warn('[Circles SelfTest]', status, result.error);
     }
   }
 
@@ -453,6 +454,7 @@ export function runCirclesSelfTestWithLogging(): void {
   if (!report.passed) {
     const failedTests = report.results.filter((r) => !r.passed);
     for (const t of failedTests) {
+      if (__DEV__) console.warn('[Circles SelfTest] failed:', t.name, t.error);
     }
     throw new Error(`[Circles SelfTest] ${report.failedTests} tests failed`);
   }

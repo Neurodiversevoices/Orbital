@@ -43,9 +43,7 @@ import {
   CIRCLES_SCOPE,
   CIRCLES_SCHEMA_VERSION,
   CAPACITY_TO_CIRCLE_COLOR,
-  toViewerSafe,
   toConnectionSummary,
-  CircleId,
   ConnectionId,
   InviteToken,
 } from './types';
@@ -70,7 +68,6 @@ import {
   deleteSignal,
   getConnection,
   saveConnection,
-  deleteConnection,
   updateConnectionStatus,
   getAllConnections,
   getActiveConnections,
@@ -84,7 +81,6 @@ import {
   removeBlockedUser,
   isUserBlocked,
   getBlockedUsers,
-  generateCircleId,
   generateConnectionId,
   generateInviteToken,
   wipeAllCirclesData,
@@ -97,19 +93,15 @@ import {
   validateViewerSignal,
   validateStoredSignal,
   validateConnection,
-  validateInvite,
   assertInviteValid,
   assertNoAggregation,
   assertRevocationComplete,
   assertValidTTL,
-  assertNoHierarchy,
   isSignalExpired,
   toValidatedViewerSignal,
-  CirclesLawViolation as InvariantViolation,
 } from './invariants';
 
 import {
-  assertValidCircleId,
   assertValidConnectionId,
   assertValidInviteToken,
 } from './ids';

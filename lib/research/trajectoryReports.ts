@@ -4,7 +4,7 @@ import {
   TrajectoryReport,
   InterventionCategory,
 } from '../../types';
-import { hasActiveConsent } from './researchConsent';
+
 
 const TRAJECTORY_REPORTS_KEY = '@orbital:trajectory_reports';
 

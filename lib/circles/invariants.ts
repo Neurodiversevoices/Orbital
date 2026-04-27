@@ -20,7 +20,6 @@
 
 import {
   MAX_CONNECTIONS,
-  DEFAULT_SIGNAL_TTL_MS,
   MIN_SIGNAL_TTL_MS,
   MAX_SIGNAL_TTL_MS,
   CIRCLES_KEY_PREFIX,
@@ -28,7 +27,6 @@ import {
   CIRCLES_SCHEMA_VERSION,
   FORBIDDEN_KEY_PREFIXES,
   CirclesLawViolation,
-  assertValidConnectionCount,
 } from './constants';
 
 import {
@@ -37,7 +35,6 @@ import {
   CircleConnection,
   CircleInvite,
   CircleColor,
-  ConnectionStatus,
   FORBIDDEN_FIELD_NAMES,
   VALID_CIRCLE_COLORS,
   VALID_CONNECTION_STATUSES,
@@ -49,9 +46,6 @@ import {
   assertValidCircleId,
   assertValidConnectionId,
   assertValidInviteToken,
-  isCircleIdFormat,
-  isConnectionIdFormat,
-  isInviteTokenFormat,
 } from './ids';
 
 // Re-export for convenience

@@ -162,7 +162,7 @@ export function assertNoHistory(data: unknown): void {
   }
 
   // Rule 3: Nested arrays are time-series data
-  for (const [key, value] of Object.entries(obj)) {
+  for (const [, value] of Object.entries(obj)) {
     if (Array.isArray(value)) {
       // Any array with more than 0 items could be history
       if (value.length > 0) {

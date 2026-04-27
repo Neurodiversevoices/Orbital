@@ -1,20 +1,15 @@
 /**
  * Apple Search Ads Attribution
  *
- * Implements the full attribution pipeline:
- * 1. ATT prompt (iOS 14.5+) — gated, shown once, respects denial
- * 2. AdServices token collection via RevenueCat
- * 3. Purchase event instrumentation for ROAS mapping
+ * v1 posture: **no** App Tracking Transparency prompt — `NSUserTrackingUsageDescription` is
+ * **not** in `app.json`. Do not call `requestTrackingPermissionsAsync` until that changes.
  *
- * Privacy posture:
- * - ATT prompt is shown once on first app launch (iOS only)
- * - If user denies, we still collect deterministic AdServices tokens
- *   (no IDFA required — Apple's privacy-safe attribution)
- * - No device identifiers are stored locally
- * - Compliant with Orbital governance P-003, P-013
+ * Active pieces:
+ * - AdServices token path via RevenueCat (no IDFA required for that lane)
+ * - Purchase breadcrumbs for observability
  *
- * Requires next native build to take effect (Expo config plugin
- * adds NSUserTrackingUsageDescription and SKAdNetworkItems to Info.plist).
+ * If you re-enable ATT, add the plist string first, then uncomment the prompt in
+ * `requestATTPermission` below.
  */
 
 import { Platform } from 'react-native';
@@ -46,29 +41,32 @@ export interface AttributionEvent {
  *
  * Called once during app initialization. If the user denies,
  * AdServices deterministic attribution still works (no IDFA needed).
+ *
+ * NOTE: ATT prompt is DISABLED for v1.
+ * NSUserTrackingUsageDescription is not present in the v1 Info.plist.
+ * Apple will reject any build where requestTrackingPermissionsAsync() is
+ * called without that plist key. Re-enable in the next native build once
+ * NSUserTrackingUsageDescription has been added to app.json ios.infoPlist.
  */
 async function requestATTPermission(): Promise<'granted' | 'denied' | 'unavailable'> {
-  if (Platform.OS !== 'ios') return 'unavailable';
+  // DISABLED: ATT deferred to post-v1. Calling requestTrackingPermissionsAsync()
+  // without NSUserTrackingUsageDescription in Info.plist causes App Store rejection.
+  // Remove this early-return guard once the plist key is added.
+  if (__DEV__) console.warn('[Attribution] ATT prompt skipped — deferred to post-v1 (no NSUserTrackingUsageDescription in v1 binary)');
+  return 'unavailable';
 
-  try {
-    // Dynamic import — only resolves on native iOS builds that include
-    // expo-tracking-transparency. Falls back gracefully if not installed.
-    const TrackingModule = await import('expo-tracking-transparency');
-    const { status } = await TrackingModule.requestTrackingPermissionsAsync();
-
-    Sentry.addBreadcrumb({
-      category: 'attribution',
-      message: `ATT prompt result: ${status}`,
-      level: 'info',
-    });
-
-    return status === 'granted' ? 'granted' : 'denied';
-  } catch {
-    // expo-tracking-transparency not installed or not available
-    // This is expected until the next native build
-    if (__DEV__) console.log('[Attribution] ATT module not available (expected before next native build)');
-    return 'unavailable';
-  }
+  // --- Code below is preserved for when ATT is re-enabled post-v1 ---
+  // if (Platform.OS !== 'ios') return 'unavailable';
+  //
+  // try {
+  //   const TrackingModule = await import('expo-tracking-transparency');
+  //   const { status } = await TrackingModule.requestTrackingPermissionsAsync();
+  //   Sentry.addBreadcrumb({ category: 'attribution', message: `ATT prompt result: ${status}`, level: 'info' });
+  //   return status === 'granted' ? 'granted' : 'denied';
+  // } catch {
+  //   if (__DEV__) console.warn('[Attribution] ATT module not available');
+  //   return 'unavailable';
+  // }
 }
 
 // =============================================================================
@@ -106,11 +104,11 @@ async function enableRevenueCatAttribution(): Promise<void> {
       level: 'info',
     });
 
-    if (__DEV__) console.log('[Attribution] RevenueCat AdServices attribution enabled');
+    if (__DEV__) console.warn('[Attribution] RevenueCat AdServices attribution enabled');
   } catch {
     // RevenueCat not configured yet — this is fine, will be called
     // again on next app launch after configure() succeeds
-    if (__DEV__) console.log('[Attribution] RevenueCat attribution setup skipped (SDK not ready)');
+    if (__DEV__) console.warn('[Attribution] RevenueCat attribution setup skipped (SDK not ready)');
   }
 }
 
@@ -181,5 +179,6 @@ export function trackPurchaseAttribution(event: AttributionEvent): void {
   });
 
   if (__DEV__) {
+    console.warn('[Attribution] Purchase event recorded', event.type);
   }
 }

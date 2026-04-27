@@ -7,8 +7,8 @@
  * All reports include non-diagnostic disclaimers and watermarks.
  */
 
-import { CapacityLog, CapacityState, Category, ExportSummary } from '../../types';
-import { getLogs, getLogsByDateRange, getVaultedLogs, getVaultMetadata } from '../storage';
+import {CapacityLog, CapacityState, Category} from '../../types';
+import {getLogsByDateRange, getVaultedLogs} from '../storage';
 
 export type ReportPeriod = 'quarterly' | 'annual' | 'custom';
 

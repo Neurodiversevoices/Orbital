@@ -39,8 +39,6 @@ import {
 import type {
   TeamModeSettings,
   TeamConfig,
-  TeamAggregate,
-  TeamActionSuggestion,
   Category,
 } from '../types';
 
@@ -403,6 +401,10 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: 18,

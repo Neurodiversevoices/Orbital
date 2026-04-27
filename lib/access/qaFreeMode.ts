@@ -84,6 +84,7 @@ export async function enableQAFreeMode(): Promise<void> {
 
   // Log for audit
   if (__DEV__) {
+    console.warn('[qaFreeMode] enabled');
   }
 }
 
@@ -96,6 +97,7 @@ export async function disableQAFreeMode(): Promise<void> {
 
   // Log for audit
   if (__DEV__) {
+    console.warn('[qaFreeMode] disabled');
   }
 }
 

@@ -1,4 +1,4 @@
-import { AuditAction, AuditEntry } from '../../types';
+import {AuditEntry} from '../../types';
 import { getAuditLog, logAuditEntry, clearAuditLog } from '../storage';
 
 export async function logShareCreated(recipientId: string, recipientName: string): Promise<void> {

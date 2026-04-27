@@ -34,12 +34,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // 3. Expiration enforcement
 const VERIFICATION_SALT = 'orbital-sponsor-v1';
 
-// Code format: XXXX-XXXX-XXXX-XXXX (16 chars, groups of 4)
-const CODE_PATTERN = /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
-
-// Maximum age for a code to be valid (block old leaked codes)
-const MAX_CODE_AGE_DAYS = 90;
-
 // =============================================================================
 // BASE32 ENCODING (RFC 4648)
 // =============================================================================
@@ -65,26 +59,6 @@ function base32Encode(data: Uint8Array): string {
   }
 
   return result;
-}
-
-function base32Decode(str: string): Uint8Array {
-  const cleanStr = str.toUpperCase().replace(/[^A-Z2-7]/g, '');
-  const result: number[] = [];
-  let bits = 0;
-  let value = 0;
-
-  for (let i = 0; i < cleanStr.length; i++) {
-    const idx = BASE32_ALPHABET.indexOf(cleanStr[i]);
-    if (idx === -1) continue;
-    value = (value << 5) | idx;
-    bits += 5;
-    if (bits >= 8) {
-      bits -= 8;
-      result.push((value >> bits) & 0xff);
-    }
-  }
-
-  return new Uint8Array(result);
 }
 
 // =============================================================================
@@ -155,50 +129,6 @@ export function generateSponsorCode(
 // =============================================================================
 // CODE VALIDATION
 // =============================================================================
-
-/**
- * Parse a sponsor code string into its components.
- */
-function parseCode(code: string): { payload: string; signature: string } | null {
-  // Normalize: uppercase, remove dashes/spaces
-  const normalized = code.toUpperCase().replace(/[-\s]/g, '');
-
-  if (normalized.length < 12) {
-    return null;
-  }
-
-  // Last 6 chars are signature, rest is payload
-  const payload = normalized.slice(0, -6);
-  const signature = normalized.slice(-6);
-
-  return { payload, signature };
-}
-
-/**
- * Decode payload from base32 to JSON.
- */
-function decodePayload(payloadB32: string): SponsorCodePayload | null {
-  try {
-    const bytes = base32Decode(payloadB32);
-    const json = new TextDecoder().decode(bytes);
-    const parsed = JSON.parse(json);
-
-    // Validate structure
-    if (
-      parsed.v !== 1 ||
-      !['core', 'pro'].includes(parsed.t) ||
-      typeof parsed.d !== 'number' ||
-      typeof parsed.i !== 'number' ||
-      typeof parsed.n !== 'string'
-    ) {
-      return null;
-    }
-
-    return parsed as SponsorCodePayload;
-  } catch {
-    return null;
-  }
-}
 
 /**
  * Check if a code has already been redeemed on this device.

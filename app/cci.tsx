@@ -1,7 +1,7 @@
 /**
  * CCI-Q4 Instrument Viewer
  *
- * View and export the Clinical Capacity Instrument (CCI-Q4) artifact.
+ * View and export the Capacity Instrument (CCI-Q4) artifact.
  *
  * GOLDEN MASTER LOCKED: Visual output matches output/CCI_Q4_2025_Ultra_PatternReadable.pdf exactly.
  * Do NOT modify styling, layout, or content.
@@ -213,7 +213,7 @@ export default function CCIInstrumentScreen() {
         {/* Artifact Info Card */}
         <View style={[styles.infoCard, (isCircle || isBundle) && styles.infoCardCircle]}>
           <Text style={styles.infoTitle}>
-            {isCircle ? 'Circle Capacity Instrument' : isBundle ? 'Bundle Capacity Instrument' : 'Clinical Capacity Instrument'}
+            {isCircle ? 'Circle Capacity Instrument' : isBundle ? 'Bundle Capacity Instrument' : 'Capacity Instrument (CCI)'}
           </Text>
           <Text style={[styles.infoSubtitle, (isCircle || isBundle) && styles.infoSubtitleCircle]}>
             {isCircle ? 'AGGREGATE CCI-Q4' : isBundle ? `${bundleSeatCount}-SEAT BUNDLE` : 'Q4 2025 Artifact'}
@@ -269,9 +269,9 @@ export default function CCIInstrumentScreen() {
             </View>
           )}
 
-          {/* Clinical Capacity Index Notice */}
-          <View style={styles.cptNotice}>
-            <Text style={styles.cptNoticeText}>
+          {/* Capacity index notice */}
+          <View style={styles.billingContextNotice}>
+            <Text style={styles.billingContextNoticeText}>
               Designed to support documentation workflows.
             </Text>
           </View>
@@ -518,13 +518,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'rgba(255,255,255,0.8)',
   },
-  cptNotice: {
+  billingContextNotice: {
     marginTop: spacing.md,
     backgroundColor: 'rgba(122,154,170,0.1)',
     borderRadius: 6,
     padding: spacing.sm,
   },
-  cptNoticeText: {
+  billingContextNoticeText: {
     fontSize: 11,
     color: 'rgba(255,255,255,0.6)',
     lineHeight: 16,

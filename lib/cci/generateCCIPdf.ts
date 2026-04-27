@@ -252,7 +252,7 @@ export async function generateCCIPdf(
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(newUri, {
           mimeType: 'application/pdf',
-          dialogTitle: `Capacity Clinical Summary — ${formatted.observationWindowDisplay}`,
+          dialogTitle: `Capacity summary — ${formatted.observationWindowDisplay}`,
           UTI: 'com.adobe.pdf',
         });
       } else if (Platform.OS === 'web') {

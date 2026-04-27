@@ -1,8 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Pressable, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Animated, {
-  FadeIn,
-  FadeOut,
   SlideInRight,
   SlideOutLeft,
   SlideInLeft,
@@ -26,8 +24,6 @@ import { ProprietaryFooter } from '../components/legal';
 
 // NOTE: Why Orbital screen marks itself as seen when dismissed.
 // We only check hasSeenWhyOrbital here, we don't pre-mark it.
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface TutorialStep {
   id: string;
@@ -129,7 +125,12 @@ export default function TutorialScreen() {
       {/* Skip Button */}
       <View style={styles.header}>
         <View style={styles.headerSpacer} />
-        <Pressable onPress={handleSkip} style={styles.skipButton}>
+        <Pressable
+          onPress={handleSkip}
+          style={styles.skipButton}
+          testID="occ-tutorial-skip"
+          accessibilityLabel="Skip tutorial"
+        >
           <Text style={styles.skipText}>Skip</Text>
           <X color="rgba(255,255,255,0.5)" size={16} />
         </Pressable>
@@ -227,6 +228,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
     padding: spacing.sm,
+    minHeight: 44,
   },
   skipText: {
     fontSize: 14,
@@ -318,6 +320,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
     padding: spacing.sm,
+    minHeight: 44,
   },
   navButtonDisabled: {
     opacity: 0.5,

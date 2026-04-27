@@ -2,9 +2,7 @@
  * Payments Module
  *
  * Centralized payment configuration and utilities.
- *
- * STUB IMPLEMENTATION: Uses mockCheckout until Stripe is integrated.
- * All purchases "work" end-to-end by simulating success and granting entitlements.
+ * Uses RevenueCat for real IAP via StoreKit / Google Play.
  */
 
 export {
@@ -25,4 +23,4 @@ export {
   type PurchaseIntent,
   type PurchaseResult,
   type ProductInfo,
-} from './mockCheckout';
+} from './revenueCatCheckout';

@@ -12,25 +12,11 @@
  * Year of Birth cannot be reconstructed from cohort.
  */
 
-import { AgeCohort, AgeCohortMapping } from './types';
+import { AgeCohort } from './types';
 
 // =============================================================================
 // COHORT DEFINITIONS
 // =============================================================================
-
-/**
- * 10-year age cohorts.
- * These are the ONLY age-related data stored in the system.
- */
-const COHORT_MAPPINGS: AgeCohortMapping[] = [
-  { cohortId: 'under_20', minYear: null, maxYear: null }, // Calculated dynamically
-  { cohortId: '20_29', minYear: null, maxYear: null },
-  { cohortId: '30_39', minYear: null, maxYear: null },
-  { cohortId: '40_49', minYear: null, maxYear: null },
-  { cohortId: '50_59', minYear: null, maxYear: null },
-  { cohortId: '60_69', minYear: null, maxYear: null },
-  { cohortId: '70_plus', minYear: null, maxYear: null },
-];
 
 /**
  * Human-readable cohort labels for UI display.

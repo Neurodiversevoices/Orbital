@@ -19,6 +19,10 @@ import {
   TermsAcceptance,
   TermsAcceptanceRecord,
   CURRENT_TERMS_VERSION,
+  TeamModeSettings,
+  TeamConfig,
+  SchoolZoneModeSettings,
+  SchoolZoneConfig,
 } from '../types';
 import {
   onCapacityLogSaved,
@@ -549,13 +553,6 @@ export async function updateTermsPromptedAt(): Promise<void> {
 // ============================================
 // TEAM MODE STORAGE
 // ============================================
-
-import type {
-  TeamModeSettings,
-  TeamConfig,
-  SchoolZoneModeSettings,
-  SchoolZoneConfig,
-} from '../types';
 
 const DEFAULT_TEAM_MODE_SETTINGS: TeamModeSettings = {
   enabled: false,

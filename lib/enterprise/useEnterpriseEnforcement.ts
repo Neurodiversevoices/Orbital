@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Platform } from 'react-native';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
@@ -30,7 +30,6 @@ import {
 import {
   hasAcceptedTerms,
   recordTermsAcceptance,
-  requireTermsAcceptance,
   logGroupCreationConsent,
 } from './termsEnforcement';
 import { processAgeOnboarding, createAgeCohortRecord } from './ageCohort';

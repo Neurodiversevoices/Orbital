@@ -8,7 +8,7 @@ if (Platform.OS === 'ios') {
   try {
     widgetModule = require('../../modules/orbital-widget');
   } catch (e) {
-    if (__DEV__) console.log('[WidgetSync] Widget module not available');
+    if (__DEV__) console.warn('[WidgetSync] Widget module not available');
   }
 }
 

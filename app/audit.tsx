@@ -13,7 +13,6 @@ import { X, Download, Shield, Eye, FileOutput, Share2, UserX, Clock } from 'luci
 import { colors, commonStyles, spacing } from '../theme';
 import { getAuditLog, getRecipients } from '../lib/storage';
 import { AuditEntry, AuditAction, ShareRecipient } from '../types';
-import { useLocale } from '../lib/hooks/useLocale';
 
 const ACTION_ICONS: Record<AuditAction, React.ComponentType<{ color: string; size: number }>> = {
   share_created: Share2,
@@ -33,9 +32,8 @@ const ACTION_COLORS: Record<AuditAction, string> = {
 
 export default function AuditScreen() {
   const router = useRouter();
-  const { t } = useLocale();
   const [entries, setEntries] = useState<AuditEntry[]>([]);
-  const [recipients, setRecipients] = useState<Map<string, ShareRecipient>>(new Map());
+  const [, setRecipients] = useState<Map<string, ShareRecipient>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -127,6 +125,7 @@ export default function AuditScreen() {
         title: 'Orbital Audit Log',
       });
     } catch (error) {
+      if (__DEV__) console.warn('[Audit] Share export failed', error);
     }
   }, [entries]);
 
@@ -235,6 +234,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   infoCard: {
     marginHorizontal: spacing.md,

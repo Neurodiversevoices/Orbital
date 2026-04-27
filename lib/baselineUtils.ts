@@ -203,7 +203,6 @@ export function findMostRecent7DayStreakWindow(
 
   // Find all 7+ day streaks and return the most recent one
   const streaks: { start: string; end: string }[] = [];
-  let streakStart = sortedDates[0];
   let streakDates = [sortedDates[0]];
 
   const areConsecutive = (date1: string, date2: string): boolean => {
@@ -223,7 +222,6 @@ export function findMostRecent7DayStreakWindow(
         const end = streakDates[streakDates.length - 1];
         streaks.push({ start, end });
       }
-      streakStart = sortedDates[i];
       streakDates = [sortedDates[i]];
     }
   }

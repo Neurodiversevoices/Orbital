@@ -26,7 +26,6 @@ import {
   RestrictedDomain,
   DomainCheckResult,
   EnforcementResult,
-  EnforcementPoint,
 } from './types';
 
 // =============================================================================

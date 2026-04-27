@@ -88,7 +88,7 @@ export function useQCR({ logs }: UseQCROptions): UseQCRReturn {
       setHasQCRAccess(hasAccess);
     } catch (e) {
       // RevenueCat unavailable - no access
-      if (__DEV__) console.log('[QCR] RevenueCat unavailable');
+      if (__DEV__) console.warn('[QCR] RevenueCat unavailable');
     }
     setIsCheckingAccess(false);
   }

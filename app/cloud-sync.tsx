@@ -44,7 +44,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { colors, spacing, borderRadius } from '../theme';
 import { useAuth, isSupabaseConfigured, validatePassword, MFAFactor, MFAEnrollment } from '../lib/supabase';
 import { useCloudSync, getDeviceId } from '../lib/cloud';
-import { useBiometric, getBiometricDisplayName } from '../lib/biometric';
+import {useBiometric} from '../lib/biometric';
 
 // Password field prop key (split to avoid banned-term grep false positive)
 const _HIDDEN = 'se\x63ureTextEntry';
@@ -706,6 +706,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,

@@ -485,7 +485,7 @@ export async function exportCohortManifest(cohortId: string): Promise<{
   const statistics = await getCohortStatistics(cohortId);
 
   // Remove createdBy to blocks identification
-  const { createdBy, ...cohortWithoutCreator } = cohort;
+  const { createdBy: _createdBy, ...cohortWithoutCreator } = cohort;
 
   return {
     cohort: cohortWithoutCreator,

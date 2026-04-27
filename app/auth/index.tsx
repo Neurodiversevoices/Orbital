@@ -114,7 +114,7 @@ export default function AuthScreen() {
           .eq('user_id', user.id)
           .single();
         if (!profile?.orb_tuning) {
-          router.replace('/(onboarding)/avatar');
+          router.replace('/upgrade' as any);
           return;
         }
       }

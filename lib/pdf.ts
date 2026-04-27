@@ -1,7 +1,7 @@
 /**
- * Clinical Brief PDF Generator
+ * Capacity brief PDF generator
  *
- * Generates a professional clinical-grade PDF report from capacity data.
+ * Generates a professional pattern-based PDF report from capacity data.
  * Uses expo-print for HTML-to-PDF rendering.
  *
  * Design: Infrastructure aesthetic - clean, neutral, non-diagnostic.
@@ -9,8 +9,8 @@
 
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import { Platform } from 'react-native';
-import { CapacityLog, CapacityState, Category } from '../types';
+
+import {CapacityLog, CapacityState} from '../types';
 import { getLogs } from './storage';
 
 interface ClinicalBriefData {
@@ -552,7 +552,7 @@ function generateHTML(data: ClinicalBriefData): string {
   <div class="disclaimer">
     <strong>Important Notice</strong>
     This document is a Patient-Reported Outcome Measure (PROM). It represents subjective self-reported data
-    and is not a clinical evaluation, professional assessment, or care recommendation. The patterns shown
+    and is not a formal medical evaluation, professional assessment, or care recommendation. The patterns shown
     reflect correlations in user-reported signals and should not be interpreted as causal relationships.
     Always consult qualified healthcare providers for medical advice.
   </div>
@@ -580,7 +580,7 @@ export async function generateClinicalBrief(options?: { days?: number }): Promis
     if (await Sharing.isAvailableAsync()) {
       await Sharing.shareAsync(uri, {
         mimeType: 'application/pdf',
-        dialogTitle: 'Share Clinical Brief',
+        dialogTitle: 'Share capacity summary',
         UTI: 'com.adobe.pdf',
       });
     }

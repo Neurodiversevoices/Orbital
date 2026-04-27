@@ -34,8 +34,6 @@
 import * as Crypto from 'expo-crypto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  MAX_CONNECTIONS,
-  CirclesLawViolation,
   CircleSecurityError,
   CircleSecurityEvent,
   CircleSecurityEventType,
@@ -44,10 +42,7 @@ import {
 import { checkIsPro } from '../entitlements';
 import { assertNoHistory, assertNoAggregation, assertSymmetry } from './guardrails';
 import {
-  generateCircleId,
   generateConnectionId,
-  assertValidCircleId,
-  assertValidConnectionId,
   CircleId,
   ConnectionId,
 } from './ids';
@@ -58,7 +53,6 @@ import {
   getAllConnections,
   saveConnection,
   isUserBlocked,
-  addBlockedUser,
 } from './storage';
 
 // =============================================================================

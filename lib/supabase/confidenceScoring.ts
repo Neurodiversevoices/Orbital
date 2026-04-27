@@ -163,6 +163,7 @@ export async function applyConfidenceFlags(
     .eq('id', logId);
 
   if (error && __DEV__) {
+    console.warn('[confidenceScoring] update flags failed', error.message);
   }
 }
 

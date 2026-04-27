@@ -284,21 +284,21 @@ export const QCR_DEMO_SNAPSHOT: QuarterlyCapacityReport = {
       level: 'Complete',
     },
     verdict: 'CLINICALLY RELIABLE SIGNAL',
-    narrativeSummary: 'This report reflects 85% observation compliance with consistent input patterns (mean latency 4.2s). Pattern coherence of 78% indicates low probability of random or reflexive entry. Data quality supports clinical utility.',
+    narrativeSummary: 'This report reflects 85% observation compliance with consistent input patterns (mean latency 4.2s). Pattern coherence of 78% indicates low probability of random or reflexive entry. Data quality supports documentation utility.',
   } as QCRSignalFidelity,
 
   // Forensic Infrastructure: Provider Shield
   providerShield: {
     utilityStatement:
-      'This report is provided as a supplementary resource to support clinical dialogue. ' +
+      'This report is provided as a supplementary resource to support care conversations. ' +
       'It reflects client-reported observations and computed pattern metrics. ' +
-      'This document does not constitute a professional evaluation, care recommendation, or clinical assessment.',
+      'This document does not constitute a professional evaluation, care recommendation, or formal health assessment.',
     liabilityDisclaimer:
       'IMPORTANT: This report is generated from self-reported data and algorithmic analysis. ' +
-      'It is not a substitute for professional clinical judgment. Healthcare providers should ' +
-      'integrate this information with their own assessments, clinical interviews, and professional expertise. ' +
+      'It is not a substitute for professional judgment. Healthcare providers should ' +
+      'integrate this information with their own assessments, direct interviews, and professional expertise. ' +
       'Orbital Health Intelligence, Inc. makes no warranties regarding the accuracy, completeness, ' +
-      'or clinical applicability of this report for any individual case.',
+      'or applicability of this report for any individual case.',
     dataHandlingNotice:
       'Data Processing: All observations are processed locally on the client device. ' +
       'This report was generated from encrypted local storage. ' +

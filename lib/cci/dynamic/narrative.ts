@@ -71,7 +71,7 @@ export function resolveStatus(distribution: {
  */
 export function resolveTrendDirection(
   stabilityPercent: number,
-  volatilityRaw: number,
+  _volatilityRaw: number,
 ): 'stable' | 'variable' | 'shifting' {
   if (stabilityPercent >= 75) return 'stable';
   if (stabilityPercent >= 45) return 'variable';
@@ -85,7 +85,7 @@ export function resolveDominantPattern(
   distribution: { resourced: number; stretched: number; depleted: number; total: number },
   stabilityPercent: number,
 ): string {
-  const { resourced, stretched, depleted, total } = distribution;
+  const { resourced, depleted, total } = distribution;
   if (total === 0) return 'insufficient data';
 
   const rPct = resourced / total;

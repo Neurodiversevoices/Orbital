@@ -16,7 +16,6 @@ import {
   TeamActionSuggestion,
   TEAM_MIN_PARTICIPANTS,
   SCHOOL_MIN_STUDENTS,
-  CAPACITY_TO_TEAM_LABEL,
   TEAM_ACTION_TEMPLATES,
   EnvironmentFactor,
 } from '../types';

@@ -15,7 +15,6 @@ import {
   InterventionSensitivityData,
   QSBOverviewData,
   QSBResult,
-  MIN_COHORT_SIZE,
   InsufficientDataError,
 } from './types';
 import {

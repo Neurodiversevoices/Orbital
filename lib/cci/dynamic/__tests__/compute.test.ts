@@ -7,7 +7,6 @@
 import { CapacityLog } from '../../../../types';
 import {
   computeCCIDynamicData,
-  computeObservationWindow,
   computeTrackingContinuity,
   computePatternStability,
   computeVerdict,

@@ -14,8 +14,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   AccessGrant,
-  AccessState,
-  AnyTier,
   BaseTier,
   FamilyAddon,
   BundleType,
@@ -27,24 +25,14 @@ import { validateSponsorCode, generateTestCode } from './sponsorCodes';
 import { STARTER_TIER } from '../subscription/pricing';
 import {
   initializeQAFreeMode,
-  isQAFreeModeEnabled,
   enableQAFreeMode as enableQA,
   disableQAFreeMode as disableQA,
   QA_FREE_MODE_LIMITS,
 } from './qaFreeMode';
 import {
   initializeForcedRoleView,
-  isFreeUserViewActive,
   enableFreeUserView,
   disableFreeUserView,
-  shouldBlockOrgBypass,
-  getOverriddenBaseTier,
-  getOverriddenFeatures,
-  shouldShowOrganizationTab,
-  shouldShowBriefingsOrgGlobal,
-  shouldShowSentinelDemo,
-  shouldShowCCIIssuance,
-  getFreeUserViewBanner,
   FREE_ROLE_RESTRICTIONS,
 } from './forcedRoleView';
 import { FOUNDER_DEMO_ENABLED } from '../hooks/useDemoMode';
@@ -85,12 +73,6 @@ async function addGrant(grant: AccessGrant): Promise<void> {
   // Remove any existing grant of the same tier
   const filtered = grants.filter((g) => g.tier !== grant.tier);
   filtered.push(grant);
-  await saveGrants(filtered);
-}
-
-async function removeGrant(grantId: string): Promise<void> {
-  const grants = await loadGrants();
-  const filtered = grants.filter((g) => g.id !== grantId);
   await saveGrants(filtered);
 }
 
@@ -226,7 +208,7 @@ export function useAccess(): AccessContext {
   const [grants, setGrants] = useState<AccessGrant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [appMode, setAppModeState] = useState<string>('personal');
-  const [revenueCatEntitlements, setRevenueCatEntitlements] = useState<string[]>([]);
+  const [, setRevenueCatEntitlements] = useState<string[]>([]);
   const [qaFreeModeEnabled, setQAFreeModeEnabled] = useState<boolean>(false);
   const [freeUserViewActive, setFreeUserViewActive] = useState<boolean>(false);
 

@@ -32,8 +32,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-
 import {
   AggregatedUnitMetrics,
   RawUnitSignals,
@@ -47,7 +45,6 @@ import {
   getVelocityArrow,
   getFreshnessIndicator,
   shouldRenderWithColor,
-  validateFilteredView,
 } from '../lib/enterprise/kAnonymity';
 import { INSTITUTIONAL_DASHBOARD_HEADER } from '../lib/enterprise/termsEnforcement';
 import { K_ANONYMITY_THRESHOLD } from '../lib/enterprise/types';
@@ -111,7 +108,6 @@ function generateMockSignals(count: number): RawUnitSignals['signals'] {
 // =============================================================================
 
 export default function EnterpriseDashboard() {
-  const router = useRouter();
   const [metrics, setMetrics] = useState<AggregatedUnitMetrics[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);

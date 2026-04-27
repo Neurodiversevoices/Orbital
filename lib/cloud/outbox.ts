@@ -9,7 +9,7 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { OutboxEntry, OutboxEntryStatus, CloudLogUpsert } from './types';
+import {OutboxEntry, CloudLogUpsert} from './types';
 import { isDemoLogId } from '../hooks/useDemoMode';
 
 // =============================================================================
@@ -71,6 +71,7 @@ export async function enqueueLog(
   // ==========================================================================
   if (isDemoLogId(clientLogId)) {
     if (__DEV__) {
+      console.warn('[outbox] Skipped enqueue for demo log', clientLogId);
     }
     return ''; // Return empty string, log is NOT enqueued
   }
@@ -114,6 +115,7 @@ export async function enqueueDelete(clientLogId: string): Promise<string> {
   // Demo logs were never synced, so no delete operation needed
   if (isDemoLogId(clientLogId)) {
     if (__DEV__) {
+      console.warn('[outbox] Skipped delete enqueue for demo log', clientLogId);
     }
     return '';
   }

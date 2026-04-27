@@ -4,6 +4,8 @@ import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, StyleSheet, Modal, Pressable, Platform } from 'react-native';
+// Side-effect import above is required by RN; named import is separate statement (same package).
+// eslint-disable-next-line no-duplicate-imports -- gesture-handler must load side-effect before RootView
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Sentry from '@sentry/react-native';
 import * as Linking from 'expo-linking';
@@ -18,9 +20,13 @@ import { SubscriptionProvider } from '../lib/subscription';
 import { TermsAcceptanceProvider } from '../lib/hooks/useTermsAcceptance';
 import { ErrorBoundary } from '../components';
 import { AgeGate } from '../components/legal/AgeGate';
-import { useIdleTimeout, updateLastActivity } from '../lib/session';
+import {
+  useIdleTimeout,
+  updateLastActivity,
+  logSessionExpired,
+  createDeviceSession,
+} from '../lib/session';
 import { useAuth } from '../lib/supabase';
-import { logSessionExpired, createDeviceSession } from '../lib/session';
 import { isDevAutoLoginEnabled, performDevAutoLogin } from '../lib/dev/autoLogin';
 
 // =============================================================================
@@ -75,7 +81,7 @@ Sentry.init({
   // ==========================================================================
   // beforeSend: Filter noise BEFORE it reaches Sentry
   // ==========================================================================
-  beforeSend(event, hint) {
+  beforeSend(event, _hint) {
     // DROP: warning, info, debug levels (noise)
     // KEEP: error, fatal (critical failures only)
     const level = event.level;
@@ -125,7 +131,7 @@ Sentry.init({
 
   // Integrations configuration
   integrations: (integrations) => {
-    return integrations.filter((integration) => {
+    return integrations.filter((_integration) => {
       // Keep default integrations, filter if needed
       return true;
     });
@@ -319,9 +325,11 @@ const idleStyles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#00E5FF',
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
     borderRadius: borderRadius.md,
+    minHeight: 44,
+    justifyContent: 'center',
   },
   buttonText: {
     fontSize: 16,
@@ -555,6 +563,13 @@ function RootLayout() {
                     options={{
                       presentation: 'modal',
                       animation: 'slide_from_bottom',
+                    }}
+                  />
+                  <Stack.Screen
+                    name="ai-interface"
+                    options={{
+                      headerShown: false,
+                      animation: 'fade',
                     }}
                   />
                 </Stack>

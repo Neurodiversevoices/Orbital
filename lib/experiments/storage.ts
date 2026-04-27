@@ -6,7 +6,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Experiment,
   ExperimentDay,
-  ExperimentStatus,
   EXPERIMENT_CONSTANTS,
 } from './types';
 

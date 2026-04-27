@@ -31,6 +31,7 @@ class CrashReporter {
     try {
       Sentry.captureMessage(message, { extra: context as Record<string, unknown> });
     } catch {
+      if (__DEV__) console.warn('[crashReporter] captureMessage failed');
     }
   }
 

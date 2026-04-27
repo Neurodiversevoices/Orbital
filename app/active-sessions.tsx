@@ -25,21 +25,20 @@ import {
   Trash2,
   Shield,
   Clock,
-  AlertTriangle,
   CheckCircle,
 } from 'lucide-react-native';
-import Animated, { FadeInDown, FadeOut } from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { colors, spacing, borderRadius } from '../theme';
 import {
   getDeviceSessions,
   getCurrentSession,
   removeDeviceSession,
-  clearAllSessions,
   formatSessionTime,
-  getPlatformIcon,
   DeviceSession,
+  getAuditLog,
+  getActionDescription,
+  SessionAuditEntry,
 } from '../lib/session';
-import { getAuditLog, getActionDescription, SessionAuditEntry } from '../lib/session';
 
 export default function ActiveSessionsScreen() {
   const router = useRouter();
@@ -318,6 +317,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,
