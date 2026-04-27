@@ -45,7 +45,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     id: 'home',
     icon: Home,
     title: 'Signal Your Capacity',
-    description: 'Swipe the orb to log how you feel. Resourced, stretched, or depleted.',
+    description: 'Swipe the gauge to log how you feel. Resourced, stretched, or depleted.',
     hint: 'Tap to save your signal',
   },
   {

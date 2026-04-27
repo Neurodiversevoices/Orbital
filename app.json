@@ -26,7 +26,7 @@
       "supportsTablet": true,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.erparris.orbital",
-      "buildNumber": "125",
+      "buildNumber": "127",
       "deploymentTarget": "15.1",
       "appleTeamId": "2KM3QL4UMV",
       "icon": "./assets/icon.png",
@@ -38,10 +38,11 @@
       "infoPlist": {
         "LSApplicationCategoryType": "public.app-category.healthcare-fitness",
         "ITSAppUsesNonExemptEncryption": false,
-        "NSPhotoLibraryUsageDescription": "Orbital accesses your photo library to let you set a profile photo.",
-        "NSFaceIDUsageDescription": "Orbital uses Face ID to protect access to your capacity data.",
-        "NSMotionUsageDescription": "Orbital uses motion data to improve gesture responsiveness.",
-        "NSMicrophoneUsageDescription": "Orbital may use the microphone if you choose to add a voice note."
+        "NSPhotoLibraryUsageDescription": "This permission is required by a system framework Orbital depends on. Orbital does not access your photo library.",
+        "NSFaceIDUsageDescription": "This permission is required by a system framework Orbital depends on for secure credential storage. Orbital does not authenticate with Face ID.",
+        "NSMotionUsageDescription": "This permission is required by a system framework Orbital depends on for animations. Orbital does not access motion or fitness data.",
+        "NSMicrophoneUsageDescription": "This permission is required by a system framework Orbital depends on. Orbital does not access your microphone.",
+        "NSLocationWhenInUseUsageDescription": "This permission is required by a system framework Orbital depends on. Orbital does not access your location."
       },
       "runtimeVersion": "1.0.0"
     },
