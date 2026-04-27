@@ -1,1893 +1,1268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Orbital — Capacity intelligence for high-performance professionals and their care teams</title>
-<meta name="description" content="Capacity intelligence for high-performance professionals and their care teams. Daily check-ins become longitudinal capacity records for care teams. Founded for therapists, coaches, and neurodivergent adults.">
-<meta name="theme-color" content="#05060A">
-<link rel="icon" href="/favicon.ico">
-<link rel="canonical" href="https://orbitalhealth.app/">
-
-<!-- Open Graph -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://orbitalhealth.app/">
-<meta property="og:title" content="Orbital — Capacity intelligence for high-performance professionals and their care teams">
-<meta property="og:description" content="One daily check-in. Three capacity states. 90 days of signals become a clinical-grade Clinical Capacity Instrument — a longitudinal record that informs clinical decisions.">
-<meta property="og:image" content="https://orbitalhealth.app/og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:site_name" content="Orbital">
-
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Orbital — Clinical-grade capacity tracking">
-<meta name="twitter:description" content="One daily check-in. Three states. 90 days of data becomes a longitudinal Clinical Capacity Instrument for care teams.">
-<meta name="twitter:image" content="https://orbitalhealth.app/og-image.png">
-
-<!-- Fonts: DM Sans (headings/buttons), Space Mono (data/labels) -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-
-<!-- Google Analytics 4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-FHEH76Q0JZ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-FHEH76Q0JZ');
-</script>
-
-<!-- JSON-LD Structured Data -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "name": "Orbital Health Intelligence",
-      "url": "https://orbitalhealth.app",
-      "logo": "https://orbitalhealth.app/Orbital.png",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "email": "contact@orbitalhealth.app",
-        "contactType": "customer service"
-      }
-    },
-    {
-      "@type": "SoftwareApplication",
-      "name": "Orbital",
-      "applicationCategory": "HealthApplication",
-      "operatingSystem": "iOS, Web",
-      "url": "https://orbitalhealth.app",
-      "description": "Capacity intelligence for high-performance professionals and their care teams. Daily check-ins become longitudinal capacity records for care teams.",
-      "offers": [
-        {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD",
-          "name": "Free"
-        },
-        {
-          "@type": "Offer",
-          "price": "29",
-          "priceCurrency": "USD",
-          "name": "Pro",
-          "billingPeriod": "P1M"
-        },
-        {
-          "@type": "Offer",
-          "price": "199",
-          "priceCurrency": "USD",
-          "name": "CCI Founding Cohort"
-        }
-      ]
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orbital — Know your capacity before it breaks</title>
+  <meta name="description" content="Capacity tracking built for neurodivergent adults who run close to their limit. RESOURCED. ELEVATED. DEPLETED. Know your signal.">
+  <meta property="og:title" content="Orbital — Capacity Intelligence Instrument">
+  <meta property="og:description" content="Three signals. One instrument. Know your capacity before it breaks.">
+  <meta property="og:image" content="/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- Google Fonts: DM Sans + Space Mono subset -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap">
+  <style>
+    /* ─── DESIGN TOKENS ─────────────────────────────────────── */
+    :root {
+      --bg-void:          #01020A;
+      --bg-surface:       rgba(255,255,255,0.03);
+      --bg-glass:         rgba(255,255,255,0.04);
+      --hairline:         rgba(255,255,255,0.08);
+      --text-primary:     #FFFFFF;
+      --text-secondary:   #B8C0CC;
+      --text-tertiary:    #7A8593;
+      --brand-cyan:       #5DD9D4;
+      --brand-cyan-dim:   rgba(93,217,212,0.18);
+      --brand-cyan-glow:  rgba(93,217,212,0.40);
+      --state-resourced:  #5DD9D4;
+      --state-elevated:   #F5B547;
+      --state-depleted:   #E5484D;
     }
-  ]
-}
-</script>
 
-<style>
-  /* ================================================================
-     CSS CUSTOM PROPERTIES
-     ================================================================ */
-  :root {
-    --bg: #05060A;
-    --cyan: #00D7FF;
-    --cyan-dim: rgba(0, 215, 255, 0.12);
-    --cyan-border: rgba(0, 215, 255, 0.25);
-    --amber: #F5B700;
-    --red: #FF3B30;
-    --text: rgba(255,255,255,0.85);
-    --text-dim: rgba(255,255,255,0.5);
-    --text-faint: rgba(255,255,255,0.3);
-    --surface: rgba(255,255,255,0.03);
-    --surface-hover: rgba(255,255,255,0.06);
-    --border: rgba(255,255,255,0.06);
-    --border-hover: rgba(255,255,255,0.12);
-    --font-heading: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-mono: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
-    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  }
+    /* ─── RESET ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg-void);
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { color: inherit; }
+    img { display: block; max-width: 100%; }
 
-  /* ================================================================
-     RESET & BASE
-     ================================================================ */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
-  }
-  h1, h2, h3 { font-family: var(--font-heading); }
+    /* ─── UTILITY ────────────────────────────────────────────── */
+    .eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--brand-cyan);
+      text-align: center;
+      display: block;
+      margin-bottom: 16px;
+    }
+    .section-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+    .visually-hidden {
+      position: absolute;
+      width: 1px; height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
 
-  /* ================================================================
-     LAYOUT
-     ================================================================ */
-  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+    /* ─── NAV ────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.3s ease, backdrop-filter 0.3s ease;
+    }
+    nav.scrolled {
+      background: rgba(1,2,10,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--hairline);
+    }
+    .nav-wordmark {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+    }
 
-  /* ================================================================
-     NAV
-     ================================================================ */
-  nav {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(5,6,10,0.88);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-inner {
-    display: flex; align-items: center; justify-content: space-between;
-    max-width: 960px; margin: 0 auto; padding: 14px 24px;
-  }
-  .nav-logo {
-    display: inline-flex; align-items: center; gap: 10px;
-    font-family: var(--font-heading);
-    font-size: 18px; font-weight: 700; color: #fff;
-    letter-spacing: 0.5px; text-decoration: none;
-  }
-  .nav-logo img { width: 32px; height: 32px; border-radius: 50%; }
-  .founding-nav-badge {
-    font-family: var(--font-mono);
-    font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
-    color: var(--amber); background: rgba(245,183,0,0.1);
-    border: 1px solid rgba(245,183,0,0.2);
-    border-radius: 100px; padding: 3px 10px;
-    animation: pulse-glow 2.5s ease-in-out infinite;
-  }
-  @keyframes pulse-glow {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.55; }
-  }
-  .nav-links { display: flex; gap: 24px; align-items: center; }
-  .nav-links a {
-    font-size: 14px; color: var(--text-dim);
-    text-decoration: none; transition: color 0.2s;
-  }
-  .nav-links a:hover { color: #fff; }
-  .nav-cta {
-    background: var(--cyan); color: var(--bg);
-    border-radius: 8px; padding: 8px 18px;
-    font-family: var(--font-heading);
-    font-size: 13px; font-weight: 700;
-    text-decoration: none; transition: all 0.2s;
-  }
-  .nav-cta:hover { background: #33e0ff; color: var(--bg); }
+    /* ─── BUTTONS ────────────────────────────────────────────── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 54px;
+      padding: 0 32px;
+      background: var(--brand-cyan);
+      color: #01020A;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      min-width: 200px;
+    }
+    .btn-primary:hover { transform: scale(1.02); }
+    .btn-primary:active { transform: scale(0.99); }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 54px;
+      padding: 0 32px;
+      background: transparent;
+      color: var(--brand-cyan);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      border: 1px solid var(--brand-cyan);
+      border-radius: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+    .btn-outline:hover {
+      background: var(--brand-cyan-dim);
+      transform: scale(1.02);
+    }
 
-  /* ================================================================
-     HERO
-     ================================================================ */
-  .hero {
-    padding: 100px 0 80px;
-    text-align: center;
-    position: relative;
-  }
-  .hero::before {
-    content: ""; position: absolute;
-    top: -60px; left: 50%; transform: translateX(-50%);
-    width: 700px; height: 700px;
-    background: radial-gradient(circle, rgba(0,215,255,0.06) 0%, transparent 65%);
-    pointer-events: none;
-  }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(245,183,0,0.08);
-    border: 1px solid rgba(245,183,0,0.2); border-radius: 100px;
-    padding: 8px 20px; margin-bottom: 28px;
-    font-family: var(--font-mono);
-    font-size: 12px; font-weight: 700; color: var(--amber);
-    letter-spacing: 0.5px;
-  }
-  .hero-badge-dot {
-    width: 6px; height: 6px; border-radius: 50%; background: var(--amber);
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-  .hero h1 {
-    font-size: clamp(32px, 5.5vw, 52px);
-    font-weight: 700; color: #fff;
-    line-height: 1.15; margin-bottom: 20px;
-    letter-spacing: -0.5px;
-    max-width: 720px; margin-left: auto; margin-right: auto;
-  }
-  .hero .subtitle {
-    font-size: clamp(15px, 2.2vw, 18px);
-    color: var(--text-dim);
-    max-width: 580px; margin: 0 auto 36px;
-    line-height: 1.6;
-  }
-  .hero-cta {
-    display: inline-block;
-    background: var(--cyan); color: var(--bg);
-    font-family: var(--font-heading);
-    font-size: 16px; font-weight: 700;
-    border: none; border-radius: 12px;
-    padding: 18px 40px;
-    cursor: pointer; transition: all 0.2s;
-    text-decoration: none;
-  }
-  .hero-cta:hover { background: #33e0ff; transform: translateY(-1px); }
-  .hero-fine {
-    font-size: 13px; color: var(--text-faint);
-    margin-top: 14px; line-height: 1.5;
-  }
-  .spots-counter {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-family: var(--font-mono);
-    font-size: 13px; font-weight: 700; color: var(--cyan);
-    background: rgba(0,215,255,0.06);
-    border: 1px solid rgba(0,215,255,0.15);
-    border-radius: 100px; padding: 8px 20px;
-    margin-top: 20px;
-  }
-  .spots-dot {
-    width: 7px; height: 7px; border-radius: 50%; background: #32D74B;
-    flex-shrink: 0;
-  }
+    /* ─── S1: HERO ───────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 32px 80px;
+      background:
+        radial-gradient(ellipse at 50% 60%, rgba(93,217,212,0.08) 0%, transparent 70%),
+        var(--bg-void);
+      overflow: hidden;
+    }
+    .hero-stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--brand-cyan);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: clamp(40px, 6vw, 80px);
+      line-height: 1.08;
+      color: var(--text-primary);
+      max-width: 14ch;
+      margin: 0 auto 20px;
+      letter-spacing: -0.02em;
+    }
+    .hero-sub {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 36px;
+      line-height: 1.65;
+    }
+    .hero-gauge-wrap {
+      position: relative;
+      width: 400px;
+      max-width: 100%;
+      margin: 0 auto 40px;
+    }
+    #hero-gauge {
+      width: 400px;
+      max-width: 100%;
+      height: 240px;
+      display: block;
+    }
+    .hero-ctas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .hero-cta-primary-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .counter-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--brand-cyan);
+    }
+    .hero-link-secondary {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+    .hero-link-secondary:hover { text-decoration: underline; }
+    .waitlist-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--brand-cyan);
+      border: 1px solid var(--hairline);
+      padding: 8px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s;
+      background: transparent;
+      user-select: none;
+    }
+    .waitlist-chip:hover { background: var(--brand-cyan-dim); }
+    .hero-platform-note {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: var(--text-tertiary);
+      margin-top: 16px;
+    }
 
-  /* ================================================================
-     SOCIAL PROOF BAR
-     ================================================================ */
-  .social-proof {
-    padding: 40px 0;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-  }
-  .social-proof-label {
-    font-size: 12px; color: var(--text-faint);
-    letter-spacing: 1px; text-transform: uppercase;
-    margin-bottom: 16px; font-weight: 500;
-  }
-  .proof-pills {
-    display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
-  }
-  .proof-pill {
-    font-family: var(--font-heading);
-    font-size: 13px; font-weight: 600; color: var(--text-dim);
-    background: var(--surface);
-    border: 1px solid var(--border); border-radius: 100px;
-    padding: 8px 20px;
-  }
+    /* ─── S2: SYSTEM STATUS ──────────────────────────────────── */
+    #system-status {
+      height: 300vh;
+      position: relative;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #system-status { height: 100vh; }
+    }
+    .system-status-sticky {
+      position: sticky;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 32px;
+    }
+    #status-gauge {
+      width: 500px;
+      max-width: 90vw;
+      height: 300px;
+      display: block;
+    }
+    .voice-container {
+      position: relative;
+      min-height: 80px;
+      margin-top: 24px;
+      text-align: center;
+      max-width: 520px;
+      width: 100%;
+    }
+    .voice-template {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+    #voice-depleted  { opacity: 1; color: var(--state-depleted); }
+    #voice-elevated  { opacity: 0; color: var(--state-elevated); }
+    #voice-resourced { opacity: 0; color: var(--state-resourced); }
 
-  /* ================================================================
-     SECTIONS — SHARED
-     ================================================================ */
-  section { padding: 80px 0; }
-  .section-label {
-    font-family: var(--font-mono);
-    font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--cyan); margin-bottom: 12px;
-  }
-  section h2 {
-    font-size: clamp(24px, 4vw, 36px); font-weight: 700; color: #fff;
-    margin-bottom: 16px; letter-spacing: -0.3px;
-  }
-  section h2 + p.section-sub, p.section-sub {
-    color: var(--text-dim); font-size: 16px;
-    max-width: 580px; margin-bottom: 48px; line-height: 1.6;
-  }
+    @media (prefers-reduced-motion: reduce) {
+      .voice-template {
+        position: relative;
+        opacity: 1 !important;
+        display: flex;
+        margin-bottom: 6px;
+      }
+      .voice-container {
+        position: relative;
+        min-height: unset;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
 
-  /* ================================================================
-     HOW IT WORKS — 3 CARDS
-     ================================================================ */
-  .steps {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-  .step-card {
-    background: var(--surface);
-    border: 1px solid var(--border); border-radius: 16px;
-    padding: 32px 28px;
-    transition: border-color 0.25s;
-  }
-  .step-card:hover { border-color: var(--border-hover); }
-  .step-num {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 36px; height: 36px; border-radius: 50%;
-    background: rgba(0,215,255,0.08); border: 1px solid rgba(0,215,255,0.2);
-    font-family: var(--font-mono);
-    color: var(--cyan); font-size: 14px; font-weight: 700;
-    margin-bottom: 16px;
-  }
-  .step-card h3 {
-    font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;
-  }
-  .step-card p {
-    font-size: 14px; color: var(--text-dim); line-height: 1.65;
-  }
+    /* ─── S3: THREE SIGNALS ──────────────────────────────────── */
+    .signals-section {
+      padding: 120px 0;
+    }
+    .signals-section h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .signals-section .section-sub {
+      font-size: 17px;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 560px;
+      margin: 0 auto 56px;
+    }
+    .signals-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    @media (max-width: 768px) {
+      .signals-grid { grid-template-columns: 1fr; }
+    }
+    .signal-card {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 32px;
+    }
+    @supports (animation-timeline: view()) {
+      @media (prefers-reduced-motion: no-preference) {
+        .signal-card {
+          opacity: 0;
+          transform: translateY(24px);
+          animation: fadeUp 0.5s ease forwards;
+          animation-timeline: view();
+          animation-range: entry 0% entry 40%;
+        }
+      }
+    }
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .signal-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--brand-cyan-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .signal-card h3 {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--brand-cyan);
+      margin-bottom: 8px;
+    }
+    .signal-card p {
+      font-size: 14px;
+      color: var(--text-tertiary);
+      margin-bottom: 20px;
+    }
+    .sparkline-wrap {
+      height: 40px;
+      overflow: hidden;
+    }
+    .sparkline-wrap svg {
+      width: 100%;
+      height: 40px;
+    }
 
-  /* ================================================================
-     CCI SHOWCASE
-     ================================================================ */
-  .cci-showcase { text-align: center; }
-  .cci-showcase h2 { margin-bottom: 16px; }
-  .cci-showcase .section-sub {
-    max-width: 620px; margin-left: auto; margin-right: auto;
-  }
-  .cci-preview-box {
-    width: 100%; max-width: 400px; height: 300px;
-    margin: 0 auto 36px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text-faint); font-size: 14px;
-    font-family: var(--font-mono);
-  }
-  .cci-cta {
-    display: inline-block;
-    background: var(--cyan); color: var(--bg);
-    font-family: var(--font-heading);
-    font-size: 15px; font-weight: 700;
-    border: none; border-radius: 10px;
-    padding: 16px 36px;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .cci-cta:hover { background: #33e0ff; transform: translateY(-1px); }
+    /* ─── S4: PATTERNS ───────────────────────────────────────── */
+    .patterns-section {
+      padding: 120px 0;
+      background: radial-gradient(ellipse at 80% 50%, rgba(93,217,212,0.04) 0%, transparent 60%);
+    }
+    .patterns-section h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .patterns-section .section-sub {
+      font-size: 17px;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .pattern-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 680px;
+      margin: 0 auto 32px;
+    }
+    .pattern-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+      border-radius: 16px;
+      padding: 24px 24px 24px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .pattern-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 2px;
+    }
+    .pattern-card.elevated::before  { background: var(--state-elevated); }
+    .pattern-card.depleted::before  { background: var(--state-depleted); }
+    .pattern-card.resourced::before { background: var(--state-resourced); }
+    .pattern-card.neutral::before   { background: var(--text-tertiary); }
+    @supports (animation-timeline: view()) {
+      @media (prefers-reduced-motion: no-preference) {
+        .pattern-card {
+          opacity: 0;
+          transform: translateX(-20px);
+          animation: slideIn 0.4s ease forwards;
+          animation-timeline: view();
+          animation-range: entry 0% entry 35%;
+        }
+      }
+    }
+    @keyframes slideIn {
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .pattern-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .pattern-card.elevated .pattern-label  { color: var(--state-elevated); }
+    .pattern-card.depleted .pattern-label  { color: var(--state-depleted); }
+    .pattern-card.resourced .pattern-label { color: var(--state-resourced); }
+    .pattern-card.neutral .pattern-label   { color: var(--text-tertiary); }
+    .pattern-card > p {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .patterns-footer-note {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: var(--text-tertiary);
+      text-align: center;
+      letter-spacing: 0.04em;
+    }
 
-  /* ================================================================
-     CCI INTERACTIVE DEMO
-     ================================================================ */
-  .cci-demo {
-    background: #0A0C12;
-    border: 1px solid rgba(0, 212, 255, 0.1);
-    border-radius: 12px;
-    padding: 32px;
-    max-width: 720px;
-    margin: 0 auto 36px;
-    text-align: left;
-    position: relative;
-    overflow: hidden;
-  }
-  .cci-demo-label {
-    font-family: var(--font-mono);
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
-    color: var(--cyan); margin-bottom: 4px;
-  }
-  .cci-demo-title {
-    font-family: var(--font-heading);
-    font-size: 22px; font-weight: 700;
-    color: #fff; margin-bottom: 4px;
-  }
-  .cci-demo-period {
-    font-family: var(--font-mono);
-    font-size: 11px; color: var(--text-faint);
-    margin-bottom: 24px;
-  }
-  .cci-tabs {
-    display: flex; gap: 4px;
-    margin-bottom: 28px;
-  }
-  .cci-tab {
-    font-family: var(--font-mono);
-    font-size: 13px; font-weight: 700;
-    color: var(--text-dim);
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 8px;
-    padding: 10px 24px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .cci-tab:hover { border-color: var(--border-hover); color: #fff; }
-  .cci-tab.active {
-    color: var(--bg);
-    background: var(--cyan);
-    border-color: var(--cyan);
-  }
-  .cci-score-section {
-    display: flex;
-    align-items: center;
-    gap: 32px;
-    margin-bottom: 28px;
-    justify-content: center;
-  }
-  /* Arc gauge — replaces circular SVG ring */
-  .cci-score-ring {
-    position: relative;
-    width: 200px; height: 200px;
-    flex-shrink: 0;
-  }
-  .cci-score-ring canvas {
-    display: block;
-  }
-  .cci-score-value {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -40%);
-    text-align: center;
-    pointer-events: none;
-  }
-  .cci-score-num {
-    font-family: var(--font-heading);
-    font-size: 44px; font-weight: 700;
-    color: #fff; line-height: 1;
-    transition: color 0.3s;
-  }
-  .cci-score-of {
-    font-family: var(--font-mono);
-    font-size: 11px; color: var(--text-faint);
-  }
-  .cci-score-label-text {
-    font-family: var(--font-mono);
-    font-size: 9px; font-weight: 700;
-    letter-spacing: 1.5px;
-    color: var(--text-dim);
-    margin-top: 3px;
-    text-transform: uppercase;
-  }
-  /* Hero gauge demo */
-  .hero-gauge-wrap {
-    position: relative;
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  .hero-gauge-label {
-    font-family: var(--font-mono);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 2px; color: var(--text-dim);
-    text-transform: uppercase;
-    margin-top: 6px;
-  }
-  .cci-score-meta {
-    text-align: left;
-  }
-  .cci-score-badge {
-    font-family: var(--font-mono);
-    font-size: 12px; font-weight: 700;
-    letter-spacing: 1px;
-    padding: 4px 12px;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    display: inline-block;
-    transition: all 0.3s;
-  }
-  .cci-trend-info {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--text-dim);
-  }
-  .cci-trend-rate {
-    font-weight: 700;
-    transition: color 0.3s;
-  }
-  .cci-distribution {
-    margin-bottom: 28px;
-  }
-  .cci-dist-label {
-    font-family: var(--font-mono);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 8px;
-  }
-  .cci-dist-bar {
-    display: flex;
-    height: 8px;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 6px;
-  }
-  .cci-dist-bar span {
-    transition: width 0.6s ease;
-  }
-  .cci-dist-labels {
-    display: flex;
-    justify-content: space-between;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-faint);
-  }
-  .cci-dist-labels span {
-    display: flex; align-items: center; gap: 4px;
-  }
-  .cci-dist-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-  .cci-wave {
-    margin-bottom: 28px;
-  }
-  .cci-wave-label {
-    font-family: var(--font-mono);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 8px;
-  }
-  .cci-wave-chart {
-    width: 100%;
-    height: 200px;
-  }
-  .cci-wave-chart svg {
-    width: 100%;
-    height: 100%;
-  }
-  .cci-drivers {
-    margin-bottom: 28px;
-  }
-  .cci-drivers-label {
-    font-family: var(--font-mono);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 12px;
-  }
-  .cci-drivers-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .cci-driver-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-    border-left: 3px solid;
-    transition: border-color 0.3s;
-  }
-  .cci-driver-card.positive { border-left-color: #2DD4BF; }
-  .cci-driver-card.negative { border-left-color: #FF3B30; }
-  .cci-driver-name {
-    font-family: var(--font-heading);
-    font-size: 13px; font-weight: 600;
-    color: #fff; margin-bottom: 2px;
-  }
-  .cci-driver-impact {
-    font-family: var(--font-mono);
-    font-size: 11px; font-weight: 700;
-    margin-bottom: 1px;
-    transition: color 0.3s;
-  }
-  .cci-driver-impact.positive { color: #2DD4BF; }
-  .cci-driver-impact.negative { color: #FF3B30; }
-  .cci-driver-corr {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-faint);
-  }
-  .cci-observations {
-    margin-bottom: 24px;
-    border-left: 2px solid rgba(0,215,255,0.2);
-    padding-left: 16px;
-  }
-  .cci-obs-label {
-    font-family: var(--font-mono);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 10px;
-  }
-  .cci-obs-list {
-    list-style: none; padding: 0; margin: 0;
-  }
-  .cci-obs-list li {
-    font-size: 13px;
-    color: var(--text-dim);
-    line-height: 1.6;
-    padding: 3px 0;
-    padding-left: 12px;
-    position: relative;
-  }
-  .cci-obs-list li::before {
-    content: "\2022";
-    position: absolute;
-    left: 0;
-    color: var(--cyan);
-  }
-  .cci-demo-footer {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    color: rgba(255,255,255,0.2);
-    text-align: center;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-  }
-  .cci-client-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: rgba(255,255,255,0.3);
-    margin-bottom: 12px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border);
-  }
-  .cci-watermark {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-35deg);
-    font-family: var(--font-mono);
-    font-size: 48px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.03);
-    pointer-events: none;
-    white-space: nowrap;
-    letter-spacing: 8px;
-    z-index: 1;
-  }
-  .cci-forecast {
-    margin-bottom: 24px;
-    padding: 16px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-  }
-  .cci-forecast-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 4px;
-  }
-  .cci-forecast-divider {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: rgba(255,255,255,0.1);
-    margin-bottom: 8px;
-  }
-  .cci-forecast-text {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-dim);
-    line-height: 1.7;
-  }
-  .cci-forecast-arrow {
-    color: var(--cyan);
-  }
-  .cci-credibility {
-    text-align: center;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: rgba(255,255,255,0.4);
-    margin-bottom: 20px;
-  }
-  .cci-download-link {
-    text-align: center;
-    margin-top: 16px;
-  }
-  .cci-download-link a {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--text-dim);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    transition: color 0.2s;
-  }
-  .cci-download-link a:hover {
-    color: var(--cyan);
-  }
+    /* ─── S5: FOUNDER BLOCK ──────────────────────────────────── */
+    .founder-section {
+      padding: 120px 0;
+    }
+    .founder-inner {
+      max-width: 640px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .founder-section h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .founder-section .section-sub {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      line-height: 1.7;
+    }
+    .founder-counter {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--brand-cyan);
+      margin-bottom: 32px;
+      display: block;
+    }
+    .founder-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    .founder-form label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      align-self: flex-start;
+    }
+    .founder-form input[type="email"] {
+      width: 100%;
+      max-width: 400px;
+      height: 54px;
+      padding: 0 20px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .founder-form input[type="email"]:focus { border-color: var(--brand-cyan); }
+    .founder-form input[type="email"]::placeholder { color: var(--text-tertiary); }
+    #founder-error {
+      display: none;
+      font-size: 14px;
+      color: var(--state-depleted);
+      max-width: 400px;
+      text-align: center;
+    }
+    .founder-bullets {
+      list-style: none;
+      text-align: left;
+      max-width: 420px;
+      margin: 0 auto 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .founder-bullets li {
+      display: flex;
+      gap: 10px;
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .founder-bullets li::before {
+      content: '\2713';
+      color: var(--brand-cyan);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .founder-trust {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      line-height: 1.8;
+      letter-spacing: 0.03em;
+    }
+    #founder-sold-out {
+      display: none;
+      margin-bottom: 32px;
+    }
+    #founder-sold-out > p {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+    .soldout-waitlist {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+    .soldout-waitlist input[type="email"] {
+      width: 260px;
+      height: 48px;
+      padding: 0 16px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      outline: none;
+    }
+    .soldout-waitlist button {
+      height: 48px;
+      padding: 0 24px;
+      background: var(--brand-cyan);
+      color: #01020A;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+    }
 
-  /* ================================================================
-     PRICING — 3 CARDS
-     ================================================================ */
-  .pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px; max-width: 960px; margin: 0 auto;
-    align-items: start;
-  }
-  .pricing-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px; padding: 36px 28px;
-    display: flex; flex-direction: column;
-    transition: border-color 0.25s;
-  }
-  .pricing-card:hover { border-color: var(--border-hover); }
-  .pricing-card.featured {
-    border-color: rgba(0,215,255,0.35);
-    background: rgba(0,215,255,0.03);
-    box-shadow: 0 0 40px rgba(0,215,255,0.06), 0 0 80px rgba(0,215,255,0.03);
-    position: relative;
-  }
-  .pricing-tag {
-    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-    background: var(--cyan); color: var(--bg);
-    font-family: var(--font-heading);
-    font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
-    padding: 4px 16px; border-radius: 100px;
-    white-space: nowrap;
-  }
-  .pricing-card h3 {
-    font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px;
-  }
-  .pricing-card .price {
-    font-family: var(--font-heading);
-    font-size: 36px; font-weight: 700; color: #fff;
-    line-height: 1; margin-bottom: 4px;
-  }
-  .pricing-card .price small {
-    font-size: 16px; font-weight: 500; color: var(--text-faint);
-  }
-  .pricing-card .price-note {
-    font-size: 13px; color: var(--text-faint); margin-bottom: 24px;
-  }
-  .plan-features {
-    list-style: none; padding: 0; margin: 0 0 28px; flex: 1;
-  }
-  .plan-features li {
-    font-size: 14px; color: var(--text-dim);
-    padding: 6px 0 6px 22px; position: relative; line-height: 1.5;
-  }
-  .plan-features li::before {
-    content: "\2713"; position: absolute; left: 0;
-    color: var(--cyan); font-weight: 700; font-size: 13px;
-  }
-  .pricing-cta {
-    display: block; text-align: center;
-    padding: 14px; border-radius: 10px;
-    font-family: var(--font-heading);
-    font-size: 14px; font-weight: 600;
-    text-decoration: none; transition: all 0.2s;
-    cursor: pointer; border: none;
-  }
-  .pricing-cta.primary {
-    background: var(--cyan); color: var(--bg);
-  }
-  .pricing-cta.primary:hover { background: #33e0ff; }
-  .pricing-cta.secondary {
-    background: var(--surface-hover); color: var(--text-dim);
-    border: 1px solid var(--border);
-  }
-  .pricing-cta.secondary:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    /* ─── S6: PRICING ────────────────────────────────────────── */
+    .pricing-section {
+      padding: 120px 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(93,217,212,0.04) 0%, transparent 60%);
+    }
+    .pricing-section h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .pricing-section .section-sub {
+      font-size: 17px;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .pricing-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 760px;
+      margin: 0 auto 32px;
+    }
+    @media (max-width: 640px) {
+      .pricing-cards { grid-template-columns: 1fr; }
+    }
+    .pricing-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .pricing-card.featured {
+      border-color: rgba(93,217,212,0.30);
+      background: rgba(93,217,212,0.04);
+    }
+    .pricing-badge {
+      display: inline-block;
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #01020A;
+      background: var(--brand-cyan);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+    .pricing-price {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 28px;
+      color: var(--text-primary);
+    }
+    .pricing-price span {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--text-tertiary);
+    }
+    .pricing-per-year {
+      font-size: 14px;
+      color: var(--text-tertiary);
+    }
+    .pricing-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .pricing-features li {
+      font-size: 14px;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 8px;
+    }
+    .pricing-features li::before {
+      content: '\00B7';
+      color: var(--brand-cyan);
+    }
+    .pricing-cta-chip {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+      text-align: center;
+      padding: 12px 16px;
+      border: 1px solid var(--hairline);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+      background: transparent;
+      text-transform: uppercase;
+    }
+    .pricing-cta-chip:hover { background: var(--bg-surface); }
+    .platform-note {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      text-align: center;
+    }
 
-  /* ================================================================
-     FAQ ACCORDION
-     ================================================================ */
-  .faq-list { max-width: 680px; margin: 0 auto; }
-  .faq-item { border-bottom: 1px solid var(--border); padding: 24px 0; }
-  .faq-item:last-child { border-bottom: none; }
-  .faq-q {
-    font-family: var(--font-heading);
-    font-size: 16px; font-weight: 600; color: #fff;
-    cursor: pointer;
-    display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-  }
-  .faq-q::after {
-    content: "+"; font-size: 20px; font-weight: 400;
-    color: var(--text-faint); flex-shrink: 0;
-    line-height: 1.3; transition: transform 0.2s;
-  }
-  .faq-item.open .faq-q::after { transform: rotate(45deg); color: var(--text-dim); }
-  .faq-a {
-    font-size: 14px; color: var(--text-dim); line-height: 1.65;
-    display: none; padding: 12px 32px 0 0;
-  }
-  .faq-item.open .faq-a { display: block; }
+    /* ─── S7: WEB APP ────────────────────────────────────────── */
+    .webapp-section {
+      padding: 120px 0;
+      text-align: center;
+    }
+    .webapp-section h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .webapp-section .section-sub {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
 
-  /* ================================================================
-     BOTTOM CTA
-     ================================================================ */
-  .cta-bottom {
-    text-align: center; padding: 100px 0 60px;
-  }
-  .cta-bottom h2 {
-    font-size: clamp(24px, 4vw, 36px); font-weight: 700; color: #fff;
-    margin-bottom: 12px; letter-spacing: -0.3px;
-  }
-  .cta-bottom .cta-sub {
-    color: var(--text-dim); font-size: 16px;
-    max-width: 500px; margin: 0 auto 36px; line-height: 1.55;
-  }
-  .bottom-cta-btn {
-    display: inline-block;
-    background: var(--cyan); color: var(--bg);
-    font-family: var(--font-heading);
-    font-size: 16px; font-weight: 700;
-    border: none; border-radius: 12px;
-    padding: 18px 40px;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .bottom-cta-btn:hover { background: #33e0ff; transform: translateY(-1px); }
-
-  /* ================================================================
-     FOOTER
-     ================================================================ */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 40px 0 32px;
-  }
-  .footer-inner {
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 16px;
-  }
-  .footer-left { font-size: 13px; color: var(--text-faint); }
-  .footer-links { display: flex; gap: 24px; }
-  .footer-links a {
-    font-size: 13px; color: rgba(255,255,255,0.35);
-    text-decoration: none; transition: color 0.2s;
-  }
-  .footer-links a:hover { color: var(--text-dim); }
-  .footer-disclaimer {
-    width: 100%; text-align: center;
-    font-size: 11px; color: rgba(255,255,255,0.2);
-    margin-top: 20px; line-height: 1.5;
-  }
-
-  /* ================================================================
-     CHECKOUT MODAL
-     ================================================================ */
-  .modal-overlay {
-    display: none;
-    position: fixed; inset: 0; z-index: 1000;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(4px);
-    align-items: center; justify-content: center;
-  }
-  .modal-overlay.active { display: flex; }
-  .modal-box {
-    background: #0D0E14;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 40px 36px;
-    max-width: 420px; width: 90%;
-    text-align: center;
-    position: relative;
-  }
-  .modal-box h3 {
-    font-family: var(--font-heading);
-    font-size: 20px; font-weight: 700; color: #fff;
-    margin-bottom: 8px;
-  }
-  .modal-box .modal-sub {
-    font-size: 14px; color: var(--text-dim); margin-bottom: 24px;
-  }
-  .modal-input {
-    width: 100%;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 10px;
-    padding: 14px 18px;
-    font-size: 15px; color: #fff;
-    font-family: var(--font-body);
-    outline: none; transition: border-color 0.2s;
-    margin-bottom: 16px;
-  }
-  .modal-input::placeholder { color: var(--text-faint); }
-  .modal-input:focus { border-color: rgba(0,215,255,0.4); }
-  .modal-input.error { border-color: var(--red); }
-  .modal-submit {
-    width: 100%;
-    background: var(--cyan); color: var(--bg);
-    font-family: var(--font-heading);
-    font-size: 15px; font-weight: 700;
-    border: none; border-radius: 10px;
-    padding: 16px;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .modal-submit:hover { background: #33e0ff; }
-  .modal-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-  .modal-close {
-    position: absolute; top: 16px; right: 16px;
-    background: none; border: none;
-    color: var(--text-faint); font-size: 24px;
-    cursor: pointer; line-height: 1;
-  }
-  .modal-close:hover { color: #fff; }
-  .modal-error {
-    font-size: 13px; color: var(--red);
-    margin-top: 12px;
-  }
-
-  /* ================================================================
-     SUCCESS BANNER
-     ================================================================ */
-  .success-banner {
-    background: rgba(50,215,75,0.1);
-    border-bottom: 1px solid rgba(50,215,75,0.2);
-    color: #32D74B;
-    text-align: center; padding: 14px 24px;
-    font-family: var(--font-heading);
-    font-size: 14px; font-weight: 600;
-  }
-
-  /* ================================================================
-     RESPONSIVE
-     ================================================================ */
-  @media (max-width: 768px) {
-    .steps { grid-template-columns: 1fr; }
-    .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
-    .hero { padding: 80px 0 60px; }
-    .nav-links a:not(.nav-cta) { display: none; }
-    .footer-inner { flex-direction: column; text-align: center; }
-    .container { display: flex; flex-direction: column; }
-    .hero { order: 0; }
-    .social-proof { order: 1; }
-    .cci-showcase { order: 2; }
-    #how-it-works { order: 3; }
-    #pricing { order: 4; }
-    #faq { order: 5; }
-    .cta-bottom { order: 6; }
-    footer { order: 7; }
-    .cci-demo { padding: 24px 20px; }
-    .cci-score-section { flex-direction: column; gap: 16px; }
-    .cci-score-meta { text-align: center; }
-    .cci-drivers-grid { grid-template-columns: 1fr; }
-    .cci-watermark { font-size: 32px; }
-  }
-  @media (max-width: 480px) {
-    .hero h1 { font-size: 28px; }
-    .hero-cta, .bottom-cta-btn, .cci-cta { padding: 16px 28px; font-size: 15px; }
-    .cci-tabs { flex-wrap: wrap; }
-  }
-</style>
+    /* ─── S8: FOOTER ─────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--hairline);
+      padding: 60px 32px 40px;
+    }
+    .footer-grid {
+      max-width: 1100px;
+      margin: 0 auto 48px;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 48px;
+    }
+    @media (max-width: 768px) {
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+    }
+    .footer-wordmark {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+    .footer-tagline {
+      font-size: 14px;
+      color: var(--text-tertiary);
+      line-height: 1.6;
+    }
+    .footer-col h4 {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 16px;
+    }
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-col ul li a {
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-col ul li a:hover { color: var(--text-primary); }
+    .footer-col ul li.muted a { color: var(--text-tertiary); }
+    .footer-bottom {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding-top: 24px;
+      border-top: 1px solid var(--hairline);
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.8;
+    }
+    .footer-sep { color: rgba(255,255,255,0.15); }
+  </style>
 </head>
 <body>
 
-<!-- Success banner (shown on return from Stripe) -->
-<div id="success-banner" class="success-banner" style="display:none">
-  Thank you! Check your email for next steps.
-</div>
+  <!-- ═══════════════════════════════════════════════════════════
+       NAV
+  ═══════════════════════════════════════════════════════════ -->
+  <nav aria-label="Main navigation">
+    <a href="/" class="nav-wordmark" aria-label="Orbital home">ORBITAL</a>
+    <ul class="nav-links" role="list">
+      <li><a href="#system-status">How it works</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="/app">Sign in</a></li>
+    </ul>
+  </nav>
 
-<!-- ================================================================
-     SECTION 1 — NAV
-     ================================================================ -->
-<nav>
-  <div class="nav-inner">
-    <a href="/" class="nav-logo">
-      <img src="/Orbital.png?v=2" alt="Orbital" width="32" height="32">
-      Orbital
-      <span class="founding-nav-badge">Founding Offer</span>
-    </a>
-    <div class="nav-links">
-      <a href="#how-it-works">How It Works</a>
-      <a href="#pricing">Pricing</a>
-      <a href="#faq">FAQ</a>
-      <a href="#pricing" class="nav-cta">Claim Founding Access</a>
-    </div>
-  </div>
-</nav>
+  <!-- ═══════════════════════════════════════════════════════════
+       S1. HERO
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-stars" aria-hidden="true"></div>
 
-<!-- ================================================================
-     SECTION 2 — HERO
-     ================================================================ -->
-<div class="container">
-  <section class="hero">
-    <div class="hero-badge"><span class="hero-badge-dot"></span> Founding Cohort &mdash; 100 Spots</div>
+    <p class="hero-eyebrow">CAPACITY INTELLIGENCE INSTRUMENT</p>
 
-    <h1>Capacity intelligence for high-performance professionals and their care teams</h1>
+    <h1 id="hero-heading">Know your capacity before it breaks.</h1>
 
-    <p class="subtitle">One daily check-in. Three capacity states. 90 days of signals become a clinical-grade Clinical Capacity Instrument — a longitudinal record that informs clinical decisions.</p>
+    <p class="hero-sub">
+      Capacity tracking. Built for neurodivergent adults who run close to their limit.
+    </p>
 
-    <!-- Live arc gauge demo -->
-    <div class="hero-gauge-wrap">
-      <canvas id="hero-arc-canvas" width="240" height="240" style="cursor:pointer" aria-label="Capacity gauge demo — click to animate"></canvas>
-      <div class="hero-gauge-label" id="hero-gauge-label">ELEVATED</div>
+    <div class="hero-gauge-wrap" role="img" aria-label="Orbital capacity gauge showing ELEVATED state at score 66">
+      <canvas id="hero-gauge" width="400" height="240"></canvas>
     </div>
 
-    <button class="hero-cta cta-founding" type="button">Claim Founding Access &mdash; $199</button>
+    <div class="hero-ctas">
+      <div class="hero-cta-primary-wrap">
+        <button id="cta-founder-hero" class="btn-primary" type="button">
+          Claim founder spot — $99
+        </button>
+        <span id="counter-hero" class="counter-label">— of 100 founder spots claimed</span>
+      </div>
 
-    <p class="hero-fine">Includes 3 months Pro free. First 100 only.</p>
+      <a href="/app" class="hero-link-secondary" aria-label="Try the web app now">
+        Try it now on the web →
+      </a>
 
-    <div><span class="spots-counter"><span class="spots-dot"></span> <span class="counter-text">Loading spots...</span></span></div>
+      <div
+        id="ios-waitlist-hero"
+        class="waitlist-chip"
+        role="button"
+        tabindex="0"
+        aria-label="Join the iOS waitlist — tap to expand"
+        onkeydown="if(event.key==='Enter'||event.key===' ')this.click()"
+      >
+        Coming soon to App Store
+      </div>
+    </div>
+
+    <p class="hero-platform-note">Web · iOS soon · Android soon</p>
   </section>
 
-  <!-- ================================================================
-       SECTION 3 — SOCIAL PROOF BAR
-       ================================================================ -->
-  <div class="social-proof">
-    <div class="social-proof-label">Built for:</div>
-    <div class="proof-pills">
-      <span class="proof-pill">Therapists</span>
-      <span class="proof-pill">Executive Coaches</span>
-      <span class="proof-pill">Sports Performance</span>
-      <span class="proof-pill">Occupational Health</span>
-    </div>
-  </div>
+  <!-- ═══════════════════════════════════════════════════════════
+       S2. SYSTEM STATUS
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="system-status" aria-labelledby="system-status-heading">
+    <div class="system-status-sticky">
+      <span class="eyebrow" id="system-status-heading">YOUR SYSTEM STATUS</span>
 
-  <!-- ================================================================
-       SECTION 4 — HOW IT WORKS
-       ================================================================ -->
-  <section id="how-it-works">
-    <div class="section-label">How It Works</div>
-    <h2>Three steps. Zero friction.</h2>
+      <canvas
+        id="status-gauge"
+        width="500"
+        height="300"
+        role="img"
+        aria-label="Capacity gauge showing RESOURCED, ELEVATED, or DEPLETED state as you scroll"
+      ></canvas>
 
-    <div class="steps">
-      <div class="step-card">
-        <div class="step-num">1</div>
-        <h3>Check in daily</h3>
-        <p>5 seconds. Swipe to set your capacity state. Resourced, Stretched, or Depleted.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">2</div>
-        <h3>Patterns emerge</h3>
-        <p>After 14 days, Orbital detects trends in your capacity data automatically.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">3</div>
-        <h3>Generate your CCI</h3>
-        <p>At 90 days, receive a clinical-grade Clinical Capacity Instrument &mdash; a longitudinal record for care teams.</p>
+      <div class="voice-container" aria-live="polite" aria-atomic="true">
+        <div id="voice-depleted" class="voice-template">
+          Below baseline. Conserve. One commitment, no more.
+        </div>
+        <div id="voice-elevated" class="voice-template">
+          Steady at your working baseline. Today is a workhorse day.
+        </div>
+        <div id="voice-resourced" class="voice-template">
+          Operating above baseline. Today carries leverage. Protect cognitive bandwidth.
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ================================================================
-       SECTION 5 — CCI SHOWCASE
-       ================================================================ -->
-  <section class="cci-showcase">
-    <div class="section-label">Clinical Capacity Instrument</div>
-    <h2>What your client's care team receives</h2>
-    <p class="section-sub" style="margin-left:auto;margin-right:auto;">Three timepoints. One longitudinal story. Tap through a sample Clinical Capacity Instrument.</p>
+  <!-- ═══════════════════════════════════════════════════════════
+       S3. THREE SIGNALS
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="signals-section" aria-labelledby="signals-heading">
+    <div class="section-wrap">
+      <span class="eyebrow">WHAT ORBITAL READS</span>
+      <h2 id="signals-heading">Three signals. One instrument.</h2>
+      <p class="section-sub">
+        No wearable required for the basics. Optional integrations deepen the picture.
+      </p>
 
-    <div class="cci-demo" id="cci-demo">
-      <div class="cci-watermark">SAMPLE REPORT</div>
-      <div class="cci-client-header">
-        <span>[CLIENT NAME REDACTED]</span>
-        <span>CONFIDENTIAL</span>
-      </div>
-      <div class="cci-demo-label">ORBITAL</div>
-      <div class="cci-demo-title">Capacity Composite Index</div>
-      <div class="cci-demo-period" id="cci-period-text">Q1 2026 &middot; 90-Day Report &middot; Confidential</div>
+      <div class="signals-grid" role="list">
 
-      <div class="cci-tabs">
-        <button class="cci-tab" data-period="30" type="button">30-Day</button>
-        <button class="cci-tab" data-period="60" type="button">60-Day</button>
-        <button class="cci-tab active" data-period="90" type="button">90-Day (Full CCI)</button>
-      </div>
-
-      <div class="cci-score-section">
-        <div class="cci-score-ring">
-          <canvas id="cci-arc-canvas" width="200" height="200"></canvas>
-          <div class="cci-score-value">
-            <div class="cci-score-num" id="cci-score-num">72</div>
-            <div class="cci-score-of">/100</div>
-            <div class="cci-score-label-text">CAPACITY SCORE</div>
+        <!-- Recovery Signal -->
+        <div class="signal-card" role="listitem">
+          <div class="signal-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+              <path d="M3 12C3 7.03 7.03 3 12 3C16.97 3 21 7.03 21 12" stroke="#5DD9D4" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M3 12C3 16.97 7.03 21 12 21C16.97 21 21 16.97 21 12" stroke="#5DD9D4" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+              <path d="M12 7V12L15 15" stroke="#5DD9D4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Recovery Signal</h3>
+          <p>Sleep quality &amp; duration — how well did you recover?</p>
+          <div class="sparkline-wrap" aria-hidden="true">
+            <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+              <polyline
+                points="0,32 15,28 30,20 45,24 60,16 75,18 90,12 105,15 120,10"
+                fill="none"
+                stroke="#5DD9D4"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
           </div>
         </div>
-        <div class="cci-score-meta">
-          <div class="cci-score-badge" id="cci-score-badge" style="background:rgba(45,212,191,0.15);color:#2DD4BF">STABLE</div>
-          <div class="cci-trend-info">
-            Trend: <span id="cci-trend-label">improving</span> &middot; <span class="cci-trend-rate" id="cci-trend-rate" style="color:#2DD4BF">+1.4 pts/week</span>
+
+        <!-- Nervous System Load -->
+        <div class="signal-card" role="listitem">
+          <div class="signal-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+              <path d="M2 11h3l2-5 3 10 2-8 2 6 2-3h4" stroke="#F5B547" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Nervous System Load</h3>
+          <p>Heart rate variability — how regulated is your system?</p>
+          <div class="sparkline-wrap" aria-hidden="true">
+            <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+              <polyline
+                points="0,20 15,18 30,22 45,16 60,24 75,14 90,20 105,22 120,18"
+                fill="none"
+                stroke="#F5B547"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
           </div>
         </div>
-      </div>
 
-      <div class="cci-distribution">
-        <div class="cci-dist-label">State Distribution</div>
-        <div class="cci-dist-bar">
-          <span id="cci-dist-resourced" style="width:52%;background:#2DD4BF"></span>
-          <span id="cci-dist-stretched" style="width:34%;background:#F5B700"></span>
-          <span id="cci-dist-depleted" style="width:14%;background:#FF3B30"></span>
+        <!-- Cardiac Drift -->
+        <div class="signal-card" role="listitem">
+          <div class="signal-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+              <path d="M12 21L5 13.5C3.5 11.9 3.5 9.4 5 7.8C6.5 6.2 9 6.2 10.5 7.8L12 9.5L13.5 7.8C15 6.2 17.5 6.2 19 7.8C20.5 9.4 20.5 11.9 19 13.5L12 21Z" stroke="#7A8593" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </div>
+          <h3>Cardiac Drift</h3>
+          <p>Resting heart rate — are you trending toward overload?</p>
+          <div class="sparkline-wrap" aria-hidden="true">
+            <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+              <polyline
+                points="0,28 15,26 30,25 45,22 60,20 75,18 90,16 105,14 120,12"
+                fill="none"
+                stroke="#7A8593"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
         </div>
-        <div class="cci-dist-labels">
-          <span><span class="cci-dist-dot" style="background:#2DD4BF"></span> <span id="cci-dist-r-label">Resourced 52%</span></span>
-          <span><span class="cci-dist-dot" style="background:#F5B700"></span> <span id="cci-dist-s-label">Stretched 34%</span></span>
-          <span><span class="cci-dist-dot" style="background:#FF3B30"></span> <span id="cci-dist-d-label">Depleted 14%</span></span>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       S4. PATTERNS DETECTED
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="patterns-section" aria-labelledby="patterns-heading">
+    <div class="section-wrap">
+      <span class="eyebrow">PATTERN INTELLIGENCE</span>
+      <h2 id="patterns-heading">What the system learns about you.</h2>
+      <p class="section-sub">Orbital reads the rhythm underneath the noise.</p>
+
+      <div class="pattern-cards" role="list">
+
+        <div class="pattern-card elevated" role="listitem">
+          <div class="pattern-label">ELEVATED</div>
+          <p>Mondays run depleted — the week begins before you've had a chance to recover.</p>
         </div>
-      </div>
 
-      <div class="cci-wave">
-        <div class="cci-wave-label">Capacity Wave</div>
-        <div class="cci-wave-chart">
-          <svg id="cci-wave-svg" viewBox="0 0 700 185" preserveAspectRatio="none"></svg>
+        <div class="pattern-card depleted" role="listitem">
+          <div class="pattern-label">DEPLETED</div>
+          <p>Sleep under 6h costs you 14 capacity points the next day. The signal is consistent.</p>
         </div>
+
+        <div class="pattern-card resourced" role="listitem">
+          <div class="pattern-label">RESOURCED</div>
+          <p>Trending up this month — three consecutive weeks above your baseline score.</p>
+        </div>
+
+        <div class="pattern-card neutral" role="listitem">
+          <div class="pattern-label">NOTICE</div>
+          <p>Watch for the late-fall dip — last year you dropped 11 points by mid-November.</p>
+        </div>
+
       </div>
 
-      <div class="cci-drivers">
-        <div class="cci-drivers-label">Top Capacity Drivers</div>
-        <div class="cci-drivers-grid" id="cci-drivers-grid"></div>
-      </div>
-
-      <div class="cci-observations">
-        <div class="cci-obs-label">Clinical Observations</div>
-        <ul class="cci-obs-list" id="cci-obs-list"></ul>
-      </div>
-
-      <div class="cci-forecast" id="cci-forecast"></div>
-
-      <div class="cci-demo-footer">Generated by Orbital Health Intelligence Inc. &middot; orbitalhealth.app &middot; Confidential</div>
-    </div>
-
-    <p class="cci-credibility">Designed with input from licensed clinicians, ADHD coaches, and occupational health specialists.</p>
-
-    <button class="cci-cta cta-founding" type="button">Claim Founding Access &mdash; $199</button>
-
-    <div class="cci-download-link">
-      <!-- TODO: Replace with actual PDF link when available -->
-      <a href="mailto:contact@orbitalhealth.app?subject=Request%20Sample%20CCI%20PDF">Download sample CCI report (PDF)</a>
+      <p class="patterns-footer-note">
+        Pattern detection runs on-device. Your data never leaves you.
+      </p>
     </div>
   </section>
 
-  <!-- ================================================================
-       SECTION 6 — PRICING
-       ================================================================ -->
-  <section id="pricing">
-    <div class="section-label">Pricing</div>
-    <h2>Simple, transparent pricing</h2>
-    <p class="section-sub">Start free. Upgrade when your data is ready.</p>
+  <!-- ═══════════════════════════════════════════════════════════
+       S5. FOUNDER BLOCK
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="founder" class="founder-section" aria-labelledby="founder-heading">
+    <div class="section-wrap">
+      <div class="founder-inner">
+        <span class="eyebrow">FOUNDERS &middot; 100 SPOTS</span>
+        <h2 id="founder-heading">Help shape the instrument.<br>$99 for your first year.</h2>
+        <p class="section-sub">
+          Normally $290/yr. Founder year unlocks Pro Annual at $99 — 66% off, one year only.
+          Year 2 onwards renews at $290/yr in the App Store. Limited to the first 100.
+        </p>
 
-    <div class="pricing-grid">
-      <!-- Free -->
-      <div class="pricing-card">
-        <h3>Free</h3>
-        <div class="price">$0</div>
-        <p class="price-note">No credit card required</p>
-        <ul class="plan-features">
-          <li>Daily check-ins</li>
-          <li>3 capacity states</li>
-          <li>7-day history</li>
-          <li>On-device storage</li>
+        <span class="founder-counter" id="counter-founder">— of 100 founder spots claimed</span>
+
+        <!-- Sold-out state (hidden until JS reveals it) -->
+        <div id="founder-sold-out" aria-live="polite" role="status">
+          <p>All 100 founder spots have been claimed. Join the waitlist for general launch.</p>
+          <div class="soldout-waitlist">
+            <input
+              type="email"
+              id="soldout-email"
+              placeholder="your@email.com"
+              aria-label="Email address for general launch waitlist"
+              autocomplete="email"
+            >
+            <button
+              type="button"
+              id="soldout-btn"
+              onclick="(async function(){
+                var e=document.getElementById('soldout-email').value.trim();
+                if(!e)return;
+                try{
+                  await fetch('/api/waitlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,source:'founder-sold-out'})});
+                  document.getElementById('founder-sold-out').innerHTML='<p style=\"color:#5DD9D4;font-family:\'Space Mono\',monospace;font-size:13px;\">You\'re on the waitlist.</p>';
+                }catch(err){}
+              })()"
+            >Join waitlist</button>
+          </div>
+        </div>
+
+        <!-- Checkout form -->
+        <form id="founder-form" class="founder-form" novalidate aria-label="Claim founder spot">
+          <label for="founder-email">Your email</label>
+          <input
+            type="email"
+            id="founder-email"
+            name="email"
+            required
+            placeholder="your@email.com"
+            autocomplete="email"
+            aria-describedby="founder-error"
+          >
+          <button id="cta-founder-block" class="btn-primary" type="submit">
+            Claim founder spot — $99
+          </button>
+          <div id="founder-error" role="alert" style="display:none;font-size:14px;color:var(--state-depleted);max-width:400px;text-align:center;"></div>
+        </form>
+
+        <ul class="founder-bullets" aria-label="What is included">
+          <li>Pro Annual access — full pattern detection + system voice + signals</li>
+          <li>Founder badge on profile (post-launch)</li>
+          <li>Direct line to founder (eric@orbitalhealth.app) for year 1</li>
+          <li>One year of Pro at $99 — renews at $290/yr in App Store, only if you choose</li>
         </ul>
-        <a href="https://apps.apple.com/app/id6757295146" class="pricing-cta secondary" target="_blank" rel="noopener" data-tier="free">Download Free</a>
-      </div>
 
-      <!-- Pro -->
-      <div class="pricing-card">
-        <h3>Pro</h3>
-        <div class="price">$29<small>/mo</small></div>
-        <p class="price-note">Full capacity intelligence</p>
-        <ul class="plan-features">
-          <li>Full history</li>
-          <li>Pattern detection</li>
-          <li>Driver tracking</li>
-          <li>Trend analysis</li>
-          <li>Encrypted cloud sync</li>
-        </ul>
-        <a href="https://apps.apple.com/app/id6757295146" class="pricing-cta secondary" target="_blank" rel="noopener" data-tier="pro">Start Pro</a>
-      </div>
-
-      <!-- CCI Founding — featured -->
-      <div class="pricing-card featured">
-        <div class="pricing-tag">First 100 Only</div>
-        <h3>Clinical Capacity Instrument</h3>
-        <div class="price">$199<small> one-time</small></div>
-        <p class="price-note">Full CCI report at 90 days + 3 months Pro free</p>
-        <ul class="plan-features">
-          <li>Full CCI report at 90 days</li>
-          <li>3 months Pro access free</li>
-          <li>Longitudinal capacity record</li>
-          <li>Shareable with care teams</li>
-          <li>Founding price locked forever</li>
-        </ul>
-        <button class="pricing-cta primary cta-founding" type="button" data-tier="cci">Claim Founding Access &mdash; $199</button>
+        <p class="founder-trust">
+          One-time charge of $99 today. 30-day refund window.<br>
+          Year 2 renewal happens in iOS Settings, never on this site.
+        </p>
       </div>
     </div>
   </section>
 
-  <!-- ================================================================
-       SECTION 7 — FAQ
-       ================================================================ -->
-  <section id="faq">
-    <div class="section-label">FAQ</div>
-    <h2>Common questions</h2>
+  <!-- ═══════════════════════════════════════════════════════════
+       S6. PRICING
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="pricing" class="pricing-section" aria-labelledby="pricing-heading" data-apple-live="false">
+    <div class="section-wrap">
+      <span class="eyebrow">ORBITAL PRO</span>
+      <h2 id="pricing-heading">See your patterns. Use your signal.</h2>
+      <p class="section-sub">Full access to everything Orbital reads and learns.</p>
 
-    <div class="faq-list">
-      <div class="faq-item">
-        <div class="faq-q">What is a Clinical Capacity Instrument?</div>
-        <div class="faq-a">A longitudinal record of your capacity states over 90+ days. Unlike mood scales or symptom checklists, the CCI tracks how you perform under real-world cognitive, emotional, and environmental load. It's designed to be shared with therapists, coaches, and care teams.</div>
+      <div class="pricing-cards">
+
+        <!-- Card A: Annual -->
+        <div class="pricing-card featured" role="region" aria-label="Annual plan — best value">
+          <div><span class="pricing-badge">BEST VALUE</span></div>
+          <div class="pricing-price">$24.17<span>/mo</span></div>
+          <div class="pricing-per-year">$290 billed annually</div>
+          <ul class="pricing-features" aria-label="Annual plan features">
+            <li>Full pattern detection</li>
+            <li>System voice — RESOURCED, ELEVATED, DEPLETED</li>
+            <li>All three signals</li>
+            <li>Priority support</li>
+          </ul>
+          <div
+            id="ios-waitlist-pricing"
+            class="pricing-cta-chip waitlist-chip"
+            role="button"
+            tabindex="0"
+            aria-label="Join iOS waitlist for annual plan"
+            onkeydown="if(event.key==='Enter'||event.key===' ')this.click()"
+          >
+            Coming soon to App Store &mdash; join waitlist
+          </div>
+        </div>
+
+        <!-- Card B: Monthly -->
+        <div class="pricing-card" role="region" aria-label="Monthly plan">
+          <div class="pricing-price">$29<span>/mo</span></div>
+          <div class="pricing-per-year">Month to month</div>
+          <ul class="pricing-features" aria-label="Monthly plan features">
+            <li>Full pattern detection</li>
+            <li>System voice — RESOURCED, ELEVATED, DEPLETED</li>
+            <li>All three signals</li>
+          </ul>
+          <div class="pricing-cta-chip" style="cursor:default;">
+            Coming soon to App Store
+          </div>
+        </div>
+
       </div>
-      <div class="faq-item">
-        <div class="faq-q">Is this a diagnostic tool?</div>
-        <div class="faq-a">No. Orbital is not a medical device and does not diagnose conditions. The CCI is an observational capacity record that supplements clinical judgment.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">What does the founding offer include?</div>
-        <div class="faq-a">$199 one-time payment. You get the full CCI report generated after 90 days of daily logging, plus 3 months of Pro access free. This price is locked for the first 100 users only.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">How long does a daily check-in take?</div>
-        <div class="faq-a">About 5 seconds. You swipe to set your state and optionally add context tags.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">Who is this for?</div>
-        <div class="faq-a">High-performance professionals, neurodivergent adults, therapists tracking client capacity, executive coaches, and sports performance staff.</div>
-      </div>
+
+      <p class="platform-note">iOS App Store pending review. Web app available now.</p>
     </div>
   </section>
 
-  <!-- ================================================================
-       SECTION 8 — BOTTOM CTA
-       ================================================================ -->
-  <section class="cta-bottom">
-    <h2>Join the founding cohort.</h2>
-    <p class="cta-sub">First 100 get the CCI at founding price &mdash; locked forever.</p>
-
-    <button class="bottom-cta-btn cta-founding" type="button">Claim Your Spot &mdash; $199</button>
-
-    <div style="margin-top:20px"><span class="spots-counter"><span class="spots-dot"></span> <span class="counter-text">Loading spots...</span></span></div>
+  <!-- ═══════════════════════════════════════════════════════════
+       S7. WEB APP CTA
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="web-app" class="webapp-section" aria-labelledby="webapp-heading">
+    <div class="section-wrap">
+      <span class="eyebrow">AVAILABLE NOW</span>
+      <h2 id="webapp-heading">Use Orbital on the web today.</h2>
+      <p class="section-sub">
+        Web version is live. iOS coming soon. Founder spots redeem on web immediately — iOS unlocks at launch.
+      </p>
+      <a href="/app" class="btn-outline" aria-label="Open the Orbital web app">
+        Open the web app →
+      </a>
+    </div>
   </section>
 
-  <!-- ================================================================
-       SECTION 9 — FOOTER
-       ================================================================ -->
-  <footer>
-    <div class="footer-inner">
-      <div class="footer-left">&copy; 2026 Orbital Health Intelligence, Inc.</div>
-      <div class="footer-links">
-        <a href="/privacy">Privacy</a>
-        <a href="/support">Terms</a>
-        <a href="/support">Support</a>
-        <a href="mailto:contact@orbitalhealth.app">contact@orbitalhealth.app</a>
+  <!-- ═══════════════════════════════════════════════════════════
+       S8. FOOTER
+  ═══════════════════════════════════════════════════════════ -->
+  <footer role="contentinfo">
+    <div class="footer-grid">
+
+      <!-- Col 1: Brand -->
+      <div>
+        <div class="footer-wordmark">ORBITAL</div>
+        <p class="footer-tagline">Capacity intelligence for anyone running close to their limit.</p>
       </div>
-      <p class="footer-disclaimer">Orbital is not a medical device and does not provide medical advice, diagnosis, or treatment. The CCI is an observational record only.</p>
+
+      <!-- Col 2: Nav -->
+      <nav class="footer-col" aria-label="Site navigation">
+        <h4>Navigate</h4>
+        <ul role="list">
+          <li><a href="#system-status">How it works</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="/app">Web app</a></li>
+          <li class="muted"><a href="#ios-waitlist-hero">iOS (coming soon)</a></li>
+        </ul>
+      </nav>
+
+      <!-- Col 3: Legal -->
+      <nav class="footer-col" aria-label="Legal and support">
+        <h4>Legal &amp; Support</h4>
+        <ul role="list">
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+          <li><a href="/support">Support</a></li>
+          <li><a href="mailto:eric@orbitalhealth.app">eric@orbitalhealth.app</a></li>
+        </ul>
+      </nav>
+
+    </div>
+
+    <div class="footer-bottom">
+      <span>&copy; 2026 Orbital Health Intelligence, Inc.</span>
+      <span class="footer-sep">&middot;</span>
+      <span>Wellness app</span>
+      <span class="footer-sep">&middot;</span>
+      <span>Not a medical device</span>
+      <span class="footer-sep">&middot;</span>
+      <span>Provider-compatible</span>
     </div>
   </footer>
-</div>
 
-<!-- ================================================================
-     CHECKOUT MODAL
-     ================================================================ -->
-<div id="checkout-modal" class="modal-overlay">
-  <div class="modal-box">
-    <button class="modal-close" type="button" aria-label="Close">&times;</button>
-    <h3>Continue to checkout</h3>
-    <p class="modal-sub">Enter your email to claim your founding spot.</p>
-    <input type="email" id="checkout-email" class="modal-input" placeholder="you@example.com" autocomplete="email">
-    <button id="checkout-submit" class="modal-submit" type="button">Continue to Checkout &mdash; $199</button>
-    <div id="checkout-error" class="modal-error" style="display:none"></div>
-  </div>
-</div>
+  <!-- ═══════════════════════════════════════════════════════════
+       INLINE INIT SCRIPT
+  ═══════════════════════════════════════════════════════════ -->
+  <script>
+    (function() {
+      var nav = document.querySelector('nav');
+      if (!nav) return;
+      window.addEventListener('scroll', function() {
+        nav.classList.toggle('scrolled', window.scrollY > 80);
+      }, { passive: true });
 
-<!-- ================================================================
-     JAVASCRIPT
-     ================================================================ -->
-<script>
-// =========================================================================
-// UTM PARAMS
-// =========================================================================
-var urlParams = new URLSearchParams(window.location.search);
-var utm = {
-  utm_source: urlParams.get('utm_source') || undefined,
-  utm_medium: urlParams.get('utm_medium') || undefined,
-  utm_campaign: urlParams.get('utm_campaign') || undefined,
-};
-
-// =========================================================================
-// SUCCESS STATE (return from Stripe checkout)
-// =========================================================================
-if (urlParams.get('purchased') === '1') {
-  var banner = document.getElementById('success-banner');
-  if (banner) banner.style.display = 'block';
-}
-
-// =========================================================================
-// ANALYTICS — keep existing custom trackEvent system
-// =========================================================================
-function trackEvent(event, metadata) {
-  fetch('/api/track', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      event: event,
-      page: window.location.pathname,
-      referrer: document.referrer || undefined,
-      utm_source: utm.utm_source,
-      utm_medium: utm.utm_medium,
-      utm_campaign: utm.utm_campaign,
-      metadata: metadata || {},
-    }),
-  }).catch(function() {}); // fire-and-forget
-}
-
-// Track page view
-trackEvent('page_view');
-
-// =========================================================================
-// CCI COUNTER — fetch from /api/cci-counter
-// =========================================================================
-(function loadCounter() {
-  var counterEls = document.querySelectorAll('.counter-text');
-  fetch('/api/cci-counter')
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      var remaining = typeof data.remaining === 'number' ? data.remaining : 100;
-      counterEls.forEach(function(el) {
-        el.textContent = remaining + ' of 100 founding spots remaining';
-      });
-    })
-    .catch(function() {
-      counterEls.forEach(function(el) {
-        el.textContent = 'Limited spots remaining';
-      });
-    });
-})();
-
-// =========================================================================
-// CCI INTERACTIVE DEMO
-// =========================================================================
-var cciData = {
-  '30': {
-    period: '30-Day',
-    capacityScore: 58,
-    scoreLabel: 'STRAINED',
-    trend: 'declining',
-    trendRate: '-2.1 pts/week',
-    stateDistribution: { resourced: 30, stretched: 42, depleted: 28 },
-    capacityWave: [72,70,68,65,63,60,58,55,57,54,52,50,53,55,52,49,51,48,50,52,55,53,50,52,54,56,58,55,57,58],
-    drivers: [
-      { name: 'Sensory Load', impact: '-16pts avg impact', correlation: '30-day correlation', direction: 'negative' },
-      { name: 'Social Demand', impact: '-11pts avg impact', correlation: '30-day correlation', direction: 'negative' },
-      { name: 'Sleep Quality', impact: '+9pts avg impact', correlation: '30-day correlation', direction: 'positive' },
-      { name: 'Focus Blocks', impact: '+7pts avg impact', correlation: '30-day correlation', direction: 'positive' }
-    ],
-    clinicalObservations: [
-      'Subject shows declining capacity trend over initial 30-day observation period.',
-      'Sensory overload events correlate with 48\u201372hr capacity suppression.',
-      'Baseline stability score: 5.1/10 \u2014 below cohort average of 6.1.'
-    ],
-    forecast: {
-      label: 'CAPACITY FORECAST',
-      intro: 'Insufficient data for projection. Continue logging to unlock forecasting.',
-      items: ['\u2192 60 more days needed for reliable forecast.']
-    }
-  },
-  '60': {
-    period: '60-Day',
-    capacityScore: 65,
-    scoreLabel: 'BUILDING',
-    trend: 'stabilizing',
-    trendRate: '+0.8 pts/week',
-    stateDistribution: { resourced: 40, stretched: 38, depleted: 22 },
-    capacityWave: [72,70,68,65,63,60,58,55,57,54,52,50,53,55,52,49,51,48,50,52,55,53,50,52,54,56,58,55,57,58,60,62,58,61,63,60,62,64,61,63,65,63,66,64,67,65,63,66,68,65,67,64,66,68,65,67,66,64,66,65],
-    drivers: [
-      { name: 'Sensory Load', impact: '-14pts avg impact', correlation: '60-day correlation', direction: 'negative' },
-      { name: 'Sleep Quality', impact: '+14pts avg impact', correlation: '60-day correlation', direction: 'positive' },
-      { name: 'Social Demand', impact: '-9pts avg impact', correlation: '60-day correlation', direction: 'negative' },
-      { name: 'Focus Blocks', impact: '+11pts avg impact', correlation: '60-day correlation', direction: 'positive' }
-    ],
-    clinicalObservations: [
-      'Capacity trend stabilizing after week 5 intervention adjustments.',
-      'Sleep quality emerging as primary positive driver \u2014 recovery pattern improving.',
-      'Baseline stability score: 6.0/10 \u2014 approaching cohort average of 6.1.'
-    ],
-    forecast: {
-      label: 'CAPACITY FORECAST (PRELIMINARY)',
-      intro: 'Early projection based on emerging patterns:',
-      items: [
-        '\u2192 Projected capacity in 4 weeks: 69/100',
-        '\u2192 Risk of capacity drop below 60: MODERATE',
-        '\u2192 Primary risk factor: Sensory load spikes',
-        '\u2192 30 more days of data will improve forecast accuracy.'
-      ]
-    }
-  },
-  '90': {
-    period: '90-Day',
-    capacityScore: 72,
-    scoreLabel: 'STABLE',
-    trend: 'improving',
-    trendRate: '+1.4 pts/week',
-    stateDistribution: { resourced: 52, stretched: 34, depleted: 14 },
-    capacityWave: [72,70,68,65,63,60,58,55,57,54,52,50,53,55,52,49,51,48,50,52,55,53,50,52,54,56,58,55,57,58,60,62,58,61,63,60,62,64,61,63,65,63,66,64,67,65,63,66,68,65,67,64,66,68,65,67,66,64,66,65,68,70,67,69,71,68,70,72,69,71,73,70,72,74,71,73,72,70,73,75,72,74,73,71,73,72,74,73,72,72],
-    drivers: [
-      { name: 'Sleep Quality', impact: '+18pts avg impact', correlation: '90-day correlation', direction: 'positive' },
-      { name: 'Sensory Load', impact: '-14pts on high days', correlation: '90-day correlation', direction: 'negative' },
-      { name: 'Social Demand', impact: '-9pts avg impact', correlation: '90-day correlation', direction: 'negative' },
-      { name: 'Focus Blocks', impact: '+11pts when present', correlation: '90-day correlation', direction: 'positive' }
-    ],
-    clinicalObservations: [
-      'Subject demonstrates consistent capacity recovery following rest intervals.',
-      'Sensory overload events correlate with 48\u201372hr capacity suppression.',
-      'Baseline stability score: 7.2/10 \u2014 above cohort average of 6.1.'
-    ],
-    forecast: {
-      label: 'CAPACITY FORECAST',
-      intro: 'Based on current trajectory and driver patterns:',
-      items: [
-        '\u2192 Projected capacity in 4 weeks: 76/100',
-        '\u2192 Risk of capacity drop below 60: LOW',
-        '\u2192 Highest leverage intervention: Maintain sleep consistency'
-      ]
-    }
-  }
-};
-
-var currentCciPeriod = '90';
-var cciRingInitialized = false;
-
-function getCciColor(score) {
-  if (score >= 65) return '#00D7FF';
-  if (score >= 40) return '#F5B700';
-  return '#FF3B30';
-}
-
-function getCciBadgeStyle(label) {
-  switch (label) {
-    case 'STRAINED': return 'background:rgba(245,183,0,0.15);color:#F5B700';
-    case 'BUILDING': return 'background:rgba(0,215,255,0.15);color:#00D7FF';
-    case 'STABLE': return 'background:rgba(45,212,191,0.15);color:#2DD4BF';
-    default: return 'background:rgba(255,255,255,0.1);color:#fff';
-  }
-}
-
-function getTrendColor(trend) {
-  switch (trend) {
-    case 'declining': return '#FF3B30';
-    case 'stabilizing': return '#F5B700';
-    case 'improving': return '#2DD4BF';
-    default: return 'rgba(255,255,255,0.5)';
-  }
-}
-
-function renderWaveChart(data, color, period) {
-  var svg = document.getElementById('cci-wave-svg');
-  var w = 700, h = 185;
-  var padL = 50, padR = 10, padT = 10, padB = 35;
-  var plotW = w - padL - padR;
-  var plotH = h - padT - padB;
-
-  var html = '';
-
-  // Defs: color gradient for line + fill
-  html += '<defs>';
-  html += '<linearGradient id="cci-line-grad" gradientUnits="userSpaceOnUse" x1="0" y1="' + padT + '" x2="0" y2="' + (padT + plotH) + '">';
-  html += '<stop offset="0%" stop-color="#00D7FF"/>';
-  html += '<stop offset="30%" stop-color="#00D7FF"/>';
-  html += '<stop offset="30.7%" stop-color="#F5B700"/>';
-  html += '<stop offset="50%" stop-color="#F5B700"/>';
-  html += '<stop offset="50.7%" stop-color="#FF3B30"/>';
-  html += '<stop offset="100%" stop-color="#FF3B30"/>';
-  html += '</linearGradient>';
-  html += '<linearGradient id="cci-fill-grad" gradientUnits="userSpaceOnUse" x1="0" y1="' + padT + '" x2="0" y2="' + (padT + plotH) + '">';
-  html += '<stop offset="0%" stop-color="#00D7FF" stop-opacity="0.10"/>';
-  html += '<stop offset="30%" stop-color="#00D7FF" stop-opacity="0.10"/>';
-  html += '<stop offset="30.7%" stop-color="#F5B700" stop-opacity="0.08"/>';
-  html += '<stop offset="50%" stop-color="#F5B700" stop-opacity="0.06"/>';
-  html += '<stop offset="50.7%" stop-color="#FF3B30" stop-opacity="0.04"/>';
-  html += '<stop offset="100%" stop-color="#FF3B30" stop-opacity="0.01"/>';
-  html += '</linearGradient>';
-  html += '</defs>';
-
-  // Grid lines + Y-axis tick labels at 0, 25, 50, 75, 100
-  [0, 25, 50, 75, 100].forEach(function(val) {
-    var y = padT + plotH - (val / 100 * plotH);
-    html += '<line x1="' + padL + '" y1="' + y.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + y.toFixed(1) + '" stroke="rgba(255,255,255,0.06)" stroke-dasharray="4,4"/>';
-    html += '<text x="' + (padL - 6) + '" y="' + (y + 3).toFixed(1) + '" fill="rgba(255,255,255,0.2)" font-size="9" font-family="\'Space Mono\', monospace" text-anchor="end">' + val + '</text>';
-  });
-
-  // Y-axis rotated label
-  var midY = padT + plotH / 2;
-  html += '<text x="10" y="' + midY + '" fill="rgba(255,255,255,0.15)" font-size="9" font-family="\'Space Mono\', monospace" text-anchor="middle" transform="rotate(-90, 10, ' + midY + ')">Capacity Score</text>';
-
-  // X-axis labels
-  var xLabels;
-  if (period === '90') {
-    xLabels = [{t: 'Month 1', p: 0}, {t: 'Month 2', p: 0.33}, {t: 'Month 3', p: 0.67}];
-  } else if (period === '60') {
-    xLabels = [{t: 'Week 1', p: 0}, {t: 'Week 4', p: 0.47}, {t: 'Week 8', p: 0.93}];
-  } else {
-    xLabels = [{t: 'Week 1', p: 0}, {t: 'Week 2', p: 0.33}, {t: 'Week 3', p: 0.67}, {t: 'Week 4', p: 1}];
-  }
-  xLabels.forEach(function(label) {
-    var x = padL + label.p * plotW;
-    var anchor = label.p === 0 ? 'start' : label.p >= 0.9 ? 'end' : 'middle';
-    html += '<text x="' + x.toFixed(1) + '" y="' + (padT + plotH + 20) + '" fill="rgba(255,255,255,0.2)" font-size="9" font-family="\'Space Mono\', monospace" text-anchor="' + anchor + '">' + label.t + '</text>';
-  });
-
-  // Build points
-  var points = [];
-  data.forEach(function(val, i) {
-    var x = padL + (i / (data.length - 1)) * plotW;
-    var y = padT + plotH - (val / 100 * plotH);
-    points.push(x.toFixed(1) + ',' + y.toFixed(1));
-  });
-
-  // Fill area
-  var firstX = padL;
-  var lastX = (padL + plotW).toFixed(1);
-  var bottomY = (padT + plotH).toFixed(1);
-  html += '<path d="M' + points.join(' L') + ' L' + lastX + ',' + bottomY + ' L' + firstX + ',' + bottomY + ' Z" fill="url(#cci-fill-grad)"/>';
-
-  // Line with color gradient
-  html += '<polyline points="' + points.join(' ') + '" fill="none" stroke="url(#cci-line-grad)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
-
-  // End dot with glow
-  var lastPt = points[points.length - 1].split(',');
-  html += '<circle cx="' + lastPt[0] + '" cy="' + lastPt[1] + '" r="7" fill="' + color + '" opacity="0.2"/>';
-  html += '<circle cx="' + lastPt[0] + '" cy="' + lastPt[1] + '" r="4" fill="' + color + '"/>';
-
-  svg.innerHTML = html;
-}
-
-function renderCciDemo(period) {
-  currentCciPeriod = period;
-  var d = cciData[period];
-  var color = getCciColor(d.capacityScore);
-
-  // Update tabs
-  document.querySelectorAll('.cci-tab').forEach(function(tab) {
-    tab.classList.toggle('active', tab.getAttribute('data-period') === period);
-  });
-
-  // Period label
-  document.getElementById('cci-period-text').textContent = 'Q1 2026 \u00B7 ' + d.period + ' Report \u00B7 Confidential';
-
-  // Score ring — only animate if IntersectionObserver has fired
-  var circumference = 2 * Math.PI * 58;
-  var ringFg = document.getElementById('cci-ring-fg');
-  ringFg.style.strokeDasharray = circumference;
-  ringFg.setAttribute('stroke', color);
-  if (cciRingInitialized) {
-    ringFg.style.transition = 'stroke-dashoffset 0.6s ease, stroke 0.4s ease';
-    ringFg.style.strokeDashoffset = circumference * (1 - d.capacityScore / 100);
-  }
-
-  // Score number
-  document.getElementById('cci-score-num').textContent = d.capacityScore;
-  document.getElementById('cci-score-num').style.color = color;
-
-  // Score badge
-  var badge = document.getElementById('cci-score-badge');
-  badge.textContent = d.scoreLabel;
-  badge.setAttribute('style', getCciBadgeStyle(d.scoreLabel));
-
-  // Trend
-  document.getElementById('cci-trend-label').textContent = d.trend;
-  var trendRate = document.getElementById('cci-trend-rate');
-  trendRate.textContent = d.trendRate;
-  trendRate.style.color = getTrendColor(d.trend);
-
-  // Distribution bar
-  var dist = d.stateDistribution;
-  document.getElementById('cci-dist-resourced').style.width = dist.resourced + '%';
-  document.getElementById('cci-dist-stretched').style.width = dist.stretched + '%';
-  document.getElementById('cci-dist-depleted').style.width = dist.depleted + '%';
-  document.getElementById('cci-dist-r-label').textContent = 'Resourced ' + dist.resourced + '%';
-  document.getElementById('cci-dist-s-label').textContent = 'Stretched ' + dist.stretched + '%';
-  document.getElementById('cci-dist-d-label').textContent = 'Depleted ' + dist.depleted + '%';
-
-  // Wave chart with period for axis labels
-  renderWaveChart(d.capacityWave, color, period);
-
-  // Drivers
-  var driversHtml = '';
-  d.drivers.forEach(function(dr) {
-    driversHtml += '<div class="cci-driver-card ' + dr.direction + '">';
-    driversHtml += '<div class="cci-driver-name">' + dr.name + '</div>';
-    driversHtml += '<div class="cci-driver-impact ' + dr.direction + '">' + dr.impact + '</div>';
-    driversHtml += '<div class="cci-driver-corr">' + dr.correlation + '</div>';
-    driversHtml += '</div>';
-  });
-  document.getElementById('cci-drivers-grid').innerHTML = driversHtml;
-
-  // Clinical observations
-  var obsHtml = '';
-  d.clinicalObservations.forEach(function(obs) {
-    obsHtml += '<li>' + obs + '</li>';
-  });
-  document.getElementById('cci-obs-list').innerHTML = obsHtml;
-
-  // Capacity forecast
-  var fc = d.forecast;
-  var fcHtml = '<div class="cci-forecast-label">' + fc.label + '</div>';
-  fcHtml += '<div class="cci-forecast-divider">\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501</div>';
-  fcHtml += '<div class="cci-forecast-text">';
-  fcHtml += fc.intro;
-  if (fc.items.length > 0) {
-    fcHtml += '<br><br>';
-    fc.items.forEach(function(item) {
-      fcHtml += '<span class="cci-forecast-arrow">' + item + '</span><br>';
-    });
-  }
-  fcHtml += '</div>';
-  document.getElementById('cci-forecast').innerHTML = fcHtml;
-}
-
-// Tab click handlers
-document.querySelectorAll('.cci-tab').forEach(function(tab) {
-  tab.addEventListener('click', function() {
-    var period = tab.getAttribute('data-period');
-    renderCciDemo(period);
-    trackEvent('cci_demo_tab_clicked', { period: period });
-  });
-});
-
-// Initial render — 90-day by default
-renderCciDemo('90');
-
-// Score ring scroll animation — animate from 0 on first viewport entry
-var cciObserver = new IntersectionObserver(function(entries) {
-  entries.forEach(function(entry) {
-    if (entry.isIntersecting && !cciRingInitialized) {
-      cciRingInitialized = true;
-      var d = cciData[currentCciPeriod];
-      var circumference = 2 * Math.PI * 58;
-      var ringFg = document.getElementById('cci-ring-fg');
-      // Ensure empty state
-      ringFg.style.transition = 'none';
-      ringFg.style.strokeDashoffset = circumference;
-      ringFg.getBoundingClientRect(); // force reflow
-      // Animate to score over 1.5s
-      ringFg.style.transition = 'stroke-dashoffset 1.5s ease-out';
-      ringFg.style.strokeDashoffset = circumference * (1 - d.capacityScore / 100);
-      cciObserver.disconnect();
-    }
-  });
-}, { threshold: 0.3 });
-cciObserver.observe(document.getElementById('cci-demo'));
-
-// =========================================================================
-// CHECKOUT MODAL — wire all .cta-founding buttons
-// =========================================================================
-var modal = document.getElementById('checkout-modal');
-var emailInput = document.getElementById('checkout-email');
-var submitBtn = document.getElementById('checkout-submit');
-var errorEl = document.getElementById('checkout-error');
-
-// Open modal on any founding CTA click
-document.querySelectorAll('.cta-founding').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    modal.classList.add('active');
-    emailInput.value = '';
-    emailInput.classList.remove('error');
-    errorEl.style.display = 'none';
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Continue to Checkout \u2014 $199';
-    setTimeout(function() { emailInput.focus(); }, 100);
-    trackEvent('founding_cta_clicked');
-  });
-});
-
-// Close modal
-modal.querySelector('.modal-close').addEventListener('click', function() {
-  modal.classList.remove('active');
-});
-modal.addEventListener('click', function(e) {
-  if (e.target === modal) modal.classList.remove('active');
-});
-
-// Handle enter key in email input
-emailInput.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') submitBtn.click();
-});
-
-// Submit checkout
-submitBtn.addEventListener('click', async function() {
-  var email = emailInput.value.trim();
-  if (!email || !email.includes('@') || !email.includes('.')) {
-    emailInput.classList.add('error');
-    errorEl.textContent = 'Please enter a valid email address.';
-    errorEl.style.display = 'block';
-    return;
-  }
-
-  emailInput.classList.remove('error');
-  errorEl.style.display = 'none';
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Redirecting to Stripe...';
-
-  try {
-    trackEvent('checkout_started', { product_id: 'cci_founding' });
-
-    var res = await fetch('/api/create-checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        product_id: 'cci_founding',
-        supabase_user_id: 'guest',
-        customer_email: email,
-        success_url: window.location.origin + '/?purchased=1',
-        cancel_url: window.location.origin + '/',
-      }),
-    });
-
-    var data = await res.json();
-
-    if (res.ok && data.checkout_url) {
-      window.location.href = data.checkout_url;
-    } else {
-      throw new Error(data.error || 'Checkout unavailable');
-    }
-  } catch (err) {
-    // TODO: Fallback to mailto if Stripe STRIPE_PRICE_CCI_FOUNDING env var is not set
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Continue to Checkout \u2014 $199';
-    errorEl.innerHTML = 'Checkout temporarily unavailable. <a href="mailto:contact@orbitalhealth.app?subject=CCI%20Founding%20Access" style="color:#00D7FF;text-decoration:underline;">Email us instead</a>';
-    errorEl.style.display = 'block';
-  }
-});
-
-// =========================================================================
-// PRICING CARD CLICKS — track tier
-// =========================================================================
-document.querySelectorAll('.pricing-cta').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    var tier = btn.getAttribute('data-tier') || '';
-    trackEvent('pricing_card_clicked', { tier: tier });
-  });
-});
-
-// =========================================================================
-// ORBITAL ARC GAUGE — matches iOS/web Gauge component exactly
-// ARC_START=225°, ARC_SWEEP=270°, gradient crimson→amber→teal
-// =========================================================================
-(function() {
-  var ARC_START = 225 * Math.PI / 180;
-  var ARC_SWEEP = 270 * Math.PI / 180;
-
-  function gaugeColor(score) {
-    if (score < 40) return '#E5484D';
-    if (score < 70) return '#F5B547';
-    return '#5DD9D4';
-  }
-
-  function drawArcGauge(canvas, score, size) {
-    var dpr = window.devicePixelRatio || 1;
-    canvas.width = size * dpr;
-    canvas.height = size * dpr;
-    canvas.style.width = size + 'px';
-    canvas.style.height = size + 'px';
-    var ctx = canvas.getContext('2d');
-    ctx.save();
-    ctx.scale(dpr, dpr);
-    var cx = size / 2, cy = size / 2;
-    var r = size * 0.375;
-    var w = size * 0.044;
-    var s = Math.max(0, Math.min(100, score));
-    var endAngle = ARC_START + (s / 100) * ARC_SWEEP;
-
-    // Track
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, ARC_START, ARC_START + ARC_SWEEP);
-    ctx.strokeStyle = 'rgba(255,255,255,0.10)';
-    ctx.lineWidth = w;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-
-    // Active arc with gradient
-    if (s > 0.5) {
-      var gx0 = cx + r * Math.cos(ARC_START);
-      var gy0 = cy + r * Math.sin(ARC_START);
-      var gx1 = cx + r * Math.cos(ARC_START + ARC_SWEEP);
-      var gy1 = cy + r * Math.sin(ARC_START + ARC_SWEEP);
-      var grad = ctx.createLinearGradient(gx0, gy0, gx1, gy1);
-      grad.addColorStop(0, '#E5484D');
-      grad.addColorStop(0.5, '#F5B547');
-      grad.addColorStop(1, '#5DD9D4');
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, ARC_START, endAngle);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = w;
-      ctx.lineCap = 'round';
-      ctx.stroke();
-    }
-
-    // Glow dot at tip
-    var tx = cx + r * Math.cos(endAngle);
-    var ty = cy + r * Math.sin(endAngle);
-    var glow = ctx.createRadialGradient(tx, ty, 0, tx, ty, w * 1.2);
-    glow.addColorStop(0, 'rgba(93,217,212,0.40)');
-    glow.addColorStop(1, 'rgba(93,217,212,0)');
-    ctx.beginPath();
-    ctx.arc(tx, ty, w * 1.2, 0, Math.PI * 2);
-    ctx.fillStyle = glow;
-    ctx.fill();
-
-    // White tip dot
-    ctx.beginPath();
-    ctx.arc(tx, ty, w * 0.72, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-    ctx.fill();
-
-    ctx.restore();
-  }
-
-  function stateLabel(score) {
-    if (score < 40) return 'DEPLETED';
-    if (score < 70) return 'ELEVATED';
-    return 'RESOURCED';
-  }
-
-  // ── Hero gauge (animated demo) ──────────────────────────────────────
-  var heroCanvas = document.getElementById('hero-arc-canvas');
-  var heroLabelEl = document.getElementById('hero-gauge-label');
-  if (heroCanvas) {
-    var heroScore = 60;
-    var heroTarget = 60;
-    var heroDir = 1;
-    var heroAnimId = null;
-
-    function drawHero() {
-      drawArcGauge(heroCanvas, heroScore, 240);
-      if (heroLabelEl) {
-        heroLabelEl.textContent = stateLabel(heroScore);
-        heroLabelEl.style.color = gaugeColor(heroScore);
+      // Stars
+      var starsContainer = document.querySelector('.hero-stars');
+      if (starsContainer) {
+        for (var i = 0; i < 60; i++) {
+          var star = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          star.setAttribute('width', '2');
+          star.setAttribute('height', '2');
+          star.style.cssText =
+            'position:absolute;left:' + (Math.random() * 100) + '%;' +
+            'top:' + (Math.random() * 100) + '%;' +
+            'opacity:' + (0.08 + Math.random() * 0.10) + ';' +
+            'pointer-events:none;';
+          star.innerHTML = '<circle cx="1" cy="1" r="1" fill="white"/>';
+          starsContainer.appendChild(star);
+        }
       }
-    }
+    })();
+  </script>
 
-    function heroAnimate() {
-      heroScore += (heroTarget - heroScore) * 0.06;
-      if (Math.abs(heroScore - heroTarget) < 0.3) {
-        heroScore = heroTarget;
-        // Pick next target
-        var targets = [25, 50, 75, 100, 60, 40, 80, 30];
-        heroTarget = targets[Math.floor(Math.random() * targets.length)];
-      }
-      drawHero();
-      heroAnimId = requestAnimationFrame(heroAnimate);
-    }
-
-    drawHero();
-    heroAnimId = requestAnimationFrame(heroAnimate);
-
-    // Click to set score
-    heroCanvas.addEventListener('click', function(e) {
-      var rect = heroCanvas.getBoundingClientRect();
-      var mx = e.clientX - rect.left - rect.width / 2;
-      var my = e.clientY - rect.top - rect.height / 2;
-      var angle = Math.atan2(my, mx);
-      var deg = ((angle * 180 / Math.PI) + 360) % 360;
-      var cw = (deg + 90) % 360;
-      var onArc = (cw - 225 + 360) % 360;
-      if (onArc > 270) onArc = onArc - 270 < 360 - onArc ? 270 : 0;
-      heroTarget = (onArc / 270) * 100;
-    });
-  }
-
-  // ── CCI section arc gauge ────────────────────────────────────────────
-  var cciCanvas = document.getElementById('cci-arc-canvas');
-  if (cciCanvas) {
-    window._drawCciArc = function(score) {
-      drawArcGauge(cciCanvas, score, 200);
-    };
-    window._drawCciArc(72);
-  }
-}());
-
-// Patch renderCciDemo to also update the arc canvas
-var _origRenderCciDemo = typeof renderCciDemo === 'function' ? renderCciDemo : null;
-if (_origRenderCciDemo) {
-  renderCciDemo = function(period) {
-    _origRenderCciDemo(period);
-    var numEl = document.getElementById('cci-score-num');
-    if (numEl && window._drawCciArc) {
-      setTimeout(function() {
-        window._drawCciArc(parseInt(numEl.textContent) || 72);
-      }, 50);
-    }
-  };
-}
-
-// =========================================================================
-// FAQ ACCORDION
-// =========================================================================
-document.querySelectorAll('.faq-item').forEach(function(item) {
-  item.querySelector('.faq-q').addEventListener('click', function() {
-    var isOpen = item.classList.contains('open');
-    // Close all
-    document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('open'); });
-    // Toggle clicked
-    if (!isOpen) {
-      item.classList.add('open');
-      trackEvent('faq_opened', { question: item.querySelector('.faq-q').textContent.replace('+','').trim() });
-    }
-  });
-});
-</script>
+  <script defer src="/js/gauge.js"></script>
+  <script defer src="/js/founder.js"></script>
+  <script defer src="/js/waitlist.js"></script>
 
 </body>
 </html>

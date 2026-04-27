@@ -181,10 +181,69 @@ async function recordPurchase(
 // EVENT HANDLERS
 // =============================================================================
 
+async function handleFounderCheckout(session: Stripe.Checkout.Session): Promise<void> {
+  const email = session.metadata?.founder_email;
+  if (!email) {
+    console.error('[stripe-webhook] orbital_founder_year_99: no founder_email in metadata');
+    return;
+  }
+
+  const supabase = getSupabaseAdmin();
+
+  // Idempotency check
+  const { data: existing } = await supabase
+    .from('founders')
+    .select('is_paid')
+    .eq('stripe_checkout_session_id', session.id)
+    .single();
+
+  if (existing?.is_paid) {
+    console.log('[stripe-webhook] founder already paid, no-op:', session.id);
+    return;
+  }
+
+  const { error } = await supabase
+    .from('founders')
+    .update({
+      is_paid: true,
+      paid_at: new Date().toISOString(),
+      amount_cents: session.amount_total,
+      stripe_payment_intent_id: typeof session.payment_intent === 'string'
+        ? session.payment_intent
+        : session.payment_intent?.id ?? null,
+      position: null, // will be set via DB after nextval — see note
+    })
+    .eq('email', email.toLowerCase());
+
+  if (error) {
+    console.error('[stripe-webhook] founder update error:', error);
+    throw error;
+  }
+
+  // Assign position via sequence (raw SQL via RPC)
+  const { data: seqData, error: seqError } = await supabase
+    .rpc('assign_founder_position', { p_email: email.toLowerCase() });
+
+  if (seqError) {
+    console.error('[stripe-webhook] position assignment error:', seqError);
+    // Non-fatal: paid status already set
+  } else {
+    console.log('[stripe-webhook] founder position assigned:', seqData);
+  }
+
+  console.log('[stripe-webhook] orbital_founder_year_99 fulfilled for', email);
+}
+
 async function handleCheckoutCompleted(
   stripe: Stripe,
   session: Stripe.Checkout.Session,
 ): Promise<void> {
+  // Route to orbital_founder_year_99 handler if this is the new founder product
+  if (session.metadata?.product === 'orbital_founder_year_99') {
+    await handleFounderCheckout(session);
+    return;
+  }
+
   const userId = session.metadata?.supabase_user_id;
   if (!userId) {
     console.error('[stripe-webhook] No supabase_user_id in session metadata');
