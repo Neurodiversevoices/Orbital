@@ -83,8 +83,10 @@ export default function UpgradeScreen() {
       }
       try {
         await new Promise<void>(resolve => InteractionManager.runAfterInteractions(resolve));
-        const ok = await purchaseViaRevenueCat(productId);
-        if (ok) router.back();
+        await purchaseViaRevenueCat(productId);
+        // Navigate away regardless of entitlement timing — RevenueCat may lag sandbox
+        if (router.canGoBack()) router.back();
+        else router.replace('/' as any);
       } catch (err: any) {
         if (err?.code !== 'PURCHASE_CANCELLED') {
           Alert.alert('Purchase failed', err?.message ?? 'Unknown error');
@@ -112,8 +114,9 @@ export default function UpgradeScreen() {
       {/* Top bar */}
       <View style={[s.topBar, { marginTop: 4 }]}>
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => { if (router.canGoBack()) router.back(); else router.replace('/' as any); }}
           style={s.closeBtn}
+          hitSlop={{ top: 12, left: 12, bottom: 12, right: 12 }}
           accessibilityRole="button"
           accessibilityLabel="Close"
         >
@@ -224,6 +227,7 @@ const s = StyleSheet.create({
   topBar: {
     flexDirection: 'row', alignItems: 'center',
     paddingHorizontal: 16, paddingVertical: 8,
+    zIndex: 10,
   },
   closeBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   content: { paddingHorizontal: 20, paddingTop: 8, alignItems: 'center' },
