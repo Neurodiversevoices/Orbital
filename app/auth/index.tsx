@@ -19,9 +19,9 @@ import {
   Platform,
   KeyboardAvoidingView,
   Linking,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import ShaderOrb from '../../components/orb/ShaderOrb';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { useFonts } from 'expo-font';
@@ -257,10 +257,10 @@ export default function AuthScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* ── Top section: ShaderOrb + title ── */}
+          {/* ── Top section: icon + title ── */}
           <View style={styles.topSection}>
             <View style={styles.orbWrap}>
-              <ShaderOrb size={220} staticCapacity={1.0} disabled />
+              <Image source={require('../../assets/icon.png')} style={styles.appIcon} />
             </View>
 
             {/* Title */}
@@ -495,6 +495,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
+  },
+  appIcon: {
+    width: 120,
+    height: 120,
+    borderRadius: 28,
   },
 
   // ── Title ───────────────────────────────────────────────────────────────
