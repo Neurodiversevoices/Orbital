@@ -2,7 +2,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import {
   View, Text, StyleSheet, Pressable, ScrollView,
-  ActivityIndicator, Alert, Platform, InteractionManager,
+  ActivityIndicator, Alert, Platform, InteractionManager, Linking,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -217,6 +217,23 @@ export default function UpgradeScreen() {
         <Text style={s.trustLine}>
           Privacy by default · Your data stays yours · Cancel anytime in Settings
         </Text>
+        <View style={s.legalRow}>
+          <Pressable
+            onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}
+            accessibilityRole="link"
+            accessibilityLabel="Terms of Use"
+          >
+            <Text style={s.legalLink}>Terms of Use (EULA)</Text>
+          </Pressable>
+          <Text style={s.legalSep}> · </Text>
+          <Pressable
+            onPress={() => Linking.openURL('https://orbitalhealth.app/privacy')}
+            accessibilityRole="link"
+            accessibilityLabel="Privacy Policy"
+          >
+            <Text style={s.legalLink}>Privacy Policy</Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -314,4 +331,7 @@ const s = StyleSheet.create({
   trustLine: {
     fontFamily: 'DMSans-Regular', fontSize: 11, color: '#7A8593', textAlign: 'center', marginTop: 8,
   },
+  legalRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 10, marginBottom: 4 },
+  legalLink: { fontFamily: 'DMSans-Regular', fontSize: 11, color: '#5DD9D4', textDecorationLine: 'underline' },
+  legalSep: { fontFamily: 'DMSans-Regular', fontSize: 11, color: '#7A8593' },
 });
