@@ -1,6 +1,4 @@
 runpod~=1.7
-torch==2.1.0+cu121
-torchvision==0.16.0+cu121
 numpy<2
 diffusers==0.33.0
 transformers==4.42.0
