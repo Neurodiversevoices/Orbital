@@ -1,4 +1,5 @@
-FROM runpod/pytorch:1.0.3-cu1281-torch290-ubuntu2204
-RUN pip install --no-cache-dir runpod diffusers transformers accelerate pillow huggingface_hub
+FROM aiorbust/wan2.1-steadydancer:latest
+ENTRYPOINT []
+RUN pip install --no-cache-dir runpod
 COPY handler.py /handler.py
 CMD ["python", "-u", "/handler.py"]
