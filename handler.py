@@ -11,47 +11,44 @@ log = RunPodLogger()
 
 MODEL_PATH = "/model"
 VALID_FRAMES = [i for i in range(1, 82) if (i - 1) % 4 == 0]
+PIPE = None
 
 
 def _snap_frames(n):
     return min(VALID_FRAMES, key=lambda x: abs(x - n))
 
 
-# Module-level init — runs ONCE at worker boot
-import torch
-from diffusers import AutoencoderKLWan, WanImageToVideoPipeline
-from transformers import CLIPVisionModel
+def _load_model():
+    global PIPE
+    if PIPE is not None:
+        return
+    import torch
+    from diffusers import AutoencoderKLWan, WanImageToVideoPipeline
+    from transformers import CLIPVisionModel
 
-log.info("Checking for model — downloading if needed")
-if not Path(MODEL_PATH + "/model_index.json").exists():
-    from huggingface_hub import snapshot_download
-    hf_token = os.environ.get("HF_TOKEN", "") or None
-    log.info(f"Downloading WAN2.1 1.3B (token={'set' if hf_token else 'unset'})")
-    snapshot_download(
-        "Wan-AI/Wan2.1-I2V-1.3B-480P-Diffusers",
-        local_dir=MODEL_PATH,
-        token=hf_token,
-        ignore_patterns=["*.gguf"],
+    if not Path(MODEL_PATH + "/model_index.json").exists():
+        from huggingface_hub import snapshot_download
+        hf_token = os.environ.get("HF_TOKEN") or None
+        log.info(f"Downloading model (token_set={hf_token is not None})")
+        snapshot_download(
+            "Wan-AI/Wan2.1-I2V-1.3B-480P-Diffusers",
+            local_dir=MODEL_PATH,
+            token=hf_token,
+            ignore_patterns=["*.gguf"],
+        )
+
+    log.info("Loading model into GPU")
+    image_encoder = CLIPVisionModel.from_pretrained(
+        MODEL_PATH, subfolder="image_encoder", torch_dtype=torch.float32
     )
-    log.info("Download complete")
-
-log.info("Loading model into GPU")
-image_encoder = CLIPVisionModel.from_pretrained(
-    MODEL_PATH, subfolder="image_encoder", torch_dtype=torch.float32
-)
-vae = AutoencoderKLWan.from_pretrained(
-    MODEL_PATH, subfolder="vae", torch_dtype=torch.float32
-)
-PIPE = WanImageToVideoPipeline.from_pretrained(
-    MODEL_PATH, vae=vae, image_encoder=image_encoder, torch_dtype=torch.bfloat16
-)
-PIPE.to("cuda")
-log.info("Model ready")
-
-
-@runpod.serverless.register_fitness_check
-def gpu_available():
-    assert torch.cuda.is_available(), "CUDA not available"
+    vae = AutoencoderKLWan.from_pretrained(
+        MODEL_PATH, subfolder="vae", torch_dtype=torch.float32
+    )
+    PIPE = WanImageToVideoPipeline.from_pretrained(
+        MODEL_PATH, vae=vae, image_encoder=image_encoder, torch_dtype=torch.bfloat16
+    )
+    PIPE.to("cuda")
+    log.info("Model ready")
 
 
 def handler(event):
@@ -70,6 +67,7 @@ def handler(event):
 
     try:
         Path(image_path).write_bytes(base64.b64decode(image_b64))
+        _load_model()
 
         from diffusers.utils import export_to_video
         from PIL import Image
