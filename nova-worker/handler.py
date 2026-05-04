@@ -6,6 +6,7 @@ from pathlib import Path
 
 import runpod
 
+MODEL_PATH = os.environ.get("MODEL_PATH", "/runpod-volume/wan2.1-i2v-14b")
 PIPE = None
 
 
@@ -17,16 +18,16 @@ def _load_model():
     from diffusers import AutoencoderKLWan, WanImageToVideoPipeline
     from transformers import CLIPVisionModel
 
-    model_id = os.environ.get("MODEL_ID", "Wan-AI/Wan2.1-I2V-14B-480P-Diffusers")
     dtype = torch.bfloat16
+    print(f"Loading WAN2.1 from {MODEL_PATH}", flush=True)
     image_encoder = CLIPVisionModel.from_pretrained(
-        model_id, subfolder="image_encoder", torch_dtype=dtype
+        MODEL_PATH, subfolder="image_encoder", torch_dtype=dtype
     )
     vae = AutoencoderKLWan.from_pretrained(
-        model_id, subfolder="vae", torch_dtype=torch.float32
+        MODEL_PATH, subfolder="vae", torch_dtype=torch.float32
     )
     PIPE = WanImageToVideoPipeline.from_pretrained(
-        model_id, vae=vae, image_encoder=image_encoder, torch_dtype=dtype
+        MODEL_PATH, vae=vae, image_encoder=image_encoder, torch_dtype=dtype
     )
     PIPE.to("cuda")
     print("WAN2.1 loaded", flush=True)
@@ -34,6 +35,11 @@ def _load_model():
 
 def handler(job):
     inp = job.get("input", {})
+
+    # One-time setup mode: download model to volume
+    if inp.get("setup"):
+        return _setup()
+
     image_b64 = inp.get("image_base64", "")
     prompt = inp.get("prompt", "a person moving naturally, photorealistic")
     num_frames = max(16, min(int(inp.get("length", 81)), 120))
@@ -67,6 +73,21 @@ def handler(job):
         return {"error": str(e)}
     finally:
         Path(image_path).unlink(missing_ok=True)
+
+
+def _setup():
+    from huggingface_hub import snapshot_download
+    dest = Path(MODEL_PATH)
+    if (dest / "model_index.json").exists():
+        return {"status": "already_exists", "path": str(dest)}
+    dest.mkdir(parents=True, exist_ok=True)
+    print(f"Downloading WAN2.1 I2V 14B to {dest}...", flush=True)
+    snapshot_download(
+        "Wan-AI/Wan2.1-I2V-14B-480P-Diffusers",
+        local_dir=str(dest),
+        ignore_patterns=["*.gguf"],
+    )
+    return {"status": "done", "path": str(dest)}
 
 
 runpod.serverless.start({"handler": handler})
