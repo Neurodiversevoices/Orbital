@@ -1,0 +1,11 @@
+.git
+__pycache__
+.venv
+weights/
+*.mp4
+.DS_Store
+*.pyc
+nova-worker/
+node_modules/
+dist/
+.eas/
