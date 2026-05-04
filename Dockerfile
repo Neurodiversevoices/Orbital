@@ -5,8 +5,12 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python
 
 WORKDIR /app
 
+# Torch first — must use PyTorch index
+RUN pip install --no-cache-dir     torch==2.1.0+cu121 torchvision==0.16.0+cu121     --index-url https://download.pytorch.org/whl/cu121
+
+# Rest from PyPI
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt     --extra-index-url https://download.pytorch.org/whl/cu121
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY handler.py .
 
