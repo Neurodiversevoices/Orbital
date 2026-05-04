@@ -5,12 +5,15 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python
 
 WORKDIR /app
 
-# Torch first — must use PyTorch index
+# Torch via PyTorch index
 RUN pip install --no-cache-dir     torch==2.1.0+cu121 torchvision==0.16.0+cu121     --index-url https://download.pytorch.org/whl/cu121
 
-# Rest from PyPI
+# Rest of deps
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Bake T2V 1.3B model — public, no token needed (~5GB)
+RUN python -c "from huggingface_hub import snapshot_download; snapshot_download('Wan-AI/Wan2.1-T2V-1.3B-Diffusers', local_dir='/model')"
 
 COPY handler.py .
 
