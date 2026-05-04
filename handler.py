@@ -1,4 +1,5 @@
 import base64
+import os
 import traceback
 import uuid
 from pathlib import Path
@@ -9,8 +10,6 @@ from runpod.serverless.modules.rp_logger import RunPodLogger
 log = RunPodLogger()
 
 MODEL_PATH = "/model"
-
-# Valid WAN temporal VAE frame counts: (n-1) % 4 == 0
 VALID_FRAMES = [i for i in range(1, 82) if (i - 1) % 4 == 0]
 
 
@@ -18,12 +17,25 @@ def _snap_frames(n):
     return min(VALID_FRAMES, key=lambda x: abs(x - n))
 
 
-# Module-level init — runs ONCE at worker boot, not per request
+# Module-level init — runs ONCE at worker boot
 import torch
 from diffusers import AutoencoderKLWan, WanImageToVideoPipeline
 from transformers import CLIPVisionModel
 
-log.info(f"Loading WAN2.1 I2V 1.3B from {MODEL_PATH}")
+log.info("Checking for model — downloading if needed")
+if not Path(MODEL_PATH + "/model_index.json").exists():
+    from huggingface_hub import snapshot_download
+    hf_token = os.environ.get("HF_TOKEN", "") or None
+    log.info(f"Downloading WAN2.1 1.3B (token={'set' if hf_token else 'unset'})")
+    snapshot_download(
+        "Wan-AI/Wan2.1-I2V-1.3B-480P-Diffusers",
+        local_dir=MODEL_PATH,
+        token=hf_token,
+        ignore_patterns=["*.gguf"],
+    )
+    log.info("Download complete")
+
+log.info("Loading model into GPU")
 image_encoder = CLIPVisionModel.from_pretrained(
     MODEL_PATH, subfolder="image_encoder", torch_dtype=torch.float32
 )
