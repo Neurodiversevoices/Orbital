@@ -8,6 +8,7 @@ from runpod.serverless.modules.rp_logger import RunPodLogger
 
 log = RunPodLogger()
 
+MODEL_REPO = "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
 MODEL_PATH = "/model"
 VALID_FRAMES = [i for i in range(1, 82) if (i - 1) % 4 == 0]
 PIPE = None
@@ -23,6 +24,14 @@ def _load_model():
         return
     import torch
     from diffusers import WanPipeline
+    from huggingface_hub import snapshot_download
+
+    model_dir = Path(MODEL_PATH)
+    if not (model_dir / "model_index.json").exists():
+        log.info(f"Downloading {MODEL_REPO} to {MODEL_PATH} ...")
+        snapshot_download(MODEL_REPO, local_dir=MODEL_PATH)
+        log.info("Download complete")
+
     log.info(f"Loading WAN T2V 1.3B from {MODEL_PATH}")
     PIPE = WanPipeline.from_pretrained(MODEL_PATH, torch_dtype=torch.bfloat16)
     PIPE.to("cuda")

@@ -12,9 +12,6 @@ RUN pip install --no-cache-dir     torch==2.1.0+cu121 torchvision==0.16.0+cu121 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Bake T2V 1.3B model — public, no token needed (~5GB)
-RUN python -c "from huggingface_hub import snapshot_download; snapshot_download('Wan-AI/Wan2.1-T2V-1.3B-Diffusers', local_dir='/model')"
-
 COPY handler.py .
 
 CMD ["python", "-u", "handler.py"]
