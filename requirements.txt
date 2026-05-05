@@ -1,7 +1,7 @@
 runpod~=1.7
 numpy<2
 ftfy
-opencv-python-headless
+imageio[ffmpeg]
 diffusers==0.33.0
 transformers==4.42.0
 accelerate==0.33.0
