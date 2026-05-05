@@ -29,6 +29,20 @@ def _load_model():
     log.info("Model ready")
 
 
+def _save_video(frames, out_path: str, fps: int = 16):
+    """Save frames to MP4 using imageio (no OpenCV needed)."""
+    import imageio
+    import numpy as np
+    writer = imageio.get_writer(out_path, fps=fps, format="mp4", codec="libx264", quality=8)
+    for frame in frames:
+        if hasattr(frame, "numpy"):
+            frame = frame.numpy()
+        if hasattr(frame, "__array__"):
+            frame = np.array(frame)
+        writer.append_data(frame)
+    writer.close()
+
+
 def handler(event):
     job_input = event["input"]
     log.info(f"job: {list(job_input.keys())}")
@@ -39,11 +53,10 @@ def handler(event):
 
     try:
         _load_model()
-        from diffusers.utils import export_to_video
         import base64
 
         result = PIPE(prompt=prompt, num_frames=num_frames, guidance_scale=5.0, num_inference_steps=20)
-        export_to_video(result.frames[0], out_path, fps=16)
+        _save_video(result.frames[0], out_path, fps=16)
         video_b64 = base64.b64encode(Path(out_path).read_bytes()).decode()
         return {"video_b64": video_b64, "frames": num_frames, "fps": 16}
 
