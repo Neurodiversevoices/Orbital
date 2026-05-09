@@ -10,6 +10,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AccessibilityInfo } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { STORAGE_KEYS } from '../storage';
 import {
@@ -69,14 +70,33 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
   const [isOnline, setIsOnline] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load settings on mount
+  // Load settings on mount, then sync `reduceMotion` from OS-level
+  // AccessibilityInfo. Followup #5: respect the system Reduce Motion toggle so
+  // users don't have to double-toggle (OS + in-app).
   useEffect(() => {
     const loadSettings = async () => {
       try {
         const data = await AsyncStorage.getItem(STORAGE_KEYS.ACCESSIBILITY);
+        let osReduceMotion = false;
+        try {
+          osReduceMotion = await AccessibilityInfo.isReduceMotionEnabled();
+        } catch {
+          // No-op: web/SSR without AccessibilityInfo support
+        }
+
         if (data) {
           const saved = JSON.parse(data);
-          setSettings({ ...DEFAULT_ACCESSIBILITY_SETTINGS, ...saved });
+          // OS setting wins when ON; user can still opt-in via in-app toggle.
+          setSettings({
+            ...DEFAULT_ACCESSIBILITY_SETTINGS,
+            ...saved,
+            reduceMotion: osReduceMotion || !!saved.reduceMotion,
+          });
+        } else {
+          setSettings({
+            ...DEFAULT_ACCESSIBILITY_SETTINGS,
+            reduceMotion: osReduceMotion,
+          });
         }
 
         // Load undo stack
@@ -93,6 +113,25 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
       setIsLoaded(true);
     };
     loadSettings();
+  }, []);
+
+  // Subscribe to OS-level reduce-motion changes. When the user flips iOS
+  // Settings → Accessibility → Motion → Reduce Motion, mirror the change in
+  // our settings. We do not persist this back to AsyncStorage — it's an
+  // ambient OS signal, not user intent.
+  useEffect(() => {
+    const sub = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      (enabled: boolean) => {
+        setSettings(prev => (prev.reduceMotion === enabled ? prev : { ...prev, reduceMotion: enabled }));
+      },
+    );
+    return () => {
+      // RN >= 0.65: subscription has .remove(); guard for older surface area.
+      if (sub && typeof (sub as { remove?: () => void }).remove === 'function') {
+        (sub as { remove: () => void }).remove();
+      }
+    };
   }, []);
 
   // Save settings

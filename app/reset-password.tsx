@@ -7,7 +7,7 @@
  * enter a new password.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -18,16 +18,24 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Eye, EyeOff } from 'lucide-react-native';
-import { useAuth, validatePassword } from '../lib/supabase';
+import { useAuth, validatePassword, getSupabase } from '../lib/supabase';
 
 const BG = '#01020A';
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
   const auth = useAuth();
+  const params = useLocalSearchParams<{
+    token?: string;
+    token_hash?: string;
+    access_token?: string;
+    refresh_token?: string;
+    type?: string;
+    email?: string;
+  }>();
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -35,6 +43,89 @@ export default function ResetPasswordScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  // Recovery-session state. We only allow the password form once the deep-link
+  // token has produced a valid recovery session (or one already exists).
+  // Followup #9: guard against /reset-password being navigated to without a
+  // valid recovery token.
+  const [verifying, setVerifying] = useState(true);
+  const [tokenValid, setTokenValid] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const validate = async () => {
+      try {
+        const supabase = getSupabase();
+
+        // 1) If a recovery session already exists (e.g. detectSessionInUrl
+        //    on web), accept it.
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          if (!cancelled) {
+            setTokenValid(true);
+            setVerifying(false);
+          }
+          return;
+        }
+
+        // 2) Modern Supabase recovery links carry token_hash in the query.
+        const tokenHash = params.token_hash || params.token;
+        if (tokenHash) {
+          const { error: verifyErr } = await supabase.auth.verifyOtp({
+            type: 'recovery',
+            token_hash: String(tokenHash),
+          } as Parameters<typeof supabase.auth.verifyOtp>[0]);
+          if (!cancelled) {
+            if (verifyErr) {
+              setTokenValid(false);
+              setError('This password reset link is invalid or has expired.');
+            } else {
+              setTokenValid(true);
+            }
+            setVerifying(false);
+          }
+          return;
+        }
+
+        // 3) Legacy hash-fragment style (access_token + refresh_token).
+        if (params.access_token && params.refresh_token) {
+          const { error: setErr } = await supabase.auth.setSession({
+            access_token: String(params.access_token),
+            refresh_token: String(params.refresh_token),
+          });
+          if (!cancelled) {
+            if (setErr) {
+              setTokenValid(false);
+              setError('This password reset link is invalid or has expired.');
+            } else {
+              setTokenValid(true);
+            }
+            setVerifying(false);
+          }
+          return;
+        }
+
+        // 4) No token, no session — block the form.
+        if (!cancelled) {
+          setTokenValid(false);
+          setError('This password reset link is invalid or has expired.');
+          setVerifying(false);
+        }
+      } catch {
+        if (!cancelled) {
+          setTokenValid(false);
+          setError('Could not verify reset link. Please request a new one.');
+          setVerifying(false);
+        }
+      }
+    };
+
+    validate();
+    return () => {
+      cancelled = true;
+    };
+  }, [params.token, params.token_hash, params.access_token, params.refresh_token]);
 
   const passwordValidation = validatePassword(password);
 
@@ -80,6 +171,38 @@ export default function ResetPasswordScreen() {
             onPress={() => router.replace('/(tabs)')}
           >
             <Text style={styles.btnText}>Continue to Orbital</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (verifying) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.center}>
+          <ActivityIndicator color="#FFFFFF" size="large" />
+          <Text style={[styles.subtitle, { marginTop: 16 }]}>
+            Verifying reset link…
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!tokenValid) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.center}>
+          <Text style={styles.title}>Link Expired</Text>
+          <Text style={styles.subtitle}>
+            {error || 'This password reset link is invalid or has expired.'}
+          </Text>
+          <Pressable
+            style={styles.btn}
+            onPress={() => router.replace('/auth')}
+          >
+            <Text style={styles.btnText}>Back to Sign In</Text>
           </Pressable>
         </View>
       </SafeAreaView>

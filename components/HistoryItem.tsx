@@ -24,9 +24,9 @@ import { TranslationKeys, Locale } from '../locales';
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const stateColors: Record<CapacityState, string> = {
-  resourced: '#00E5FF',
-  stretched: '#E8A830',
-  depleted: '#F44336',
+  resourced: '#06B6D4',
+  stretched: '#F59E0B',
+  depleted: '#DC2626',
 };
 
 const tagIcons: Record<string, React.ComponentType<any>> = {
@@ -110,10 +110,10 @@ export function HistoryItem({ log, onDelete }: HistoryItemProps) {
 
       {/* Time info */}
       <View style={styles.timeContainer}>
-        <Text style={styles.timeText}>
+        <Text style={styles.timeText} maxFontSizeMultiplier={1.5}>
           {formatTime(log.timestamp, locale)}
         </Text>
-        <Text style={styles.dateText}>
+        <Text style={styles.dateText} maxFontSizeMultiplier={1.5}>
           {formatDate(log.timestamp, t, locale)}
         </Text>
       </View>
@@ -128,14 +128,16 @@ export function HistoryItem({ log, onDelete }: HistoryItemProps) {
               return (
                 <View key={tag} style={[styles.tagChip, { borderColor: `${color}40` }]}>
                   <Icon size={12} color={color} strokeWidth={1.5} />
-                  <Text style={[styles.tagLabel, { color }]}>{getTagLabel(tag, t)}</Text>
+                  <Text style={[styles.tagLabel, { color }]} maxFontSizeMultiplier={1.5}>
+                    {getTagLabel(tag, t)}
+                  </Text>
                 </View>
               );
             })}
           </View>
         )}
         {log.note && (
-          <Text style={styles.noteText} numberOfLines={1}>
+          <Text style={styles.noteText} numberOfLines={1} maxFontSizeMultiplier={1.5}>
             {log.note}
           </Text>
         )}

@@ -73,7 +73,7 @@ Sentry.init({
   sessionTrackingIntervalMillis: 30000, // 30 seconds
 
   // ==========================================================================
-  // beforeSend: Filter noise BEFORE it reaches Sentry
+  // beforeSend: Filter noise BEFORE it reaches Sentry + scrub PII
   // ==========================================================================
   beforeSend(event, hint) {
     // DROP: warning, info, debug levels (noise)
@@ -81,6 +81,53 @@ Sentry.init({
     const level = event.level;
     if (level === 'warning' || level === 'info' || level === 'debug' || level === 'log') {
       return null; // Discard - do not send to Sentry
+    }
+
+    // ------------------------------------------------------------------------
+    // PII SCRUBBER — strip emails / phone numbers from exception messages and
+    // local variables before they ship to Sentry. Audit followup #3.
+    //
+    // Email pattern: matches local-part@domain.tld
+    // Phone pattern: matches a leading "+" or digit followed by 7+ chars of
+    //   digits / spaces / parens / dots / hyphens. Applied ONLY to message
+    //   strings (not numeric IDs) to avoid false positives.
+    // ------------------------------------------------------------------------
+    const EMAIL_RE = /[\w.+-]+@[\w-]+\.[\w.-]+/g;
+    const PHONE_RE = /(\+?\d[\d\s().-]{7,})/g;
+
+    const scrubString = (s: unknown): unknown => {
+      if (typeof s !== 'string') return s;
+      return s.replace(EMAIL_RE, '[email]').replace(PHONE_RE, '[phone]');
+    };
+
+    try {
+      // Scrub top-level event message (if any)
+      if (event.message && typeof event.message === 'string') {
+        event.message = scrubString(event.message) as string;
+      }
+
+      // Scrub exception values + frame vars
+      const exceptions = event.exception?.values;
+      if (Array.isArray(exceptions)) {
+        for (const ex of exceptions) {
+          if (typeof ex.value === 'string') {
+            ex.value = scrubString(ex.value) as string;
+          }
+          const frames = ex.stacktrace?.frames;
+          if (Array.isArray(frames)) {
+            for (const frame of frames) {
+              if (frame.vars && typeof frame.vars === 'object') {
+                for (const k of Object.keys(frame.vars)) {
+                  frame.vars[k] = scrubString(frame.vars[k]);
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch {
+      // If scrubbing throws, do not block the event; better to send a slightly
+      // PII-leaky error than to silently lose crash visibility.
     }
 
     // Attach additional context for payment-related errors
@@ -293,12 +340,12 @@ const idleStyles = StyleSheet.create({
     maxWidth: 320,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,152,0,0.3)',
+    borderColor: 'rgba(245,158,11,0.3)',
   },
   title: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#FF9800',
+    color: '#F59E0B',
     marginBottom: spacing.md,
   },
   message: {
@@ -344,13 +391,32 @@ function RootLayout() {
   }, [providersReady]);
 
   useEffect(() => {
+    // Forward Supabase recovery params (in URL query OR fragment) to the
+    // reset-password screen so it can establish a recovery session before
+    // allowing a password change. Followup #9.
+    const buildResetPath = (rawUrl: string): string => {
+      try {
+        const queryIdx = rawUrl.indexOf('?');
+        const fragIdx = rawUrl.indexOf('#');
+        const tail =
+          queryIdx >= 0
+            ? rawUrl.slice(queryIdx + 1)
+            : fragIdx >= 0
+              ? rawUrl.slice(fragIdx + 1)
+              : '';
+        return tail ? `/reset-password?${tail}` : '/reset-password';
+      } catch {
+        return '/reset-password';
+      }
+    };
+
     const handleDeepLink = (event: { url: string }) => {
       const { url } = event;
       if (url === 'orbital://log' || url.startsWith('orbital://log')) {
         router.replace('/');
       }
       if (url.startsWith('orbital://reset-password')) {
-        router.replace('/reset-password');
+        router.replace(buildResetPath(url));
       }
     };
 
@@ -361,7 +427,7 @@ function RootLayout() {
         router.replace('/');
       }
       if (url && url.startsWith('orbital://reset-password')) {
-        router.replace('/reset-password');
+        router.replace(buildResetPath(url));
       }
     });
 

@@ -47,19 +47,25 @@ export function EmptyState({
         />
       </View>
 
-      <Text style={[styles.title, size === 'compact' && styles.titleCompact]}>
+      <Text
+        style={[styles.title, size === 'compact' && styles.titleCompact]}
+        maxFontSizeMultiplier={1.5}
+      >
         {title}
       </Text>
 
       {description && (
-        <Text style={[styles.description, size === 'compact' && styles.descriptionCompact]}>
+        <Text
+          style={[styles.description, size === 'compact' && styles.descriptionCompact]}
+          maxFontSizeMultiplier={1.5}
+        >
           {description}
         </Text>
       )}
 
       {actionHint && (
         <View style={styles.actionHintContainer}>
-          <Text style={styles.actionHint}>{actionHint}</Text>
+          <Text style={styles.actionHint} maxFontSizeMultiplier={1.5}>{actionHint}</Text>
         </View>
       )}
     </View>
