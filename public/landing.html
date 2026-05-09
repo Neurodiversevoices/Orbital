@@ -439,6 +439,14 @@ footer a:hover { color: var(--cyan); }
 </head>
 <body>
 
+<!-- Non-diagnostic banner — App Review 1.4.1 belt-and-suspenders.
+     Visible above the hero so reviewers can see Orbital is positioned as
+     a self-tracking instrument, not a medical device. Credibility framing
+     stays in the hero copy below. -->
+<div role="note" aria-label="Non-diagnostic notice" style="position:relative;z-index:5;background:rgba(0,0,0,0.55);backdrop-filter:saturate(140%) blur(10px);-webkit-backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid rgba(255,255,255,0.08);padding:8px 16px;text-align:center;font:500 11px/1.4 'Geist Mono','SF Mono',monospace;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.74);">
+  Non-diagnostic · Self-tracking instrument · Not medical advice
+</div>
+
 <!-- WebGL shader hero background -->
 <canvas id="shader" aria-hidden="true"></canvas>
 <div class="grain" aria-hidden="true"></div>
