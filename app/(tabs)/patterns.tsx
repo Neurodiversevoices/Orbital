@@ -6,6 +6,7 @@ import { HeroSparkline } from '../../components/patterns/HeroSparkline';
 import { PatternCard } from '../../components/patterns/PatternCard';
 import { Skeleton } from '../../components/Skeleton';
 import { SkeletonRow } from '../../components/SkeletonRow';
+import { ParallaxCard } from '../../components/ParallaxCard';
 import { getFakeCapacityData, ALL_FAKE_DATA, type RangeKey } from '../../lib/dev/fakeCapacityData';
 
 const RANGES: RangeKey[] = ['14d', '30d', '90d', '1y', 'all'];
@@ -101,10 +102,10 @@ export default function PatternsScreen() {
           </>
         ) : (
           <>
-            {/* Hero sparkline */}
-            <View style={s.heroWrap}>
+            {/* Hero sparkline · 3D parallax tilt on press */}
+            <ParallaxCard intensity="subtle" style={s.heroWrap}>
               <HeroSparkline data={data} />
-            </View>
+            </ParallaxCard>
 
             {/* Section heading */}
             <Text style={s.sectionHeading}>DETECTED PATTERNS</Text>
