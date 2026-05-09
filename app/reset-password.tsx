@@ -22,6 +22,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { useAuth, validatePassword } from '../lib/supabase';
+import { MeshAtmosphere } from '../components/MeshAtmosphere';
 
 const BG = '#01020A';
 
@@ -70,6 +71,7 @@ export default function ResetPasswordScreen() {
   if (success) {
     return (
       <SafeAreaView style={styles.container}>
+        <MeshAtmosphere intensity="subtle" />
         <View style={styles.center}>
           <Text style={styles.title}>Password Updated</Text>
           <Text style={styles.subtitle}>
@@ -88,6 +90,7 @@ export default function ResetPasswordScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <MeshAtmosphere intensity="subtle" />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.flex}
