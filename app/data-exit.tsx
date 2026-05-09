@@ -14,9 +14,11 @@ import {
   ScrollView,
   Alert,
   Share,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import {
   X,
   Trash2,
@@ -149,6 +151,10 @@ export default function DataExitScreen() {
   }, [logs]);
 
   const handleConfirmDeletion = useCallback(() => {
+    // HIG: warn haptic before presenting a destructive confirmation alert.
+    if (Platform.OS === 'ios') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
+    }
     Alert.alert(
       'Permanent Deletion',
       'This action cannot be undone. All your capacity data will be permanently deleted. Are you absolutely sure?',

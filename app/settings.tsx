@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet, Pressable, Text, Alert, Modal, ScrollView, Platform, Linking } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import Animated, {
   useAnimatedStyle,
   withSpring,
@@ -159,6 +160,11 @@ export default function SettingsScreen() {
     if (logs.length === 0) {
       Alert.alert(t.settings.noData, t.settings.noDataToClear);
       return;
+    }
+
+    // HIG: warn haptic before presenting a destructive confirmation alert.
+    if (Platform.OS === 'ios') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
     }
 
     // Include retention disclosure in confirmation message

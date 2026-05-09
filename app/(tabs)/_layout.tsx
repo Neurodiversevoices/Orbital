@@ -1,9 +1,20 @@
 import { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { Tabs, useRouter } from 'expo-router';
 import { Home, BarChart2, FileText } from 'lucide-react-native';
+import * as Haptics from 'expo-haptics';
 import { colors } from '../../theme';
 import { useAuth } from '../../lib/supabase';
 import { isProfileSetupComplete } from '../profile-setup';
+
+// HIG: light selection haptic on tab change. iOS-only — Android haptic API parity is inconsistent.
+const tabPressHaptic = () => {
+  if (Platform.OS === 'ios') {
+    Haptics.selectionAsync().catch(() => {});
+  }
+};
+
+const tabPressListeners = { tabPress: tabPressHaptic };
 
 export default function TabLayout() {
   const router = useRouter();
@@ -57,6 +68,7 @@ export default function TabLayout() {
             <Home color={color} size={size} />
           ),
         }}
+        listeners={tabPressListeners}
       />
       <Tabs.Screen
         name="patterns"
@@ -66,6 +78,7 @@ export default function TabLayout() {
             <BarChart2 color={color} size={size} />
           ),
         }}
+        listeners={tabPressListeners}
       />
       <Tabs.Screen
         name="brief"
@@ -75,6 +88,7 @@ export default function TabLayout() {
             <FileText color={color} size={size} />
           ),
         }}
+        listeners={tabPressListeners}
       />
     </Tabs>
   );

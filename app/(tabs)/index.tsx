@@ -24,6 +24,7 @@ import Animated, {
 import { useRouter, useLocalSearchParams, Redirect } from 'expo-router';
 import { Settings, TrendingUp, TrendingDown, Minus, Sparkles } from 'lucide-react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 import { SavePulse, CategorySelector, Composer, COMPOSER_HEIGHT, ModeInsightsPanel, OrgRoleBanner } from '../../components';
 import { GlassOrb } from '../../components/GlassOrb';
 
@@ -198,6 +199,10 @@ export default function HomeScreen() {
         const tags = selectedCategory ? [selectedCategory] : [];
         const trimmedNote = note.trim() || undefined;
         await saveEntry(currentState, tags, trimmedNote, trimmedNote);
+        // HIG: confirm successful capacity log with a system success haptic (iOS only).
+        if (Platform.OS === 'ios') {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+        }
         setTimeout(() => {
           setCurrentState(null);
           setSelectedCategory(null);

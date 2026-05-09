@@ -7,7 +7,7 @@
  * in the background before navigating to the main app.
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,8 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Eye, EyeOff } from 'lucide-react-native';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import * as Haptics from 'expo-haptics';
 import { useFonts } from 'expo-font';
 import {
   DMSans_400Regular,
@@ -93,6 +95,9 @@ export default function AuthScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Password input ref — focused via the email field's "next" return key.
+  const passwordInputRef = useRef<TextInput>(null);
 
   const passwordValidation = validatePassword(password);
   const isConfigured = isSupabaseConfigured();
@@ -178,6 +183,9 @@ export default function AuthScreen() {
     const result = await auth.signInWithApple();
     setIsSubmitting(false);
     if (result.success) {
+      if (Platform.OS === 'ios') {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      }
       onSuccess();
     } else if (result.error) {
       setError(result.error);
@@ -269,19 +277,21 @@ export default function AuthScreen() {
           {/* ── Bottom section: auth buttons or email form ── */}
           {authMode === null ? (
             <View style={styles.buttonStack}>
-              {/* Apple — iOS only */}
+              {/* Apple — iOS only. Uses Apple's spec-compliant native button per HIG/4.8. */}
               {Platform.OS === 'ios' ? (
-                <Pressable
-                  style={[styles.btn, styles.appleBtn]}
-                  onPress={handleApple}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
+                isSubmitting ? (
+                  <View style={[styles.btn, styles.appleBtn]}>
                     <ActivityIndicator color="#000" size="small" />
-                  ) : (
-                    <Text style={styles.appleBtnText}> Sign in with Apple</Text>
-                  )}
-                </Pressable>
+                  </View>
+                ) : (
+                  <AppleAuthentication.AppleAuthenticationButton
+                    buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+                    buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.WHITE}
+                    cornerRadius={12}
+                    style={styles.appleNativeBtn}
+                    onPress={handleApple}
+                  />
+                )
               ) : null}
 
               {/* Email — always visible */}
@@ -350,20 +360,31 @@ export default function AuthScreen() {
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
+                autoCorrect={false}
                 keyboardType="email-address"
                 autoComplete="email"
+                textContentType="emailAddress"
+                returnKeyType="next"
+                onSubmitEditing={() => passwordInputRef.current?.focus()}
+                blurOnSubmit={false}
                 editable={!isSubmitting}
               />
 
               <View style={styles.passwordRow}>
                 <TextInput
+                  ref={passwordInputRef}
                   style={[styles.input, styles.passwordInput]}
                   placeholder="Password"
                   placeholderTextColor="rgba(255,255,255,0.35)"
                   value={password}
                   onChangeText={setPassword}
                   {...{ [_HIDDEN]: !showPassword }}
+                  autoCapitalize="none"
+                  autoCorrect={false}
                   autoComplete={authMode === 'signup' ? 'new-password' : 'current-password'}
+                  textContentType={authMode === 'signup' ? 'newPassword' : 'password'}
+                  returnKeyType="go"
+                  onSubmitEditing={handleEmailAuth}
                   editable={!isSubmitting}
                 />
                 <Pressable
@@ -572,6 +593,10 @@ const styles = StyleSheet.create({
   },
   appleBtn: {
     backgroundColor: '#FFFFFF',
+  },
+  appleNativeBtn: {
+    width: '100%',
+    height: 54,
   },
   appleBtnText: {
     fontFamily: 'DMSans_600SemiBold',
