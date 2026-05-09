@@ -715,3 +715,24 @@ export function canUpgrade(fromTierId: string, toTierId: string): boolean {
 export function canDowngrade(_fromTierId: string, _toTierId: string): boolean {
   return CHECKOUT_CONFIG.allowDowngrade;
 }
+
+// ---------------------------------------------------------------------------
+// Cents-denominated aliases for paywall.web.tsx (added 2026-05-09)
+// ---------------------------------------------------------------------------
+
+export const TRIAL_DAYS = 7;
+
+export const PRICES_CENTS = {
+  PRO:    { monthly: 2900,  annual: 29000 },
+  CIRCLE: { monthly: 7900,  annual: 79000 },
+} as const;
+
+export const fmt = (cents: number): string =>
+  (cents / 100).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  });
+
+export const annualSavings = (monthlyCents: number, annualCents: number): number =>
+  Math.round(100 - (annualCents / (monthlyCents * 12)) * 100);

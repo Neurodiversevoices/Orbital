@@ -18,6 +18,7 @@
     "node_modules",
     "lib/sentinel/__tests__",
     "tests/e2e",
-    "scripts"
+    "scripts",
+    "supabase"
   ]
 }
