@@ -22,6 +22,7 @@ import {
 } from 'lucide-react-native';
 import { colors, commonStyles, spacing } from '../theme';
 import {getAllPolicies, PolicyDocument} from '../lib/policies/policyContent';
+import { GlassCard } from '../components/GlassCard';
 const POLICY_ICONS: Record<string, React.ComponentType<{ color: string; size: number }>> = {
   terms_of_service: FileText,
   privacy_policy: Shield,
@@ -65,13 +66,13 @@ export default function LegalScreen() {
         </Pressable>
       </View>
 
-      <View style={styles.infoCard}>
+      <GlassCard style={styles.infoCardSpacing}>
         <Text style={styles.infoTitle}>Policy Center</Text>
         <Text style={styles.infoDesc}>
           Versioned legal documents governing your use of Orbital.
           All policies are effective as of January 1, 2025.
         </Text>
-      </View>
+      </GlassCard>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {policies.map((policy) => {
@@ -193,13 +194,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  infoCard: {
+  infoCardSpacing: {
     marginHorizontal: spacing.md,
-    backgroundColor: 'rgba(0,229,255,0.08)',
-    borderRadius: 12,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.2)',
     marginBottom: spacing.md,
   },
   infoTitle: {
