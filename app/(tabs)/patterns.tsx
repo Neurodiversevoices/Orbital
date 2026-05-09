@@ -1,9 +1,11 @@
 // PATTERNS PREMIUM v1 — Pattern Intelligence
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeroSparkline } from '../../components/patterns/HeroSparkline';
 import { PatternCard } from '../../components/patterns/PatternCard';
+import { Skeleton } from '../../components/Skeleton';
+import { SkeletonRow } from '../../components/SkeletonRow';
 import { getFakeCapacityData, ALL_FAKE_DATA, type RangeKey } from '../../lib/dev/fakeCapacityData';
 
 const RANGES: RangeKey[] = ['14d', '30d', '90d', '1y', 'all'];
@@ -14,6 +16,7 @@ export default function PatternsScreen() {
   const [range, setRange] = useState<RangeKey>('30d');
   const [seed, setSeed] = useState(42);
   const [refreshing, setRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const data = useMemo(() => getFakeCapacityData(range, seed), [range, seed]);
   const all = useMemo(() => getFakeCapacityData('all', seed), [seed]);
@@ -23,6 +26,12 @@ export default function PatternsScreen() {
     const now = Date.now(); const DAY = 86_400_000;
     return full.filter(r => { const t=new Date(r.date).getTime(); return t>=now-60*DAY && t<now-30*DAY; });
   }, [seed]);
+
+  // Simulate initial fetch — replaced by Supabase pattern detection call later.
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 600);
+    return () => clearTimeout(t);
+  }, []);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true); setSeed(s=>s+1); setTimeout(()=>setRefreshing(false), 400);
@@ -74,19 +83,39 @@ export default function PatternsScreen() {
           ))}
         </ScrollView>
 
-        {/* Hero sparkline */}
-        <View style={s.heroWrap}>
-          <HeroSparkline data={data} />
-        </View>
+        {isLoading ? (
+          <>
+            {/* Hero sparkline placeholder */}
+            <View style={s.heroWrap}>
+              <Skeleton height={160} radius={12} />
+            </View>
 
-        {/* Section heading */}
-        <Text style={s.sectionHeading}>DETECTED PATTERNS</Text>
+            {/* Section heading */}
+            <Text style={s.sectionHeading}>DETECTED PATTERNS</Text>
 
-        {/* Pattern cards */}
-        <PatternCard type="monday" data={all} />
-        <PatternCard type="sleep" data={all} />
-        <PatternCard type="trending" data={all} data30d={data30d} prevData30d={prevData30d} />
-        <PatternCard type="seasonal" data={all} />
+            {/* Pattern card placeholders */}
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+          </>
+        ) : (
+          <>
+            {/* Hero sparkline */}
+            <View style={s.heroWrap}>
+              <HeroSparkline data={data} />
+            </View>
+
+            {/* Section heading */}
+            <Text style={s.sectionHeading}>DETECTED PATTERNS</Text>
+
+            {/* Pattern cards */}
+            <PatternCard type="monday" data={all} />
+            <PatternCard type="sleep" data={all} />
+            <PatternCard type="trending" data={all} data30d={data30d} prevData30d={prevData30d} />
+            <PatternCard type="seasonal" data={all} />
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
