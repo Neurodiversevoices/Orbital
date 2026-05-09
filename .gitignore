@@ -74,6 +74,7 @@ lib/supabase/config.local.ts
 
 # Claude local settings (may contain secrets in permission history)
 .claude/settings.local.json
+.claude/worktrees/
 keys/
 smoke_*.png
 fastlane/report.xml
