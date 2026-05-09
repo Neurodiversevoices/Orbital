@@ -116,7 +116,10 @@ export default function CirclesCreateInvite() {
         <Muted>
           Share with a trusted peer. No persistent links. Single-use.
           Hard-expiring. Recipient must redeem and you must confirm their
-          identity.
+          identity. By sharing capacity data through Circles you affirm this
+          is voluntary and you understand the recipient will see your
+          self-reported capacity signal until you revoke. Either party can
+          revoke at any time.
         </Muted>
 
         <StatusMessage message={msg} type={msgType} />
