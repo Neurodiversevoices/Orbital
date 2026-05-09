@@ -40,6 +40,17 @@ const tagIcons: Record<Tag, React.ComponentType<any>> = {
 
 const tagOrder: Tag[] = ['sleep', 'stress', 'exercise', 'meds', 'food', 'social'];
 
+const tagA11yLabels: Record<Tag, string> = {
+  sensory: 'Sensory',
+  demand: 'Demand',
+  social: 'Social',
+  sleep: 'Sleep',
+  stress: 'Stress',
+  exercise: 'Exercise',
+  meds: 'Medications',
+  food: 'Food',
+};
+
 function TagButton({
   tag,
   isSelected,
@@ -74,6 +85,10 @@ function TagButton({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       style={[styles.tagButton, animatedStyle]}
+      accessibilityRole="button"
+      accessibilityLabel={tagA11yLabels[tag]}
+      accessibilityState={{ selected: isSelected }}
+      accessibilityHint={isSelected ? 'Double tap to remove this tag' : 'Double tap to add this tag'}
     >
       <Icon
         size={22}

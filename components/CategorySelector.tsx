@@ -62,6 +62,10 @@ function CategoryButton({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       style={[styles.categoryButton, animatedStyle]}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: isSelected }}
+      accessibilityHint={isSelected ? 'Currently selected category' : 'Double tap to select this category'}
     >
       <Icon
         size={24}

@@ -68,6 +68,12 @@ function TabButton({
     scale.value = withSpring(1, { damping: 15 });
   };
 
+  const a11yLabel = isLocked && !isTease
+    ? `${range.label} time range, locked`
+    : isTease
+      ? `${range.label} time range, preview only, requires Pro`
+      : `${range.label} time range`;
+
   return (
     <AnimatedPressable
       onPress={isClickable ? onPress : undefined}
@@ -80,6 +86,9 @@ function TabButton({
         isLocked && !isTease && styles.tabLocked,
         isTease && styles.tabTease,
       ]}
+      accessibilityRole="tab"
+      accessibilityLabel={a11yLabel}
+      accessibilityState={{ selected: isSelected, disabled: !isClickable }}
     >
       {isLocked && !isTease ? (
         <Lock size={10} color="rgba(255,255,255,0.2)" />

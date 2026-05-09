@@ -99,6 +99,8 @@ export function HistoryItem({ log, onDelete }: HistoryItemProps) {
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       style={[styles.container, animatedStyle]}
+      accessibilityRole="button"
+      accessibilityLabel={`Capacity ${log.state} at ${formatTime(log.timestamp, locale)} on ${formatDate(log.timestamp, t, locale)}${log.note ? `, note: ${log.note}` : ''}`}
     >
       {/* Capacity state orb indicator */}
       <View style={styles.orbIndicator}>
@@ -144,7 +146,10 @@ export function HistoryItem({ log, onDelete }: HistoryItemProps) {
         <Pressable
           onPress={() => onDelete(log.id)}
           style={styles.deleteButton}
-          hitSlop={8}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel="Delete log"
+          accessibilityHint="Removes this capacity log entry"
         >
           <Trash2 size={16} color="rgba(255,255,255,0.25)" />
         </Pressable>

@@ -30,7 +30,9 @@
       "icon": "./assets/icon.png",
       "infoPlist": {
         "LSApplicationCategoryType": "public.app-category.healthcare-fitness",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSFaceIDUsageDescription": "Orbital uses Face ID to unlock your private vault and protect sensitive actions like deleting your account or exporting your data.",
+        "NSUserTrackingUsageDescription": "Allow Orbital to measure which Apple Search Ads campaign brought you here. This is used only for first-party attribution analytics — Orbital never tracks you across other companies' apps or websites."
       }
     },
     "android": {

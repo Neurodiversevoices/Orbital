@@ -52,6 +52,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          tabBarAccessibilityLabel: 'Home',
           tabBarIcon: ({ color, size }) => (
             <Home color={color} size={size} />
           ),
@@ -60,6 +61,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="patterns"
         options={{
+          tabBarAccessibilityLabel: 'Patterns',
           tabBarIcon: ({ color, size }) => (
             <BarChart2 color={color} size={size} />
           ),
@@ -68,6 +70,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="brief"
         options={{
+          tabBarAccessibilityLabel: 'Brief',
           tabBarIcon: ({ color, size }) => (
             <FileText color={color} size={size} />
           ),
