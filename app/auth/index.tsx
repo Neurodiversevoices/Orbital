@@ -23,7 +23,9 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated from 'react-native-reanimated';
 import { Eye, EyeOff } from 'lucide-react-native';
+import { useSpringPress } from '../../lib/animations/useSpringPress';
 import { useFonts } from 'expo-font';
 import {
   DMSans_400Regular,
@@ -96,6 +98,9 @@ export default function AuthScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Spring physics for the primary email-auth submit button
+  const submitPress = useSpringPress();
 
   const passwordValidation = validatePassword(password);
   const isConfigured = isSupabaseConfigured();
@@ -414,19 +419,23 @@ export default function AuthScreen() {
                 </Pressable>
               ) : null}
 
-              <Pressable
-                style={[styles.btn, styles.appleBtn, isSubmitting && styles.btnDisabled]}
-                onPress={handleEmailAuth}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <ActivityIndicator color="#000" size="small" />
-                ) : (
-                  <Text style={styles.appleBtnText}>
-                    {authMode === 'signup' ? 'Create account' : 'Sign in'}
-                  </Text>
-                )}
-              </Pressable>
+              <Animated.View style={submitPress.animatedStyle}>
+                <Pressable
+                  style={[styles.btn, styles.appleBtn, isSubmitting && styles.btnDisabled]}
+                  onPress={handleEmailAuth}
+                  onPressIn={submitPress.onPressIn}
+                  onPressOut={submitPress.onPressOut}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <ActivityIndicator color="#000" size="small" />
+                  ) : (
+                    <Text style={styles.appleBtnText}>
+                      {authMode === 'signup' ? 'Create account' : 'Sign in'}
+                    </Text>
+                  )}
+                </Pressable>
+              </Animated.View>
 
               <Pressable
                 style={styles.backLink}
