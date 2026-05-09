@@ -1,20 +1,21 @@
 <!doctype html>
-<html lang="en" data-motion="on" data-sound="off">
+<html lang="en" data-motion="on">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Orbital — Capacity Intelligence Instrument</title>
-<meta name="description" content="Capacity intelligence for anyone running close to their limit. A clinical-grade instrument. iOS · Android · Web.">
-<meta name="theme-color" content="#0A0E1A">
+<title>Orbital — The intelligence layer for being human at scale</title>
+<meta name="description" content="Orbital turns conversation into outcomes. Grounded retrieval, permissioned tools, and user-controlled memory — all visible, never promised.">
+<meta name="theme-color" content="#01020A">
 <link rel="icon" href="/favicon.ico">
 <link rel="canonical" href="https://orbitalhealth.app/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://orbitalhealth.app/">
-<meta property="og:title" content="Orbital — Capacity Intelligence Instrument">
-<meta property="og:description" content="Capacity intelligence for anyone running close to their limit. Clinical-grade daily instrument.">
+<meta property="og:title" content="Orbital — The intelligence layer for being human at scale">
+<meta property="og:description" content="Orbital turns conversation into outcomes. Grounded retrieval, permissioned tools, and user-controlled memory — all visible, never promised.">
 <meta property="og:image" content="https://orbitalhealth.app/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Orbital — Capacity Intelligence Instrument">
+<meta name="twitter:title" content="Orbital — The intelligence layer for being human at scale">
+<meta name="twitter:description" content="Trust visible. Outcomes, not chat.">
 <meta name="twitter:image" content="https://orbitalhealth.app/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,544 +23,1502 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-FHEH76Q0JZ"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-FHEH76Q0JZ');function track(n,p){if(typeof gtag==='function')gtag('event',n,p||{});}</script>
 <style>
-/* TOKENS — two-color discipline: --ink + --amber only. --paper for provider report. */
 :root {
-  --ink:    #0A0E1A;
-  --amber:  #F2B134;
-  --paper:  #F4EFE6;
-  --hairline: 1px solid rgba(244,239,230,0.14);
-  --print: cubic-bezier(0.16,1,0.3,1);
-  --gutter: clamp(20px,3vw,64px);
-  --t-display: clamp(52px,8.5vw,148px);
-  --t-h2:      clamp(34px,5vw,78px);
+  --bg:        #01020A;
+  --bg-soft:   #050714;
+  --ink:       #E9EEF7;
+  --ink-dim:   rgba(233,238,247,0.62);
+  --ink-faint: rgba(233,238,247,0.38);
+  --hairline:  rgba(255,255,255,0.10);
+  --glass-bg:  rgba(255,255,255,0.05);
+  --glass-bd:  rgba(255,255,255,0.13);
+  --teal:      #2DD4BF;
+  --cyan:      #06B6D4;
+  --amber:     #F59E0B;
+  --crimson:   #DC2626;
+  --print:     cubic-bezier(0.16,1,0.3,1);
+  --gutter:    clamp(20px,4vw,72px);
+  --t-display: clamp(40px,7.4vw,128px);
+  --t-h2:      clamp(30px,4.6vw,72px);
   --t-h3:      clamp(18px,1.6vw,26px);
-  --t-mono:    clamp(10px,0.75vw,12px);
-}
-@media (prefers-reduced-motion:reduce) {
-  *,*::before,*::after { animation-duration:0.001ms!important; transition-duration:0.001ms!important; }
+  --t-mono:    clamp(10px,0.78vw,12px);
 }
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-html { background:var(--ink); overflow-x:hidden; }
-body { font-family:'JetBrains Mono',ui-monospace,monospace; background:var(--ink); color:var(--paper); line-height:1.6; overflow-x:hidden; }
-::selection { background:var(--amber); color:var(--ink); }
-@media (pointer:fine) { html,a,button { cursor:none; } }
-
-/* INTRO SEQUENCE */
-#intro {
-  position:fixed; inset:0; background:var(--ink); z-index:60;
-  display:grid; place-items:center;
+html { background:var(--bg); overflow-x:hidden; scroll-behavior:auto; }
+body {
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.55;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:'ss01','cv11';
 }
-.reticle { width:260px; height:260px; opacity:0; animation:reticleIn 1.0s var(--print) 0.1s forwards; }
-@keyframes reticleIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
-.reg { position:absolute; color:var(--amber); font-family:'JetBrains Mono',monospace; font-size:16px; opacity:0; animation:regIn 0.4s var(--print) forwards; }
-.reg.tl{top:28px;left:28px;animation-delay:0.72s}
-.reg.tr{top:28px;right:28px;animation-delay:0.82s}
-.reg.bl{bottom:28px;left:28px;animation-delay:0.92s}
-.reg.br{bottom:28px;right:28px;animation-delay:1.02s}
-@keyframes regIn { from{opacity:0;transform:translate(-3px,-3px)} to{opacity:1;transform:translate(0,0)} }
-.boot { position:absolute; bottom:96px; left:0; right:0; text-align:center; color:var(--amber); font-size:11px; letter-spacing:0.2em; opacity:0; animation:bootIn 0.7s var(--print) 1.15s forwards; }
-@keyframes bootIn { from{clip-path:inset(0 100% 0 0);opacity:0} to{clip-path:inset(0 0 0 0);opacity:1} }
+::selection { background:var(--teal); color:var(--bg); }
+:focus-visible {
+  outline:2px solid var(--teal);
+  outline-offset:3px;
+  border-radius:4px;
+}
+a { color:inherit; text-decoration:none; }
+button { font:inherit; color:inherit; background:none; border:none; cursor:pointer; }
 
-/* TELEMETRY STRIP */
-.telemetry { position:fixed; top:0; left:0; right:0; height:36px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; padding:0 var(--gutter); border-bottom:var(--hairline); background:rgba(10,14,26,0.92); backdrop-filter:blur(10px); font-size:10px; letter-spacing:0.18em; z-index:40; }
-.telemetry > :nth-child(2) { color:var(--amber); text-align:center; }
-.telemetry > :nth-child(3) { text-align:right; }
+/* SKIP LINK */
+.skip {
+  position:fixed; top:-100px; left:16px; z-index:200;
+  background:var(--teal); color:var(--bg);
+  padding:10px 14px; border-radius:8px;
+  font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.08em;
+  transition:top 0.18s var(--print);
+}
+.skip:focus { top:16px; }
 
-/* CROSSHAIR */
-.crosshair { position:fixed; top:0; left:0; width:24px; height:24px; pointer-events:none; z-index:100; transform:translate(-50%,-50%); opacity:0; transition:opacity 0.2s; }
-.crosshair.on { opacity:1; }
-.crosshair svg { width:100%; height:100%; stroke:var(--paper); stroke-width:1; overflow:visible; }
-.ch-readout { position:absolute; top:18px; left:18px; font-size:9px; letter-spacing:0.16em; color:var(--paper); white-space:nowrap; opacity:0.7; }
-@media (pointer:coarse) { .crosshair { display:none; } }
+/* CUSTOM CURSOR */
+@media (pointer:fine) and (prefers-reduced-motion:no-preference) {
+  body.has-cursor, body.has-cursor a, body.has-cursor button { cursor:none; }
+}
+.cursor {
+  position:fixed; top:0; left:0; width:22px; height:22px;
+  pointer-events:none; z-index:300;
+  transform:translate(-50%,-50%);
+  mix-blend-mode:difference;
+  opacity:0;
+  transition:opacity 0.2s, width 0.18s var(--print), height 0.18s var(--print);
+}
+.cursor.on { opacity:1; }
+.cursor.lg { width:48px; height:48px; }
+.cursor svg { width:100%; height:100%; stroke:var(--ink); stroke-width:1; overflow:visible; }
+@media (pointer:coarse), (prefers-reduced-motion:reduce) { .cursor { display:none!important; } }
 
-/* HERO */
-#hero { min-height:100vh; display:grid; place-items:center; padding:120px var(--gutter) 80px; position:relative; }
-.headline { font-family:'Inter',system-ui,sans-serif; font-size:var(--t-display); line-height:0.92; text-align:center; letter-spacing:-0.04em; font-weight:200; }
-.headline .char { display:inline-block; opacity:0; transform:translateY(0.55em); transition:opacity 0.4s var(--print),transform 0.4s var(--print); }
-.headline .char.in { opacity:1; transform:translateY(0); }
-.bracket { position:absolute; top:50%; color:var(--amber); font-size:18px; opacity:0.65; }
-.bracket.l { left:var(--gutter); } .bracket.r { right:var(--gutter); }
-.sub { color:var(--paper); opacity:0.65; max-width:480px; text-align:center; margin:36px auto 0; line-height:1.6; font-size:var(--t-mono); letter-spacing:0.1em; }
-.cta-row { display:flex; gap:14px; justify-content:center; margin-top:44px; flex-wrap:wrap; }
-.cta { display:inline-block; padding:14px 22px; border:1px solid var(--amber); color:var(--paper); text-decoration:none; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.16em; transition:background 0.28s,color 0.28s; }
-.cta.primary { background:var(--amber); color:var(--ink); }
-.cta:hover { background:var(--paper); color:var(--ink); border-color:var(--paper); }
-.surface { display:flex; gap:10px; justify-content:center; margin-top:36px; font-size:10px; letter-spacing:0.28em; opacity:0.45; list-style:none; }
+/* WEBGL CANVAS */
+#stage {
+  position:fixed; inset:0; z-index:0;
+  pointer-events:none;
+}
+#stage canvas { display:block; width:100%; height:100%; }
+#stage-fallback {
+  position:fixed; inset:0; z-index:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(45,212,191,0.18) 0%, rgba(6,182,212,0.10) 35%, rgba(1,2,10,0) 70%),
+    radial-gradient(ellipse 30% 30% at 50% 50%, rgba(245,158,11,0.08) 0%, rgba(1,2,10,0) 60%),
+    var(--bg);
+  display:none;
+}
 
-/* GAUGE CONSOLE */
-#gauge { min-height:100vh; display:grid; place-items:center; padding:100px var(--gutter); position:relative; }
-.orb-caption { position:absolute; top:56px; left:50%; transform:translateX(-50%); font-size:10px; letter-spacing:0.26em; opacity:0.5; white-space:nowrap; }
-.gauge-svg { width:min(72vmin,580px); height:min(72vmin,580px); display:block; }
-.gauge-readout { position:absolute; bottom:80px; left:50%; transform:translateX(-50%); text-align:center; display:flex; flex-direction:column; align-items:center; gap:4px; }
-.gauge-num { color:var(--amber); font-family:'Inter',system-ui,sans-serif; font-size:clamp(40px,7vmin,72px); letter-spacing:0.04em; font-weight:200; }
-.gauge-state { color:var(--paper); opacity:0.65; font-size:10px; letter-spacing:0.32em; }
-.gauge-time  { color:var(--paper); opacity:0.35; font-size:9px; letter-spacing:0.18em; }
+/* TELEMETRY HUD */
+.hud {
+  position:fixed; top:0; left:0; right:0;
+  height:38px;
+  display:grid; grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  padding:0 var(--gutter);
+  border-bottom:1px solid var(--hairline);
+  background:rgba(1,2,10,0.65);
+  backdrop-filter:blur(14px) saturate(140%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:0.18em; color:var(--ink-dim);
+  z-index:50;
+}
+.hud > :nth-child(2) { color:var(--teal); text-align:center; }
+.hud > :nth-child(3) { text-align:right; }
+.hud .dot {
+  display:inline-block; width:6px; height:6px; border-radius:50%;
+  background:var(--teal);
+  margin-right:8px; vertical-align:middle;
+  box-shadow:0 0 8px var(--teal);
+  animation:pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:0.55} 50%{opacity:1} }
 
-/* PATTERN TELEMETRY */
-#telemetry { padding:120px var(--gutter); }
-.h2 { font-family:'Inter',system-ui,sans-serif; font-size:var(--t-h2); font-weight:200; letter-spacing:-0.03em; margin:0 0 64px; }
-.strip-track { display:grid; gap:20px; }
-.strip { height:32px; display:grid; grid-template-columns:60px 1fr; gap:16px; align-items:center; }
-.strip-label { font-size:10px; letter-spacing:0.2em; opacity:0.45; }
-.strip-bars { display:grid; grid-template-columns:repeat(24,1fr); height:100%; gap:2px; }
-.strip-bar { background:rgba(244,239,230,0.07); transition:background 0.25s; border-radius:1px; }
-.strip-bar.amber { background:rgba(242,177,52,0.65); }
-.strip-bar.dim   { background:rgba(244,239,230,0.03); }
-.strip-bar:hover { background:var(--paper)!important; }
-.caption { font-size:10px; letter-spacing:0.22em; opacity:0.45; margin-top:28px; text-align:right; }
+/* NAV */
+.nav {
+  position:fixed; top:38px; left:0; right:0;
+  height:54px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 var(--gutter);
+  z-index:48;
+  pointer-events:none;
+}
+.nav > * { pointer-events:auto; }
+.brand {
+  display:flex; align-items:center; gap:10px;
+  font-family:'Inter',system-ui,sans-serif;
+  font-weight:500; font-size:14px; letter-spacing:-0.01em;
+}
+.brand-mark {
+  width:18px; height:18px; border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, var(--teal), var(--cyan) 70%);
+  box-shadow:0 0 12px rgba(45,212,191,0.55), inset 0 0 6px rgba(255,255,255,0.4);
+}
+.nav-links { display:flex; gap:8px; }
+.nav-links a {
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; letter-spacing:0.14em;
+  padding:8px 14px;
+  border:1px solid transparent;
+  border-radius:10px;
+  color:var(--ink-dim);
+  transition:color 0.2s, border-color 0.2s, background 0.2s;
+}
+.nav-links a:hover, .nav-links a:focus-visible {
+  color:var(--ink); border-color:var(--glass-bd); background:var(--glass-bg);
+}
+.nav-links a.cta-pill {
+  background:var(--teal); color:var(--bg); border-color:var(--teal);
+}
+.nav-links a.cta-pill:hover { background:#5EEAD4; border-color:#5EEAD4; }
+@media (max-width:680px) { .nav-links a:not(.cta-pill) { display:none; } }
 
-/* PROVIDER REPORT */
-#report { padding:120px var(--gutter); display:grid; place-items:center; }
-.page.paper { background:var(--paper); color:var(--ink); padding:60px 56px; max-width:720px; width:100%; position:relative; }
-.perf { position:absolute; left:0; right:0; height:12px; background:repeating-linear-gradient(90deg,var(--ink) 0 4px,transparent 4px 12px); }
-.perf.top{top:-6px} .perf.bottom{bottom:-6px}
-.page-head { display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.22em; padding-bottom:20px; border-bottom:1px solid var(--ink); }
-.page .h3 { font-family:'Inter',system-ui,sans-serif; font-size:var(--t-h3); font-weight:280; margin:28px 0 10px; color:var(--ink); }
-.page.paper p,.page.paper li { font-size:14px; color:var(--ink); opacity:0.85; line-height:1.7; font-family:'JetBrains Mono',monospace; }
-.page.paper ul { padding-left:0; list-style:none; margin:0; }
-.page.paper li { padding:4px 0; }
-.page.paper li::before { content:'— '; opacity:0.5; }
-.page-foot { display:flex; justify-content:space-between; gap:16px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.18em; margin-top:48px; padding-top:18px; border-top:1px solid var(--ink); opacity:0.55; flex-wrap:wrap; }
-.stamp { display:inline-block; border:1px solid var(--ink); padding:6px 12px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.2em; opacity:0.65; margin-top:20px; transform:rotate(-1.4deg); }
+/* SCENE LAYOUT */
+section.scene {
+  position:relative;
+  z-index:2;
+  padding:140px var(--gutter) 120px;
+  min-height:100vh;
+  display:flex; flex-direction:column; justify-content:center;
+}
+.scene-meta {
+  position:absolute; top:104px; left:var(--gutter);
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:0.22em;
+  color:var(--ink-faint);
+}
+.scene-meta .num { color:var(--teal); margin-right:10px; }
 
-/* PRICING SCHEMA */
-#pricing { padding:120px var(--gutter); display:grid; gap:40px; max-width:1200px; margin:0 auto; }
-.period-toggle { display:flex; }
-.period-toggle button { background:transparent; color:var(--paper); border:1px solid rgba(242,177,52,0.45); padding:12px 18px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.2em; }
-.period-toggle button:first-child { border-right:none; }
-.period-toggle button[aria-pressed="true"] { background:var(--amber); color:var(--ink); border-color:var(--amber); }
-.cards { display:grid; gap:24px; }
-@media (min-width:860px) { .cards { grid-template-columns:1fr 1fr; } }
-.spec-card { border:1px solid rgba(244,239,230,0.16); padding:36px; transition:border-color 0.3s; }
-.spec-card:hover { border-color:var(--amber); }
-.spec-card-head { display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.22em; opacity:0.5; margin-bottom:20px; }
-.spec-card-name { font-family:'Inter',system-ui,sans-serif; font-size:clamp(28px,3vw,42px); font-weight:200; letter-spacing:-0.03em; margin-bottom:24px; }
-.specs { list-style:none; padding:0; margin:0 0 28px; }
-.specs li { padding:9px 0; border-bottom:1px solid rgba(244,239,230,0.06); font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.08em; display:flex; gap:10px; align-items:flex-start; }
-.specs li::before { content:'☑'; color:var(--amber); flex-shrink:0; }
-.price { display:flex; align-items:baseline; gap:6px; margin:28px 0 8px; }
-.amount { font-family:'Inter',system-ui,sans-serif; font-size:clamp(72px,9vmin,108px); font-weight:200; letter-spacing:-0.04em; color:var(--amber); line-height:1; }
-.amount::before { content:'$'; font-size:0.28em; vertical-align:super; opacity:0.6; }
-.unit { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.2em; opacity:0.55; }
-.save-badge { display:inline-block; border:1px solid var(--amber); color:var(--amber); padding:4px 10px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.18em; transform:rotate(-1.2deg); margin-bottom:20px; }
-.spec-card .cta { margin-top:4px; display:block; text-align:center; }
+/* SCENE 1 — CALIBRATION */
+#scene-calibration {
+  min-height:100vh;
+  text-align:center;
+  align-items:center;
+  padding-top:30vh;
+}
+.eyebrow {
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; letter-spacing:0.32em;
+  color:var(--teal);
+  margin-bottom:28px;
+  opacity:0;
+  animation:fadeUp 0.9s var(--print) 0.3s forwards;
+}
+.headline {
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:var(--t-display);
+  line-height:0.96;
+  letter-spacing:-0.04em;
+  font-weight:300;
+  max-width:18ch;
+  margin:0 auto;
+  font-variation-settings:'opsz' 32;
+}
+.headline .word {
+  display:inline-block;
+  overflow:hidden;
+  vertical-align:bottom;
+}
+.headline .word > span {
+  display:inline-block;
+  transform:translateY(110%);
+  opacity:0;
+}
+.headline .word > span.in {
+  transform:translateY(0);
+  opacity:1;
+  transition:transform 0.9s var(--print), opacity 0.6s var(--print);
+}
+.headline em {
+  font-style:normal;
+  background:linear-gradient(120deg, var(--teal), var(--cyan));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.subhead {
+  margin-top:32px;
+  font-size:clamp(15px,1.3vw,19px);
+  line-height:1.5;
+  color:var(--ink-dim);
+  max-width:52ch;
+  margin-left:auto; margin-right:auto;
+  opacity:0;
+  animation:fadeUp 0.9s var(--print) 1.6s forwards;
+}
+.cta-row {
+  display:flex; gap:12px; justify-content:center;
+  margin-top:44px;
+  flex-wrap:wrap;
+  opacity:0;
+  animation:fadeUp 0.9s var(--print) 1.9s forwards;
+}
+.btn {
+  display:inline-flex; align-items:center; gap:10px;
+  height:54px; padding:0 26px;
+  border-radius:14px;
+  font-family:'Inter',system-ui,sans-serif;
+  font-weight:500; font-size:14px; letter-spacing:0.01em;
+  transition:transform 0.22s var(--print), background 0.22s, border-color 0.22s, box-shadow 0.22s;
+  border:1px solid var(--glass-bd);
+  background:var(--glass-bg);
+  color:var(--ink);
+  backdrop-filter:blur(10px);
+}
+.btn:hover, .btn:focus-visible {
+  transform:translateY(-1px);
+  background:rgba(255,255,255,0.09);
+  border-color:rgba(255,255,255,0.22);
+}
+.btn-primary {
+  background:linear-gradient(135deg, var(--teal), var(--cyan));
+  border-color:transparent;
+  color:#02110E;
+  box-shadow:0 8px 32px rgba(45,212,191,0.32), inset 0 1px 0 rgba(255,255,255,0.4);
+  font-weight:600;
+}
+.btn-primary:hover, .btn-primary:focus-visible {
+  box-shadow:0 12px 40px rgba(45,212,191,0.5), inset 0 1px 0 rgba(255,255,255,0.5);
+  background:linear-gradient(135deg, #5EEAD4, #22D3EE);
+}
+.scroll-hint {
+  position:absolute; bottom:42px; left:50%;
+  transform:translateX(-50%);
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:0.28em;
+  color:var(--ink-faint);
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  opacity:0;
+  animation:fadeUp 0.9s var(--print) 2.2s forwards;
+}
+.scroll-hint::after {
+  content:'';
+  width:1px; height:38px;
+  background:linear-gradient(to bottom, var(--ink-faint), transparent);
+  animation:dropline 2.2s ease-in-out infinite;
+  transform-origin:top;
+}
+@keyframes dropline { 0%,100%{transform:scaleY(0.4); opacity:0.3} 50%{transform:scaleY(1); opacity:1} }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
 
-/* FOOTER COORDINATES */
-#coordinates { padding:80px var(--gutter) 60px; border-top:var(--hairline); display:grid; gap:48px; }
-@media (min-width:900px) { #coordinates { grid-template-columns:2fr 1fr 1fr; } }
-.plate .row { display:grid; grid-template-columns:88px 1fr; padding:7px 0; font-size:10px; letter-spacing:0.16em; border-bottom:1px solid rgba(244,239,230,0.05); }
-.plate .k { opacity:0.45; } .plate .v { opacity:0.8; }
-.links { display:flex; flex-direction:column; gap:10px; font-size:10px; letter-spacing:0.16em; }
-.links a { color:var(--paper); text-decoration:none; opacity:0.6; transition:opacity 0.2s,color 0.2s; }
-.links a:hover { color:var(--amber); opacity:1; }
-.toggles { display:flex; flex-direction:column; gap:10px; }
-.toggles button { background:transparent; color:var(--paper); border:1px solid rgba(244,239,230,0.16); padding:10px 14px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.2em; text-align:left; transition:border-color 0.25s,color 0.25s; }
-.toggles button[aria-pressed="true"] { border-color:var(--amber); color:var(--amber); }
+/* SCENE 2 — TRUST VISIBLE */
+#scene-trust { padding-bottom:160px; }
+.scene-title {
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:var(--t-h2);
+  font-weight:300;
+  letter-spacing:-0.03em;
+  line-height:1.05;
+  max-width:18ch;
+  margin-bottom:24px;
+}
+.scene-title em {
+  font-style:normal;
+  background:linear-gradient(120deg, var(--teal), var(--cyan));
+  -webkit-background-clip:text; background-clip:text;
+  color:transparent;
+}
+.scene-lead {
+  font-size:clamp(15px,1.2vw,18px);
+  color:var(--ink-dim);
+  max-width:52ch;
+  line-height:1.55;
+  margin-bottom:64px;
+}
+.glass-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:18px;
+  perspective:1400px;
+}
+.glass-card {
+  position:relative;
+  padding:22px 22px 20px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--glass-bd);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  overflow:hidden;
+  transform-style:preserve-3d;
+  transition:transform 0.5s var(--print), border-color 0.3s, background 0.3s;
+  will-change:transform;
+}
+.glass-card::before {
+  content:'';
+  position:absolute; inset:0;
+  border-radius:inherit;
+  background:linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0.04) 100%);
+  pointer-events:none;
+}
+.glass-card::after {
+  content:'';
+  position:absolute; inset:-1px;
+  border-radius:inherit;
+  background:linear-gradient(135deg, rgba(45,212,191,0.0), rgba(6,182,212,0.0));
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.3s;
+  z-index:-1;
+}
+.glass-card:hover {
+  transform:translateY(-4px);
+  border-color:rgba(255,255,255,0.22);
+  background:rgba(255,255,255,0.07);
+}
+.gc-label {
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:0.18em;
+  color:var(--teal);
+  margin-bottom:14px;
+}
+.gc-label .gc-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--teal);
+  box-shadow:0 0 8px var(--teal);
+}
+.gc-title {
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:17px; font-weight:500;
+  margin-bottom:8px;
+  letter-spacing:-0.005em;
+}
+.gc-body {
+  font-size:13.5px; line-height:1.5;
+  color:var(--ink-dim);
+  margin-bottom:16px;
+}
+.gc-chip {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 10px;
+  border-radius:999px;
+  background:rgba(45,212,191,0.10);
+  border:1px solid rgba(45,212,191,0.30);
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:0.10em;
+  color:var(--teal);
+}
+.gc-chip.alt {
+  background:rgba(6,182,212,0.08);
+  border-color:rgba(6,182,212,0.28);
+  color:var(--cyan);
+}
+.gc-toggle {
+  display:inline-flex; align-items:center; gap:10px;
+  margin-top:6px;
+  padding:8px 12px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--glass-bd);
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; letter-spacing:0.06em;
+  color:var(--ink);
+}
+.gc-toggle .switch {
+  width:28px; height:16px;
+  background:var(--teal);
+  border-radius:999px;
+  position:relative;
+  flex-shrink:0;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.2);
+}
+.gc-toggle .switch::after {
+  content:''; position:absolute;
+  top:2px; right:2px;
+  width:12px; height:12px; border-radius:50%;
+  background:var(--bg);
+  box-shadow:0 1px 2px rgba(0,0,0,0.3);
+}
+.gc-citation {
+  display:flex; gap:10px;
+  padding:10px 12px;
+  border-radius:10px;
+  border-left:2px solid var(--teal);
+  background:rgba(255,255,255,0.03);
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; letter-spacing:0.04em;
+  color:var(--ink-dim);
+}
+.gc-citation .src { color:var(--teal); flex-shrink:0; }
+
+/* SCENE 3 — CRISIS */
+#scene-crisis {
+  text-align:center;
+  align-items:center;
+  min-height:90vh;
+}
+.crisis-mark {
+  display:inline-flex; align-items:center; gap:10px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; letter-spacing:0.22em;
+  color:var(--amber);
+  margin-bottom:32px;
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid rgba(245,158,11,0.35);
+  background:rgba(245,158,11,0.08);
+}
+.crisis-mark .pulse {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--crimson);
+  box-shadow:0 0 12px var(--crimson);
+  animation:pulse 1.6s ease-in-out infinite;
+}
+.crisis-headline {
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:clamp(34px,5.6vw,84px);
+  font-weight:300;
+  line-height:1.02;
+  letter-spacing:-0.035em;
+  max-width:18ch;
+  margin:0 auto;
+}
+.crisis-headline strong { font-weight:500; color:var(--amber); }
+.crisis-sub {
+  margin-top:28px;
+  font-size:clamp(15px,1.3vw,19px);
+  color:var(--ink-dim);
+  max-width:48ch;
+  margin-left:auto; margin-right:auto;
+}
+
+/* SCENE 4 — THREE LAYERS */
+#scene-layers .layers-head {
+  display:grid; gap:32px;
+  grid-template-columns:1fr;
+  margin-bottom:64px;
+  align-items:end;
+}
+@media (min-width:900px) { #scene-layers .layers-head { grid-template-columns:1.4fr 1fr; } }
+.hud-readout {
+  border:1px solid var(--glass-bd);
+  background:var(--glass-bg);
+  border-radius:14px;
+  padding:18px 22px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; letter-spacing:0.10em;
+  color:var(--ink-dim);
+  display:grid; gap:10px;
+  backdrop-filter:blur(10px);
+}
+.hud-readout .row { display:flex; justify-content:space-between; gap:14px; }
+.hud-readout .k { color:var(--ink-faint); }
+.hud-readout .v { color:var(--teal); font-variant-numeric:tabular-nums; font-feature-settings:'tnum'; }
+.hud-readout .v.amber { color:var(--amber); }
+.hud-readout .v.cyan { color:var(--cyan); }
+.layers-grid {
+  display:grid; gap:16px;
+  grid-template-columns:1fr;
+}
+@media (min-width:780px) { .layers-grid { grid-template-columns:repeat(3,1fr); } }
+.layer-card {
+  padding:28px 24px 26px;
+  border-radius:18px;
+  border:1px solid var(--glass-bd);
+  background:linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+  backdrop-filter:blur(14px) saturate(140%);
+  position:relative;
+  overflow:hidden;
+  transition:border-color 0.3s, transform 0.3s var(--print);
+}
+.layer-card:hover { transform:translateY(-3px); border-color:rgba(255,255,255,0.22); }
+.layer-card .layer-num {
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; letter-spacing:0.20em;
+  color:var(--teal);
+  margin-bottom:18px;
+}
+.layer-card.l2 .layer-num { color:var(--cyan); }
+.layer-card.l3 .layer-num { color:var(--amber); }
+.layer-card .layer-title {
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:24px; font-weight:400;
+  letter-spacing:-0.02em;
+  margin-bottom:8px;
+}
+.layer-card .layer-tag {
+  font-size:13.5px; color:var(--ink-dim);
+  margin-bottom:22px;
+  line-height:1.5;
+}
+.layer-card ul { list-style:none; display:grid; gap:9px; }
+.layer-card li {
+  font-family:'JetBrains Mono',monospace;
+  font-size:11.5px; letter-spacing:0.04em;
+  color:var(--ink);
+  display:flex; gap:10px; align-items:flex-start;
+  line-height:1.5;
+}
+.layer-card li::before {
+  content:''; flex-shrink:0;
+  width:5px; height:5px; border-radius:50%;
+  background:var(--teal); margin-top:7px;
+  box-shadow:0 0 6px var(--teal);
+}
+.layer-card.l2 li::before { background:var(--cyan); box-shadow:0 0 6px var(--cyan); }
+.layer-card.l3 li::before { background:var(--amber); box-shadow:0 0 6px var(--amber); }
+
+/* SCENE 5 — TIERS */
+#scene-tiers .tier-grid {
+  display:grid; gap:14px;
+  grid-template-columns:1fr;
+}
+@media (min-width:680px) { #scene-tiers .tier-grid { grid-template-columns:repeat(2,1fr); } }
+@media (min-width:1080px) { #scene-tiers .tier-grid { grid-template-columns:repeat(3,1fr); } }
+.tier {
+  padding:24px 22px;
+  border-radius:16px;
+  border:1px solid var(--glass-bd);
+  background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+  backdrop-filter:blur(12px);
+  position:relative;
+  transition:transform 0.35s var(--print), border-color 0.3s, background 0.3s;
+  cursor:pointer;
+  overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.tier:hover, .tier:focus-within {
+  transform:translateY(-6px);
+  border-color:rgba(45,212,191,0.45);
+  background:linear-gradient(180deg, rgba(45,212,191,0.06), rgba(255,255,255,0.02));
+}
+.tier-head {
+  display:flex; justify-content:space-between; align-items:flex-start;
+  gap:12px;
+  margin-bottom:14px;
+}
+.tier-name {
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:21px; font-weight:500;
+  letter-spacing:-0.015em;
+}
+.tier-name .sub {
+  display:block;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:0.22em;
+  color:var(--ink-faint);
+  font-weight:400;
+  margin-top:4px;
+}
+.tier-badge {
+  font-family:'JetBrains Mono',monospace;
+  font-size:9.5px; letter-spacing:0.18em;
+  padding:4px 9px;
+  border-radius:999px;
+  background:rgba(45,212,191,0.12);
+  color:var(--teal);
+  border:1px solid rgba(45,212,191,0.28);
+  white-space:nowrap;
+}
+.tier-badge.amber { background:rgba(245,158,11,0.10); color:var(--amber); border-color:rgba(245,158,11,0.28); }
+.tier-badge.cyan  { background:rgba(6,182,212,0.10);  color:var(--cyan);  border-color:rgba(6,182,212,0.28); }
+.tier-line {
+  font-size:14px; line-height:1.5;
+  color:var(--ink); margin-bottom:14px;
+  font-weight:400;
+}
+.tier-chips {
+  display:flex; gap:6px; flex-wrap:wrap;
+  margin-top:auto;
+}
+.tier-chip {
+  font-family:'JetBrains Mono',monospace;
+  font-size:9.5px; letter-spacing:0.10em;
+  padding:4px 8px;
+  border-radius:6px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--hairline);
+  color:var(--ink-dim);
+}
+
+/* SCENE 6 — BEGIN */
+#scene-begin {
+  text-align:center;
+  align-items:center;
+  min-height:90vh;
+}
+.begin-eyebrow {
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; letter-spacing:0.32em;
+  color:var(--teal);
+  margin-bottom:28px;
+}
+.begin-headline {
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:clamp(34px,5.4vw,80px);
+  font-weight:300;
+  line-height:1.02;
+  letter-spacing:-0.035em;
+  max-width:20ch;
+  margin:0 auto 24px;
+}
+.begin-headline em {
+  font-style:normal;
+  background:linear-gradient(120deg, var(--teal), var(--cyan));
+  -webkit-background-clip:text; background-clip:text;
+  color:transparent;
+}
+.begin-sub {
+  font-size:clamp(15px,1.2vw,18px);
+  color:var(--ink-dim);
+  max-width:48ch;
+  margin:0 auto 44px;
+}
+
+/* FOOTER */
+footer.foot {
+  position:relative; z-index:2;
+  padding:80px var(--gutter) 48px;
+  border-top:1px solid var(--hairline);
+  background:rgba(1,2,10,0.72);
+  backdrop-filter:blur(10px);
+  display:grid; gap:48px;
+}
+@media (min-width:900px) { footer.foot { grid-template-columns:2fr 1fr 1fr 1fr; } }
+.foot-brand {
+  display:flex; flex-direction:column; gap:14px;
+  max-width:36ch;
+}
+.foot-brand .brand { font-size:16px; }
+.foot-brand p {
+  font-size:13px; color:var(--ink-dim); line-height:1.55;
+}
+.foot-disclaimer {
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:0.18em;
+  color:var(--ink-faint);
+  margin-top:8px;
+}
+.foot-col h4 {
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:0.22em;
+  color:var(--ink-faint);
+  margin-bottom:14px;
+  font-weight:500;
+}
+.foot-col ul { list-style:none; display:grid; gap:10px; }
+.foot-col a {
+  font-size:13.5px;
+  color:var(--ink-dim);
+  transition:color 0.2s;
+}
+.foot-col a:hover, .foot-col a:focus-visible { color:var(--teal); }
+.foot-bottom {
+  grid-column:1/-1;
+  display:flex; justify-content:space-between;
+  flex-wrap:wrap; gap:16px;
+  padding-top:32px;
+  border-top:1px solid var(--hairline);
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:0.16em;
+  color:var(--ink-faint);
+}
+
+/* REDUCED MOTION */
+@media (prefers-reduced-motion:reduce) {
+  *,*::before,*::after {
+    animation-duration:0.001ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:0.001ms!important;
+    scroll-behavior:auto!important;
+  }
+  .headline .word > span { transform:none!important; opacity:1!important; }
+  .eyebrow, .subhead, .cta-row, .scroll-hint { opacity:1!important; }
+  .scroll-hint::after { display:none; }
+  #stage { display:none; }
+  #stage-fallback { display:block!important; }
+}
+
+/* PRINT */
+@media print {
+  #stage, #stage-fallback, .cursor, .scroll-hint { display:none!important; }
+  body { background:white; color:black; }
+}
 </style>
 </head>
 <body>
 
-<!-- ① INTRO SEQUENCE -->
-<section id="intro" data-element="intro-sequence" aria-label="Instrument boot sequence">
-  <svg class="reticle" viewBox="0 0 200 200" aria-hidden="true">
-    <circle cx="100" cy="100" r="88" fill="none" stroke="#F2B134" stroke-width="1" opacity="0.8"/>
-    <circle cx="100" cy="100" r="56" fill="none" stroke="#F2B134" stroke-width="0.75" stroke-dasharray="3 5" opacity="0.55"/>
-    <line x1="100" y1="4" x2="100" y2="196" stroke="#F2B134" stroke-width="0.5" opacity="0.6"/>
-    <line x1="4" y1="100" x2="196" y2="100" stroke="#F2B134" stroke-width="0.5" opacity="0.6"/>
-    <circle cx="100" cy="100" r="3" fill="#F2B134" opacity="0.9"/>
-  </svg>
-  <div class="reg tl" aria-hidden="true">+</div>
-  <div class="reg tr" aria-hidden="true">+</div>
-  <div class="reg bl" aria-hidden="true">+</div>
-  <div class="reg br" aria-hidden="true">+</div>
-  <div class="boot">ORBITAL · CAPACITY INSTRUMENT · REF.0001 · CAL 04.25.2026</div>
-</section>
+<a class="skip" href="#scene-calibration">Skip to content</a>
 
-<!-- TELEMETRY STRIP -->
-<header class="telemetry" role="banner" aria-live="polite">
-  <span>ORBITAL · REF.0001</span>
-  <span data-clock>—</span>
-  <span>CAP <strong data-live-cap>59</strong> · <strong data-live-state>ELEVATED</strong></span>
+<!-- WEBGPU/WEBGL STAGE -->
+<div id="stage" aria-hidden="true"></div>
+<div id="stage-fallback" aria-hidden="true"></div>
+
+<!-- TELEMETRY HUD -->
+<header class="hud" role="banner" aria-live="polite">
+  <span><span class="dot" aria-hidden="true"></span>ORBITAL · v131</span>
+  <span data-hud-state>CALIBRATING</span>
+  <span><span data-hud-cap>0.28</span> · CAPACITY FIELD</span>
 </header>
 
-<!-- ② CALIPER HERO -->
-<section id="hero" data-element="caliper-hero" aria-label="Headline">
-  <span class="bracket l" aria-hidden="true">+</span>
-  <h1 class="headline" id="headline">Know your capacity<br>before it breaks.</h1>
-  <span class="bracket r" aria-hidden="true">+</span>
-  <p class="sub">Capacity intelligence for anyone running close to their limit.</p>
-  <nav class="cta-row" aria-label="Primary actions">
-    <a href="#gauge" class="cta primary" data-magnet>OPEN INSTRUMENT →</a>
-    <a href="#report" class="cta" data-magnet>VIEW SAMPLE REPORT</a>
-  </nav>
-  <ul class="surface" aria-label="Available platforms">
-    <li>iOS</li><li aria-hidden="true">·</li><li>Android</li><li aria-hidden="true">·</li><li>Web</li>
-  </ul>
-</section>
+<!-- NAV -->
+<nav class="nav" aria-label="Primary navigation">
+  <a class="brand" href="#scene-calibration" aria-label="Orbital home">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <span>Orbital</span>
+  </a>
+  <div class="nav-links">
+    <a href="#scene-trust">Trust</a>
+    <a href="#scene-layers">Architecture</a>
+    <a href="#scene-tiers">Tiers</a>
+    <a href="https://apps.apple.com/app/orbital" class="cta-pill" data-magnet>Begin →</a>
+  </div>
+</nav>
 
-<!-- CROSSHAIR CURSOR -->
-<div class="crosshair" aria-hidden="true">
-  <svg viewBox="0 0 24 24"><line x1="0" y1="12" x2="24" y2="12"/><line x1="12" y1="0" x2="12" y2="24"/></svg>
-  <span class="ch-readout"></span>
+<!-- CUSTOM CURSOR -->
+<div class="cursor" aria-hidden="true">
+  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none"/><line x1="0" y1="12" x2="24" y2="12"/><line x1="12" y1="0" x2="12" y2="24"/></svg>
 </div>
 
-<!-- ③ GAUGE CONSOLE -->
-<section id="gauge" data-element="gauge-console" aria-label="Capacity gauge instrument">
-  <p class="orb-caption">CAPACITY · LIVE · 24-HR ROLLING NORMALIZATION</p>
-  <svg class="gauge-svg" id="capGauge" role="img" aria-label="Analog capacity gauge showing 59 percent — elevated"></svg>
-  <div class="gauge-readout" aria-live="polite">
-    <span class="gauge-num" data-gauge-num>59</span>
-    <span class="gauge-state" data-gauge-state>ELEVATED</span>
-    <span class="gauge-time" data-clock-fine>—</span>
+<main id="main">
+
+  <!-- SCENE 1 — CALIBRATION -->
+  <section class="scene" id="scene-calibration" aria-labelledby="hl-1">
+    <div class="scene-meta"><span class="num">01</span>CALIBRATION</div>
+    <p class="eyebrow">A NEW INTELLIGENCE LAYER</p>
+    <h1 class="headline" id="hl-1" data-typeset>
+      The intelligence layer for <em>being human at scale.</em>
+    </h1>
+    <p class="subhead">
+      Trust visible. Outcomes, not chat. Orbital combines retrieval grounded in your sources, tools you grant explicitly, and memory you control — so conversation actually moves work forward.
+    </p>
+    <div class="cta-row">
+      <a href="https://apps.apple.com/app/orbital" class="btn btn-primary" data-magnet onclick="track('cta_begin_personal')">Begin Personal →</a>
+      <a href="#scene-tiers" class="btn" data-magnet>For teams →</a>
+    </div>
+    <div class="scroll-hint" aria-hidden="true">SCROLL · CALIBRATE</div>
+  </section>
+
+  <!-- SCENE 2 — TRUST VISIBLE -->
+  <section class="scene" id="scene-trust" aria-labelledby="hl-2">
+    <div class="scene-meta"><span class="num">02</span>TRUST · VISIBLE</div>
+    <h2 class="scene-title" id="hl-2">Trust isn't a promise. It's a <em>visible surface.</em></h2>
+    <p class="scene-lead">
+      Every answer cites where it came from. Every memory is yours to edit. Every permission has a scope, a window, and a one-click revoke. You see what Orbital knows — and what it does — at all times.
+    </p>
+    <div class="glass-grid" role="list">
+      <article class="glass-card" role="listitem" data-tilt>
+        <div class="gc-label"><span class="gc-dot"></span>PROVENANCE</div>
+        <div class="gc-title">Every answer carries its sources.</div>
+        <p class="gc-body">Inline citations to your notes, files, and approved web sources. No phantom claims.</p>
+        <div class="gc-citation"><span class="src">[1]</span><span>page 14 of brief.pdf</span></div>
+      </article>
+      <article class="glass-card" role="listitem" data-tilt>
+        <div class="gc-label"><span class="gc-dot"></span>SOURCE TRACE</div>
+        <div class="gc-title">Grounded in what you trust.</div>
+        <p class="gc-body">Pull from your notes, drives, and workspaces — with traceable retrieval, not vibes.</p>
+        <span class="gc-chip">Source: your notes from Mar 4</span>
+      </article>
+      <article class="glass-card" role="listitem" data-tilt>
+        <div class="gc-label"><span class="gc-dot"></span>MEMORY CONTROL</div>
+        <div class="gc-title">Your memory. Your switch.</div>
+        <p class="gc-body">Off by default. Edit, export, or wipe at any time. Memory never travels without consent.</p>
+        <div class="gc-toggle"><span class="switch" aria-hidden="true"></span><span>Use past chats: ON · Edit</span></div>
+      </article>
+      <article class="glass-card" role="listitem" data-tilt>
+        <div class="gc-label"><span class="gc-dot"></span>PERMISSION GRANT</div>
+        <div class="gc-title">Tools execute only with explicit scope.</div>
+        <p class="gc-body">Time-bounded grants. Per-tool. Per-action. Auditable. Revocable in one click.</p>
+        <span class="gc-chip alt">Calendar · Read · 30 days · Revoke</span>
+      </article>
+      <article class="glass-card" role="listitem" data-tilt>
+        <div class="gc-label"><span class="gc-dot"></span>AUDIT LOG</div>
+        <div class="gc-title">Every action, on the record.</div>
+        <p class="gc-body">Read, write, retrieve, summarize — every tool call is logged with who, what, when, and why.</p>
+        <span class="gc-chip">12 events today · Export JSON</span>
+      </article>
+      <article class="glass-card" role="listitem" data-tilt>
+        <div class="gc-label"><span class="gc-dot"></span>EVALS</div>
+        <div class="gc-title">Tested before it ships.</div>
+        <p class="gc-body">Continuous evals on grounding, refusals, and safety regressions. Numbers, not vibes.</p>
+        <span class="gc-chip alt">Faithfulness 0.94 · Build #2412</span>
+      </article>
+    </div>
+  </section>
+
+  <!-- SCENE 3 — CRISIS -->
+  <section class="scene" id="scene-crisis" aria-labelledby="hl-3">
+    <div class="scene-meta"><span class="num">03</span>THE GAP</div>
+    <div class="crisis-mark"><span class="pulse" aria-hidden="true"></span>FIELD UNSTABLE</div>
+    <h2 class="crisis-headline" id="hl-3">
+      Most days you don't run out of time.<br>You run out of <strong>capacity.</strong>
+    </h2>
+    <p class="crisis-sub">And every assistant that doesn't see that — fails. Orbital sees the field, names the state, and adapts before the day breaks.</p>
+  </section>
+
+  <!-- SCENE 4 — THREE LAYERS -->
+  <section class="scene" id="scene-layers" aria-labelledby="hl-4">
+    <div class="scene-meta"><span class="num">04</span>THREE LAYERS</div>
+    <div class="layers-head">
+      <h2 class="scene-title" id="hl-4">A trustworthy core. A capability engine. <em>Packs for who you are.</em></h2>
+      <div class="hud-readout" aria-live="polite" aria-label="Live system telemetry">
+        <div class="row"><span class="k">CAPACITY</span><span class="v" data-tick-cap>0.28</span></div>
+        <div class="row"><span class="k">GROUNDING</span><span class="v cyan" data-tick-ground>0.91</span></div>
+        <div class="row"><span class="k">CONSENT GATES</span><span class="v">7 / 7 ACTIVE</span></div>
+        <div class="row"><span class="k">AUDIT</span><span class="v amber">SIGNED</span></div>
+      </div>
+    </div>
+    <div class="layers-grid">
+      <article class="layer-card l1">
+        <div class="layer-num">LAYER · 01</div>
+        <h3 class="layer-title">Trust core</h3>
+        <p class="layer-tag">The substrate every Orbital surface inherits.</p>
+        <ul>
+          <li>Consent gates on memory, retrieval, and tool use</li>
+          <li>Append-only audit logs · exportable</li>
+          <li>User-controlled memory · off by default</li>
+          <li>Continuous evals · grounding, refusals, regressions</li>
+        </ul>
+      </article>
+      <article class="layer-card l2">
+        <div class="layer-num">LAYER · 02</div>
+        <h3 class="layer-title">Capability engine</h3>
+        <p class="layer-tag">What turns conversation into outcomes.</p>
+        <ul>
+          <li>Grounded answers · retrieval over your sources</li>
+          <li>Bounded agents · scoped, audited, revocable</li>
+          <li>Multimodal · text, voice, files, screen</li>
+          <li>Workspaces · shared context, isolated tenancy</li>
+        </ul>
+      </article>
+      <article class="layer-card l3">
+        <div class="layer-num">LAYER · 03</div>
+        <h3 class="layer-title">Segment packs</h3>
+        <p class="layer-tag">Same core, shaped for the work in front of you.</p>
+        <ul>
+          <li>Personal · default, private-first</li>
+          <li>Workspace · teams, shared retrieval</li>
+          <li>Enterprise · tenancy, controls, residency</li>
+          <li>Health · Edu · Gov · regulated modes</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- SCENE 5 — TIERS -->
+  <section class="scene" id="scene-tiers" aria-labelledby="hl-5">
+    <div class="scene-meta"><span class="num">05</span>PICK YOUR TIER</div>
+    <h2 class="scene-title" id="hl-5">One core. <em>Six postures.</em></h2>
+    <p class="scene-lead">Lead with Personal. Bring your team when you're ready. The same trustworthy core scales across every segment we serve.</p>
+    <div class="tier-grid">
+      <a class="tier" href="https://apps.apple.com/app/orbital" data-magnet aria-label="Orbital Personal — start now">
+        <div class="tier-head">
+          <div class="tier-name">Orbital Personal<span class="sub">CONSUMER · DEFAULT</span></div>
+          <span class="tier-badge">Start here</span>
+        </div>
+        <p class="tier-line">Memory off by default. Yours alone.</p>
+        <div class="tier-chips"><span class="tier-chip">Private-first</span><span class="tier-chip">On-device options</span><span class="tier-chip">Export anytime</span></div>
+      </a>
+      <a class="tier" href="#scene-begin" data-magnet aria-label="Orbital Workspace — for teams">
+        <div class="tier-head">
+          <div class="tier-name">Orbital Workspace<span class="sub">TEAMS · SMB</span></div>
+          <span class="tier-badge cyan">Teams</span>
+        </div>
+        <p class="tier-line">Team knowledge, tenant-isolated.</p>
+        <div class="tier-chips"><span class="tier-chip">Shared retrieval</span><span class="tier-chip">Roles &amp; scopes</span><span class="tier-chip">SSO</span></div>
+      </a>
+      <a class="tier" href="#scene-begin" data-magnet aria-label="Orbital Enterprise">
+        <div class="tier-head">
+          <div class="tier-name">Orbital Enterprise<span class="sub">REGULATED · LARGE</span></div>
+          <span class="tier-badge cyan">Enterprise</span>
+        </div>
+        <p class="tier-line">SOC 2. ISO 42001-aligned.</p>
+        <div class="tier-chips"><span class="tier-chip">Residency</span><span class="tier-chip">DLP hooks</span><span class="tier-chip">Audit export</span></div>
+      </a>
+      <a class="tier" href="#scene-begin" data-magnet aria-label="Orbital Health">
+        <div class="tier-head">
+          <div class="tier-name">Orbital Health<span class="sub">REGULATED MODE</span></div>
+          <span class="tier-badge amber">Regulated</span>
+        </div>
+        <p class="tier-line">HIPAA mode. PHI minimization.</p>
+        <div class="tier-chips"><span class="tier-chip">BAA-ready</span><span class="tier-chip">Redaction</span><span class="tier-chip">Non-diagnostic</span></div>
+      </a>
+      <a class="tier" href="#scene-begin" data-magnet aria-label="Orbital Edu">
+        <div class="tier-head">
+          <div class="tier-name">Orbital Edu<span class="sub">SCHOOLS · DISTRICTS</span></div>
+          <span class="tier-badge amber">Regulated</span>
+        </div>
+        <p class="tier-line">FERPA. COPPA-ready under 13.</p>
+        <div class="tier-chips"><span class="tier-chip">Roster sync</span><span class="tier-chip">Parent consent</span><span class="tier-chip">Safe-mode</span></div>
+      </a>
+      <a class="tier" href="#scene-begin" data-magnet aria-label="Orbital Gov">
+        <div class="tier-head">
+          <div class="tier-name">Orbital Gov<span class="sub">PUBLIC SECTOR</span></div>
+          <span class="tier-badge amber">Regulated</span>
+        </div>
+        <p class="tier-line">FedRAMP track. Section 508.</p>
+        <div class="tier-chips"><span class="tier-chip">GovCloud path</span><span class="tier-chip">CJIS-ready</span><span class="tier-chip">Accessible</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- SCENE 6 — BEGIN -->
+  <section class="scene" id="scene-begin" aria-labelledby="hl-6">
+    <div class="scene-meta"><span class="num">06</span>BEGIN</div>
+    <p class="begin-eyebrow">ONE OF MANY · CONSTELLATION ONLINE</p>
+    <h2 class="begin-headline" id="hl-6">Your orb. <em>Your rules.</em><br>Your outcomes.</h2>
+    <p class="begin-sub">Memory off by default. Sources you trust. Tools you grant. Outcomes you can audit.</p>
+    <div class="cta-row">
+      <a href="https://apps.apple.com/app/orbital" class="btn btn-primary" data-magnet onclick="track('cta_begin_personal_bottom')">Begin Personal →</a>
+      <a href="mailto:eric@orbitalhealth.app?subject=Orbital%20for%20teams" class="btn" data-magnet onclick="track('cta_for_teams')">For teams →</a>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="foot" role="contentinfo">
+  <div class="foot-brand">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>Orbital</span>
+    </div>
+    <p>The intelligence layer for being human at scale. A trustworthy core, a capability engine, and packs for the work in front of you.</p>
+    <p class="foot-disclaimer">NON-DIAGNOSTIC · SELF-TRACKING ONLY</p>
   </div>
-</section>
-
-<!-- ④ PATTERN TELEMETRY -->
-<section id="telemetry" data-element="pattern-telemetry" aria-label="Weekly capacity patterns">
-  <h2 class="h2">Patterns.<br>Printed.</h2>
-  <div class="strip-track" id="stripTrack" role="table" aria-label="Hourly capacity heatmap by day"></div>
-  <p class="caption">HOVER ANY HOUR · TELEMETRY UPDATES ABOVE</p>
-</section>
-
-<!-- ⑤ PROVIDER REPORT -->
-<section id="report" data-element="provider-report" aria-label="Sample provider report">
-  <article class="page paper" role="document">
-    <div class="perf top" aria-hidden="true"></div>
-    <header class="page-head">
-      <span>ORBITAL · CAPACITY INTELLIGENCE REPORT</span>
-      <span>ID 2025-1-001</span>
-    </header>
-    <h3 class="h3">90-day baseline</h3>
-    <p>Capacity sat <strong>near baseline</strong> 62% of days, <strong>above</strong> 24%, <strong>below</strong> 14%. No catastrophic depletion events logged.</p>
-    <h3 class="h3">30-day direction</h3>
-    <p>Trending <strong>steady</strong> with two recovery windows in the last 14 days. Morning capacity consistently 12 points above evening baseline.</p>
-    <h3 class="h3">Areas showing most change</h3>
+  <nav class="foot-col" aria-label="Product">
+    <h4>Product</h4>
     <ul>
-      <li>Sleep window — shifting earlier by 40 min</li>
-      <li>Sensory load — slightly elevated on weekdays</li>
-      <li>Social demand — reduced; correlated with higher capacity scores</li>
+      <li><a href="#scene-trust">Trust</a></li>
+      <li><a href="#scene-layers">Architecture</a></li>
+      <li><a href="#scene-tiers">Tiers</a></li>
+      <li><a href="https://apps.apple.com/app/orbital">App Store</a></li>
+      <li><a href="https://play.google.com/store/apps/details?id=com.erparris.orbital">Play Store</a></li>
     </ul>
-    <div class="stamp" aria-label="Legal exclusion notice">CDS EXCLUSION · CURES ACT §3060(a)</div>
-    <footer class="page-foot">
-      <span>NOT A MEDICAL DEVICE</span>
-      <span>NOT FOR DIAGNOSIS OR TREATMENT</span>
-      <span>ORBITAL HEALTH INTELLIGENCE INC</span>
-    </footer>
-    <div class="perf bottom" aria-hidden="true"></div>
-  </article>
-</section>
-
-<!-- ⑥ PRICING SCHEMA -->
-<section id="pricing" data-element="pricing-schema" aria-label="Subscription specifications">
-  <h2 class="h2">Specifications.</h2>
-  <div class="period-toggle" role="group" aria-label="Billing period">
-    <button data-period="monthly" aria-pressed="false">MONTHLY</button>
-    <button data-period="annual" aria-pressed="true">ANNUAL · SAVE 17%</button>
-  </div>
-  <div class="cards">
-    <article class="spec-card" data-plan="pro">
-      <header class="spec-card-head"><span>MODEL: OB-PRO</span><span>SEATS · 1</span></header>
-      <h3 class="spec-card-name">Pro</h3>
-      <ul class="specs">
-        <li>Daily capacity instrument</li>
-        <li>Pattern detection · weekly</li>
-        <li>Provider-compatible report</li>
-        <li>HealthKit / Health Connect</li>
-        <li>Predictive alerts</li>
-      </ul>
-      <div class="price"><span class="amount" data-price-pro>290</span><span class="unit">/YR</span></div>
-      <div class="save-badge">SAVE 17%</div>
-      <a href="https://apps.apple.com/app/orbital" class="cta primary" data-magnet aria-label="Start 7-day free trial of Pro plan">START 7-DAY TRIAL →</a>
-    </article>
-    <article class="spec-card" data-plan="circle">
-      <header class="spec-card-head"><span>MODEL: OB-CIRCLE</span><span>SEATS · 5</span></header>
-      <h3 class="spec-card-name">Circle</h3>
-      <ul class="specs">
-        <li>Everything in Pro</li>
-        <li>Five seats · expandable</li>
-        <li>Shared cohort patterns</li>
-        <li>Admin dashboard</li>
-      </ul>
-      <div class="price"><span class="amount" data-price-circle>790</span><span class="unit">/YR</span></div>
-      <div class="save-badge">SAVE 17%</div>
-      <a href="https://apps.apple.com/app/orbital" class="cta" data-magnet aria-label="Start 7-day free trial of Circle plan">START 7-DAY TRIAL →</a>
-    </article>
-  </div>
-</section>
-
-<!-- ⑦ FOOTER COORDINATES -->
-<footer id="coordinates" data-element="footer-coordinates" aria-label="Instrument data plate">
-  <nav class="plate" aria-label="Instrument specifications">
-    <div class="row"><span class="k">MFR</span><span class="v">ORBITAL HEALTH INTELLIGENCE INC</span></div>
-    <div class="row"><span class="k">SERIAL</span><span class="v">2025-1-001</span></div>
-    <div class="row"><span class="k">CAL DATE</span><span class="v">04.25.2026</span></div>
-    <div class="row"><span class="k">NEXT CAL</span><span class="v">10.25.2026</span></div>
-    <div class="row"><span class="k">NETWORK</span><span class="v">iOS · ANDROID · WEB</span></div>
-    <div class="row"><span class="k">CONTACT</span><span class="v">eric@orbitalhealth.app</span></div>
   </nav>
-  <nav class="links" aria-label="Site links">
-    <a href="/privacy">01. Privacy</a>
-    <a href="/terms">02. Terms</a>
-    <a href="https://apps.apple.com/app/orbital">03. App Store</a>
-    <a href="https://play.google.com/store/apps/details?id=com.erparris.orbital">04. Play Store</a>
-    <a href="/support">05. Support</a>
+  <nav class="foot-col" aria-label="Sub-brands">
+    <h4>Sub-brands</h4>
+    <ul>
+      <li><a href="#scene-tiers">Personal</a></li>
+      <li><a href="#scene-tiers">Workspace</a></li>
+      <li><a href="#scene-tiers">Enterprise</a></li>
+      <li><a href="#scene-tiers">Health</a></li>
+      <li><a href="#scene-tiers">Edu</a></li>
+      <li><a href="#scene-tiers">Gov</a></li>
+    </ul>
   </nav>
-  <div class="toggles" role="group" aria-label="Display settings">
-    <button data-toggle="motion" aria-pressed="true">MOTION · ON</button>
-    <button data-toggle="sound" aria-pressed="false">SOUND · OFF</button>
+  <nav class="foot-col" aria-label="Company">
+    <h4>Company</h4>
+    <ul>
+      <li><a href="/privacy">Privacy</a></li>
+      <li><a href="/terms">Terms</a></li>
+      <li><a href="/support">Support</a></li>
+      <li><a href="https://status.orbitalhealth.app">Status</a></li>
+      <li><a href="mailto:eric@orbitalhealth.app">Contact</a></li>
+    </ul>
+  </nav>
+  <div class="foot-bottom">
+    <span>© 2026 ORBITAL HEALTH INTELLIGENCE INC</span>
+    <span>v131 · CAL 05.09.2026</span>
   </div>
 </footer>
 
 <script type="module">
-import Lenis from 'https://esm.sh/lenis@1.3.4';
-import gsap from 'https://esm.sh/gsap@3.13.0';
-import { ScrollTrigger } from 'https://esm.sh/gsap@3.13.0/ScrollTrigger.js';
-
-gsap.registerPlugin(ScrollTrigger);
 const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+const isCoarse = matchMedia('(pointer:coarse)').matches;
+const isSmall = innerWidth < 720;
 
-// Lenis + GSAP
-const lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.9 });
-lenis.on('scroll', ScrollTrigger.update);
-gsap.ticker.add(t => lenis.raf(t * 1000));
-gsap.ticker.lagSmoothing(0);
+// ─────────────────────────────────────────────────────────
+// LENIS + GSAP
+// ─────────────────────────────────────────────────────────
+let gsap, ScrollTrigger, Lenis;
+try {
+  const [g, st, l] = await Promise.all([
+    import('https://esm.sh/gsap@3.13.0'),
+    import('https://esm.sh/gsap@3.13.0/ScrollTrigger.js'),
+    import('https://esm.sh/lenis@1.3.4'),
+  ]);
+  gsap = g.default || g.gsap || g;
+  ScrollTrigger = st.ScrollTrigger || st.default;
+  Lenis = l.default || l;
+  gsap.registerPlugin(ScrollTrigger);
+} catch (e) {
+  console.warn('[Orbital] GSAP/Lenis failed to load — falling back', e);
+}
 
-// UTC Clock
-const pad = n => String(n).padStart(2, '0');
-const fmtClock = () => { const d = new Date(); return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())} UTC`; };
-setInterval(() => document.querySelectorAll('[data-clock],[data-clock-fine]').forEach(el => el.textContent = fmtClock()), 1000);
-
-// Intro dismiss
-const introEl = document.getElementById('intro');
-if (reduce) { introEl.style.display = 'none'; }
-else { gsap.delayedCall(1.8, () => gsap.to(introEl, { opacity:0, duration:0.55, ease:'power2.inOut', onComplete:() => introEl.style.display='none' })); }
-
-// ── GAUGE ────────────────────────────────────────────────────────
-function mountGauge(svgEl, initCap) {
-  const SIZE = 600, H = SIZE/2, DEG2R = Math.PI/180;
-  const RBZ=SIZE*.475, RTR=SIZE*.415, RSC=SIZE*.355;
-  const RBO=SIZE*.390, RBI=SIZE*.330;
-  const NL=SIZE*.305, CB=SIZE*.065;
-  const START=-135, SWEEP=270;
-  svgEl.setAttribute('viewBox',`0 0 ${SIZE} ${SIZE}`);
-  const ns='http://www.w3.org/2000/svg';
-  const mk=(t,a)=>{ const e=document.createElementNS(ns,t); Object.entries(a).forEach(([k,v])=>e.setAttribute(k,String(v))); return e; };
-  const pt=(deg,r)=>[H+Math.cos(deg*DEG2R)*r, H+Math.sin(deg*DEG2R)*r];
-  const arc=(sd,ed,ro,ri)=>{
-    const [x1,y1]=pt(sd,ro),[x2,y2]=pt(ed,ro),[x3,y3]=pt(ed,ri),[x4,y4]=pt(sd,ri);
-    const lg=(ed-sd)>180?1:0;
-    return `M${x1} ${y1} A${ro} ${ro} 0 ${lg} 1 ${x2} ${y2} L${x3} ${y3} A${ri} ${ri} 0 ${lg} 0 ${x4} ${y4}Z`;
-  };
-
-  // Background face
-  svgEl.appendChild(mk('circle',{cx:H,cy:H,r:RBZ+8,fill:'#0A0E1A'}));
-  svgEl.appendChild(mk('circle',{cx:H,cy:H,r:RBZ+8,fill:'none',stroke:'#F4EFE6','stroke-width':3,opacity:.1}));
-  svgEl.appendChild(mk('circle',{cx:H,cy:H,r:RBZ,fill:'none',stroke:'#F4EFE6','stroke-width':1.5,opacity:.75}));
-
-  // 12 bezel hashes
-  for(let i=0;i<12;i++){const a=i*30-90;const[x1,y1]=pt(a,RBZ);const[x2,y2]=pt(a,RBZ-10);svgEl.appendChild(mk('line',{x1,y1,x2,y2,stroke:'#F4EFE6','stroke-width':1.2,opacity:.42}));}
-
-  // Chemin-de-fer
-  svgEl.appendChild(mk('circle',{cx:H,cy:H,r:RTR,fill:'none',stroke:'#F4EFE6','stroke-width':.6,opacity:.45}));
-  svgEl.appendChild(mk('circle',{cx:H,cy:H,r:RTR-7,fill:'none',stroke:'#F4EFE6','stroke-width':.6,opacity:.45}));
-
-  // Amber band
-  const bandPath=mk('path',{d:arc(START,START+SWEEP*initCap,RBO,RBI),fill:'#F2B134',opacity:.82});
-  bandPath.id='cap-band'; svgEl.appendChild(bandPath);
-
-  // 60 ticks
-  for(let i=0;i<=60;i++){
-    const deg=START+(i/60)*SWEEP;
-    const ll=i%10===0,l=i%5===0,tl=ll?16:l?9:4;
-    const[x1,y1]=pt(deg,RSC),[x2,y2]=pt(deg,RSC-tl);
-    svgEl.appendChild(mk('line',{x1,y1,x2,y2,stroke:'#F4EFE6','stroke-width':ll?1.4:l?.8:.5,opacity:ll?.9:l?.65:.35}));
+if (Lenis && !reduce) {
+  const lenis = new Lenis({ lerp:0.085, wheelMultiplier:0.95, smoothWheel:true });
+  if (ScrollTrigger) lenis.on('scroll', ScrollTrigger.update);
+  if (gsap) {
+    gsap.ticker.add(t => lenis.raf(t * 1000));
+    gsap.ticker.lagSmoothing(0);
+  } else {
+    function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
   }
+}
 
-  // Numerals
-  for(let i=0;i<=10;i++){
-    const deg=START+(i/10)*SWEEP,[x,y]=pt(deg,RSC-32);
-    const t=mk('text',{x,y:y+4.5,'text-anchor':'middle',fill:'#F4EFE6','font-family':'Inter,system-ui','font-size':13,'font-weight':280,opacity:.85});
-    t.textContent=String(i*10); svgEl.appendChild(t);
-  }
-
-  // Lume dots
-  [0,.25,.5,.75,1].forEach(p=>{const deg=START+p*SWEEP,[x,y]=pt(deg,RSC+16);svgEl.appendChild(mk('circle',{cx:x,cy:y,r:3.5,fill:'#F2B134'}));});
-
-  // Calibration stamp
-  const st=mk('text',{x:H,y:H-SIZE*.295,'text-anchor':'middle',fill:'#F4EFE6','font-family':'JetBrains Mono,monospace','font-size':10,'letter-spacing':1.5,opacity:.65});
-  st.textContent='REF.0001 · CAL 04.25.2026'; svgEl.appendChild(st);
-
-  // Sub-dial 6 o'clock
-  const SCX=H, SCY=H+SIZE*.19, SR=SIZE*.072;
-  svgEl.appendChild(mk('circle',{cx:SCX,cy:SCY,r:SR,fill:'rgba(10,14,26,.6)',stroke:'#F4EFE6','stroke-width':.8,opacity:.55}));
-  for(let i=0;i<8;i++){const a=(i/8)*360-90,ra=a*DEG2R;svgEl.appendChild(mk('line',{x1:SCX+Math.cos(ra)*SR,y1:SCY+Math.sin(ra)*SR,x2:SCX+Math.cos(ra)*(SR-4),y2:SCY+Math.sin(ra)*(SR-4),stroke:'#F4EFE6','stroke-width':.6,opacity:.4}));}
-  const slb=mk('text',{x:SCX,y:SCY-SR-7,'text-anchor':'middle',fill:'#F4EFE6','font-family':'JetBrains Mono,monospace','font-size':8,'letter-spacing':1.6,opacity:.55});
-  slb.textContent='30D AVG'; svgEl.appendChild(slb);
-  const subN=mk('line',{x1:SCX,y1:SCY,x2:SCX,y2:SCY-SR+5,stroke:'#F2B134','stroke-width':1.5,'stroke-linecap':'round'});
-  subN.id='sub-needle'; svgEl.appendChild(subN);
-  svgEl.appendChild(mk('circle',{cx:SCX,cy:SCY,r:2.5,fill:'#F2B134'}));
-
-  // Outer sig
-  const sig=mk('text',{x:H,y:H+SIZE*.43,'text-anchor':'middle',fill:'#F4EFE6','font-family':'JetBrains Mono,monospace','font-size':9,'letter-spacing':2.5,opacity:.5});
-  sig.textContent='ORBITAL · CAPACITY INSTRUMENT'; svgEl.appendChild(sig);
-
-  // Subtle glass highlight
-  svgEl.appendChild(mk('path',{d:'M 175,138 A 145,145 0 0,1 235,88',fill:'none',stroke:'white','stroke-width':20,'stroke-linecap':'round',opacity:.035}));
-
-  // Needle
-  let curCap=initCap;
-  const needleDeg=c=>START+c*SWEEP;
-  const ng=mk('g',{id:'needle-group'});
-  ng.style.cssText=`transform-origin:${H}px ${H}px;transform:rotate(${START}deg);transition:transform 1.4s cubic-bezier(0.16,1,0.3,1)`;
-  ng.appendChild(mk('line',{x1:H,y1:H,x2:H,y2:H-NL,stroke:'#F4EFE6','stroke-width':2,'stroke-linecap':'round'}));
-  ng.appendChild(mk('line',{x1:H,y1:H,x2:H,y2:H+CB,stroke:'#F4EFE6','stroke-width':3,'stroke-linecap':'round',opacity:.75}));
-  svgEl.appendChild(ng);
-  svgEl.appendChild(mk('circle',{cx:H,cy:H,r:8,fill:'#0A0E1A',stroke:'#F2B134','stroke-width':1.8}));
-  svgEl.appendChild(mk('circle',{cx:H,cy:H,r:2.5,fill:'#F2B134'}));
-
-  requestAnimationFrame(()=>ng.style.transform=`rotate(${needleDeg(initCap)}deg)`);
-
-  // Idle tick
-  setInterval(()=>{
-    const b=needleDeg(curCap);
-    ng.style.transition='transform .22s ease-out';
-    ng.style.transform=`rotate(${b+2.6}deg)`;
-    setTimeout(()=>{ng.style.transform=`rotate(${b-1.8}deg)`;
-      setTimeout(()=>{ng.style.transition='transform .55s cubic-bezier(0.16,1,0.3,1)';ng.style.transform=`rotate(${b}deg)`;},260);
-    },260);
-  },8000);
-
-  // Cursor coupling
-  let cActive=false;
-  addEventListener('pointermove',e=>{
-    const r=svgEl.getBoundingClientRect();
-    const ecx=r.left+r.width/2,ecy=r.top+r.height/2;
-    const d=Math.hypot(e.clientX-ecx,e.clientY-ecy);
-    if(d>260){if(cActive){cActive=false;ng.style.transition='transform .6s cubic-bezier(0.16,1,0.3,1)';ng.style.transform=`rotate(${needleDeg(curCap)}deg)`;} return;}
-    cActive=true;
-    const ag=Math.atan2(e.clientY-ecy,e.clientX-ecx)*180/Math.PI+90;
-    const dt=Math.max(-3,Math.min(3,(ag-needleDeg(curCap))*.05));
-    ng.style.transition='transform .14s linear';
-    ng.style.transform=`rotate(${needleDeg(curCap)+dt}deg)`;
+// ─────────────────────────────────────────────────────────
+// CURSOR
+// ─────────────────────────────────────────────────────────
+const cursor = document.querySelector('.cursor');
+if (cursor && !isCoarse && !reduce) {
+  document.body.classList.add('has-cursor');
+  let mx=-200,my=-200,cx=-200,cy=-200;
+  addEventListener('pointermove',e=>{ mx=e.clientX; my=e.clientY; cursor.classList.add('on'); });
+  addEventListener('pointerleave',()=>cursor.classList.remove('on'));
+  addEventListener('blur',()=>cursor.classList.remove('on'));
+  document.querySelectorAll('[data-magnet], a, button').forEach(el=>{
+    el.addEventListener('pointerenter',()=>cursor.classList.add('lg'));
+    el.addEventListener('pointerleave',()=>cursor.classList.remove('lg'));
   });
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  (function tick(){
+    cx=lerp(cx,mx,0.22); cy=lerp(cy,my,0.22);
+    cursor.style.transform=`translate(${cx}px,${cy}px) translate(-50%,-50%)`;
+    requestAnimationFrame(tick);
+  })();
+}
 
-  // Sub-needle scroll progress
-  addEventListener('scroll',()=>{
-    const p=scrollY/Math.max(1,document.body.scrollHeight-innerHeight);
-    subN.style.transformOrigin=`${SCX}px ${SCY}px`;
-    subN.style.transform=`rotate(${p*360}deg)`;
-  },{passive:true});
-
-  return {
-    setCapacity(c){
-      curCap=c;
-      bandPath.setAttribute('d',arc(START,START+SWEEP*c,RBO,RBI));
-      ng.style.transition='transform 1.0s cubic-bezier(0.16,1,0.3,1)';
-      ng.style.transform=`rotate(${needleDeg(c)}deg)`;
+// ─────────────────────────────────────────────────────────
+// HEADLINE TYPESET (split into words/letters)
+// ─────────────────────────────────────────────────────────
+const headline = document.querySelector('[data-typeset]');
+if (headline && !reduce) {
+  const html = headline.innerHTML;
+  // Wrap each word so it can clip its letter
+  const tokens = html.split(/(<em>.*?<\/em>|\s+)/g).filter(Boolean);
+  headline.innerHTML = tokens.map(tok=>{
+    if (/^\s+$/.test(tok)) return ' ';
+    if (tok.startsWith('<em>')) {
+      const inner = tok.slice(4,-5);
+      return `<span class="word"><span><em>${inner}</em></span></span>`;
     }
-  };
+    return `<span class="word"><span>${tok}</span></span>`;
+  }).join(' ');
+
+  const spans = headline.querySelectorAll('.word > span');
+  setTimeout(()=>{
+    spans.forEach((s,i)=>setTimeout(()=>s.classList.add('in'), i*55+400));
+  }, 100);
 }
 
-const gauge = mountGauge(document.getElementById('capGauge'), 0.59);
+// ─────────────────────────────────────────────────────────
+// HUD TICKER
+// ─────────────────────────────────────────────────────────
+const hudCap = document.querySelector('[data-hud-cap]');
+const hudState = document.querySelector('[data-hud-state]');
+const tickCap = document.querySelector('[data-tick-cap]');
+const tickGround = document.querySelector('[data-tick-ground]');
 
-// GSAP clip-path wipes
-if (!reduce) {
-  gsap.from('#gauge', { clipPath:'inset(0 100% 0 0)', duration:1.0, ease:'power3.out', scrollTrigger:{trigger:'#gauge',start:'top 80%',once:true} });
-  gsap.from('#report .page', { clipPath:'inset(0 0 100% 0)', duration:0.9, ease:'power3.out', scrollTrigger:{trigger:'#report',start:'top 72%',once:true} });
-  gsap.from('.strip-track', { opacity:0, y:30, duration:0.7, ease:'power2.out', scrollTrigger:{trigger:'#telemetry',start:'top 80%',once:true} });
-  gsap.from('#pricing .cards', { opacity:0, y:30, duration:0.7, ease:'power2.out', scrollTrigger:{trigger:'#pricing',start:'top 75%',once:true} });
-}
+let cap = 0.28;
+let target = 0.28;
+let ground = 0.91;
 
-// Headline char-print
-const headline = document.getElementById('headline');
-if (headline && !reduce) {
-  const src = headline.innerHTML;
-  headline.innerHTML = src.split('<br>').map(line =>
-    [...line].map(c => c===' '?'<span class="char"> </span>':`<span class="char">${c}</span>`).join('')
-  ).join('<br>');
-  ScrollTrigger.create({
-    trigger:'#hero', start:'top 78%', once:true,
-    onEnter:()=> headline.querySelectorAll('.char').forEach((c,i)=>setTimeout(()=>c.classList.add('in'),i*18+400))
-  });
-}
+const states = ['CALIBRATING','ATMOSPHERE','CAPACITY FIELD','TRUST CORE','CAPABILITY','PACK SELECT','CONSTELLATION'];
+let stateIdx = 0;
+setInterval(()=>{
+  stateIdx = (stateIdx + 1) % states.length;
+  if (hudState) hudState.textContent = states[stateIdx];
+}, 3200);
 
-// Variable-font weight on scroll velocity
-if (headline && !reduce) {
-  let lY=scrollY, lT=performance.now(), w=200;
-  (function tick(now){ const dt=now-lT, v=Math.abs(scrollY-lY)/Math.max(dt,1); w+=(Math.min(700,200+v*500)-w)*.1; headline.style.fontWeight=Math.round(w); lY=scrollY;lT=now; requestAnimationFrame(tick); })(performance.now());
-}
-
-// Crosshair
-const xh=document.querySelector('.crosshair'), xhR=xh?.querySelector('.ch-readout');
-let mx=-200,my=-200,cx2=-200,cy2=-200;
-addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;xh?.classList.add('on');});
-addEventListener('pointerleave',()=>xh?.classList.remove('on'));
-const lerp=(a,b,t)=>a+(b-a)*t;
-(function chTick(){
-  let tx=mx,ty=my,snapped=false,lbl='';
-  document.querySelectorAll('[data-magnet]').forEach(el=>{
-    const r=el.getBoundingClientRect(),ecx=r.left+r.width/2,ecy=r.top+r.height/2;
-    if(Math.hypot(mx-ecx,my-ecy)<60){tx=ecx;ty=ecy;snapped=true;lbl=el.textContent?.trim().slice(0,18)||'→';}
-  });
-  cx2=lerp(cx2,tx,.16);cy2=lerp(cy2,ty,.16);
-  if(xh)xh.style.transform=`translate(${cx2}px,${cy2}px) translate(-50%,-50%)`;
-  if(xhR)xhR.textContent=snapped?lbl:'CAP 59 · ELEVATED';
-  requestAnimationFrame(chTick);
+(function ticker(){
+  cap += (target - cap) * 0.06;
+  if (hudCap) hudCap.textContent = cap.toFixed(2);
+  if (tickCap) tickCap.textContent = cap.toFixed(2);
+  if (tickGround) tickGround.textContent = (ground + Math.sin(performance.now()/1500)*0.02).toFixed(2);
+  requestAnimationFrame(ticker);
 })();
 
-// Pattern telemetry strips
-const track=document.getElementById('stripTrack');
-if(track){
-  ['MON','TUE','WED','THU','FRI'].forEach((day,di)=>{
-    const strip=document.createElement('div'); strip.className='strip';
-    strip.setAttribute('role','row');
-    strip.innerHTML=`<span class="strip-label" role="rowheader">${day}</span><div class="strip-bars" role="row"></div>`;
-    const bars=strip.querySelector('.strip-bars');
-    for(let h=0;h<24;h++){
-      const n=Math.sin((h+di*3)/5.5)*.38+Math.cos((h*1.3+di)/3.8)*.28+.5;
-      const b=document.createElement('div');
-      b.className='strip-bar'+(n>.6?' amber':n<.3?' dim':'');
-      b.setAttribute('role','cell');
-      b.setAttribute('aria-label',`${day} ${pad(h)}:00 — ${Math.round(n*100)}% capacity`);
-      b.addEventListener('mouseenter',()=>{
-        const v=Math.round(n*100);
-        const cap=document.querySelector('[data-live-cap]'), st=document.querySelector('[data-live-state]');
-        const gn=document.querySelector('[data-gauge-num]'), gs=document.querySelector('[data-gauge-state]');
-        const label=v<40?'DEPLETED':v>68?'RESOURCED':'ELEVATED';
-        if(cap)cap.textContent=v; if(st)st.textContent=label;
-        if(gn)gn.textContent=v; if(gs)gs.textContent=label;
-        gauge?.setCapacity(n);
+// Capacity rises as user scrolls deeper
+addEventListener('scroll', ()=>{
+  const p = scrollY / Math.max(1, document.body.scrollHeight - innerHeight);
+  // 0..0.35: 0.28, 0.35..0.5: dip to 0.22 (crisis), 0.5..1: rise to 0.84
+  if (p < 0.30) target = 0.28 + p * 0.10;
+  else if (p < 0.50) target = 0.30 - (p-0.30) * 0.6; // dip
+  else target = 0.20 + (p-0.50) * 1.28;
+  target = Math.max(0.10, Math.min(0.92, target));
+}, { passive:true });
+
+// ─────────────────────────────────────────────────────────
+// GLASS CARD TILT (parallax with mouse)
+// ─────────────────────────────────────────────────────────
+if (!reduce && !isCoarse) {
+  document.querySelectorAll('[data-tilt]').forEach(card=>{
+    let raf=0;
+    card.addEventListener('pointermove', e=>{
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(()=>{
+        card.style.transform = `translateY(-4px) rotateX(${-y*4}deg) rotateY(${x*5}deg)`;
       });
-      bars.appendChild(b);
-    }
-    track.appendChild(strip);
+    });
+    card.addEventListener('pointerleave', ()=>{
+      cancelAnimationFrame(raf);
+      card.style.transform = '';
+    });
   });
 }
 
-// Period toggle
-document.querySelectorAll('.period-toggle button').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.period-toggle button').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));
-    const annual=btn.dataset.period==='annual';
-    const p=document.querySelector('[data-price-pro]'), c=document.querySelector('[data-price-circle]');
-    if(p)p.textContent=annual?'290':'29';
-    if(c)c.textContent=annual?'790':'79';
-    document.querySelectorAll('.unit').forEach(u=>u.textContent=annual?'/YR':'/MO');
-    document.querySelectorAll('.save-badge').forEach(s=>s.style.display=annual?'':'none');
+// ─────────────────────────────────────────────────────────
+// SCROLL CAMERA — fade-up scenes
+// ─────────────────────────────────────────────────────────
+if (gsap && ScrollTrigger && !reduce) {
+  document.querySelectorAll('.scene').forEach(sec=>{
+    if (sec.id === 'scene-calibration') return;
+    gsap.from(sec.querySelectorAll('.scene-meta, .scene-title, .scene-lead, .crisis-mark, .crisis-headline, .crisis-sub, .layers-head, .layers-grid > *, .glass-grid > *, .tier-grid > *, .begin-eyebrow, .begin-headline, .begin-sub, .cta-row, .hud-readout'), {
+      opacity:0, y:36,
+      duration:0.9, ease:'power3.out', stagger:0.06,
+      scrollTrigger:{ trigger:sec, start:'top 76%', once:true }
+    });
   });
-});
 
-// Toggles
-document.querySelectorAll('[data-toggle]').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    const k=btn.dataset.toggle, on=btn.getAttribute('aria-pressed')!=='true';
-    btn.setAttribute('aria-pressed',String(on));
-    btn.textContent=`${k.toUpperCase()} · ${on?'ON':'OFF'}`;
-    document.documentElement.dataset[k]=on?'on':'off';
+  // Headline parallax
+  gsap.to('#scene-calibration .headline', {
+    y:-80, opacity:0.4,
+    scrollTrigger:{ trigger:'#scene-calibration', start:'top top', end:'bottom top', scrub:0.6 }
   });
-});
+}
 
-console.info('[Orbital] REF.0001 initialized. Seven elements. Gauge as centerpiece. No orb.');
+// ─────────────────────────────────────────────────────────
+// WEBGL ORB SCENE (Three.js — WebGPU when available, WebGL fallback)
+// ─────────────────────────────────────────────────────────
+const stage = document.getElementById('stage');
+const stageFallback = document.getElementById('stage-fallback');
+
+if (reduce || isSmall) {
+  // skip WebGL entirely — use static gradient fallback
+  stage.style.display = 'none';
+  stageFallback.style.display = 'block';
+} else {
+  loadOrb().catch(err=>{
+    console.warn('[Orbital] orb scene failed', err);
+    stage.style.display='none';
+    stageFallback.style.display='block';
+  });
+}
+
+async function loadOrb() {
+  const THREE = await import('https://esm.sh/three@0.169.0');
+
+  const w = innerWidth, h = innerHeight;
+  const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.6));
+  renderer.setClearColor(0x000000, 0);
+  stage.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+  camera.position.set(0, 0, 4);
+
+  // ORB — shader sphere with FBM nebula
+  const geo = new THREE.SphereGeometry(1.0, 96, 96);
+  const uniforms = {
+    uTime:   { value: 0.0 },
+    uMouse:  { value: new THREE.Vector2(0,0) },
+    uMouseStrength: { value: 0.0 },
+    uCapacity: { value: 0.28 },           // 0..1
+    uCrisis:   { value: 0.0 },            // 0..1, fades during scene 3
+    uRes:    { value: new THREE.Vector2(w,h) },
+    uColorTeal:    { value: new THREE.Color(0x2DD4BF) },
+    uColorCyan:    { value: new THREE.Color(0x06B6D4) },
+    uColorAmber:   { value: new THREE.Color(0xF59E0B) },
+    uColorCrimson: { value: new THREE.Color(0xDC2626) },
+    uColorBg:      { value: new THREE.Color(0x01020A) },
+  };
+
+  const vert = `
+    varying vec3 vPos;
+    varying vec3 vNormal;
+    varying vec2 vUv;
+    uniform float uTime;
+    uniform vec2 uMouse;
+    uniform float uMouseStrength;
+    uniform float uCrisis;
+
+    // simple hash & noise for vertex displacement
+    vec3 hash3(vec3 p){ p=vec3(dot(p,vec3(127.1,311.7,74.7)),dot(p,vec3(269.5,183.3,246.1)),dot(p,vec3(113.5,271.9,124.6))); return -1.0+2.0*fract(sin(p)*43758.5453123); }
+    float noise(vec3 p){
+      vec3 i=floor(p), f=fract(p);
+      vec3 u=f*f*(3.0-2.0*f);
+      return mix(mix(mix(dot(hash3(i+vec3(0,0,0)),f-vec3(0,0,0)),
+                         dot(hash3(i+vec3(1,0,0)),f-vec3(1,0,0)),u.x),
+                     mix(dot(hash3(i+vec3(0,1,0)),f-vec3(0,1,0)),
+                         dot(hash3(i+vec3(1,1,0)),f-vec3(1,1,0)),u.x),u.y),
+                 mix(mix(dot(hash3(i+vec3(0,0,1)),f-vec3(0,0,1)),
+                         dot(hash3(i+vec3(1,0,1)),f-vec3(1,0,1)),u.x),
+                     mix(dot(hash3(i+vec3(0,1,1)),f-vec3(0,1,1)),
+                         dot(hash3(i+vec3(1,1,1)),f-vec3(1,1,1)),u.x),u.y),u.z);
+    }
+    float fbm(vec3 p){
+      float v=0.0, a=0.5;
+      for(int i=0;i<5;i++){ v+=a*noise(p); p*=2.02; a*=0.5; }
+      return v;
+    }
+    void main(){
+      vUv = uv;
+      vNormal = normal;
+      vec3 p = position;
+      // domain warp
+      vec3 q = vec3(fbm(p*1.6 + uTime*0.10),
+                    fbm(p*1.6 + vec3(5.2,1.3,2.8) + uTime*0.12),
+                    fbm(p*1.6 + vec3(1.7,9.2,5.1) + uTime*0.08));
+      float n = fbm(p*2.0 + q*0.9 + uTime*0.05);
+      // gravitational dimple toward mouse
+      vec3 mDir = normalize(vec3(uMouse, 0.6));
+      float pull = pow(max(dot(normalize(p), mDir), 0.0), 6.0) * uMouseStrength;
+      // crisis ejection
+      float crisis = uCrisis * (0.06 + 0.10 * sin(uTime*4.0 + n*8.0));
+      vec3 displaced = p + normal * (n*0.10 - pull*0.18 + crisis);
+      vPos = displaced;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(displaced, 1.0);
+    }
+  `;
+
+  const frag = `
+    precision highp float;
+    varying vec3 vPos;
+    varying vec3 vNormal;
+    varying vec2 vUv;
+    uniform float uTime;
+    uniform vec2 uMouse;
+    uniform float uMouseStrength;
+    uniform float uCapacity;
+    uniform float uCrisis;
+    uniform vec3 uColorTeal;
+    uniform vec3 uColorCyan;
+    uniform vec3 uColorAmber;
+    uniform vec3 uColorCrimson;
+    uniform vec3 uColorBg;
+
+    vec3 hash3(vec3 p){ p=vec3(dot(p,vec3(127.1,311.7,74.7)),dot(p,vec3(269.5,183.3,246.1)),dot(p,vec3(113.5,271.9,124.6))); return -1.0+2.0*fract(sin(p)*43758.5453123); }
+    float noise(vec3 p){
+      vec3 i=floor(p), f=fract(p);
+      vec3 u=f*f*(3.0-2.0*f);
+      return mix(mix(mix(dot(hash3(i+vec3(0,0,0)),f-vec3(0,0,0)),dot(hash3(i+vec3(1,0,0)),f-vec3(1,0,0)),u.x),
+                     mix(dot(hash3(i+vec3(0,1,0)),f-vec3(0,1,0)),dot(hash3(i+vec3(1,1,0)),f-vec3(1,1,0)),u.x),u.y),
+                 mix(mix(dot(hash3(i+vec3(0,0,1)),f-vec3(0,0,1)),dot(hash3(i+vec3(1,0,1)),f-vec3(1,0,1)),u.x),
+                     mix(dot(hash3(i+vec3(0,1,1)),f-vec3(0,1,1)),dot(hash3(i+vec3(1,1,1)),f-vec3(1,1,1)),u.x),u.y),u.z);
+    }
+    float fbm(vec3 p){ float v=0.0,a=0.5; for(int i=0;i<5;i++){v+=a*noise(p);p*=2.02;a*=0.5;} return v; }
+
+    void main(){
+      vec3 n = normalize(vNormal);
+      vec3 v = normalize(-vPos);
+      float fres = pow(1.0 - max(dot(n,v), 0.0), 2.4);
+
+      // FBM nebula on the surface
+      vec3 q = vec3(
+        fbm(vPos*2.2 + uTime*0.10),
+        fbm(vPos*2.2 + vec3(5.2,1.3,2.8) + uTime*0.12),
+        fbm(vPos*2.2 + vec3(1.7,9.2,5.1) + uTime*0.08)
+      );
+      float pattern = fbm(vPos*2.4 + q*1.3 + uTime*0.07);
+      float bands = smoothstep(0.2, 0.85, pattern + 0.5);
+
+      // capacity-based color blend
+      // crimson → amber → teal → cyan
+      vec3 col;
+      float c = clamp(uCapacity, 0.0, 1.0);
+      if (c < 0.33) col = mix(uColorCrimson, uColorAmber, c/0.33);
+      else if (c < 0.66) col = mix(uColorAmber, uColorTeal, (c-0.33)/0.33);
+      else col = mix(uColorTeal, uColorCyan, (c-0.66)/0.34);
+
+      // crisis pushes toward crimson regardless
+      col = mix(col, uColorCrimson, uCrisis*0.55);
+
+      // base shading
+      vec3 deep = mix(uColorBg, col*0.3, 0.6);
+      vec3 surf = mix(deep, col, bands);
+      surf += fres * col * 1.2;
+
+      // mouse warp brighten
+      vec3 mDir = normalize(vec3(uMouse, 0.6));
+      float pull = pow(max(dot(n, mDir), 0.0), 4.0) * uMouseStrength;
+      surf += pull * uColorCyan * 0.35;
+
+      // soft edge alpha
+      float alpha = smoothstep(0.0, 0.6, fres + bands*0.4);
+      gl_FragColor = vec4(surf, alpha*0.95);
+    }
+  `;
+
+  const orbMat = new THREE.ShaderMaterial({
+    uniforms,
+    vertexShader: vert,
+    fragmentShader: frag,
+    transparent: true,
+    depthWrite: false,
+  });
+  const orb = new THREE.Mesh(geo, orbMat);
+  scene.add(orb);
+
+  // halo glow — additive
+  const haloGeo = new THREE.SphereGeometry(1.5, 48, 48);
+  const haloMat = new THREE.ShaderMaterial({
+    transparent:true,
+    blending: THREE.AdditiveBlending,
+    depthWrite:false,
+    uniforms:{ uTime:uniforms.uTime, uColor:{ value:new THREE.Color(0x2DD4BF) }, uCrisis:uniforms.uCrisis },
+    vertexShader:`varying vec3 vN; varying vec3 vP; void main(){ vN=normalize(normalMatrix*normal); vP=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+    fragmentShader:`varying vec3 vN; varying vec3 vP; uniform float uTime; uniform vec3 uColor; uniform float uCrisis;
+      void main(){
+        float r = length(vP);
+        float fall = smoothstep(1.5, 1.0, r);
+        float pulse = 0.85 + 0.15 * sin(uTime*0.6);
+        vec3 c = mix(uColor, vec3(0.86,0.15,0.15), uCrisis*0.6);
+        gl_FragColor = vec4(c, fall*0.18*pulse);
+      }`,
+  });
+  const halo = new THREE.Mesh(haloGeo, haloMat);
+  scene.add(halo);
+
+  // particles for crisis ejection
+  const PCOUNT = 220;
+  const pGeo = new THREE.BufferGeometry();
+  const pPos = new Float32Array(PCOUNT*3);
+  const pSeed = new Float32Array(PCOUNT);
+  for (let i=0;i<PCOUNT;i++){
+    const t = i/PCOUNT, theta = t*Math.PI*2*7, phi = Math.acos(1-2*t);
+    pPos[i*3] = Math.sin(phi)*Math.cos(theta);
+    pPos[i*3+1] = Math.sin(phi)*Math.sin(theta);
+    pPos[i*3+2] = Math.cos(phi);
+    pSeed[i] = Math.random();
+  }
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  pGeo.setAttribute('seed', new THREE.BufferAttribute(pSeed, 1));
+  const pMat = new THREE.ShaderMaterial({
+    transparent:true,
+    depthWrite:false,
+    blending:THREE.AdditiveBlending,
+    uniforms:{ uTime:uniforms.uTime, uCrisis:uniforms.uCrisis, uColor:{ value:new THREE.Color(0xF59E0B) } },
+    vertexShader:`
+      attribute float seed; varying float vSeed;
+      uniform float uTime; uniform float uCrisis;
+      void main(){
+        vSeed=seed;
+        vec3 p = position;
+        float r = 1.0 + uCrisis * (1.5 + 2.0*seed) * (0.5 + 0.5*sin(uTime*1.5+seed*20.0));
+        p *= r;
+        vec4 mv = modelViewMatrix * vec4(p,1.0);
+        gl_PointSize = (1.0 + uCrisis*5.0) * (300.0 / -mv.z);
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader:`
+      varying float vSeed; uniform vec3 uColor; uniform float uCrisis;
+      void main(){
+        vec2 d = gl_PointCoord - 0.5;
+        float a = smoothstep(0.5, 0.0, length(d));
+        gl_FragColor = vec4(uColor, a*uCrisis*0.9);
+      }`,
+  });
+  const points = new THREE.Points(pGeo, pMat);
+  scene.add(points);
+
+  // CONSTELLATION — distant points that fade in late
+  const CCOUNT = 380;
+  const cGeo = new THREE.BufferGeometry();
+  const cPos = new Float32Array(CCOUNT*3);
+  for (let i=0;i<CCOUNT;i++){
+    const r = 8 + Math.random()*10;
+    const theta = Math.random()*Math.PI*2;
+    const phi = Math.acos(2*Math.random()-1);
+    cPos[i*3] = r*Math.sin(phi)*Math.cos(theta);
+    cPos[i*3+1] = r*Math.sin(phi)*Math.sin(theta);
+    cPos[i*3+2] = r*Math.cos(phi) - 8;
+  }
+  cGeo.setAttribute('position', new THREE.BufferAttribute(cPos, 3));
+  const cMat = new THREE.PointsMaterial({
+    color: 0x9DD9D2, size:0.035, transparent:true, opacity:0,
+    blending: THREE.AdditiveBlending, depthWrite:false, sizeAttenuation:true
+  });
+  const constellation = new THREE.Points(cGeo, cMat);
+  scene.add(constellation);
+
+  // STATE
+  let mouseTarget = new THREE.Vector2(0,0);
+  let mouseStrengthTarget = 0.0;
+  addEventListener('pointermove', e=>{
+    mouseTarget.x = (e.clientX/innerWidth)*2 - 1;
+    mouseTarget.y = -((e.clientY/innerHeight)*2 - 1);
+    mouseStrengthTarget = 1.0;
+  });
+  addEventListener('pointerleave', ()=>{ mouseStrengthTarget = 0.0; });
+
+  // RESIZE
+  let resizeTimer;
+  addEventListener('resize', ()=>{
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(()=>{
+      const W=innerWidth, H=innerHeight;
+      renderer.setSize(W,H);
+      camera.aspect = W/H;
+      camera.updateProjectionMatrix();
+      uniforms.uRes.value.set(W,H);
+    }, 80);
+  });
+
+  // RENDER LOOP
+  const clock = new THREE.Clock();
+  let scrollProgress = 0;
+  addEventListener('scroll', ()=>{
+    scrollProgress = scrollY / Math.max(1, document.body.scrollHeight - innerHeight);
+  }, {passive:true});
+
+  // pause when tab hidden
+  let visible = true;
+  document.addEventListener('visibilitychange', ()=>{ visible = !document.hidden; });
+
+  // pause when stage off-screen (full-page bg, so always visible — but still skip if no compositor)
+  function frame(){
+    if (!visible) { requestAnimationFrame(frame); return; }
+    const t = clock.getElapsedTime();
+    uniforms.uTime.value = t;
+    haloMat.uniforms.uTime.value = t;
+    pMat.uniforms.uTime.value = t;
+
+    // smooth mouse
+    uniforms.uMouse.value.x += (mouseTarget.x - uniforms.uMouse.value.x) * 0.08;
+    uniforms.uMouse.value.y += (mouseTarget.y - uniforms.uMouse.value.y) * 0.08;
+    uniforms.uMouseStrength.value += (mouseStrengthTarget - uniforms.uMouseStrength.value) * 0.06;
+
+    // capacity follows hud target
+    uniforms.uCapacity.value += (target - uniforms.uCapacity.value) * 0.04;
+
+    // crisis: peaks 35-50%, fades after
+    let crisisT = 0;
+    if (scrollProgress > 0.32 && scrollProgress < 0.55) {
+      crisisT = 1 - Math.abs((scrollProgress - 0.43) / 0.13);
+      crisisT = Math.max(0, Math.min(1, crisisT));
+    }
+    uniforms.uCrisis.value += (crisisT - uniforms.uCrisis.value) * 0.06;
+
+    // camera dolly: pulls back through scenes; orb shrinks
+    // 0..0.15 close, 0.15..0.50 mid orbit, 0.50..0.90 layer view, 0.90..1.0 constellation pull-back
+    let zTarget = 4.0;
+    let yawTarget = 0;
+    if (scrollProgress < 0.15) zTarget = 4.0 - scrollProgress * 1.0;
+    else if (scrollProgress < 0.35) { zTarget = 3.85 - (scrollProgress-0.15)*1.5; yawTarget = (scrollProgress-0.15)*0.6; }
+    else if (scrollProgress < 0.55) { zTarget = 3.55 - (scrollProgress-0.35)*0.5; yawTarget = 0.12 - (scrollProgress-0.35)*0.4; }
+    else if (scrollProgress < 0.90) { zTarget = 3.45 + (scrollProgress-0.55)*1.0; yawTarget = 0.04 + (scrollProgress-0.55)*0.3; }
+    else { zTarget = 3.80 + (scrollProgress-0.90)*40.0; yawTarget = 0.14; }
+
+    camera.position.z += (zTarget - camera.position.z) * 0.05;
+    camera.position.x += (Math.sin(yawTarget*Math.PI)*1.4 - camera.position.x) * 0.05;
+    camera.lookAt(0,0,0);
+
+    orb.rotation.y = t*0.06;
+    orb.rotation.x = Math.sin(t*0.04)*0.1;
+    halo.rotation.y = -t*0.02;
+    points.rotation.y = t*0.04;
+
+    // constellation fades in at end
+    const conTarget = scrollProgress > 0.85 ? Math.min(1, (scrollProgress-0.85)/0.10) : 0;
+    cMat.opacity += (conTarget*0.85 - cMat.opacity) * 0.05;
+    constellation.rotation.y = t*0.01;
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+console.info('[Orbital] v131 · constellation online');
 </script>
+
 </body>
 </html>
