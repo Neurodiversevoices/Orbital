@@ -16,6 +16,7 @@ import { Sparkles, Target, ShieldCheck, Database } from 'lucide-react-native';
 import { spacing, borderRadius } from '../theme';
 import { useMilestones, Milestone } from '../lib/hooks/useMilestones';
 import { CapacityLog } from '../types';
+import { AnimatedNumber } from './AnimatedNumber';
 
 interface MilestonesPanelProps {
   logs: CapacityLog[];
@@ -122,7 +123,12 @@ export function MilestonesPanel({ logs, compact = false }: MilestonesPanelProps)
         <View style={styles.compactHeader}>
           <View style={styles.depthContainer}>
             <Database size={12} color="rgba(255,255,255,0.5)" />
-            <Text style={styles.depthText}>Record depth: {totalUniqueDays} days</Text>
+            <AnimatedNumber
+              value={totalUniqueDays}
+              style={styles.depthText}
+              prefix="Record depth: "
+              suffix=" days"
+            />
           </View>
           {coveragePercent > 0 && (
             <Text style={styles.coverageText}>{coveragePercent}% coverage</Text>
@@ -142,7 +148,11 @@ export function MilestonesPanel({ logs, compact = false }: MilestonesPanelProps)
         <Text style={styles.headerTitle}>Capacity Record</Text>
         <View style={styles.depthContainer}>
           <Database size={12} color="rgba(255,255,255,0.5)" />
-          <Text style={styles.depthText}>{totalUniqueDays} days</Text>
+          <AnimatedNumber
+            value={totalUniqueDays}
+            style={styles.depthText}
+            suffix=" days"
+          />
         </View>
       </View>
 
