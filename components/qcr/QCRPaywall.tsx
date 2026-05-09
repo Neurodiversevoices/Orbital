@@ -18,6 +18,7 @@ import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { FileText, Check, X, RefreshCw } from 'lucide-react-native';
 import { colors, spacing, borderRadius } from '../../theme';
 import { QCR_PRICING } from '../../lib/qcr/types';
+import { useSpringPress } from '../../lib/animations/useSpringPress';
 
 interface QCRPaywallProps {
   visible: boolean;
@@ -36,6 +37,9 @@ export function QCRPaywall({
 }: QCRPaywallProps) {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+
+  // Spring physics for the buy CTA
+  const buyPress = useSpringPress();
 
   const handlePurchase = async () => {
     setIsPurchasing(true);
@@ -125,19 +129,23 @@ export function QCRPaywall({
               )}
 
               {/* Purchase Button */}
-              <Pressable
-                style={[styles.purchaseButton, isPurchasing && styles.buttonDisabled]}
-                onPress={handlePurchase}
-                disabled={isPurchasing || isRestoring}
-              >
-                {isPurchasing ? (
-                  <ActivityIndicator color="#000" size="small" />
-                ) : (
-                  <Text style={styles.purchaseButtonText}>
-                    Enable Quarterly Reports
-                  </Text>
-                )}
-              </Pressable>
+              <Animated.View style={buyPress.animatedStyle}>
+                <Pressable
+                  style={[styles.purchaseButton, isPurchasing && styles.buttonDisabled]}
+                  onPress={handlePurchase}
+                  onPressIn={buyPress.onPressIn}
+                  onPressOut={buyPress.onPressOut}
+                  disabled={isPurchasing || isRestoring}
+                >
+                  {isPurchasing ? (
+                    <ActivityIndicator color="#000" size="small" />
+                  ) : (
+                    <Text style={styles.purchaseButtonText}>
+                      Enable Quarterly Reports
+                    </Text>
+                  )}
+                </Pressable>
+              </Animated.View>
 
               {/* Restore */}
               <Pressable
