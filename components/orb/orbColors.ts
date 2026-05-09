@@ -96,3 +96,24 @@ export function getStateContext(capacity: number): string {
   if (capacity < 0.7) return 'Manageable load — within range';
   return 'Well-resourced — capacity available';
 }
+
+// =============================================================================
+// SPECTRUM BAND (for accessibility announcements)
+// =============================================================================
+
+/**
+ * The four primary bands on the capacity spectrum, mirroring the
+ * crimson → amber → teal → cyan colour stops.
+ *
+ * Used by the gauge accessibility wrapper so VoiceOver can announce a
+ * human-readable position on the dial alongside the numeric percentage.
+ */
+export type CapacityBand = 'low' | 'low-medium' | 'medium-high' | 'high';
+
+export function capacityBand(capacity: number): CapacityBand {
+  const c = Math.max(0, Math.min(1, capacity));
+  if (c < 0.25) return 'low';
+  if (c < 0.5) return 'low-medium';
+  if (c < 0.75) return 'medium-high';
+  return 'high';
+}

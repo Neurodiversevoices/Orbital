@@ -81,6 +81,33 @@ export const GAUGE_TICK_COUNT = 40;
 export const GAUGE_MAJOR_TICK_INTERVAL = 10;
 export const GAUGE_RECESS_DEPTH = 3;
 
+// Tick taxonomy — major every 0.1 (interval 4 of 40), minor every 0.025.
+// Lengths are expressed as ratios of gauge height.
+export const GAUGE_MAJOR_TICK_LEN_RATIO = 0.32;
+export const GAUGE_MINOR_TICK_LEN_RATIO = 0.16;
+export const GAUGE_MAJOR_TICK_WIDTH = 1.25;
+export const GAUGE_MINOR_TICK_WIDTH = 0.6;
+export const GAUGE_MAJOR_TICK_OPACITY = 0.22;
+export const GAUGE_MINOR_TICK_OPACITY = 0.07;
+
+// Needle spring — weighty, not bouncy.
+// damping=20 / stiffness=80 / mass=1 settles a full-range jump
+// (0.0 → 1.0) in ~600ms with no overshoot.
+export const GAUGE_SPRING_DAMPING = 20;
+export const GAUGE_SPRING_STIFFNESS = 80;
+export const GAUGE_SPRING_MASS = 1;
+
+// Accessibility — VoiceOver swipe step (5%).
+export const GAUGE_A11Y_STEP = 0.05;
+
+// Glass cover gradient — refraction simulation.
+export const GAUGE_GLASS_HIGHLIGHT_OPACITY = 0.14; // top-left highlight
+export const GAUGE_GLASS_SHADE_OPACITY = 0.18;     // bottom-right shade
+
+// Numeric readout under the dial.
+export const GAUGE_READOUT_FONT_SIZE = 10;
+export const GAUGE_READOUT_LETTER_SPACING = 1.6; // ~0.16em at 10px
+
 // State thresholds
 export const STATE_THRESHOLDS = {
   CRITICAL: 0.15,

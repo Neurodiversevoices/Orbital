@@ -56,7 +56,7 @@ interface AccessibilityContextType {
   isLoaded: boolean;
 }
 
-const AccessibilityContext = createContext<AccessibilityContextType | null>(null);
+export const AccessibilityContext = createContext<AccessibilityContextType | null>(null);
 
 interface AccessibilityProviderProps {
   children: ReactNode;
