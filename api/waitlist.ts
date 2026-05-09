@@ -42,9 +42,9 @@ async function sendWelcomeEmail(email: string): Promise<void> {
     <p>It's built for people whose capacity fluctuates in ways that standard tools don't capture — neurodivergent individuals, people with chronic conditions, caregivers, and anyone who wants to understand their own rhythms.</p>
     <p><strong>What's next:</strong></p>
     <ul style="padding-left:20px">
-      <li>You'll get early access when we open the next cohort</li>
-      <li>First 100 founding members get 3 months of Pro free with CCI purchase</li>
-      <li>The app is available now on <a href="https://apps.apple.com/app/id6757295146" style="color:#0066cc">App Store</a> and <a href="https://play.google.com/store/apps/details?id=com.erparris.orbital" style="color:#0066cc">Google Play</a></li>
+      <li>You'll be the first to know the moment the iOS app is live on the App Store</li>
+      <li>Founding cohort members get 3 months of Pro free</li>
+      <li>You can try the full Orbital experience right now at <a href="https://orbitalhealth.app/app" style="color:#00C2CC">orbitalhealth.app/app</a></li>
     </ul>
     <p>If you have any questions, just reply to this email.</p>
     <p style="margin-top:24px">— Eric<br><span style="color:#666;font-size:14px">Founder, Orbital Health Intelligence</span></p>

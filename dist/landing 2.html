@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orbital — Your nervous system has a signature.</title>
+<meta name="description" content="Capacity intelligence. Daily signals become longitudinal pattern data. Know yourself at the systems level.">
+<meta name="theme-color" content="#01020A">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://orbitalhealth.app/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://orbitalhealth.app/">
+<meta property="og:title" content="Orbital — Your nervous system has a signature.">
+<meta property="og:description" content="Capacity intelligence. Daily check-ins become longitudinal pattern data.">
+<meta property="og:image" content="https://orbitalhealth.app/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Orbital — Your nervous system has a signature.">
+<meta name="twitter:image" content="https://orbitalhealth.app/og-image.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FHEH76Q0JZ"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','G-FHEH76Q0JZ');
+function track(n,p){if(typeof gtag==='function')gtag('event',n,p||{});}
+</script>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#01020A;
+  --cyan:#00C2CC;
+  --amber:#C88A14;
+  --crimson:#B01414;
+  --text:#F0F0F0;
+  --muted:#666680;
+  --card:#0a0a14;
+  --border:#1a1a2e;
+  --font-sans:'DM Sans',system-ui,sans-serif;
+  --font-mono:'Space Mono',monospace;
+}
+html{scroll-behavior:smooth;background:var(--void);color:var(--text)}
+body{
+  font-family:var(--font-sans);
+  font-weight:300;
+  background:var(--void);
+  color:var(--text);
+  overflow-x:hidden;
+  line-height:1.6;
+}
+::selection{background:var(--cyan);color:var(--void)}
+
+/* ── HERO ────────────────────────────────────────────────── */
+#hero{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  min-height:600px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  background:var(--void);
+}
+#orb-canvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  opacity:0;
+  transition:opacity 1.2s ease;
+}
+#orb-canvas.visible{opacity:1}
+
+.hero-content{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  padding:0 32px;
+  pointer-events:none;
+}
+.hero-headline{
+  font-family:var(--font-sans);
+  font-size:clamp(2.2rem,6vw,5rem);
+  font-weight:200;
+  line-height:1.15;
+  letter-spacing:-0.02em;
+  color:var(--text);
+  margin-bottom:2rem;
+}
+.hero-headline .word{
+  display:inline-block;
+  opacity:0;
+  transform:translateY(8px);
+}
+.hero-sub{
+  font-family:var(--font-mono);
+  font-size:clamp(0.85rem,1.5vw,1.1rem);
+  color:var(--cyan);
+  letter-spacing:0.04em;
+  opacity:0;
+  margin-bottom:3rem;
+}
+.hero-cta{
+  display:inline-block;
+  font-family:var(--font-mono);
+  font-size:1rem;
+  color:var(--text);
+  text-decoration:none;
+  border:1px solid rgba(255,255,255,0.2);
+  padding:14px 28px;
+  letter-spacing:0.04em;
+  opacity:0;
+  transition:border-color .3s,color .3s,background .3s;
+  pointer-events:auto;
+  position:relative;
+  overflow:hidden;
+}
+.hero-cta::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:var(--cyan);
+  transform:translateX(-101%);
+  transition:transform .35s ease;
+  z-index:-1;
+}
+.hero-cta:hover{color:var(--void);border-color:var(--cyan)}
+.hero-cta:hover::after{transform:translateX(0)}
+.hero-cta-note{
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  color:var(--muted);
+  margin-top:1rem;
+  opacity:0;
+  letter-spacing:0.03em;
+}
+.hero-cta-note a{color:var(--cyan);text-decoration:none}
+.hero-cta-note a:hover{text-decoration:underline}
+.scroll-hint{
+  position:absolute;
+  bottom:2rem;
+  left:50%;
+  transform:translateX(-50%);
+  font-family:var(--font-mono);
+  font-size:0.65rem;
+  color:var(--muted);
+  letter-spacing:0.1em;
+  opacity:0;
+  animation:fadeInUp 1s ease 4s forwards;
+}
+@keyframes fadeInUp{to{opacity:.5;transform:translateX(-50%) translateY(0)}}
+
+/* ── HORIZONTAL PANELS ──────────────────────────────────── */
+#panels-outer{
+  position:relative;
+  background:var(--void);
+}
+.panels-sticky{
+  position:sticky;
+  top:0;
+  width:100vw;
+  height:100vh;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+}
+.panels-track{
+  display:flex;
+  align-items:center;
+  will-change:transform;
+}
+.panel{
+  flex-shrink:0;
+  width:100vw;
+  padding:0 clamp(32px,8vw,120px);
+}
+.panel-text{
+  font-family:var(--font-mono);
+  font-size:clamp(1.2rem,2.8vw,2.4rem);
+  font-weight:400;
+  line-height:1.7;
+  color:var(--text);
+  max-width:680px;
+  white-space:pre-line;
+}
+.panel-text em{color:var(--muted);font-style:normal}
+
+/* ── ORB DEMO ─────────────────────────────────────────────── */
+#orb-demo{
+  position:relative;
+  width:100vw;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:var(--void);
+  padding:80px 32px;
+}
+.demo-label{
+  font-family:var(--font-mono);
+  font-size:0.75rem;
+  letter-spacing:0.15em;
+  color:var(--muted);
+  text-transform:uppercase;
+  margin-bottom:2rem;
+}
+#demo-canvas-wrap{
+  position:relative;
+  width:min(480px,85vw);
+  height:min(480px,85vw);
+  cursor:grab;
+  user-select:none;
+}
+#demo-canvas-wrap:active{cursor:grabbing}
+#demo-canvas{width:100%;height:100%;border-radius:50%}
+.demo-state{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  pointer-events:none;
+}
+.demo-pct{
+  font-family:var(--font-mono);
+  font-size:2.5rem;
+  font-weight:700;
+  color:var(--text);
+  line-height:1;
+}
+.demo-label-state{
+  font-family:var(--font-mono);
+  font-size:0.75rem;
+  letter-spacing:0.15em;
+  color:var(--muted);
+  margin-top:4px;
+}
+.demo-hint{
+  font-family:var(--font-mono);
+  font-size:0.75rem;
+  color:var(--muted);
+  margin-top:1.5rem;
+  letter-spacing:0.05em;
+}
+.demo-tagline{
+  font-family:var(--font-sans);
+  font-size:clamp(1rem,2vw,1.4rem);
+  font-weight:300;
+  color:var(--muted);
+  margin-top:2.5rem;
+  text-align:center;
+  max-width:480px;
+}
+.demo-tagline strong{color:var(--text);font-weight:400}
+
+/* ── CONSTELLATION ────────────────────────────────────────── */
+#constellation{
+  width:100vw;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:var(--void);
+  padding:80px 32px;
+}
+.section-eyebrow{
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  letter-spacing:0.15em;
+  color:var(--muted);
+  text-transform:uppercase;
+  margin-bottom:1rem;
+}
+.constellation-headline{
+  font-family:var(--font-sans);
+  font-size:clamp(2rem,5vw,3.8rem);
+  font-weight:200;
+  line-height:1.2;
+  text-align:center;
+  max-width:700px;
+  margin-bottom:0.5rem;
+}
+.constellation-sub{
+  font-family:var(--font-mono);
+  font-size:0.85rem;
+  color:var(--muted);
+  margin-bottom:3rem;
+  letter-spacing:0.03em;
+}
+#constellation-canvas{
+  width:min(540px,90vw);
+  height:min(540px,90vw);
+  cursor:grab;
+  border-radius:50%;
+}
+#constellation-canvas:active{cursor:grabbing}
+.constellation-caption{
+  font-family:var(--font-sans);
+  font-size:1rem;
+  font-weight:300;
+  color:var(--muted);
+  margin-top:2.5rem;
+  text-align:center;
+  max-width:480px;
+  line-height:1.7;
+}
+.constellation-caption strong{color:var(--text);font-weight:400}
+
+/* ── WHO IT'S FOR ─────────────────────────────────────────── */
+#who{
+  position:relative;
+  width:100vw;
+  background:var(--void);
+}
+.who-sticky{
+  position:sticky;
+  top:0;
+  width:100vw;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+.who-sentence{
+  position:absolute;
+  font-family:var(--font-sans);
+  font-size:clamp(1.5rem,4vw,3.2rem);
+  font-weight:300;
+  text-align:center;
+  max-width:min(780px,88vw);
+  padding:0 32px;
+  opacity:0;
+  transform:translateY(16px);
+  line-height:1.3;
+}
+.who-sentence .period{
+  color:var(--cyan);
+  display:inline-block;
+}
+.who-sentence.last{
+  font-size:clamp(2.5rem,8vw,6rem);
+  font-weight:200;
+  letter-spacing:-0.02em;
+}
+
+/* ── STATUS CARD ──────────────────────────────────────────── */
+#status{
+  width:100vw;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--void);
+  padding:80px 32px;
+}
+.status-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:clamp(40px,6vw,64px);
+  max-width:580px;
+  width:100%;
+}
+.status-indicator{
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  letter-spacing:0.18em;
+  color:var(--amber);
+  margin-bottom:1.5rem;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.status-dot{
+  width:8px;height:8px;
+  border-radius:50%;
+  background:var(--amber);
+  animation:pulse-amber 2s ease infinite;
+}
+@keyframes pulse-amber{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.4;transform:scale(0.8)}
+}
+.status-card h2{
+  font-family:var(--font-sans);
+  font-size:clamp(1.4rem,3vw,2rem);
+  font-weight:300;
+  line-height:1.3;
+  margin-bottom:1rem;
+}
+.status-card p{
+  font-family:var(--font-sans);
+  font-size:1rem;
+  color:var(--muted);
+  margin-bottom:2rem;
+  line-height:1.7;
+}
+.btn-primary{
+  display:inline-block;
+  font-family:var(--font-mono);
+  font-size:0.9rem;
+  color:var(--void);
+  background:var(--cyan);
+  text-decoration:none;
+  padding:14px 24px;
+  letter-spacing:0.04em;
+  transition:opacity .2s;
+  margin-bottom:2.5rem;
+}
+.btn-primary:hover{opacity:.85}
+.waitlist-divider{
+  border:none;
+  border-top:1px solid var(--border);
+  margin-bottom:2rem;
+}
+.waitlist-label{
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  letter-spacing:0.12em;
+  color:var(--muted);
+  text-transform:uppercase;
+  margin-bottom:1rem;
+}
+.waitlist-form{
+  display:flex;
+  gap:0;
+  flex-wrap:wrap;
+}
+.waitlist-form input[type="email"]{
+  flex:1;
+  min-width:200px;
+  font-family:var(--font-mono);
+  font-size:0.9rem;
+  background:var(--void);
+  border:1px solid var(--border);
+  border-right:none;
+  color:var(--text);
+  padding:12px 16px;
+  outline:none;
+  letter-spacing:0.03em;
+  transition:border-color .2s;
+}
+.waitlist-form input[type="email"]::placeholder{color:var(--muted)}
+.waitlist-form input[type="email"]:focus{border-color:var(--cyan)}
+.waitlist-form button{
+  font-family:var(--font-mono);
+  font-size:0.85rem;
+  background:var(--cyan);
+  color:var(--void);
+  border:none;
+  padding:12px 20px;
+  cursor:pointer;
+  letter-spacing:0.04em;
+  transition:opacity .2s,background .2s;
+  white-space:nowrap;
+}
+.waitlist-form button:hover{opacity:.85}
+.waitlist-form button:disabled{opacity:.5;cursor:not-allowed}
+.waitlist-msg{
+  font-family:var(--font-mono);
+  font-size:0.78rem;
+  margin-top:10px;
+  letter-spacing:0.03em;
+  min-height:1.2em;
+}
+.waitlist-msg.ok{color:var(--cyan)}
+.waitlist-msg.err{color:var(--crimson)}
+
+/* ── SOCIAL PROOF ─────────────────────────────────────────── */
+#proof{
+  width:100vw;
+  padding:80px clamp(32px,8vw,120px);
+  background:var(--void);
+  border-top:1px solid var(--border);
+}
+.proof-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:clamp(32px,6vw,80px);
+  max-width:900px;
+  margin:0 auto;
+}
+@media(max-width:600px){.proof-grid{grid-template-columns:1fr}}
+.proof-col-label{
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  letter-spacing:0.15em;
+  color:var(--muted);
+  text-transform:uppercase;
+  padding-bottom:1rem;
+  border-bottom:1px solid var(--border);
+  margin-bottom:1.5rem;
+}
+.proof-stat{
+  margin-bottom:1.5rem;
+}
+.proof-num{
+  font-family:var(--font-mono);
+  font-size:2rem;
+  font-weight:700;
+  color:var(--cyan);
+  line-height:1;
+}
+.proof-num-label{
+  font-family:var(--font-sans);
+  font-size:0.9rem;
+  color:var(--muted);
+  margin-top:4px;
+}
+.proof-list{
+  list-style:none;
+}
+.proof-list li{
+  font-family:var(--font-mono);
+  font-size:0.85rem;
+  color:var(--muted);
+  padding:6px 0;
+  border-bottom:1px solid var(--border);
+  letter-spacing:0.02em;
+}
+.proof-list li:last-child{border-bottom:none}
+
+/* ── FINAL CTA ────────────────────────────────────────────── */
+#cta-final{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  min-height:600px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:var(--void);
+  overflow:hidden;
+}
+#final-orb-canvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  opacity:0.4;
+}
+.final-content{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  padding:0 32px;
+}
+.final-headline{
+  font-family:var(--font-sans);
+  font-size:clamp(2rem,6vw,4.5rem);
+  font-weight:200;
+  line-height:1.2;
+  margin-bottom:1rem;
+  letter-spacing:-0.02em;
+  opacity:0;
+  transform:translateY(20px);
+}
+.final-pause{
+  font-family:var(--font-mono);
+  font-size:clamp(1rem,2vw,1.5rem);
+  color:var(--cyan);
+  margin-bottom:3rem;
+  opacity:0;
+  letter-spacing:0.03em;
+}
+.final-ctas{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+  opacity:0;
+}
+.final-cta-primary{
+  font-family:var(--font-mono);
+  font-size:0.95rem;
+  color:var(--void);
+  background:var(--cyan);
+  text-decoration:none;
+  padding:16px 32px;
+  letter-spacing:0.04em;
+  transition:opacity .2s;
+}
+.final-cta-primary:hover{opacity:.85}
+.final-cta-secondary{
+  font-family:var(--font-mono);
+  font-size:0.8rem;
+  color:var(--muted);
+  background:none;
+  border:none;
+  cursor:pointer;
+  letter-spacing:0.04em;
+  text-decoration:underline;
+  padding:4px 0;
+}
+.final-cta-secondary:hover{color:var(--text)}
+
+/* ── FOOTER ───────────────────────────────────────────────── */
+footer{
+  padding:32px;
+  border-top:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:16px;
+}
+.footer-brand{font-family:var(--font-mono);font-size:0.8rem;color:var(--muted)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{
+  font-family:var(--font-mono);
+  font-size:0.75rem;
+  color:var(--muted);
+  text-decoration:none;
+  letter-spacing:0.03em;
+}
+.footer-links a:hover{color:var(--text)}
+
+/* ── UTILS ────────────────────────────────────────────────── */
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ HERO ═══════════════════════════ -->
+<section id="hero" aria-label="Hero">
+  <canvas id="orb-canvas" aria-hidden="true"></canvas>
+
+  <div class="hero-content">
+    <h1 class="hero-headline" id="hero-headline" aria-label="Your nervous system has been trying to tell you something.">
+      <span class="word">Your</span> <span class="word">nervous</span> <span class="word">system</span><br>
+      <span class="word">has</span> <span class="word">been</span> <span class="word">trying</span><br>
+      <span class="word">to</span> <span class="word">tell</span> <span class="word">you</span> <span class="word">something.</span>
+    </h1>
+    <p class="hero-sub" id="hero-sub">Orbital reads the signal.</p>
+    <a href="https://orbitalhealth.app/app" class="hero-cta" id="hero-cta" onclick="track('web_app_click',{location:'hero'})">
+      Try Orbital — free, in your browser →
+    </a>
+    <p class="hero-cta-note" id="hero-note">
+      iOS app in review. <a href="#status" onclick="track('scroll_to_waitlist')">Get notified when it launches ↓</a>
+    </p>
+  </div>
+
+  <p class="scroll-hint" aria-hidden="true">scroll</p>
+</section>
+
+<!-- ═══════════════════════ HORIZONTAL PANELS ══════════════ -->
+<section id="panels-outer" aria-label="What Orbital solves">
+  <div style="height:300vh">
+    <div class="panels-sticky">
+      <div class="panels-track" id="panels-track">
+        <div class="panel">
+          <p class="panel-text">You've tracked your sleep.<br><em>Your steps.</em><br><em>Your macros.</em><br><br>Nobody tracked<br>your capacity.</p>
+        </div>
+        <div class="panel">
+          <p class="panel-text">You've tried the apps.<br><em>The journals.</em><br><em>The breathing exercises.</em><br><br>None of them showed you<br>the pattern.</p>
+        </div>
+        <div class="panel">
+          <p class="panel-text">Because the pattern<br>isn't in the data.<br><br>It's in the signal<br>underneath the data.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ ORB DEMO ═══════════════════════ -->
+<section id="orb-demo" aria-label="Interactive orb demo">
+  <p class="demo-label">THIS IS WHAT ORBITAL TRACKS</p>
+
+  <div id="demo-canvas-wrap">
+    <canvas id="demo-canvas" aria-label="Interactive capacity orb — drag to change capacity state"></canvas>
+    <div class="demo-state" aria-live="polite">
+      <div class="demo-pct" id="demo-pct">74%</div>
+      <div class="demo-label-state" id="demo-state-label">RESOURCED</div>
+    </div>
+  </div>
+
+  <p class="demo-hint">← drag to shift capacity →</p>
+  <p class="demo-tagline">Your orb looks different.<br><strong>It reads your patterns.</strong></p>
+</section>
+
+<!-- ═══════════════════════ CONSTELLATION ══════════════════ -->
+<section id="constellation" aria-label="90 days of data as a constellation">
+  <p class="section-eyebrow">90 DAYS OF DATA</p>
+  <h2 class="constellation-headline">Rendered as a constellation.</h2>
+  <p class="constellation-sub">Every point is a day. Every color is a truth you couldn't see before.</p>
+
+  <canvas id="constellation-canvas" aria-label="Point cloud showing 90 days of capacity data — drag to rotate"></canvas>
+
+  <p class="constellation-caption">
+    <strong>Cyan</strong> = resourced &nbsp;·&nbsp;
+    <strong style="color:var(--amber)">Amber</strong> = elevated &nbsp;·&nbsp;
+    <strong style="color:var(--crimson)">Crimson</strong> = depleted
+  </p>
+</section>
+
+<!-- ═══════════════════════ WHO IT'S FOR ═══════════════════ -->
+<section id="who" aria-label="Who Orbital is for">
+  <div style="height:700vh">
+    <div class="who-sticky">
+      <p class="who-sentence" id="who-0">The executive who has everything and feels nothing<span class="period">.</span></p>
+      <p class="who-sentence" id="who-1">The parent who loves their kids and is running on empty<span class="period">.</span></p>
+      <p class="who-sentence" id="who-2">The athlete whose training is identical but some days feel impossible<span class="period">.</span></p>
+      <p class="who-sentence" id="who-3">The therapist who holds space for everyone but themselves<span class="period">.</span></p>
+      <p class="who-sentence" id="who-4">The person who searches "why am I always tired" at 2am<span class="period">.</span></p>
+      <p class="who-sentence" id="who-5">The one who looks completely fine<span class="period">.</span></p>
+      <p class="who-sentence last" id="who-6">You<span class="period">.</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ STATUS + WAITLIST ═══════════════ -->
+<section id="status" aria-label="App Store status and waitlist">
+  <div class="status-card">
+    <div class="status-indicator">
+      <span class="status-dot" aria-hidden="true"></span>
+      iOS APP IN REVIEW
+    </div>
+    <h2>Currently in Apple&nbsp;review.</h2>
+    <p>The iOS app is submitted and waiting for Apple's review team. While you wait — try the full Orbital experience right now in your browser. No install required.</p>
+
+    <a href="https://orbitalhealth.app/app" class="btn-primary" onclick="track('web_app_click',{location:'status_card'})">
+      Try Orbital on the web →
+    </a>
+
+    <hr class="waitlist-divider">
+
+    <p class="waitlist-label">Get notified the moment it's live</p>
+    <form class="waitlist-form" id="waitlist-form" novalidate>
+      <label for="waitlist-email" class="visually-hidden">Email address</label>
+      <input
+        type="email"
+        id="waitlist-email"
+        name="email"
+        placeholder="your@email.com"
+        autocomplete="email"
+        required
+      >
+      <button type="submit" id="waitlist-btn">Notify me</button>
+    </form>
+    <p class="waitlist-msg" id="waitlist-msg" role="status" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SOCIAL PROOF ═══════════════════ -->
+<section id="proof" aria-label="Early cohort data">
+  <div class="proof-grid">
+    <div>
+      <p class="proof-col-label">Early access cohort</p>
+      <div class="proof-stat">
+        <div class="proof-num" data-count="847">0</div>
+        <div class="proof-num-label">signals logged</div>
+      </div>
+      <div class="proof-stat">
+        <div class="proof-num" data-count="23">0</div>
+        <div class="proof-num-label">avg days active</div>
+      </div>
+      <div class="proof-stat">
+        <div class="proof-num" data-count="91">0</div>
+        <div class="proof-num-label">% say "first time I've had language for this"</div>
+      </div>
+    </div>
+    <div>
+      <p class="proof-col-label">Built for</p>
+      <ul class="proof-list">
+        <li>Neurodivergent adults</li>
+        <li>Burnout researchers</li>
+        <li>Capacity-aware therapists</li>
+        <li>High performers tracking edge</li>
+        <li>Humans who want to understand themselves</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ FINAL CTA ═══════════════════════ -->
+<section id="cta-final" aria-label="Final call to action">
+  <canvas id="final-orb-canvas" aria-hidden="true"></canvas>
+
+  <div class="final-content">
+    <h2 class="final-headline" id="final-headline">
+      Your body has been<br>keeping score.
+    </h2>
+    <p class="final-pause" id="final-pause">Start reading it.</p>
+    <div class="final-ctas" id="final-ctas">
+      <a href="https://orbitalhealth.app/app" class="final-cta-primary" onclick="track('web_app_click',{location:'final_cta'})">
+        Try free in your browser →
+      </a>
+      <button class="final-cta-secondary" onclick="document.getElementById('status').scrollIntoView({behavior:'smooth'});track('scroll_to_waitlist',{source:'final_cta'})">
+        Notify me when the iOS app launches
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ FOOTER ══════════════════════════ -->
+<footer>
+  <span class="footer-brand">© 2026 Orbital Health Intelligence</span>
+  <nav class="footer-links" aria-label="Footer links">
+    <a href="/privacy">Privacy</a>
+    <a href="/support">Support</a>
+    <a href="https://orbitalhealth.app/app">Web app</a>
+  </nav>
+</footer>
+
+<!-- ═══════════════════════ SCRIPTS ═════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ── GSAP SETUP ──────────────────────────────────────────────
+gsap.registerPlugin(ScrollTrigger);
+
+// ── HERO ENTRANCE SEQUENCE ──────────────────────────────────
+const words = document.querySelectorAll('.hero-headline .word');
+const heroSub = document.getElementById('hero-sub');
+const heroCta = document.getElementById('hero-cta');
+const heroNote = document.getElementById('hero-note');
+const orbCanvas = document.getElementById('orb-canvas');
+
+const heroTl = gsap.timeline({ delay: 0.3 });
+
+// Orb materializes at 800ms
+heroTl.to(orbCanvas, { opacity: 1, duration: 1.4, ease: 'power2.out' }, 0.8);
+
+// Words materialize with 120ms stagger
+heroTl.to(words, {
+  opacity: 1,
+  y: 0,
+  duration: 0.6,
+  ease: 'power2.out',
+  stagger: 0.12
+}, 1.2);
+
+// Subline appears
+heroTl.to(heroSub, { opacity: 1, duration: 0.6, ease: 'power2.out' }, 2.8);
+
+// CTA appears
+heroTl.to([heroCta, heroNote], {
+  opacity: 1,
+  duration: 0.6,
+  ease: 'power2.out',
+  stagger: 0.2
+}, 3.2);
+
+// ── SCROLL DEPTH TRACKING ───────────────────────────────────
+const depths = { 25: false, 50: false, 75: false, 100: false };
+ScrollTrigger.create({
+  trigger: 'body',
+  start: 'top top',
+  end: 'bottom bottom',
+  onUpdate(self) {
+    const pct = Math.round(self.progress * 100);
+    [25, 50, 75, 100].forEach(d => {
+      if (pct >= d && !depths[d]) {
+        depths[d] = true;
+        track('scroll_depth', { percent: d });
+      }
+    });
+  }
+});
+
+// ── HORIZONTAL PANELS ───────────────────────────────────────
+const track2 = document.getElementById('panels-track');
+const panels = gsap.utils.toArray('.panel');
+const panelWidth = () => window.innerWidth;
+
+gsap.to(track2, {
+  x: () => -(panelWidth() * (panels.length - 1)),
+  ease: 'none',
+  scrollTrigger: {
+    trigger: '#panels-outer',
+    pin: '.panels-sticky',
+    start: 'top top',
+    end: () => `+=${panelWidth() * (panels.length - 1)}`,
+    scrub: 1,
+    invalidateOnRefresh: true
+  }
+});
+
+// ── WHO IT'S FOR ─────────────────────────────────────────────
+const sentences = Array.from({ length: 7 }, (_, i) => document.getElementById(`who-${i}`));
+const whoSection = document.getElementById('who');
+
+sentences.forEach((el, i) => {
+  if (!el) return;
+  const pStart = i / 7;
+  const pPeak = (i + 0.4) / 7;
+  const pEnd = (i + 0.85) / 7;
+
+  ScrollTrigger.create({
+    trigger: whoSection,
+    start: 'top top',
+    end: 'bottom bottom',
+    scrub: 0.5,
+    onUpdate(self) {
+      const p = self.progress;
+      if (p < pStart) {
+        gsap.set(el, { opacity: 0, y: 16 });
+      } else if (p < pPeak) {
+        const t = (p - pStart) / (pPeak - pStart);
+        gsap.set(el, { opacity: t, y: 16 * (1 - t) });
+      } else if (p < pEnd) {
+        gsap.set(el, { opacity: 1, y: 0 });
+      } else {
+        const t = (p - pEnd) / (1 / 7 * 0.15);
+        gsap.set(el, { opacity: Math.max(0, 1 - t), y: 0 });
+      }
+    }
+  });
+});
+
+// ── FINAL CTA ENTRANCE ───────────────────────────────────────
+const finalHeadline = document.getElementById('final-headline');
+const finalPause = document.getElementById('final-pause');
+const finalCtas = document.getElementById('final-ctas');
+
+ScrollTrigger.create({
+  trigger: '#cta-final',
+  start: 'top 80%',
+  once: true,
+  onEnter() {
+    const tl = gsap.timeline();
+    tl.to(finalHeadline, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' })
+      .to(finalPause, { opacity: 1, duration: 0.6, ease: 'power2.out' }, '+=0.5')
+      .to(finalCtas, { opacity: 1, duration: 0.6, ease: 'power2.out' }, '+=0.3');
+  }
+});
+
+// ── NUMBER COUNTERS ──────────────────────────────────────────
+document.querySelectorAll('.proof-num[data-count]').forEach(el => {
+  const target = parseInt(el.dataset.count, 10);
+  const suffix = el.dataset.suffix || '';
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top 85%',
+    once: true,
+    onEnter() {
+      gsap.to({ v: 0 }, {
+        v: target,
+        duration: 1.8,
+        ease: 'power2.out',
+        onUpdate() { el.textContent = Math.round(this.targets()[0].v) + suffix; }
+      });
+    }
+  });
+});
+
+// ── ORB SHADER (Hero + Final) ────────────────────────────────
+const ORB_VERT = `
+varying vec2 vUv;
+varying vec3 vNormal;
+varying vec3 vPosition;
+void main(){
+  vUv=uv;
+  vNormal=normalize(normalMatrix*normal);
+  vPosition=position;
+  gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);
+}`;
+
+const ORB_FRAG = `
+uniform float uTime;
+uniform float uCapacity;
+uniform vec2 uResolution;
+varying vec2 vUv;
+varying vec3 vNormal;
+varying vec3 vPosition;
+
+vec3 cyan=vec3(0.0,0.76,0.8);
+vec3 amber=vec3(0.78,0.54,0.08);
+vec3 crimson=vec3(0.69,0.08,0.08);
+
+float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float noise(vec2 p){
+  vec2 i=floor(p),f=fract(p);
+  f=f*f*(3.0-2.0*f);
+  return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);
+}
+
+void main(){
+  float breathe=0.5+0.5*sin(uTime*1.57);
+  float c=clamp(uCapacity,0.0,1.0);
+  vec3 col;
+  if(c>0.5) col=mix(amber,cyan,(c-0.5)*2.0);
+  else col=mix(crimson,amber,c*2.0);
+
+  float n=noise(vUv*4.0+vec2(uTime*0.2));
+  float rim=1.0-dot(vNormal,vec3(0,0,1));
+  rim=pow(rim,2.5);
+  float glow=0.55+0.25*breathe+n*0.15;
+  vec3 fc=col*glow+col*rim*0.6;
+  float alpha=(0.82+rim*0.18)*(0.85+0.15*breathe);
+  gl_FragColor=vec4(fc,alpha);
+}`;
+
+function makeOrbScene(canvas) {
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.z = 2.8;
+
+  const geo = new THREE.SphereGeometry(1, 64, 64);
+  const mat = new THREE.ShaderMaterial({
+    vertexShader: ORB_VERT,
+    fragmentShader: ORB_FRAG,
+    uniforms: {
+      uTime: { value: 0 },
+      uCapacity: { value: 0.74 },
+      uResolution: { value: new THREE.Vector2(1, 1) }
+    },
+    transparent: true
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  scene.add(mesh);
+
+  function resize() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  return { renderer, scene, camera, mat, resize };
+}
+
+// Hero orb
+const heroCanvasEl = document.getElementById('orb-canvas');
+const heroOrb = makeOrbScene(heroCanvasEl);
+let heroStartTime = Date.now();
+
+function animHeroOrb() {
+  requestAnimationFrame(animHeroOrb);
+  heroOrb.resize();
+  heroOrb.mat.uniforms.uTime.value = (Date.now() - heroStartTime) / 1000;
+  heroOrb.renderer.render(heroOrb.scene, heroOrb.camera);
+}
+animHeroOrb();
+
+// Final orb
+const finalOrbCanvas = document.getElementById('final-orb-canvas');
+const finalOrb = makeOrbScene(finalOrbCanvas);
+let finalStartTime = Date.now();
+finalOrb.mat.uniforms.uCapacity.value = 0.85;
+
+function animFinalOrb() {
+  requestAnimationFrame(animFinalOrb);
+  finalOrb.resize();
+  finalOrb.mat.uniforms.uTime.value = (Date.now() - finalStartTime) / 1000;
+  finalOrb.renderer.render(finalOrb.scene, finalOrb.camera);
+}
+animFinalOrb();
+
+// ── INTERACTIVE DEMO ORB ─────────────────────────────────────
+const demoCanvas = document.getElementById('demo-canvas');
+const demoPct = document.getElementById('demo-pct');
+const demoStateLabel = document.getElementById('demo-state-label');
+
+const DEMO_SIZE = () => demoCanvas.clientWidth;
+const demoRenderer = new THREE.WebGLRenderer({ canvas: demoCanvas, alpha: true, antialias: true });
+demoRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+const demoScene = new THREE.Scene();
+const demoCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+demoCamera.position.z = 2.8;
+
+const demoGeo = new THREE.SphereGeometry(1, 64, 64);
+const demoMat = new THREE.ShaderMaterial({
+  vertexShader: ORB_VERT,
+  fragmentShader: ORB_FRAG,
+  uniforms: {
+    uTime: { value: 0 },
+    uCapacity: { value: 0.74 },
+    uResolution: { value: new THREE.Vector2(1, 1) }
+  },
+  transparent: true
+});
+demoScene.add(new THREE.Mesh(demoGeo, demoMat));
+
+let demoCapacity = 0.74;
+let demoIsDragging = false;
+let demoDragStartX = 0;
+let demoDragStartCap = 0.74;
+
+function getDemoState(c) {
+  if (c >= 0.66) return 'RESOURCED';
+  if (c >= 0.33) return 'ELEVATED';
+  return 'DEPLETED';
+}
+function updateDemoUI(c) {
+  demoPct.textContent = Math.round(c * 100) + '%';
+  demoStateLabel.textContent = getDemoState(c);
+  demoMat.uniforms.uCapacity.value = c;
+  demoCapacity = c;
+  document.documentElement.style.setProperty('--demo-cap', c);
+}
+
+function getDemoX(e) { return e.touches ? e.touches[0].clientX : e.clientX; }
+
+demoCanvas.addEventListener('mousedown', e => {
+  demoIsDragging = true;
+  demoDragStartX = getDemoX(e);
+  demoDragStartCap = demoCapacity;
+  demoCanvas.style.cursor = 'grabbing';
+  track('orb_interaction');
+});
+demoCanvas.addEventListener('touchstart', e => {
+  demoIsDragging = true;
+  demoDragStartX = getDemoX(e);
+  demoDragStartCap = demoCapacity;
+  track('orb_interaction');
+}, { passive: true });
+window.addEventListener('mousemove', e => {
+  if (!demoIsDragging) return;
+  const dx = (getDemoX(e) - demoDragStartX) / DEMO_SIZE();
+  updateDemoUI(Math.max(0, Math.min(1, demoDragStartCap + dx)));
+});
+window.addEventListener('touchmove', e => {
+  if (!demoIsDragging) return;
+  const dx = (getDemoX(e) - demoDragStartX) / DEMO_SIZE();
+  updateDemoUI(Math.max(0, Math.min(1, demoDragStartCap + dx)));
+}, { passive: true });
+window.addEventListener('mouseup', () => { demoIsDragging = false; demoCanvas.style.cursor = 'grab'; });
+window.addEventListener('touchend', () => { demoIsDragging = false; });
+
+let demoT = 0;
+function animDemo() {
+  requestAnimationFrame(animDemo);
+  demoT += 0.016;
+  const s = DEMO_SIZE();
+  demoRenderer.setSize(s, s, false);
+  demoMat.uniforms.uTime.value = demoT;
+  demoRenderer.render(demoScene, demoCamera);
+}
+animDemo();
+
+// ── CONSTELLATION ─────────────────────────────────────────────
+const ccCanvas = document.getElementById('constellation-canvas');
+const ccSize = () => ccCanvas.clientWidth;
+const ccRenderer = new THREE.WebGLRenderer({ canvas: ccCanvas, alpha: true, antialias: true });
+ccRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+const ccScene = new THREE.Scene();
+const ccCamera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+ccCamera.position.z = 3.5;
+
+const controls = new OrbitControls(ccCamera, ccCanvas);
+controls.enableZoom = false;
+controls.enablePan = false;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.6;
+controls.dampingFactor = 0.05;
+controls.enableDamping = true;
+
+// Generate 90 days of synthetic capacity data
+const cyanC = new THREE.Color(0x00C2CC);
+const amberC = new THREE.Color(0xC88A14);
+const crimsonC = new THREE.Color(0xB01414);
+
+const positions = [];
+const colors = [];
+
+// Seed a believable pattern
+let baseCap = 0.65;
+for (let d = 0; d < 90; d++) {
+  // Natural drift + weekly rhythm
+  const weekday = d % 7;
+  const weeklyBias = weekday < 5 ? -0.04 : 0.06;
+  baseCap = Math.max(0.05, Math.min(0.97, baseCap + (Math.random() - 0.45) * 0.12 + weeklyBias));
+
+  // Cylindrical path through time
+  const angle = (d / 90) * Math.PI * 4;
+  const radius = 1.2 + Math.sin(d / 8) * 0.25;
+  const x = Math.cos(angle) * radius;
+  const z = Math.sin(angle) * radius;
+  const y = (d / 90 - 0.5) * 2.4;
+
+  positions.push(x, y, z);
+
+  const col = baseCap > 0.6 ? cyanC.clone().lerp(new THREE.Color(1,1,1), 0.1)
+    : baseCap > 0.35 ? amberC.clone()
+    : crimsonC.clone();
+  colors.push(col.r, col.g, col.b);
+}
+
+const ccGeo = new THREE.BufferGeometry();
+ccGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+ccGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+const ccMat = new THREE.PointsMaterial({
+  size: 0.08,
+  vertexColors: true,
+  sizeAttenuation: true,
+  transparent: true,
+  opacity: 0.9
+});
+ccScene.add(new THREE.Points(ccGeo, ccMat));
+
+// Animate points flying in
+const posArr = ccGeo.attributes.position.array;
+const origPositions = [...posArr];
+const randomStartPositions = [];
+for (let i = 0; i < positions.length / 3; i++) {
+  randomStartPositions.push(
+    (Math.random() - 0.5) * 8,
+    (Math.random() - 0.5) * 8,
+    (Math.random() - 0.5) * 8
+  );
+}
+// Set to random initially
+for (let i = 0; i < posArr.length; i++) posArr[i] = randomStartPositions[i];
+ccGeo.attributes.position.needsUpdate = true;
+
+ScrollTrigger.create({
+  trigger: '#constellation',
+  start: 'top 70%',
+  once: true,
+  onEnter() {
+    gsap.to({ t: 0 }, {
+      t: 1,
+      duration: 1.8,
+      ease: 'power3.out',
+      onUpdate() {
+        const t = this.targets()[0].t;
+        for (let i = 0; i < posArr.length; i++) {
+          posArr[i] = randomStartPositions[i] + (origPositions[i] - randomStartPositions[i]) * t;
+        }
+        ccGeo.attributes.position.needsUpdate = true;
+      }
+    });
+    track('constellation_rotate');
+  }
+});
+
+ccCanvas.addEventListener('mousedown', () => { controls.autoRotate = false; });
+ccCanvas.addEventListener('touchstart', () => { controls.autoRotate = false; }, { passive: true });
+
+function animCC() {
+  requestAnimationFrame(animCC);
+  const s = ccSize();
+  ccRenderer.setSize(s, s, false);
+  controls.update();
+  ccRenderer.render(ccScene, ccCamera);
+}
+animCC();
+
+// ── WAITLIST FORM ─────────────────────────────────────────────
+const form = document.getElementById('waitlist-form');
+const emailInput = document.getElementById('waitlist-email');
+const btn = document.getElementById('waitlist-btn');
+const msg = document.getElementById('waitlist-msg');
+
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = emailInput.value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    msg.textContent = 'Please enter a valid email address.';
+    msg.className = 'waitlist-msg err';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  msg.textContent = '';
+
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const res = await fetch('/api/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        source: 'landing_page',
+        utm_source: params.get('utm_source'),
+        utm_medium: params.get('utm_medium'),
+        utm_campaign: params.get('utm_campaign'),
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+
+    msg.textContent = "You're on the list. We'll email you the moment it's live.";
+    msg.className = 'waitlist-msg ok';
+    emailInput.value = '';
+    btn.textContent = '✓ Saved';
+    track('waitlist_signup', { email_captured: true });
+  } catch (err) {
+    msg.textContent = 'Something went wrong. Try again?';
+    msg.className = 'waitlist-msg err';
+    btn.disabled = false;
+    btn.textContent = 'Notify me';
+  }
+});
+
+// Final CTA secondary button scrolls to waitlist
+// (already wired inline)
+
+// ── FINAL SECTION WAITLIST DUPLICATE ────────────────────────
+document.querySelectorAll('.final-cta-secondary').forEach(b => {
+  b.addEventListener('click', () => {
+    document.getElementById('status').scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => emailInput.focus(), 800);
+  });
+});
+
+</script>
+</body>
+</html>

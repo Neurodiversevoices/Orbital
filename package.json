@@ -52,7 +52,9 @@
     "n8n:pm2:restart": "infra/orbital-n8n-runtime/node_modules/.bin/pm2 restart orbital-n8n",
     "n8n:pm2:stop": "infra/orbital-n8n-runtime/node_modules/.bin/pm2 stop orbital-n8n",
     "n8n:pm2:logs": "infra/orbital-n8n-runtime/node_modules/.bin/pm2 logs orbital-n8n",
-    "n8n:verify": "node scripts/n8n/verify.mjs"
+    "n8n:verify": "node scripts/n8n/verify.mjs",
+    "marketing": "node scripts/marketing-agent.js",
+    "creative": "node scripts/marketing-agent.js campaign"
   },
   "dependencies": {
     "@dicebear/collection": "^9.4.2",

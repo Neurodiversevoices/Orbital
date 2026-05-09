@@ -17,8 +17,6 @@
         "autoIncrement": "versionCode"
       },
       "env": {
-        "EXPO_PUBLIC_IS_REVIEW_MODE": "true",
-        "EXPO_PUBLIC_REVENUECAT_IOS_KEY": "appl_bfYGQvAZZtYLnxgrWlMilvmGGWw",
         "SENTRY_ALLOW_FAILURE": "true"
       }
     },
@@ -36,22 +34,6 @@
       },
       "env": {
         "EXPO_PUBLIC_APP_STORE_REVIEW": "1",
-        "EXPO_PUBLIC_REVENUECAT_IOS_KEY": "appl_bfYGQvAZZtYLnxgrWlMilvmGGWw",
-        "SENTRY_ALLOW_FAILURE": "true"
-      }
-    },
-    "preview": {
-      "distribution": "internal",
-      "ios": {
-        "credentialsSource": "remote",
-        "resourceClass": "m-medium"
-      },
-      "android": {
-        "credentialsSource": "remote",
-        "buildType": "apk"
-      },
-      "env": {
-        "EXPO_PUBLIC_REVENUECAT_IOS_KEY": "appl_bfYGQvAZZtYLnxgrWlMilvmGGWw",
         "SENTRY_ALLOW_FAILURE": "true"
       }
     },
@@ -67,7 +49,6 @@
       },
       "env": {
         "EXPO_PUBLIC_FOUNDER_DEMO": "1",
-        "EXPO_PUBLIC_REVENUECAT_IOS_KEY": "appl_bfYGQvAZZtYLnxgrWlMilvmGGWw",
         "SENTRY_ALLOW_FAILURE": "true"
       }
     }
@@ -76,9 +57,9 @@
     "production": {
       "ios": {
         "ascAppId": "6757295146",
-        "ascApiKeyId": "HD4HWHHYDK",
+        "ascApiKeyId": "K5FGNKXMAZ",
         "ascApiKeyIssuerId": "a6c8bd6a-8f60-4aed-a0a6-d129cb2aaf7a",
-        "ascApiKeyPath": "./keys/AuthKey_HD4HWHHYDK.p8"
+        "ascApiKeyPath": "./keys/AuthKey_K5FGNKXMAZ.p8"
       },
       "android": {
         "serviceAccountKeyPath": "./keys/google-play-service-account.json",
