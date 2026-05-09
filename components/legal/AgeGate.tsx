@@ -151,7 +151,7 @@ function AgeGateForm({ onVerified, onBlocked }: AgeGateFormProps) {
               <TextInput
                 style={styles.input}
                 placeholder="YYYY"
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor="rgba(255,255,255,0.5)"
                 keyboardType="number-pad"
                 maxLength={4}
                 value={yearOfBirth}

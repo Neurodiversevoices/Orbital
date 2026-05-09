@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   },
   versionSubtext: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
     marginTop: spacing.xs,
     marginBottom: spacing.md,
   },

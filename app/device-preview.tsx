@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   },
   instructionSubtext: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.25)',
+    color: 'rgba(255,255,255,0.5)',
   },
 });
 
@@ -449,7 +449,7 @@ const previewStyles = StyleSheet.create({
   spectrumLabel: {
     fontSize: 7,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
     letterSpacing: 0.5,
   },
 });

@@ -19,6 +19,7 @@ import { Check } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors, spacing, borderRadius } from '../theme';
+import { useGlassStyle } from '../lib/hooks/useAccessibility';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -48,6 +49,8 @@ export function Composer({
   keyboardVisible = false,
 }: ComposerProps) {
   const insets = useSafeAreaInsets();
+  // Audit Phase 5 followup B4: card surface honors Reduce Transparency.
+  const glassStyle = useGlassStyle();
   const inputRef = useRef<TextInput>(null);
   const scale = useSharedValue(1);
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -141,14 +144,14 @@ export function Composer({
         { paddingBottom: Math.max(insets.bottom, spacing.sm) },
       ]}
     >
-      <View style={[styles.card, { borderColor: `${accentColor}30` }]}>
+      <View style={[styles.card, glassStyle, { borderColor: `${accentColor}30` }]}>
         <TextInput
           ref={inputRef}
           style={[styles.input, { borderColor: `${accentColor}20` }]}
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="rgba(255,255,255,0.3)"
+          placeholderTextColor="rgba(255,255,255,0.5)"
           multiline
           maxLength={500}
           textAlignVertical="top"

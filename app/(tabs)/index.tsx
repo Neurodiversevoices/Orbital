@@ -43,6 +43,7 @@ import { useDemoMode, FOUNDER_DEMO_ENABLED } from '../../lib/hooks/useDemoMode';
 import { useAppMode } from '../../lib/hooks/useAppMode';
 import { useTutorial } from '../../lib/hooks/useTutorial';
 import { useSubscription, shouldBypassSubscription } from '../../lib/subscription';
+import { useGlassStyle } from '../../lib/hooks/useAccessibility';
 import { Locale } from '../../locales';
 
 function formatDate(locale: Locale): string {
@@ -74,6 +75,10 @@ export default function HomeScreen() {
   const { isDemoMode, enableDemoMode, reseedDemoData } = useDemoMode();
   const { modeConfig, currentMode } = useAppMode();
   const { isPro, hasAccess } = useSubscription();
+  // Audit Phase 5 followup B4: glass surfaces should respect Reduce Transparency.
+  // The signalBar is one of the most prominent glass surfaces on the home tab —
+  // demoing the useGlassStyle() pattern here.
+  const glassStyle = useGlassStyle();
   const bypassesSubscription = shouldBypassSubscription(currentMode);
   const canLogSignal = bypassesSubscription || isPro || !hasHitSignalLimit;
   const [currentState, setCurrentState] = useState<CapacityState | null>(null);
@@ -269,7 +274,11 @@ export default function HomeScreen() {
               <ModeInsightsPanel logs={logs} />
             )}
 
-            <View style={[styles.signalBar, { borderColor: `${modeConfig.accentColor}20` }]}>
+            <View style={[
+              styles.signalBar,
+              glassStyle,
+              { borderColor: `${modeConfig.accentColor}20` },
+            ]}>
               <View style={styles.signalItem}>
                 <Text style={styles.signalLabel}>{t.core.today.toUpperCase()}</Text>
                 <Text style={[

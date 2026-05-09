@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
     marginTop: 4,
   },
 });

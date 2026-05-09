@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   },
   disclaimer: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
     textAlign: 'center',
     lineHeight: 14,
   },

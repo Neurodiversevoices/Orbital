@@ -136,7 +136,7 @@ export default function NewExperimentScreen() {
             <TextInput
               style={styles.customInput}
               placeholder="Describe what you want to try..."
-              placeholderTextColor="rgba(255,255,255,0.3)"
+              placeholderTextColor="rgba(255,255,255,0.5)"
               value={customHypothesis}
               onChangeText={setCustomHypothesis}
               multiline
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   },
   disclaimer: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
     textAlign: 'center',
     marginBottom: spacing.xl,
   },

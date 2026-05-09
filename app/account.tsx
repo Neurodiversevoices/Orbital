@@ -128,7 +128,7 @@ export default function AccountScreen() {
               onChangeText={setNameInput}
               onBlur={handleSave}
               placeholder="Enter your name"
-              placeholderTextColor="rgba(255,255,255,0.3)"
+              placeholderTextColor="rgba(255,255,255,0.5)"
               maxLength={50}
               autoCapitalize="words"
               autoCorrect={false}

@@ -48,7 +48,7 @@ export function NoteInput({
         value={value}
         onChangeText={onChangeText}
         placeholder="Add details (optional)"
-        placeholderTextColor="rgba(255,255,255,0.25)"
+        placeholderTextColor="rgba(255,255,255,0.5)"
         multiline
         maxLength={200}
       />

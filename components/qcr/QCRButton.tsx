@@ -137,6 +137,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.5)',
   },
   subtitleLocked: {
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
   },
 });

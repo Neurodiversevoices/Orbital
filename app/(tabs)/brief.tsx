@@ -615,7 +615,7 @@ const styles = StyleSheet.create({
   },
   breadcrumbSeparator: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
   },
   breadcrumbActive: {
     fontSize: 12,
@@ -1093,7 +1093,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
   },
 
   // Integrated Member Cards

@@ -358,7 +358,7 @@ export default function CloudSyncScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Email"
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor="rgba(255,255,255,0.5)"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -374,7 +374,7 @@ export default function CloudSyncScreen() {
                   <TextInput
                     style={styles.input}
                     placeholder="Password"
-                    placeholderTextColor="rgba(255,255,255,0.3)"
+                    placeholderTextColor="rgba(255,255,255,0.5)"
                     value={password}
                     onChangeText={setPassword}
                     {...{ [_HIDDEN]: !showPassword }}
@@ -569,7 +569,7 @@ export default function CloudSyncScreen() {
                     <TextInput
                       style={styles.input}
                       placeholder="Enter 6-digit code"
-                      placeholderTextColor="rgba(255,255,255,0.3)"
+                      placeholderTextColor="rgba(255,255,255,0.5)"
                       value={mfaCode}
                       onChangeText={setMfaCode}
                       keyboardType="number-pad"
@@ -732,7 +732,7 @@ const styles = StyleSheet.create({
   },
   notConfiguredSubtext: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
     textAlign: 'center',
     marginTop: spacing.lg,
   },
@@ -1154,7 +1154,7 @@ const styles = StyleSheet.create({
   },
   qrPlaceholder: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
     marginBottom: spacing.sm,
   },
   secretCode: {

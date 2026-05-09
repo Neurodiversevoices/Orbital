@@ -216,7 +216,7 @@ export default function SchoolZoneScreen() {
               value={schoolCode}
               onChangeText={setSchoolCode}
               placeholder="School Code (e.g., ELM-2024)"
-              placeholderTextColor="rgba(255,255,255,0.3)"
+              placeholderTextColor="rgba(255,255,255,0.5)"
               autoCapitalize="characters"
             />
 
@@ -225,7 +225,7 @@ export default function SchoolZoneScreen() {
               value={schoolName}
               onChangeText={setSchoolName}
               placeholder="School Name (optional)"
-              placeholderTextColor="rgba(255,255,255,0.3)"
+              placeholderTextColor="rgba(255,255,255,0.5)"
             />
 
             <Text style={styles.roleLabel}>I am a:</Text>
@@ -809,7 +809,7 @@ const styles = StyleSheet.create({
   },
   notesExcluded: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
     textAlign: 'center',
     marginTop: spacing.sm,
     fontStyle: 'italic',
@@ -889,7 +889,7 @@ const styles = StyleSheet.create({
   },
   statsText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
   },
   bottomPadding: {
     height: 40,

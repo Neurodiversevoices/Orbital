@@ -690,7 +690,7 @@ const styles = StyleSheet.create({
   },
   footerDisclaimer: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.25)',
+    color: 'rgba(255,255,255,0.5)',
     textAlign: 'center',
     lineHeight: 16,
     maxWidth: 300,
@@ -711,7 +711,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   exportLabelDisabled: {
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
   },
   methodology: {
     fontSize: 10,

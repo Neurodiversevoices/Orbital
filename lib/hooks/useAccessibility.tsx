@@ -70,18 +70,43 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
   const [isOnline, setIsOnline] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load settings on mount, then sync `reduceMotion` from OS-level
-  // AccessibilityInfo. Followup #5: respect the system Reduce Motion toggle so
-  // users don't have to double-toggle (OS + in-app).
+  // Load settings on mount, then sync `reduceMotion`, `reduceTransparency`,
+  // and `highTextContrast` from OS-level AccessibilityInfo.
+  // Followup #5: respect the system Reduce Motion toggle so users don't have
+  // to double-toggle (OS + in-app).
+  // Audit Phase 5 followups B4 + B5: also query Reduce Transparency and
+  // Increase Contrast on mount. These are ambient OS signals — not persisted.
   useEffect(() => {
     const loadSettings = async () => {
       try {
         const data = await AsyncStorage.getItem(STORAGE_KEYS.ACCESSIBILITY);
         let osReduceMotion = false;
+        let osReduceTransparency = false;
+        let osHighTextContrast = false;
         try {
           osReduceMotion = await AccessibilityInfo.isReduceMotionEnabled();
         } catch {
           // No-op: web/SSR without AccessibilityInfo support
+        }
+        try {
+          // iOS only; Android / web reject silently.
+          osReduceTransparency = await (
+            AccessibilityInfo as unknown as {
+              isReduceTransparencyEnabled?: () => Promise<boolean>;
+            }
+          ).isReduceTransparencyEnabled?.() ?? false;
+        } catch {
+          // No-op
+        }
+        try {
+          // iOS only.
+          osHighTextContrast = await (
+            AccessibilityInfo as unknown as {
+              isHighTextContrastEnabled?: () => Promise<boolean>;
+            }
+          ).isHighTextContrastEnabled?.() ?? false;
+        } catch {
+          // No-op
         }
 
         if (data) {
@@ -91,11 +116,17 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
             ...DEFAULT_ACCESSIBILITY_SETTINGS,
             ...saved,
             reduceMotion: osReduceMotion || !!saved.reduceMotion,
+            // Reduce Transparency and Increase Contrast are pure OS mirrors
+            // (no in-app override). Always trust the OS value at load time.
+            reduceTransparency: osReduceTransparency,
+            highTextContrast: osHighTextContrast,
           });
         } else {
           setSettings({
             ...DEFAULT_ACCESSIBILITY_SETTINGS,
             reduceMotion: osReduceMotion,
+            reduceTransparency: osReduceTransparency,
+            highTextContrast: osHighTextContrast,
           });
         }
 
@@ -131,6 +162,45 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
       if (sub && typeof (sub as { remove?: () => void }).remove === 'function') {
         (sub as { remove: () => void }).remove();
       }
+    };
+  }, []);
+
+  // Subscribe to OS-level Reduce Transparency changes (iOS Settings →
+  // Accessibility → Display → Reduce Transparency). Audit Phase 5 followup B4.
+  useEffect(() => {
+    let sub: { remove?: () => void } | null = null;
+    try {
+      sub = AccessibilityInfo.addEventListener(
+        // RN typings may not include this event on Android/web; cast defensively.
+        'reduceTransparencyChanged' as Parameters<typeof AccessibilityInfo.addEventListener>[0],
+        (enabled: boolean) => {
+          setSettings(prev => (prev.reduceTransparency === enabled ? prev : { ...prev, reduceTransparency: enabled }));
+        },
+      );
+    } catch {
+      // No-op for platforms without this event.
+    }
+    return () => {
+      if (sub && typeof sub.remove === 'function') sub.remove();
+    };
+  }, []);
+
+  // Subscribe to OS-level Increase Contrast changes (iOS Settings →
+  // Accessibility → Display → Increase Contrast). Audit Phase 5 followup B5.
+  useEffect(() => {
+    let sub: { remove?: () => void } | null = null;
+    try {
+      sub = AccessibilityInfo.addEventListener(
+        'highTextContrastChanged' as Parameters<typeof AccessibilityInfo.addEventListener>[0],
+        (enabled: boolean) => {
+          setSettings(prev => (prev.highTextContrast === enabled ? prev : { ...prev, highTextContrast: enabled }));
+        },
+      );
+    } catch {
+      // No-op for platforms without this event.
+    }
+    return () => {
+      if (sub && typeof sub.remove === 'function') sub.remove();
     };
   }, []);
 
@@ -364,4 +434,32 @@ export function useScaledButton(baseSize: number): number {
 export function useAccessibleColors() {
   const { getTheme } = useAccessibility();
   return getTheme();
+}
+
+/**
+ * Hook for accessible "glass" surface styling.
+ *
+ * Returns the standard translucent glass background + border, OR an opaque
+ * fallback when the user has iOS Reduce Transparency enabled.
+ *
+ * Usage:
+ *   const glass = useGlassStyle();
+ *   <View style={[styles.card, glass]}>
+ *
+ * Audit Phase 5 followup B4. The opaque fallback uses #0F1320 (a near-black
+ * tone that matches the design background #01020A while still showing card
+ * separation against the screen).
+ */
+export function useGlassStyle(): { backgroundColor: string; borderColor: string } {
+  const { settings } = useAccessibility();
+  if (settings.reduceTransparency) {
+    return {
+      backgroundColor: '#0F1320',
+      borderColor: 'rgba(255,255,255,0.5)',
+    };
+  }
+  return {
+    backgroundColor: 'rgba(255,255,255,0.07)',
+    borderColor: 'rgba(255,255,255,0.15)',
+  };
 }

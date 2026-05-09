@@ -719,6 +719,10 @@ export default function UpgradeScreen() {
                 style={[styles.planCardCtaButton, { backgroundColor: '#00E5FF' }, (hasCircle || !isPro) && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CIRCLE_ANNUAL, 'Circle (Annual)')}
                 disabled={isPurchasing || hasCircle || !isPro}
+                accessibilityRole="button"
+                accessibilityLabel={hasCircle ? 'Circle annual, active' : `Subscribe to Circle annual at ${formatPrice(CIRCLE_PRICING.annual)} per year`}
+                accessibilityState={{ disabled: isPurchasing || hasCircle || !isPro, selected: hasCircle }}
+                accessibilityHint={hasCircle ? undefined : 'Begins the Circle annual subscription purchase flow. Requires Pro.'}
               >
                 <Text style={[styles.planCardCtaButtonText, (hasCircle || !isPro) && styles.planCardCtaButtonTextDisabled]}>
                   {hasCircle ? 'Active' : `${formatPrice(CIRCLE_PRICING.annual)}/yr`}
@@ -729,6 +733,10 @@ export default function UpgradeScreen() {
                 style={[styles.planCardCtaButtonSecondary, (hasCircle || !isPro) && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CIRCLE_MONTHLY, 'Circle (Monthly)')}
                 disabled={isPurchasing || hasCircle || !isPro}
+                accessibilityRole="button"
+                accessibilityLabel={`Subscribe to Circle monthly at ${formatPrice(CIRCLE_PRICING.monthly)} per month`}
+                accessibilityState={{ disabled: isPurchasing || hasCircle || !isPro }}
+                accessibilityHint="Begins the Circle monthly subscription purchase flow. Requires Pro."
               >
                 <Text style={[styles.planCardCtaButtonSecondaryText, (hasCircle || !isPro) && styles.planCardCtaButtonTextDisabled]}>
                   {formatPrice(CIRCLE_PRICING.monthly)}/mo
@@ -748,6 +756,10 @@ export default function UpgradeScreen() {
                 style={[styles.cciInlineButtonCircle, (isPurchasing || !hasCircle) && styles.cciInlineButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CCI_CIRCLE_ALL, 'Circle Aggregate CCI')}
                 disabled={isPurchasing || !hasCircle}
+                accessibilityRole="button"
+                accessibilityLabel={`Get Circle Aggregate CCI for ${formatPrice(CCI_GROUP_PRICING.circleAll)}`}
+                accessibilityState={{ disabled: isPurchasing || !hasCircle }}
+                accessibilityHint="Begins the Circle aggregate CCI purchase flow. Requires an active Circle subscription."
               >
                 <Text style={styles.cciInlineButtonText}>
                   {`Get Circle CCI · ${formatPrice(CCI_GROUP_PRICING.circleAll)}`}
@@ -779,6 +791,10 @@ export default function UpgradeScreen() {
                 style={[styles.bundleOptionButton, bundleSize === 10 && styles.bundleOptionButtonActive]}
                 onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_10_ANNUAL, '10-Seat Pro Bundle')}
                 disabled={isPurchasing || bundleSize !== null}
+                accessibilityRole="button"
+                accessibilityLabel={`10-seat Pro bundle, ${formatPrice(BUNDLE_PRICING.bundle_10.annual)} annual`}
+                accessibilityState={{ disabled: isPurchasing || bundleSize !== null, selected: bundleSize === 10 }}
+                accessibilityHint="Begins the 10-seat bundle purchase flow"
               >
                 <Text style={[styles.bundleOptionText, bundleSize === 10 && styles.bundleOptionTextActive]}>10 seats</Text>
                 <Text style={[styles.bundleOptionPrice, bundleSize === 10 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_10.annual)}</Text>
@@ -787,6 +803,10 @@ export default function UpgradeScreen() {
                 style={[styles.bundleOptionButton, bundleSize === 15 && styles.bundleOptionButtonActive]}
                 onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_15_ANNUAL, '15-Seat Pro Bundle')}
                 disabled={isPurchasing || bundleSize !== null}
+                accessibilityRole="button"
+                accessibilityLabel={`15-seat Pro bundle, ${formatPrice(BUNDLE_PRICING.bundle_15.annual)} annual`}
+                accessibilityState={{ disabled: isPurchasing || bundleSize !== null, selected: bundleSize === 15 }}
+                accessibilityHint="Begins the 15-seat bundle purchase flow"
               >
                 <Text style={[styles.bundleOptionText, bundleSize === 15 && styles.bundleOptionTextActive]}>15 seats</Text>
                 <Text style={[styles.bundleOptionPrice, bundleSize === 15 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_15.annual)}</Text>
@@ -795,6 +815,10 @@ export default function UpgradeScreen() {
                 style={[styles.bundleOptionButton, bundleSize === 20 && styles.bundleOptionButtonActive]}
                 onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_20_ANNUAL, '20-Seat Pro Bundle')}
                 disabled={isPurchasing || bundleSize !== null}
+                accessibilityRole="button"
+                accessibilityLabel={`20-seat Pro bundle, ${formatPrice(BUNDLE_PRICING.bundle_20.annual)} annual`}
+                accessibilityState={{ disabled: isPurchasing || bundleSize !== null, selected: bundleSize === 20 }}
+                accessibilityHint="Begins the 20-seat bundle purchase flow"
               >
                 <Text style={[styles.bundleOptionText, bundleSize === 20 && styles.bundleOptionTextActive]}>20 seats</Text>
                 <Text style={[styles.bundleOptionPrice, bundleSize === 20 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_20.annual)}</Text>
@@ -813,6 +837,10 @@ export default function UpgradeScreen() {
                 style={[styles.cciInlineButtonBundle, (isPurchasing || bundleSize === null) && styles.cciInlineButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CCI_BUNDLE_ALL, 'Bundle Aggregate CCI')}
                 disabled={isPurchasing || bundleSize === null}
+                accessibilityRole="button"
+                accessibilityLabel={`Get Bundle Aggregate CCI for ${formatPrice(CCI_GROUP_PRICING.bundleAll)}`}
+                accessibilityState={{ disabled: isPurchasing || bundleSize === null }}
+                accessibilityHint="Begins the Bundle aggregate CCI purchase flow. Requires an active bundle."
               >
                 <Text style={styles.cciInlineButtonText}>
                   {`Get Bundle CCI · ${formatPrice(CCI_GROUP_PRICING.bundleAll)}`}
@@ -858,6 +886,10 @@ export default function UpgradeScreen() {
             onPress={handleRestore}
             disabled={isRestoring}
             style={styles.restoreButton}
+            accessibilityRole="button"
+            accessibilityLabel={isRestoring ? 'Restoring purchases' : 'Restore Purchases'}
+            accessibilityState={{ disabled: isRestoring, busy: isRestoring }}
+            accessibilityHint="Restores previously purchased subscriptions and CCI artifacts"
           >
             {isRestoring ? (
               <ActivityIndicator color="rgba(255,255,255,0.6)" size="small" />
@@ -887,11 +919,21 @@ export default function UpgradeScreen() {
           </Text>
 
           <View style={styles.footerLinks}>
-            <Pressable onPress={() => Linking.openURL('https://orbitalhealth.app/terms')}>
+            <Pressable
+              onPress={() => Linking.openURL('https://orbitalhealth.app/terms')}
+              accessibilityRole="link"
+              accessibilityLabel="Terms"
+              accessibilityHint="Opens the Terms of Service in your browser"
+            >
               <Text style={styles.footerLink}>Terms</Text>
             </Pressable>
             <Text style={styles.footerDot}>·</Text>
-            <Pressable onPress={() => Linking.openURL('https://orbitalhealth.app/privacy')}>
+            <Pressable
+              onPress={() => Linking.openURL('https://orbitalhealth.app/privacy')}
+              accessibilityRole="link"
+              accessibilityLabel="Privacy"
+              accessibilityHint="Opens the Privacy Policy in your browser"
+            >
               <Text style={styles.footerLink}>Privacy</Text>
             </Pressable>
           </View>
@@ -1381,7 +1423,7 @@ const styles = StyleSheet.create({
   },
   expansionPriceOr: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
     fontStyle: 'italic',
   },
   addMemberButton: {
@@ -1733,7 +1775,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
     textAlign: 'center',
     lineHeight: 14,
     marginBottom: spacing.sm,
@@ -1751,7 +1793,7 @@ const styles = StyleSheet.create({
   },
   footerDot: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.2)',
+    color: 'rgba(255,255,255,0.5)',
   },
 
   // =============================================================================

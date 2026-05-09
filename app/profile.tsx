@@ -170,7 +170,7 @@ export default function ProfileScreen() {
               onChangeText={handleYearChange}
               onBlur={handleSaveYear}
               placeholder="YYYY"
-              placeholderTextColor="rgba(255,255,255,0.3)"
+              placeholderTextColor="rgba(255,255,255,0.5)"
               keyboardType="number-pad"
               maxLength={4}
             />
@@ -253,7 +253,7 @@ export default function ProfileScreen() {
                 onChangeText={setSelfDescribedText}
                 onBlur={handleSaveSelfDescribed}
                 placeholder="How do you describe yourself? (optional)"
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor="rgba(255,255,255,0.5)"
                 maxLength={100}
               />
               <Text style={styles.selfDescribedNote}>
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.9)',
   },
   genderSelectorPlaceholder: {
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
   },
   genderOptions: {
     marginTop: spacing.sm,
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
   },
   selfDescribedNote: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
     marginTop: spacing.xs,
     fontStyle: 'italic',
   },

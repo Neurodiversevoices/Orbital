@@ -763,7 +763,7 @@ const styles = StyleSheet.create({
     width: 20,
     fontSize: 12,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
   },
   driverName: {
     width: 80,
@@ -794,7 +794,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
     textAlign: 'center',
     paddingVertical: spacing.md,
   },
@@ -835,7 +835,7 @@ const styles = StyleSheet.create({
   },
   forecastPointDate: {
     fontSize: 9,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
     fontWeight: '600',
   },
   forecastDot: {

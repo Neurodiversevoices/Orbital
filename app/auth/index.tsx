@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
   forgotLinkHomeText: {
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 12,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
   },
 
   // ── Email form ──────────────────────────────────────────────────────────
@@ -715,7 +715,7 @@ const styles = StyleSheet.create({
   legalText: {
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 11,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
     textAlign: 'center',
     marginTop: 20,
     lineHeight: 18,

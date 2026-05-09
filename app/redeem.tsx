@@ -252,7 +252,7 @@ export default function RedeemScreen() {
               value={code}
               onChangeText={handleCodeChange}
               placeholder="XXXX-XXXX-XXXX-XXXX"
-              placeholderTextColor="rgba(255,255,255,0.3)"
+              placeholderTextColor="rgba(255,255,255,0.5)"
               autoCapitalize="characters"
               autoCorrect={false}
               maxLength={19} // 16 chars + 3 dashes

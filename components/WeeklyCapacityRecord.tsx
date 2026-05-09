@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   dayCount: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
   },
   dayCountSelected: {
     color: 'rgba(255,255,255,0.9)',
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
   },
   emptyDayText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
   },
 
   // Entries List

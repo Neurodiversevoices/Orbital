@@ -50,6 +50,7 @@ import { ProprietaryFooter } from '../components/legal';
 import { APP_MODE_CONFIGS } from '../types';
 import { ModeSelector } from '../components';
 import { getUserEntitlements, type UserEntitlements } from '../lib/entitlements';
+import { useGlassStyle } from '../lib/hooks/useAccessibility';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -84,6 +85,8 @@ export default function SettingsScreen() {
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
   const [showDemoPicker, setShowDemoPicker] = useState(false);
   const [entitlements, setEntitlements] = useState<UserEntitlements | null>(null);
+  // Audit Phase 5 followup B4: about card honors Reduce Transparency.
+  const glassStyle = useGlassStyle();
 
   // Load entitlements for Circle membership check
   useEffect(() => {
@@ -546,7 +549,7 @@ export default function SettingsScreen() {
             onPress={() => router.push('/about')}
             disabled={isProcessing}
           />
-          <View style={styles.aboutCard}>
+          <View style={[styles.aboutCard, glassStyle]}>
             <View style={styles.versionRow}>
               <Text style={styles.appName}>{t.settings.appName}</Text>
               <Text style={styles.version}>v1.0.0</Text>

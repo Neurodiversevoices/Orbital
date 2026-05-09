@@ -1599,6 +1599,11 @@ export interface AccessibilitySettings {
   colorBlindMode: ColorBlindMode;
   textSize: TextSize;
   reduceMotion: boolean;
+  // OS-mirrored visual flags (iOS Settings → Accessibility → Display)
+  // Audit Phase 5 followups B4 + B5: query AccessibilityInfo on mount and
+  // subscribe to changes. Not user-configurable in-app — ambient OS signals.
+  reduceTransparency: boolean;
+  highTextContrast: boolean;
 
   // Motor
   bigButtonMode: boolean;
@@ -1639,6 +1644,8 @@ export const DEFAULT_ACCESSIBILITY_SETTINGS: AccessibilitySettings = {
   colorBlindMode: 'none',
   textSize: 'default',
   reduceMotion: false,
+  reduceTransparency: false,
+  highTextContrast: false,
 
   // Motor
   bigButtonMode: false,

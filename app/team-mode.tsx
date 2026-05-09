@@ -174,7 +174,7 @@ export default function TeamModeScreen() {
               value={teamCode}
               onChangeText={setTeamCode}
               placeholder="Team Code (e.g., ACME-2024)"
-              placeholderTextColor="rgba(255,255,255,0.3)"
+              placeholderTextColor="rgba(255,255,255,0.5)"
               autoCapitalize="characters"
             />
 
@@ -183,7 +183,7 @@ export default function TeamModeScreen() {
               value={teamName}
               onChangeText={setTeamName}
               placeholder="Team Name (optional)"
-              placeholderTextColor="rgba(255,255,255,0.3)"
+              placeholderTextColor="rgba(255,255,255,0.5)"
             />
 
             <View style={styles.formButtons}>
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
   },
   statsText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
   },
   bottomPadding: {
     height: 40,

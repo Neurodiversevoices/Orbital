@@ -146,7 +146,7 @@ export default function ProfileSetupScreen() {
               value={displayName}
               onChangeText={setDisplayName}
               placeholder="Enter your name"
-              placeholderTextColor="rgba(255,255,255,0.3)"
+              placeholderTextColor="rgba(255,255,255,0.5)"
               maxLength={30}
               autoCapitalize="words"
               returnKeyType="done"
@@ -356,6 +356,6 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   continueTextDisabled: {
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.5)',
   },
 });

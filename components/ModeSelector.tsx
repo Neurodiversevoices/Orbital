@@ -282,7 +282,7 @@ export function ModeSelector({ compact = false }: ModeSelectorProps) {
                   <TextInput
                     style={styles.orgInput}
                     placeholder="ORG CODE"
-                    placeholderTextColor="rgba(255,255,255,0.3)"
+                    placeholderTextColor="rgba(255,255,255,0.5)"
                     value={orgCodeInput}
                     onChangeText={setOrgCodeInput}
                     autoCapitalize="characters"
@@ -292,7 +292,7 @@ export function ModeSelector({ compact = false }: ModeSelectorProps) {
                   <TextInput
                     style={styles.orgInput}
                     placeholder="Organization Name (optional)"
-                    placeholderTextColor="rgba(255,255,255,0.3)"
+                    placeholderTextColor="rgba(255,255,255,0.5)"
                     value={orgNameInput}
                     onChangeText={setOrgNameInput}
                     autoCorrect={false}

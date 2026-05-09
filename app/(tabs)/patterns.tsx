@@ -1044,7 +1044,7 @@ const styles = StyleSheet.create({
   },
   longitudinalNote: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.25)',
+    color: 'rgba(255,255,255,0.5)',
     textAlign: 'center',
     marginTop: spacing.sm,
     marginBottom: spacing.md,
