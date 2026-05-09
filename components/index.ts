@@ -19,6 +19,9 @@ export { WeeklyCapacityRecord } from './WeeklyCapacityRecord';
 export { BlurredPatternTease } from './BlurredPatternTease';
 export { CCIClinicalArtifact } from './CCIClinicalArtifact';
 export type { CCIClinicalArtifactProps } from './CCIClinicalArtifact';
+export { GlassCard } from './GlassCard';
+export type { GlassIntensity } from './GlassCard';
+export { GlassDivider } from './GlassDivider';
 
 // Legal components
 export {
