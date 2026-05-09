@@ -172,6 +172,10 @@ function TierCard({
           style={[styles.tierButton, disabled && styles.tierButtonDisabled]}
           onPress={onSelectAnnual}
           disabled={disabled || isCurrentTier}
+          accessibilityRole="button"
+          accessibilityLabel={isCurrentTier ? `${name} annual, current plan` : `Subscribe to ${name} annual at ${formatPrice(annualPrice, 'year')}`}
+          accessibilityState={{ disabled: disabled || isCurrentTier, selected: isCurrentTier }}
+          accessibilityHint={isCurrentTier ? undefined : 'Begins the annual subscription purchase flow'}
         >
           <Text style={[styles.tierButtonText, disabled && styles.tierButtonTextDisabled]}>
             {isCurrentTier ? 'Current' : `${formatPrice(annualPrice, 'year')}`}
@@ -185,6 +189,10 @@ function TierCard({
           style={[styles.tierButtonSecondary, disabled && styles.tierButtonDisabled]}
           onPress={onSelectMonthly}
           disabled={disabled || isCurrentTier}
+          accessibilityRole="button"
+          accessibilityLabel={`Subscribe to ${name} monthly at ${formatPrice(monthlyPrice, 'month')}`}
+          accessibilityState={{ disabled: disabled || isCurrentTier }}
+          accessibilityHint="Begins the monthly subscription purchase flow"
         >
           <Text style={styles.tierButtonSecondaryText}>
             {formatPrice(monthlyPrice, 'month')}
@@ -213,6 +221,10 @@ function BundleCard({ seats, annualPrice, onSelect, disabled, isOwned }: BundleC
       style={[styles.bundleItem, isOwned && styles.bundleItemOwned]}
       onPress={onSelect}
       disabled={disabled || isOwned}
+      accessibilityRole="button"
+      accessibilityLabel={isOwned ? `${seats}-seat bundle, owned` : `Purchase ${seats}-seat bundle for ${formatPrice(annualPrice)} per year`}
+      accessibilityState={{ disabled: disabled || isOwned, selected: isOwned }}
+      accessibilityHint={isOwned ? undefined : 'Begins the bundle purchase flow'}
     >
       <View style={styles.bundleItemLeft}>
         <Users size={20} color={isOwned ? '#4CAF50' : '#00E5FF'} />
@@ -297,6 +309,9 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
             style={styles.cciConfirmationRow}
             onPress={() => setPermanentRecordChecked(!permanentRecordChecked)}
             disabled={disabled}
+            accessibilityRole="checkbox"
+            accessibilityLabel={CCI_PERMANENT_RECORD_TEXT}
+            accessibilityState={{ checked: permanentRecordChecked, disabled }}
           >
             <View style={[styles.cciCheckbox, permanentRecordChecked && styles.cciCheckboxChecked]}>
               {permanentRecordChecked && <Text style={styles.cciCheckboxMark}>✓</Text>}
@@ -308,6 +323,9 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
             style={styles.cciConfirmationRow}
             onPress={() => setNotDiagnosisChecked(!notDiagnosisChecked)}
             disabled={disabled}
+            accessibilityRole="checkbox"
+            accessibilityLabel={CCI_NOT_DIAGNOSIS_TEXT}
+            accessibilityState={{ checked: notDiagnosisChecked, disabled }}
           >
             <View style={[styles.cciCheckbox, notDiagnosisChecked && styles.cciCheckboxChecked]}>
               {notDiagnosisChecked && <Text style={styles.cciCheckboxMark}>✓</Text>}
@@ -319,6 +337,9 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
             style={styles.cciConfirmationRow}
             onPress={() => setConfirmationChecked(!confirmationChecked)}
             disabled={disabled}
+            accessibilityRole="checkbox"
+            accessibilityLabel={CCI_CONFIRMATION_TEXT}
+            accessibilityState={{ checked: confirmationChecked, disabled }}
           >
             <View style={[styles.cciCheckbox, confirmationChecked && styles.cciCheckboxChecked]}>
               {confirmationChecked && <Text style={styles.cciCheckboxMark}>✓</Text>}
@@ -332,6 +353,10 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
         style={[styles.cciButton, !canPurchase && styles.cciButtonDisabled]}
         onPress={() => onPurchase(allConfirmed)}
         disabled={!canPurchase}
+        accessibilityRole="button"
+        accessibilityLabel={hasPurchased ? 'CCI issued' : `Issue Individual CCI for ${formatPrice(price)}`}
+        accessibilityState={{ disabled: !canPurchase }}
+        accessibilityHint={hasPurchased ? undefined : 'Begins the CCI issuance purchase flow'}
       >
         <Text style={[styles.cciButtonText, !canPurchase && styles.cciButtonTextDisabled]}>
           {hasPurchased ? 'Issued' : `Issue Individual CCI · ${formatPrice(price)}`}
@@ -479,7 +504,13 @@ export default function UpgradeScreen() {
         <View style={styles.headerTitleContainer}>
           <Text style={styles.title}>Plans</Text>
         </View>
-        <Pressable onPress={() => router.back()} style={styles.closeButton}>
+        <Pressable
+          onPress={() => router.back()}
+          style={styles.closeButton}
+          accessibilityRole="button"
+          accessibilityLabel="Close plans"
+          accessibilityHint="Returns to the previous screen"
+        >
           <X color={colors.textPrimary} size={24} />
         </Pressable>
       </View>
@@ -531,6 +562,10 @@ export default function UpgradeScreen() {
                 style={[styles.cciInlineButton, (isPurchasing || hasCCIPurchased) && styles.cciInlineButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CCI_FREE, 'Individual CCI')}
                 disabled={isPurchasing || hasCCIPurchased}
+                accessibilityRole="button"
+                accessibilityLabel={hasCCIPurchased ? 'Individual CCI issued' : `Get Individual CCI for ${formatPrice(CCI_PRICING.ninetyDay)}`}
+                accessibilityState={{ disabled: isPurchasing || hasCCIPurchased }}
+                accessibilityHint={hasCCIPurchased ? undefined : 'Begins the Individual CCI purchase flow'}
               >
                 <Text style={styles.cciInlineButtonText}>
                   {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.ninetyDay)}`}
@@ -562,6 +597,10 @@ export default function UpgradeScreen() {
                 style={[styles.planCardCtaButton, isPro && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.PRO_ANNUAL, 'Pro (Annual)')}
                 disabled={isPurchasing || isPro}
+                accessibilityRole="button"
+                accessibilityLabel={isPro ? 'Pro annual, active' : `Subscribe to Pro annual at ${formatPrice(PRO_PRICING.annual)} per year`}
+                accessibilityState={{ disabled: isPurchasing || isPro, selected: isPro }}
+                accessibilityHint={isPro ? undefined : 'Begins the Pro annual subscription purchase flow'}
               >
                 <Text style={[styles.planCardCtaButtonText, isPro && styles.planCardCtaButtonTextDisabled]}>
                   {isPro ? 'Active' : `${formatPrice(PRO_PRICING.annual)}/yr`}
@@ -572,6 +611,10 @@ export default function UpgradeScreen() {
                 style={[styles.planCardCtaButtonSecondary, isPro && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.PRO_MONTHLY, 'Pro (Monthly)')}
                 disabled={isPurchasing || isPro}
+                accessibilityRole="button"
+                accessibilityLabel={`Subscribe to Pro monthly at ${formatPrice(PRO_PRICING.monthly)} per month`}
+                accessibilityState={{ disabled: isPurchasing || isPro }}
+                accessibilityHint="Begins the Pro monthly subscription purchase flow"
               >
                 <Text style={[styles.planCardCtaButtonSecondaryText, isPro && styles.planCardCtaButtonTextDisabled]}>
                   {formatPrice(PRO_PRICING.monthly)}/mo
@@ -591,6 +634,10 @@ export default function UpgradeScreen() {
                 style={[styles.cciInlineButtonPro, (isPurchasing || hasCCIPurchased || !isPro) && styles.cciInlineButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CCI_PRO, 'Individual CCI')}
                 disabled={isPurchasing || hasCCIPurchased || !isPro}
+                accessibilityRole="button"
+                accessibilityLabel={hasCCIPurchased ? 'Individual CCI issued' : `Get Individual CCI for ${formatPrice(CCI_PRICING.sixtyDay)}, Pro discount`}
+                accessibilityState={{ disabled: isPurchasing || hasCCIPurchased || !isPro }}
+                accessibilityHint={hasCCIPurchased ? undefined : 'Begins the Individual CCI purchase flow at the Pro discount'}
               >
                 <Text style={styles.cciInlineButtonText}>
                   {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.sixtyDay)}`}
@@ -622,6 +669,10 @@ export default function UpgradeScreen() {
                 style={[styles.planCardCtaButton, { backgroundColor: '#FF9800' }, hasFamily && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_ANNUAL, 'Family (Annual)')}
                 disabled={isPurchasing || hasFamily}
+                accessibilityRole="button"
+                accessibilityLabel={hasFamily ? 'Family annual, active' : `Subscribe to Family annual at ${formatPrice(FAMILY_PRICING.annual)} per year`}
+                accessibilityState={{ disabled: isPurchasing || hasFamily, selected: hasFamily }}
+                accessibilityHint={hasFamily ? undefined : 'Begins the Family annual subscription purchase flow'}
               >
                 <Text style={[styles.planCardCtaButtonText, hasFamily && styles.planCardCtaButtonTextDisabled]}>
                   {hasFamily ? 'Active' : `${formatPrice(FAMILY_PRICING.annual)}/yr`}
@@ -632,6 +683,10 @@ export default function UpgradeScreen() {
                 style={[styles.planCardCtaButtonSecondary, hasFamily && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_MONTHLY, 'Family (Monthly)')}
                 disabled={isPurchasing || hasFamily}
+                accessibilityRole="button"
+                accessibilityLabel={`Subscribe to Family monthly at ${formatPrice(FAMILY_PRICING.monthly)} per month`}
+                accessibilityState={{ disabled: isPurchasing || hasFamily }}
+                accessibilityHint="Begins the Family monthly subscription purchase flow"
               >
                 <Text style={[styles.planCardCtaButtonSecondaryText, hasFamily && styles.planCardCtaButtonTextDisabled]}>
                   {formatPrice(FAMILY_PRICING.monthly)}/mo

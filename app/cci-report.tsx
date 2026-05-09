@@ -254,7 +254,13 @@ export default function CCIReportScreen() {
         <Text style={styles.infoItem}>• 6-week capacity forecast</Text>
       </View>
 
-      <Pressable style={styles.generateButton} onPress={generateReport}>
+      <Pressable
+        style={styles.generateButton}
+        onPress={generateReport}
+        accessibilityRole="button"
+        accessibilityLabel="Generate Instrument"
+        accessibilityHint="Generates a 90-day Capacity Composite Index report"
+      >
         <Zap size={20} color="#000" />
         <Text style={styles.generateButtonText}>Generate Instrument</Text>
       </Pressable>
@@ -283,12 +289,21 @@ export default function CCIReportScreen() {
         <Pressable
           style={[styles.generateButton, styles.upgradeButton]}
           onPress={() => router.push('/upgrade')}
+          accessibilityRole="link"
+          accessibilityLabel="View Plans"
+          accessibilityHint="Opens the plans and pricing screen"
         >
           <Text style={styles.generateButtonText}>View Plans</Text>
         </Pressable>
       )}
 
-      <Pressable style={styles.retryButton} onPress={() => setState('idle')}>
+      <Pressable
+        style={styles.retryButton}
+        onPress={() => setState('idle')}
+        accessibilityRole="button"
+        accessibilityLabel="Try Again"
+        accessibilityHint="Returns to the report generation start"
+      >
         <Text style={styles.retryButtonText}>Try Again</Text>
       </Pressable>
     </View>
@@ -471,7 +486,13 @@ export default function CCIReportScreen() {
         </View>
 
         {/* Regenerate */}
-        <Pressable style={styles.regenerateButton} onPress={() => { setState('idle'); setPayload(null); }}>
+        <Pressable
+          style={styles.regenerateButton}
+          onPress={() => { setState('idle'); setPayload(null); }}
+          accessibilityRole="button"
+          accessibilityLabel="Generate New Report"
+          accessibilityHint="Discards this report and returns to the start screen"
+        >
           <Text style={styles.regenerateButtonText}>Generate New Report</Text>
         </Pressable>
       </ScrollView>
@@ -482,7 +503,13 @@ export default function CCIReportScreen() {
     <SafeAreaView style={commonStyles.screen} edges={['top', 'left', 'right']}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.headerBack}>
+        <Pressable
+          onPress={() => router.back()}
+          style={styles.headerBack}
+          accessibilityRole="button"
+          accessibilityLabel="Back"
+          accessibilityHint="Returns to the previous screen"
+        >
           <ArrowLeft size={24} color={colors.textPrimary} />
         </Pressable>
         <Text style={styles.headerTitle}>CCI Report</Text>

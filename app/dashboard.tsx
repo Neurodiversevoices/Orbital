@@ -88,7 +88,13 @@ export default function DashboardScreen() {
           <Building2 color={DASHBOARD_STATE_COLORS.high} size={24} />
           <Text style={styles.headerTitle}>Capacity Brief</Text>
         </View>
-        <Pressable onPress={() => router.back()} style={styles.closeButton}>
+        <Pressable
+          onPress={() => router.back()}
+          style={styles.closeButton}
+          accessibilityRole="button"
+          accessibilityLabel="Close Capacity Brief"
+          accessibilityHint="Returns to the previous screen"
+        >
           <X color={colors.textPrimary} size={24} />
         </Pressable>
       </View>
@@ -111,17 +117,24 @@ export default function DashboardScreen() {
 
       {/* Period Selector */}
       <View style={styles.periodSelector}>
-        {(['30d', '90d', '1y'] as TimePeriod[]).map((p) => (
-          <Pressable
-            key={p}
-            style={[styles.periodButton, period === p && styles.periodButtonActive]}
-            onPress={() => setPeriod(p)}
-          >
-            <Text style={[styles.periodButtonText, period === p && styles.periodButtonTextActive]}>
-              {p === '30d' ? '30 Days' : p === '90d' ? 'Quarter' : 'Annual'}
-            </Text>
-          </Pressable>
-        ))}
+        {(['30d', '90d', '1y'] as TimePeriod[]).map((p) => {
+          const periodLabel = p === '30d' ? '30 Days' : p === '90d' ? 'Quarter' : 'Annual';
+          return (
+            <Pressable
+              key={p}
+              style={[styles.periodButton, period === p && styles.periodButtonActive]}
+              onPress={() => setPeriod(p)}
+              accessibilityRole="tab"
+              accessibilityLabel={periodLabel}
+              accessibilityState={{ selected: period === p }}
+              accessibilityHint="Filters the brief by time period"
+            >
+              <Text style={[styles.periodButtonText, period === p && styles.periodButtonTextActive]}>
+                {periodLabel}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>

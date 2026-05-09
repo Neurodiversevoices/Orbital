@@ -14,6 +14,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { View, Text, ScrollView, RefreshControl } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
+import { Users } from 'lucide-react-native';
 import { CirclesAPI, PendingConfirmation, ConnectionSummary } from './_api';
 import {
   Screen,
@@ -25,6 +26,7 @@ import {
   Divider,
   Label,
 } from './_ui';
+import { EmptyState } from '../../components';
 
 export default function CirclesHome() {
   const router = useRouter();
@@ -148,7 +150,12 @@ export default function CirclesHome() {
         <Card>
           <Label>Connections ({connections.length}/25)</Label>
           {connections.length === 0 ? (
-            <Muted>No connections yet.</Muted>
+            <EmptyState
+              icon={Users}
+              title="No connections yet"
+              description="Create or redeem an invite to share a live capacity signal with someone you trust."
+              size="compact"
+            />
           ) : (
             connections.map((c, index) => (
               <View key={c.connectionId}>

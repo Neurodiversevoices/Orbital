@@ -4,7 +4,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Circle, Eye, ListTodo, Users, TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Calendar, Clock, Lock, Bug, RefreshCw, Award, FileText, Database } from 'lucide-react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { HistoryItem, EnergyGraph, TimeRangeTabs, TimeRange, getTimeRangeMs, MilestonesPanel, PatternLanguagePanel, OrgRoleBanner, WeeklyCapacityRecord, BlurredPatternTease } from '../../components';
+import { HistoryItem, EnergyGraph, TimeRangeTabs, TimeRange, getTimeRangeMs, MilestonesPanel, PatternLanguagePanel, OrgRoleBanner, WeeklyCapacityRecord, BlurredPatternTease, EmptyState } from '../../components';
 import { QCRButton, QCRScreen, QCRPaywall } from '../../components/qcr';
 import { colors, commonStyles, spacing } from '../../theme';
 import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
@@ -757,9 +757,12 @@ export default function PatternsScreen() {
                 {/* Footer */}
                 <View style={styles.footerSection}>
                   {logs.length === 0 && (
-                    <View style={styles.emptyInline}>
-                      <Text style={styles.emptyInlineText}>No entries yet. Start logging on the home screen.</Text>
-                    </View>
+                    <EmptyState
+                      icon={Calendar}
+                      title="No entries yet"
+                      description="Capacity logs will appear here once you start logging."
+                      actionHint="Tap the orb on Home to log your first signal"
+                    />
                   )}
                   <Text style={styles.longitudinalNote}>
                     {t.patterns.longitudinalNote}

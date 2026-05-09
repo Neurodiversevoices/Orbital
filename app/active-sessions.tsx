@@ -15,9 +15,11 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 import {
   X,
   Smartphone,
@@ -40,6 +42,7 @@ import {
   DeviceSession,
 } from '../lib/session';
 import { getAuditLog, getActionDescription, SessionAuditEntry } from '../lib/session';
+import { EmptyState } from '../components';
 
 export default function ActiveSessionsScreen() {
   const router = useRouter();
@@ -83,6 +86,11 @@ export default function ActiveSessionsScreen() {
       return;
     }
 
+    // HIG: warn haptic before presenting a destructive confirmation alert.
+    if (Platform.OS === 'ios') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
+    }
+
     Alert.alert(
       'Remove Session',
       `Remove session from ${session.deviceName}? This will require re-authentication on that device.`,
@@ -106,6 +114,11 @@ export default function ActiveSessionsScreen() {
     if (otherSessions.length === 0) {
       Alert.alert('No Other Sessions', 'There are no other sessions to remove.');
       return;
+    }
+
+    // HIG: warn haptic before presenting a destructive confirmation alert.
+    if (Platform.OS === 'ios') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
     }
 
     Alert.alert(
@@ -235,12 +248,13 @@ export default function ActiveSessionsScreen() {
 
         {/* No Other Sessions */}
         {sessions.filter(s => s.id !== currentSessionId).length === 0 && (
-          <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.emptyState}>
-            <Shield size={32} color="rgba(255,255,255,0.3)" />
-            <Text style={styles.emptyTitle}>No Other Sessions</Text>
-            <Text style={styles.emptyText}>
-              You're only signed in on this device.
-            </Text>
+          <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.emptyStateWrap}>
+            <EmptyState
+              icon={Shield}
+              title="No Other Sessions"
+              description="You're only signed in on this device."
+              size="compact"
+            />
           </Animated.View>
         )}
 
@@ -426,6 +440,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: borderRadius.lg,
     marginBottom: spacing.xl,
+  },
+  emptyStateWrap: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: borderRadius.lg,
+    marginBottom: spacing.xl,
+    overflow: 'hidden',
   },
   emptyTitle: {
     fontSize: 16,

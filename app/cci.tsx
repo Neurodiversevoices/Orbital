@@ -167,7 +167,13 @@ export default function CCIInstrumentScreen() {
           <Text style={styles.errorHint}>
             Valid types: circle, bundle, individual
           </Text>
-          <Pressable onPress={() => router.back()} style={styles.backButton}>
+          <Pressable
+            onPress={() => router.back()}
+            style={styles.backButton}
+            accessibilityRole="button"
+            accessibilityLabel="Go Back"
+            accessibilityHint="Returns to the previous screen"
+          >
             <Text style={styles.backButtonText}>Go Back</Text>
           </Pressable>
         </View>
@@ -182,7 +188,13 @@ export default function CCIInstrumentScreen() {
       <SafeAreaView style={commonStyles.screen}>
         <View style={styles.gatedContainer}>
           <Text style={styles.gatedText}>CCI Issuance not available</Text>
-          <Pressable onPress={() => router.back()} style={styles.backButton}>
+          <Pressable
+            onPress={() => router.back()}
+            style={styles.backButton}
+            accessibilityRole="button"
+            accessibilityLabel="Go Back"
+            accessibilityHint="Returns to the previous screen"
+          >
             <Text style={styles.backButtonText}>Go Back</Text>
           </Pressable>
         </View>
@@ -194,7 +206,13 @@ export default function CCIInstrumentScreen() {
     <SafeAreaView style={commonStyles.screen} testID="bundle-cci-ready" data-testid="bundle-cci-ready">
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.headerBack}>
+        <Pressable
+          onPress={() => router.back()}
+          style={styles.headerBack}
+          accessibilityRole="button"
+          accessibilityLabel="Back"
+          accessibilityHint="Returns to the previous screen"
+        >
           <ArrowLeft size={24} color={colors.textPrimary} />
         </Pressable>
         <View style={styles.headerCenter}>
@@ -278,7 +296,13 @@ export default function CCIInstrumentScreen() {
           </View>
 
           {/* Legal Reference — PATCH 2 */}
-          <Pressable onPress={() => router.push('/legal')} style={styles.legalLink}>
+          <Pressable
+            onPress={() => router.push('/legal')}
+            style={styles.legalLink}
+            accessibilityRole="link"
+            accessibilityLabel="See Legal and Policies for full disclaimers"
+            accessibilityHint="Opens the legal and policies screen"
+          >
             <Text style={styles.legalLinkText}>
               See Legal & Policies for full disclaimers
             </Text>
@@ -290,7 +314,13 @@ export default function CCIInstrumentScreen() {
           <Text style={styles.sectionTitle}>Issuance Actions</Text>
 
           {/* View Instrument */}
-          <Pressable style={styles.actionButton} onPress={handleViewInstrument}>
+          <Pressable
+            style={styles.actionButton}
+            onPress={handleViewInstrument}
+            accessibilityRole="button"
+            accessibilityLabel="View Instrument"
+            accessibilityHint="Opens the CCI artifact in a new browser window"
+          >
             <View style={styles.actionIcon}>
               <Eye size={20} color="#00E5FF" />
             </View>
@@ -302,7 +332,13 @@ export default function CCIInstrumentScreen() {
           </Pressable>
 
           {/* Retrieve Filed Copy */}
-          <Pressable style={styles.actionButton} onPress={handleDownloadHTML}>
+          <Pressable
+            style={styles.actionButton}
+            onPress={handleDownloadHTML}
+            accessibilityRole="button"
+            accessibilityLabel="Retrieve Filed Copy as HTML"
+            accessibilityHint="Downloads the CCI artifact as an HTML file"
+          >
             <View style={styles.actionIcon}>
               <Download size={20} color="#00E5FF" />
             </View>
@@ -316,6 +352,10 @@ export default function CCIInstrumentScreen() {
           <Pressable
             style={[styles.actionButton, styles.actionButtonPrimary]}
             onPress={handleExportPDF}
+            accessibilityRole="button"
+            accessibilityLabel="Export PDF"
+            accessibilityHint="Opens the print dialog to save the artifact as a PDF"
+            accessibilityState={{ busy: isExporting }}
           >
             <View style={[styles.actionIcon, styles.actionIconPrimary]}>
               <FileText size={20} color="#000" />
@@ -332,6 +372,9 @@ export default function CCIInstrumentScreen() {
           <Pressable
             style={styles.actionButton}
             onPress={() => Linking.openURL(ISSUANCE_REQUEST_URL)}
+            accessibilityRole="link"
+            accessibilityLabel="Request Issuance"
+            accessibilityHint="Opens an external link to request official CCI issuance"
           >
             <View style={styles.actionIcon}>
               <Mail size={20} color="#00E5FF" />

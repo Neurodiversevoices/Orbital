@@ -175,7 +175,13 @@ export default function ProfileSetupScreen() {
           entering={FadeInDown.delay(400).duration(400)}
           style={styles.actions}
         >
-          <Pressable style={styles.skipButton} onPress={handleSkip}>
+          <Pressable
+            style={styles.skipButton}
+            onPress={handleSkip}
+            accessibilityRole="button"
+            accessibilityLabel="Skip for now"
+            accessibilityHint="Skips profile setup and continues to the home screen"
+          >
             <Text style={styles.skipText}>Skip for now</Text>
           </Pressable>
 
@@ -186,6 +192,10 @@ export default function ProfileSetupScreen() {
             ]}
             onPress={handleContinue}
             disabled={!canContinue || isSubmitting}
+            accessibilityRole="button"
+            accessibilityLabel={isSubmitting ? 'Saving profile' : 'Continue'}
+            accessibilityHint="Saves your display name and avatar, then continues to the home screen"
+            accessibilityState={{ disabled: !canContinue || isSubmitting, busy: isSubmitting }}
           >
             <Text
               style={[

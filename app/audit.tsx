@@ -6,7 +6,7 @@
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, StyleSheet, Text, Pressable, ScrollView, Share, Alert } from 'react-native';
+import { View, StyleSheet, Text, Pressable, ScrollView, Share, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { X, Download, Shield, Eye, FileOutput, Share2, UserX, Clock } from 'lucide-react-native';
@@ -14,6 +14,7 @@ import { colors, commonStyles, spacing } from '../theme';
 import { getAuditLog, getRecipients } from '../lib/storage';
 import { AuditEntry, AuditAction, ShareRecipient } from '../types';
 import { useLocale } from '../lib/hooks/useLocale';
+import { EmptyState } from '../components';
 
 const ACTION_ICONS: Record<AuditAction, React.ComponentType<{ color: string; size: number }>> = {
   share_created: Share2,
@@ -37,6 +38,7 @@ export default function AuditScreen() {
   const [entries, setEntries] = useState<AuditEntry[]>([]);
   const [recipients, setRecipients] = useState<Map<string, ShareRecipient>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -52,6 +54,17 @@ export default function AuditScreen() {
     setRecipients(new Map(recipientList.map(r => [r.id, r])));
     setIsLoading(false);
   };
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    const [auditEntries, recipientList] = await Promise.all([
+      getAuditLog(),
+      getRecipients(),
+    ]);
+    setEntries(auditEntries);
+    setRecipients(new Map(recipientList.map(r => [r.id, r])));
+    setIsRefreshing(false);
+  }, []);
 
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -155,19 +168,28 @@ export default function AuditScreen() {
         </Text>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            tintColor="#00E5FF"
+            colors={['#00E5FF']}
+          />
+        }
+      >
         {isLoading ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>Loading...</Text>
+            <ActivityIndicator size="small" color="#00E5FF" />
           </View>
         ) : entries.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Shield color="rgba(255,255,255,0.2)" size={48} />
-            <Text style={styles.emptyTitle}>No Activity Recorded</Text>
-            <Text style={styles.emptyText}>
-              Share and export actions will appear here.
-            </Text>
-          </View>
+          <EmptyState
+            icon={Shield}
+            title="No Activity Recorded"
+            description="Share and export actions will appear here once you take them."
+          />
         ) : (
           entries.map((entry, index) => {
             const Icon = ACTION_ICONS[entry.action];

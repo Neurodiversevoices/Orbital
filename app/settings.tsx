@@ -221,7 +221,13 @@ export default function SettingsScreen() {
             <View style={[styles.logoInner, { backgroundColor: isDemoMode ? '#FF9800' : '#00E5FF' }]} />
           </View>
         </View>
-        <Pressable onPress={() => router.back()} style={styles.closeButton}>
+        <Pressable
+          onPress={() => router.back()}
+          style={styles.closeButton}
+          accessibilityRole="button"
+          accessibilityLabel="Close settings"
+          accessibilityHint="Returns to the previous screen"
+        >
           <X color={colors.textPrimary} size={24} />
         </Pressable>
       </View>
@@ -571,11 +577,18 @@ export default function SettingsScreen() {
         <Pressable
           style={styles.modalOverlay}
           onPress={() => setShowLanguagePicker(false)}
+          accessibilityRole="button"
+          accessibilityLabel="Dismiss language picker"
+          accessibilityHint="Closes the language selection dialog"
         >
           <View style={styles.languagePickerContainer}>
             <View style={styles.languagePickerHeader}>
               <Text style={styles.languagePickerTitle}>{t.settings.language}</Text>
-              <Pressable onPress={() => setShowLanguagePicker(false)}>
+              <Pressable
+                onPress={() => setShowLanguagePicker(false)}
+                accessibilityRole="button"
+                accessibilityLabel="Close language picker"
+              >
                 <X color={colors.textPrimary} size={20} />
               </Pressable>
             </View>
@@ -588,6 +601,10 @@ export default function SettingsScreen() {
                     localeKey === locale && styles.languageOptionSelected,
                   ]}
                   onPress={() => handleLanguageSelect(localeKey)}
+                  accessibilityRole="button"
+                  accessibilityLabel={localeNames[localeKey]}
+                  accessibilityState={{ selected: localeKey === locale }}
+                  accessibilityHint="Sets the app language"
                 >
                   <Text
                     style={[
@@ -618,11 +635,18 @@ export default function SettingsScreen() {
           <Pressable
             style={styles.modalOverlay}
             onPress={() => setShowDemoPicker(false)}
+            accessibilityRole="button"
+            accessibilityLabel="Dismiss demo mode picker"
+            accessibilityHint="Closes the demo mode selection dialog"
           >
             <View style={styles.languagePickerContainer}>
               <View style={styles.languagePickerHeader}>
                 <Text style={styles.languagePickerTitle}>{demoT.demoMode || 'Demo Mode'}</Text>
-                <Pressable onPress={() => setShowDemoPicker(false)}>
+                <Pressable
+                  onPress={() => setShowDemoPicker(false)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Close demo mode picker"
+                >
                   <X color={colors.textPrimary} size={20} />
                 </Pressable>
               </View>
@@ -633,6 +657,9 @@ export default function SettingsScreen() {
                     !isDemoMode && styles.languageOptionSelected,
                   ]}
                   onPress={() => handleDemoSelect('off')}
+                  accessibilityRole="button"
+                  accessibilityLabel="Demo mode off, use real data"
+                  accessibilityState={{ selected: !isDemoMode }}
                 >
                   <View>
                     <Text style={[styles.languageOptionText, !isDemoMode && styles.languageOptionTextSelected]}>
@@ -645,6 +672,8 @@ export default function SettingsScreen() {
                 <Pressable
                   style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
                   onPress={() => handleDemoSelect('30d')}
+                  accessibilityRole="button"
+                  accessibilityLabel="Load 30 days of demo data"
                 >
                   <View>
                     <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
@@ -656,6 +685,8 @@ export default function SettingsScreen() {
                 <Pressable
                   style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
                   onPress={() => handleDemoSelect('90d')}
+                  accessibilityRole="button"
+                  accessibilityLabel="Load 90 days of demo data"
                 >
                   <View>
                     <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
@@ -667,6 +698,8 @@ export default function SettingsScreen() {
                 <Pressable
                   style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
                   onPress={() => handleDemoSelect('180d')}
+                  accessibilityRole="button"
+                  accessibilityLabel="Load 6 months of demo data"
                 >
                   <View>
                     <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
@@ -678,6 +711,8 @@ export default function SettingsScreen() {
                 <Pressable
                   style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
                   onPress={() => handleDemoSelect('365d')}
+                  accessibilityRole="button"
+                  accessibilityLabel="Load 1 year of demo data"
                 >
                   <View>
                     <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
@@ -690,6 +725,8 @@ export default function SettingsScreen() {
                 <Pressable
                   style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
                   onPress={() => handleDemoSelect('3y')}
+                  accessibilityRole="button"
+                  accessibilityLabel="Load 3 years of demo data"
                 >
                   <View>
                     <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
@@ -701,6 +738,8 @@ export default function SettingsScreen() {
                 <Pressable
                   style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
                   onPress={() => handleDemoSelect('5y')}
+                  accessibilityRole="button"
+                  accessibilityLabel="Load 5 years of demo data"
                 >
                   <View>
                     <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
@@ -712,6 +751,8 @@ export default function SettingsScreen() {
                 <Pressable
                   style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
                   onPress={() => handleDemoSelect('10y')}
+                  accessibilityRole="button"
+                  accessibilityLabel="Load 10 years of demo data, full longitudinal record"
                 >
                   <View>
                     <Text style={[styles.languageOptionText, isDemoMode && styles.demoOptionTextSelected]}>
@@ -764,12 +805,17 @@ function SettingsRow({
   const iconColor = danger ? '#F44336' : highlight ? '#FF9800' : 'rgba(255,255,255,0.6)';
   const textColor = danger ? '#F44336' : highlight ? '#FF9800' : 'rgba(255,255,255,0.9)';
 
+  const a11yLabel = sublabel ? `${label}. ${sublabel}` : label;
+
   return (
     <AnimatedPressable
       onPress={disabled ? undefined : onPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       style={[styles.row, highlight && styles.rowHighlight, animatedStyle]}
+      accessibilityRole="button"
+      accessibilityLabel={a11yLabel}
+      accessibilityState={{ disabled, selected: highlight }}
     >
       <View style={[styles.iconContainer, danger && styles.iconContainerDanger, highlight && styles.iconContainerHighlight]}>
         <Icon color={iconColor} size={20} />
