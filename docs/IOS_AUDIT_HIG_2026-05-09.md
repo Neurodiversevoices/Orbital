@@ -629,3 +629,62 @@ These are the deferred, dep-blocked, or product-decision items. None require imm
 ---
 
 *End of HIG audit.*
+
+---
+
+## Phase 5 — HIG quick wins applied
+
+Date applied: 2026-05-09. Branch: `claude/orbital-platform-rebuild`.
+
+All five quick wins from the **Quick wins** list and the SIWA button (P2) have been wired. No `package.json` changes; both `expo-apple-authentication` and `expo-haptics` were already declared dependencies. Each fix is iOS-gated where appropriate.
+
+### P5.1 — Apple Sign In button → native `AppleAuthenticationButton` (P2)
+- **File:** `app/auth/index.tsx`
+- Replaced the custom `<Pressable>` SIWA button with `AppleAuthentication.AppleAuthenticationButton` (`buttonType=SIGN_IN`, `buttonStyle=WHITE`, `cornerRadius=12`).
+- The existing `handleApple` SIWA handler, loading state, and error tracking are preserved. While `isSubmitting`, an `ActivityIndicator` is shown inside a same-styled `<View>` to maintain the 54-pt button silhouette.
+- iOS-only: the entire native-button block is gated by `Platform.OS === 'ios'`. On Android the existing Google `<Pressable>` flow continues unchanged.
+- HIG/4.8 reject vector closed.
+
+### P5.2 — Auth `TextInput` autofill + return-key chain (K2)
+- **File:** `app/auth/index.tsx`
+- Email input: added `textContentType="emailAddress"`, `autoCorrect={false}`, `returnKeyType="next"`, `onSubmitEditing` → focus the password ref, `blurOnSubmit={false}`. Existing `autoCapitalize="none"`, `keyboardType="email-address"`, `autoComplete="email"` retained.
+- Password input: added `ref={passwordInputRef}`, `textContentType` (=`'newPassword'` on signup, `'password'` on signin), `autoCapitalize="none"`, `autoCorrect={false}`, `returnKeyType="go"`, `onSubmitEditing={handleEmailAuth}`. Existing `secureTextEntry` (via `_HIDDEN` obfuscation) and `autoComplete` retained.
+- iOS Password Autofill / keychain suggestions now surface above the keyboard; Return-key chain submits without touching the screen.
+
+### P5.3 — Haptic feedback at HIG-recommended call sites (D2)
+Used `expo-haptics` directly (already in deps; the existing `useAccessibility.triggerHaptic` helper wasn't wired through to these screens). Each call is iOS-gated; each is `.catch(() => {})` so a haptic failure can never break the user flow.
+- **Capacity log save** — `app/(tabs)/index.tsx`: `Haptics.notificationAsync(Success)` after `saveEntry` resolves.
+- **Tab change** — `app/(tabs)/_layout.tsx`: shared `tabPressListeners = { tabPress: () => Haptics.selectionAsync() }` attached to all three Tab.Screens.
+- **Destructive confirms** — `app/data-exit.tsx` (account-deletion confirm), `app/settings.tsx` (`handleClearData` clear-all-data), `app/active-sessions.tsx` (single-session remove + bulk sign-out): `Haptics.notificationAsync(Warning)` immediately before the corresponding `Alert.alert(...)`.
+- **Apple Sign In success** — `app/auth/index.tsx`: `Haptics.notificationAsync(Success)` in the SIWA success path before navigation.
+
+### P5.4 — `EmptyState` rolled into screens (N2)
+- **File:** `components/EmptyState.tsx` — unchanged, now imported by:
+  - `app/(tabs)/patterns.tsx` — replaces the inline "No entries yet" text with `<EmptyState icon={Calendar} title="No entries yet" description="..." actionHint="Tap the orb on Home to log your first signal" />`.
+  - `app/audit.tsx` — replaces the bespoke `Shield` + double-`Text` empty block with `<EmptyState icon={Shield} title="No Activity Recorded" description="..." />`.
+  - `app/active-sessions.tsx` — replaces the inline "No Other Sessions" block with a `compact`-size `<EmptyState icon={Shield} ... />` inside a sized `emptyStateWrap` container so the surrounding card chrome is preserved.
+  - `app/circles/index.tsx` — replaces the `<Muted>No connections yet.</Muted>` line with a `compact`-size `<EmptyState icon={Users} ... />`. Loading and error states unchanged.
+
+### P5.5 — `RefreshControl` on audit log (B3)
+- **File:** `app/audit.tsx`
+- Added `isRefreshing` state and a `handleRefresh` callback that re-loads `getAuditLog()` + `getRecipients()` (separate from the initial-load `loadData` so the spinner is visually distinct). The outer `<ScrollView>` now carries `refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor="#00E5FF" colors={['#00E5FF']} />}`.
+- The initial-load spinner inside the empty branch was upgraded from a plain "Loading..." text to an `<ActivityIndicator color="#00E5FF" />` for consistency with other screens.
+
+### Notes / non-changes
+- **No `package.json` changes.** Both `expo-apple-authentication` (^8.0.8) and `expo-haptics` (~15.0.8) were already declared.
+- **Gauge / orb / platform overlay** untouched per CLAUDE.md rule 2.
+- **Business logic unchanged.** `saveEntry`, `auth.signInWithApple`, `clearAll`, `deleteAccount`, `removeDeviceSession`, audit log, circle invite handlers — all signatures and effects identical. Only haptic emissions and UI affordances were added.
+- **Accessibility audit (`IOS_AUDIT_2026-05-09.md`) ownership preserved.** Inline accessibility-label additions on other files in the same branch (`app/cci.tsx`, `app/upgrade.tsx`, etc.) are from a separate concurrent agent; this Phase 5 commit covers only the HIG quick wins.
+- **TypeScript check.** `npx tsc --noEmit` is environment-blocked in the worktree (no `node_modules` mounted). On the main checkout the changes are surface-level (added prop names with literal-typed values, an added `useRef`, added imports of already-declared deps, and JSX swaps), so no new TS surface is introduced.
+
+### Quick-wins summary
+
+| # | Quick win | File:lines (post-edit) | Status |
+|---|---|---|---|
+| 1 | SIWA → `AppleAuthenticationButton` | `app/auth/index.tsx:280-295` | Done |
+| 2 | TextInput autofill + return-key chain | `app/auth/index.tsx:356-389` | Done |
+| 3 | Haptic feedback (save / tab / destructive / SIWA) | `app/(tabs)/index.tsx:202-205`, `app/(tabs)/_layout.tsx:11-17`, `app/data-exit.tsx:153-156`, `app/settings.tsx:165-168`, `app/active-sessions.tsx:88-91,120-123`, `app/auth/index.tsx:185-188` | Done |
+| 4 | `EmptyState` rolled into 4 screens | `app/(tabs)/patterns.tsx`, `app/audit.tsx`, `app/active-sessions.tsx`, `app/circles/index.tsx` | Done |
+| 5 | `RefreshControl` on audit log | `app/audit.tsx:171-181` | Done |
+
+
