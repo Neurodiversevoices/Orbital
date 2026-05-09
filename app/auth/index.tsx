@@ -112,7 +112,7 @@ export default function AuthScreen() {
           .from('user_profiles')
           .select('orb_tuning')
           .eq('user_id', user.id)
-          .single();
+          .single<{ orb_tuning: unknown }>();
         if (!profile?.orb_tuning) {
           router.replace('/upgrade' as any);
           return;

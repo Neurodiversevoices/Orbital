@@ -104,3 +104,6 @@ export const crossedThreshold = (
 export const scoreToFontWeight = (score: number): number => {
   return Math.round(700 + (Math.max(0, Math.min(100, score)) / 100) * 200);
 };
+
+// Alias used by app/(tabs)/index.web.tsx (added 2026-05-09)
+export const stateOfUppercase = stateOf;
