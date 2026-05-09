@@ -37,6 +37,7 @@ import { getLogs } from '../../lib/storage';
 import { enqueueLog } from '../../lib/cloud/outbox';
 import { pushToCloud, localToCloudUpsert } from '../../lib/cloud/syncEngine';
 import { getDeviceId } from '../../lib/cloud';
+import { useHaptics } from '../../lib/haptics/useHaptics';
 
 // Password field prop key (split to avoid banned-term grep false positive)
 const _HIDDEN = 'se\x63ureTextEntry';
@@ -80,6 +81,7 @@ type AuthMode = 'signup' | 'signin' | null;
 export default function AuthScreen() {
   const router = useRouter();
   const auth = useAuth();
+  const haptics = useHaptics();
 
   const [fontsLoaded] = useFonts({
     DMSans_400Regular,
@@ -143,28 +145,34 @@ export default function AuthScreen() {
       if (!passwordValidation.isValid) {
         setError(passwordValidation.errors[0]);
         setIsSubmitting(false);
+        haptics.error();
         return;
       }
       const result = await auth.signUpWithEmail(email, password);
       setIsSubmitting(false);
       if (result.success) {
+        haptics.success();
         setSuccessMsg('Account created! Check your email to confirm, then sign in.');
         setAuthMode('signin');
         setPassword('');
       } else {
+        haptics.error();
         setError(result.error || 'Sign up failed');
       }
     } else {
       if (!password) {
         setError('Please enter your password');
         setIsSubmitting(false);
+        haptics.error();
         return;
       }
       const result = await auth.signInWithEmail(email, password);
       setIsSubmitting(false);
       if (result.success) {
+        haptics.success();
         onSuccess();
       } else {
+        haptics.error();
         setError(result.error || 'Sign in failed');
       }
     }

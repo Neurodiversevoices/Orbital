@@ -1,5 +1,5 @@
 // TODAY PREMIUM v1 — System Status
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { View, StyleSheet, Text, Pressable, ActivityIndicator, ScrollView } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useRouter, Redirect } from 'expo-router';
@@ -11,6 +11,7 @@ import { getFakeCapacityData, ALL_FAKE_DATA } from '../../lib/dev/fakeCapacityDa
 import { computeDeltaAndMomentum, getSystemVoice, getDirective } from '../../lib/today/voice';
 import { useAppMode } from '../../lib/hooks/useAppMode';
 import { useTutorial } from '../../lib/hooks/useTutorial';
+import { useHaptics } from '../../lib/haptics/useHaptics';
 import { colors, spacing } from '../../theme';
 import type { CapacityState } from '../../lib/capacity/types';
 
@@ -86,6 +87,18 @@ export default function HomeScreen() {
   const { delta, momentum, todayScore } = useMemo(() => computeDeltaAndMomentum(data14d), [data14d]);
   const capacityState = scoreToCapacityState(todayScore);
   const hasSufficientData = BASELINE_DAY >= BASELINE_TARGET;
+
+  // Light tick on capacity-zone transition (RESOURCED ↔ ELEVATED ↔ DEPLETED).
+  // Skips first render so the user only feels actual state changes, not mount.
+  const haptics = useHaptics();
+  const prevCapacityStateRef = useRef<CapacityState | null>(null);
+  useEffect(() => {
+    const prev = prevCapacityStateRef.current;
+    if (prev !== null && prev !== capacityState) {
+      haptics.tick();
+    }
+    prevCapacityStateRef.current = capacityState;
+  }, [capacityState, haptics]);
 
   const systemVoice = useMemo(() => {
     if (!hasSufficientData) return 'Establishing your signal. Each day teaches the system more about your patterns.';
