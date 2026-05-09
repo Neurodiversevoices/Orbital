@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Crypto from 'expo-crypto';
 import {
   CapacityLog,
   CapacityState,
@@ -258,10 +259,13 @@ export async function clearAuditLog(): Promise<void> {
 // ============================================
 
 export function generateAccessToken(): string {
+  // CSPRNG via expo-crypto (was Math.random — non-cryptographic, audit CRITICAL).
+  // Tokens grant read access to capacity logs (PII), so they must be unguessable.
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const bytes = Crypto.getRandomBytes(32);
   let token = '';
   for (let i = 0; i < 32; i++) {
-    token += chars.charAt(Math.floor(Math.random() * chars.length));
+    token += chars.charAt(bytes[i] % chars.length);
   }
   return token;
 }
