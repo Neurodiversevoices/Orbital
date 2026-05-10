@@ -145,7 +145,7 @@ export default function ProfileScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Privacy Notice */}
         <Animated.View entering={FadeInDown.duration(400)} style={styles.privacyCard}>
-          <Shield size={20} color="#0E8C7B" />
+          <Shield size={20} color="#4CAF50" />
           <View style={styles.privacyContent}>
             <Text style={styles.privacyTitle}>Private Information</Text>
             <Text style={styles.privacyText}>
@@ -158,7 +158,7 @@ export default function ProfileScreen() {
         {/* Year of Birth */}
         <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Calendar size={18} color={colors.textSecondary} />
+            <Calendar size={18} color="rgba(255,255,255,0.6)" />
             <Text style={styles.sectionTitle}>Year of Birth</Text>
             <Text style={styles.optionalBadge}>Optional</Text>
           </View>
@@ -170,7 +170,7 @@ export default function ProfileScreen() {
               onChangeText={handleYearChange}
               onBlur={handleSaveYear}
               placeholder="YYYY"
-              placeholderTextColor={colors.textTertiary}
+              placeholderTextColor="rgba(255,255,255,0.3)"
               keyboardType="number-pad"
               maxLength={4}
             />
@@ -185,7 +185,7 @@ export default function ProfileScreen() {
 
           {yearError && (
             <View style={styles.errorRow}>
-              <AlertCircle size={14} color="#DC2626" />
+              <AlertCircle size={14} color="#FF5252" />
               <Text style={styles.errorText}>{yearError}</Text>
             </View>
           )}
@@ -198,7 +198,7 @@ export default function ProfileScreen() {
         {/* Gender */}
         <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.section}>
           <View style={styles.sectionHeader}>
-            <User size={18} color={colors.textSecondary} />
+            <User size={18} color="rgba(255,255,255,0.6)" />
             <Text style={styles.sectionTitle}>Gender</Text>
             <Text style={styles.optionalBadge}>Optional</Text>
           </View>
@@ -215,7 +215,7 @@ export default function ProfileScreen() {
             </Text>
             <ChevronDown
               size={18}
-              color={colors.textSecondary}
+              color="rgba(255,255,255,0.4)"
               style={{ transform: [{ rotate: showGenderPicker ? '180deg' : '0deg' }] }}
             />
           </Pressable>
@@ -238,7 +238,7 @@ export default function ProfileScreen() {
                     {option.label}
                   </Text>
                   {selectedGender === option.value && (
-                    <Check size={16} color={colors.primary} />
+                    <Check size={16} color="#00E5FF" />
                   )}
                 </Pressable>
               ))}
@@ -253,7 +253,7 @@ export default function ProfileScreen() {
                 onChangeText={setSelfDescribedText}
                 onBlur={handleSaveSelfDescribed}
                 placeholder="How do you describe yourself? (optional)"
-                placeholderTextColor={colors.textTertiary}
+                placeholderTextColor="rgba(255,255,255,0.3)"
                 maxLength={100}
               />
               <Text style={styles.selfDescribedNote}>
@@ -271,25 +271,25 @@ export default function ProfileScreen() {
         <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.infoCard}>
           <Text style={styles.infoTitle}>How this data is used</Text>
           <View style={styles.infoItem}>
-            <Check size={14} color="#0E8C7B" />
+            <Check size={14} color="#4CAF50" />
             <Text style={styles.infoText}>
               Aggregate analytics only (e.g., "25-30 age group: 60% resourced")
             </Text>
           </View>
           <View style={styles.infoItem}>
-            <Check size={14} color="#0E8C7B" />
+            <Check size={14} color="#4CAF50" />
             <Text style={styles.infoText}>
               Minimum 10 users required to show any demographic breakdown
             </Text>
           </View>
           <View style={styles.infoItem}>
-            <Check size={14} color="#0E8C7B" />
+            <Check size={14} color="#4CAF50" />
             <Text style={styles.infoText}>
               Included in your personal data export (you own your data)
             </Text>
           </View>
           <View style={styles.infoItem}>
-            <X size={14} color="#DC2626" />
+            <X size={14} color="#FF5252" />
             <Text style={styles.infoText}>
               Never visible in Circles, sharing, or to other users
             </Text>
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: 'rgba(255,255,255,0.9)',
   },
   closeButton: {
     padding: spacing.sm,
@@ -333,10 +333,10 @@ const styles = StyleSheet.create({
   privacyCard: {
     flexDirection: 'row',
     gap: spacing.md,
-    backgroundColor: 'rgba(45,212,191,0.08)',
+    backgroundColor: 'rgba(76,175,80,0.08)',
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(45,212,191,0.22)',
+    borderColor: 'rgba(76,175,80,0.2)',
     padding: spacing.md,
     marginBottom: spacing.xl,
   },
@@ -346,13 +346,13 @@ const styles = StyleSheet.create({
   privacyTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0E8C7B',
+    color: '#4CAF50',
     marginBottom: spacing.xs,
   },
   privacyText: {
     fontSize: 12,
     lineHeight: 18,
-    color: colors.textSecondary,
+    color: 'rgba(255,255,255,0.5)',
   },
   section: {
     marginBottom: spacing.xl,
@@ -366,14 +366,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: 'rgba(255,255,255,0.9)',
     flex: 1,
   },
   optionalBadge: {
     fontSize: 10,
     fontWeight: '500',
-    color: colors.textSecondary,
-    backgroundColor: colors.backgroundSubtle,
+    color: 'rgba(255,255,255,0.4)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 4,
@@ -388,28 +388,28 @@ const styles = StyleSheet.create({
   yearInput: {
     width: 100,
     height: 48,
-    backgroundColor: colors.background,
+    backgroundColor: 'rgba(0,0,0,0.2)',
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: colors.hairline,
+    borderColor: 'rgba(255,255,255,0.1)',
     paddingHorizontal: spacing.md,
     fontSize: 18,
-    color: colors.textPrimary,
+    color: 'rgba(255,255,255,0.9)',
     textAlign: 'center',
     fontFamily: 'monospace',
   },
   inputError: {
-    borderColor: '#DC2626',
+    borderColor: '#FF5252',
   },
   bracketBadge: {
-    backgroundColor: 'rgba(45,212,191,0.10)',
+    backgroundColor: 'rgba(0,229,255,0.1)',
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.sm,
   },
   bracketText: {
     fontSize: 13,
-    color: '#0E8C7B',
+    color: '#00E5FF',
   },
   errorRow: {
     flexDirection: 'row',
@@ -419,37 +419,37 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    color: '#DC2626',
+    color: '#FF5252',
   },
   helperText: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: 'rgba(255,255,255,0.4)',
     marginTop: spacing.sm,
   },
   genderSelector: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.background,
+    backgroundColor: 'rgba(0,0,0,0.2)',
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: colors.hairline,
+    borderColor: 'rgba(255,255,255,0.1)',
     paddingHorizontal: spacing.md,
     height: 48,
   },
   genderSelectorText: {
     fontSize: 16,
-    color: colors.textPrimary,
+    color: 'rgba(255,255,255,0.9)',
   },
   genderSelectorPlaceholder: {
-    color: colors.textTertiary,
+    color: 'rgba(255,255,255,0.3)',
   },
   genderOptions: {
     marginTop: spacing.sm,
-    backgroundColor: colors.backgroundSubtle,
+    backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
+    borderColor: 'rgba(255,255,255,0.06)',
     overflow: 'hidden',
   },
   genderOption: {
@@ -459,49 +459,49 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: colors.hairline,
+    borderBottomColor: 'rgba(255,255,255,0.03)',
   },
   genderOptionSelected: {
-    backgroundColor: 'rgba(45,212,191,0.10)',
+    backgroundColor: 'rgba(0,229,255,0.08)',
   },
   genderOptionText: {
     fontSize: 15,
-    color: colors.textPrimary,
+    color: 'rgba(255,255,255,0.7)',
   },
   genderOptionTextSelected: {
-    color: '#0E8C7B',
+    color: '#00E5FF',
     fontWeight: '500',
   },
   selfDescribedContainer: {
     marginTop: spacing.sm,
   },
   selfDescribedInput: {
-    backgroundColor: colors.background,
+    backgroundColor: 'rgba(0,0,0,0.2)',
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: colors.hairline,
+    borderColor: 'rgba(255,255,255,0.1)',
     paddingHorizontal: spacing.md,
     height: 48,
     fontSize: 15,
-    color: colors.textPrimary,
+    color: 'rgba(255,255,255,0.9)',
   },
   selfDescribedNote: {
     fontSize: 11,
-    color: colors.textSecondary,
+    color: 'rgba(255,255,255,0.3)',
     marginTop: spacing.xs,
     fontStyle: 'italic',
   },
   infoCard: {
-    backgroundColor: colors.card,
+    backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
+    borderColor: 'rgba(255,255,255,0.06)',
     padding: spacing.lg,
   },
   infoTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: 'rgba(255,255,255,0.7)',
     marginBottom: spacing.md,
   },
   infoItem: {
@@ -514,6 +514,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 12,
     lineHeight: 18,
-    color: colors.textSecondary,
+    color: 'rgba(255,255,255,0.5)',
   },
 });

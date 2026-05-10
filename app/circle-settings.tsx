@@ -47,8 +47,8 @@ export default function CircleSettingsScreen() {
   };
 
   const handleViewCircle = () => {
-    // Navigate to Briefings tab with Circles view
-    router.push('/(tabs)/brief');
+    // Navigate to Briefings (now a non-tab route after 5-tab restructure)
+    router.push('/brief');
   };
 
   // Demo data - in production, this would come from Circle membership

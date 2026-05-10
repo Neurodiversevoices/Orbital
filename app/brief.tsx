@@ -32,11 +32,11 @@ import {
   Link2,
   Package,
 } from 'lucide-react-native';
-import { colors, spacing, borderRadius } from '../../theme';
-import { useAccess } from '../../lib/access';
-import { CCISummaryChart } from '../../components/CCISummaryChart';
-import { BundleCCIPreview } from '../../components/BundleCCIPreview';
-import { FABRICATED_HISTORIES, getCapacityState } from '../../lib/cci/demoData';
+import { colors, spacing, borderRadius } from '../theme';
+import { useAccess } from '../lib/access';
+import { CCISummaryChart } from '../components/CCISummaryChart';
+import { BundleCCIPreview } from '../components/BundleCCIPreview';
+import { FABRICATED_HISTORIES, getCapacityState } from '../lib/cci/demoData';
 
 // =============================================================================
 // TYPES
@@ -615,7 +615,7 @@ const styles = StyleSheet.create({
   },
   breadcrumbSeparator: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: 'rgba(255,255,255,0.3)',
   },
   breadcrumbActive: {
     fontSize: 12,
@@ -1093,7 +1093,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: 'rgba(255,255,255,0.3)',
   },
 
   // Integrated Member Cards

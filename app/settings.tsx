@@ -602,9 +602,9 @@ export default function SettingsScreen() {
             </View>
             <Text style={styles.tagline}>{t.settings.tagline}</Text>
             <View style={styles.colorDots}>
-              <View style={[styles.dot, { backgroundColor: '#00E5FF' }]} />
-              <View style={[styles.dot, { backgroundColor: '#E8A830' }]} />
-              <View style={[styles.dot, { backgroundColor: '#F44336' }]} />
+              <View style={[styles.dot, { backgroundColor: '#2DD4BF' }]} />
+              <View style={[styles.dot, { backgroundColor: '#F59E0B' }]} />
+              <View style={[styles.dot, { backgroundColor: '#DC2626' }]} />
             </View>
           </View>
         </View>
