@@ -1,42 +1,70 @@
+/**
+ * Orbital theme colors — light surface system.
+ *
+ * As of the May 2026 redesign, Orbital ships a LIGHT theme (was dark).
+ * Capacity spectrum (crimson → amber → teal → cyan) is preserved
+ * because it carries semantic meaning across the app.
+ *
+ * Dark surface tokens are kept under `darkLegacy` for screens not yet
+ * repainted; new code should consume `colors.*` (the light surface).
+ */
+
 export const colors = {
-  background: '#05060A',
+  // Primary surfaces
+  background: '#FFFFFF',
+  backgroundElevated: '#FFFFFF',
+  backgroundSubtle: '#F4F5F7',
 
-  // Capacity states
-  resourced: '#00FFFF',   // Cyan - full capacity
-  stretched: '#FFB020',   // Amber - moderate capacity
-  depleted: '#FF2D55',    // Crimson - low capacity
+  // Capacity states — semantic, theme-independent
+  resourced: '#2DD4BF',   // Teal — full capacity / "Ready"
+  stretched: '#F59E0B',   // Amber — moderate / "Tight"
+  depleted: '#DC2626',    // Crimson — low / "Overloaded"
+  cyan: '#06B6D4',        // Cyan — peak / outperforming baseline
 
-  // Legacy aliases
-  good: '#00FFFF',
-  strained: '#FFB020',
-  low: '#FF2D55',
+  // Legacy state aliases (kept for screens not yet migrated)
+  good: '#2DD4BF',
+  strained: '#F59E0B',
+  low: '#DC2626',
 
-  // UI elements
-  card: '#0A0B10',
-  cardBorder: 'rgba(255, 255, 255, 0.1)',
+  // UI elements (light surface)
+  card: '#FFFFFF',
+  cardBorder: 'rgba(15, 22, 36, 0.08)',
+  cardShadow: 'rgba(15, 22, 36, 0.06)',
+  hairline: 'rgba(15, 22, 36, 0.10)',
 
-  // Text (minimal use)
-  textPrimary: '#FFFFFF',
-  textSecondary: 'rgba(255, 255, 255, 0.6)',
+  // Text
+  textPrimary: '#0F1624',                       // near-black with warmth
+  textSecondary: 'rgba(15, 22, 36, 0.62)',
+  textTertiary: 'rgba(15, 22, 36, 0.38)',
 
-  // Primary
-  primary: '#00FFFF',
+  // Primary action
+  primary: '#2DD4BF',
+  primaryDim: 'rgba(45, 212, 191, 0.16)',
 
   // Accents
-  accent: '#00FFFF',
-  accentDim: 'rgba(0, 255, 255, 0.3)',
+  accent: '#2DD4BF',
+  accentDim: 'rgba(45, 212, 191, 0.16)',
+} as const;
+
+/**
+ * Legacy dark surface tokens — for screens not yet repainted to light.
+ * New code should use `colors.*` directly.
+ */
+export const darkLegacy = {
+  background: '#01020A',
+  card: '#0A0B10',
+  cardBorder: 'rgba(255, 255, 255, 0.10)',
+  textPrimary: '#FFFFFF',
+  textSecondary: 'rgba(255, 255, 255, 0.6)',
 } as const;
 
 export type CapacityColor = typeof colors.resourced | typeof colors.stretched | typeof colors.depleted;
-
-// Legacy alias
 export type EnergyColor = CapacityColor;
 
 export const stateColors = {
   resourced: colors.resourced,
   stretched: colors.stretched,
   depleted: colors.depleted,
-  // Legacy aliases
   good: colors.good,
   strained: colors.strained,
   low: colors.low,
@@ -45,58 +73,32 @@ export const stateColors = {
 /**
  * CANONICAL DASHBOARD STATE COLORS
  *
- * Single source of truth for all dashboard/institutional UI.
- * Use this mapping EVERYWHERE for state distribution, cards, charts.
- *
- * HIGH    / Strong    / Resourced = Cyan/Teal  #00D7FF
- * STABLE  / Moderate  / Stretched = Amber/Gold #F5B700
- * LOW     / At Risk   / Depleted  = Red        #FF3B30
+ * HIGH    / Strong    / Resourced / Ready      = Teal       #2DD4BF
+ * STABLE  / Moderate  / Stretched / Tight      = Amber      #F59E0B
+ * LOW     / At Risk   / Depleted  / Overloaded = Crimson    #DC2626
+ * PEAK    / Above-baseline                     = Cyan       #06B6D4
  */
 export const DASHBOARD_STATE_COLORS = {
-  // Primary semantic names (use these)
-  high: '#00D7FF',      // Cyan - High capacity / Strong / Resourced
-  stable: '#F5B700',    // Amber - Stable / Moderate / Stretched
-  low: '#FF3B30',       // Red - Low / At Risk / Depleted
+  high: '#2DD4BF',
+  stable: '#F59E0B',
+  low: '#DC2626',
+  peak: '#06B6D4',
 
-  // Capacity state aliases (maps to same colors)
-  resourced: '#00D7FF',
-  stretched: '#F5B700',
-  depleted: '#FF3B30',
+  resourced: '#2DD4BF',
+  stretched: '#F59E0B',
+  depleted: '#DC2626',
 
-  // Risk level aliases (maps to same colors)
-  strong: '#00D7FF',
-  moderate: '#F5B700',
-  atRisk: '#FF3B30',
+  strong: '#2DD4BF',
+  moderate: '#F59E0B',
+  atRisk: '#DC2626',
 } as const;
 
-/**
- * Runtime assertion to prevent color mapping bugs.
- * Call this in __DEV__ to verify correct color usage.
- */
-export function assertStateColor(state: string, color: string): void {
-  const lowStates = ['low', 'depleted', 'atRisk', 'at_risk', 'at-risk'];
-  const highStates = ['high', 'resourced', 'strong'];
-
-  const isLowState = lowStates.includes(state.toLowerCase());
-  const isHighState = highStates.includes(state.toLowerCase());
-
-  // LOW states should NEVER be cyan
-  if (isLowState && (color === '#00D7FF' || color === '#00E5FF' || color === '#00FFFF')) {
-  }
-
-  // HIGH states should NEVER be red
-  if (isHighState && (color === '#FF3B30' || color === '#F44336' || color === '#FF2D55')) {
-  }
+export function assertStateColor(_state: string, _color: string): void {
+  // Reserved for future runtime checks. No-op today.
 }
 
-/**
- * Get the correct dashboard color for a state.
- * Always use this helper instead of hardcoding colors.
- */
-export function getDashboardStateColor(state: 'high' | 'stable' | 'low' | 'resourced' | 'stretched' | 'depleted'): string {
-  const color = DASHBOARD_STATE_COLORS[state];
-  if (__DEV__) {
-    assertStateColor(state, color);
-  }
-  return color;
+export function getDashboardStateColor(
+  state: 'high' | 'stable' | 'low' | 'peak' | 'resourced' | 'stretched' | 'depleted',
+): string {
+  return DASHBOARD_STATE_COLORS[state];
 }

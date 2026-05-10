@@ -6,7 +6,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "jsEngine": "hermes",
     "scheme": "orbital",
@@ -32,7 +32,9 @@
         "LSApplicationCategoryType": "public.app-category.healthcare-fitness",
         "ITSAppUsesNonExemptEncryption": false,
         "NSFaceIDUsageDescription": "Orbital uses Face ID to unlock your private vault and protect sensitive actions like deleting your account or exporting your data.",
-        "NSUserTrackingUsageDescription": "Allow Orbital to measure which Apple Search Ads campaign brought you here. This is used only for first-party attribution analytics — Orbital never tracks you across other companies' apps or websites."
+        "NSUserTrackingUsageDescription": "Allow Orbital to measure which Apple Search Ads campaign brought you here. This is used only for first-party attribution analytics — Orbital never tracks you across other companies' apps or websites.",
+        "NSHealthShareUsageDescription": "Orbital reads recovery, heart rate, and sleep data from Apple Health to surface your nervous-system load, cardiac drift, and recovery hours alongside your capacity signal. Read-only — Orbital never writes to Health.",
+        "NSHealthUpdateUsageDescription": "Orbital does not write to Apple Health. This permission is required by iOS even for read-only HealthKit access."
       }
     },
     "android": {
@@ -54,6 +56,14 @@
       "./plugins/withAppIcon",
       "expo-router",
       "expo-apple-authentication",
+      [
+        "react-native-health",
+        {
+          "isClinicalDataEnabled": false,
+          "healthSharePermission": "Orbital reads recovery, heart rate, and sleep data from Apple Health to surface your nervous-system load, cardiac drift, and recovery hours alongside your capacity signal. Read-only.",
+          "healthUpdatePermission": "Orbital does not write to Apple Health. This permission is required by iOS even for read-only HealthKit access."
+        }
+      ],
       [
         "expo-build-properties",
         {
