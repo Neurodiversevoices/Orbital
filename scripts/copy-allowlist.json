@@ -1,0 +1,5 @@
+{
+  "$schema": "./copy-allowlist.schema.json",
+  "comment": "Known-safe forbidden-word occurrences for scripts/copy-lint.js. Each entry needs at least one of { word, file }. line is optional.",
+  "entries": []
+}

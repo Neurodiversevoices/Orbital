@@ -20,6 +20,7 @@
     "stress": "node scripts/stress.js",
     "stress:seed": "node scripts/seed-load-users.js",
     "citadel": "npm run ci:verify && npm run preflight && npm run stress",
+    "copy:lint": "node scripts/copy-lint.js",
     "cci:export": "node scripts/cci-export-pdf.js",
     "cci:verify": "node scripts/cci-verify-golden.js",
     "cci:render": "cd output && node render_ultra.js",

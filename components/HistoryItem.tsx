@@ -24,7 +24,7 @@ import { TranslationKeys, Locale } from '../locales';
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const stateColors: Record<CapacityState, string> = {
-  resourced: '#06B6D4',
+  resourced: '#2DD4BF',
   stretched: '#F59E0B',
   depleted: '#DC2626',
 };
@@ -153,7 +153,7 @@ export function HistoryItem({ log, onDelete }: HistoryItemProps) {
           accessibilityLabel="Delete log"
           accessibilityHint="Removes this capacity log entry"
         >
-          <Trash2 size={16} color="rgba(255,255,255,0.25)" />
+          <Trash2 size={16} color={colors.textTertiary} />
         </Pressable>
       )}
     </AnimatedPressable>
@@ -167,10 +167,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
     backgroundColor: colors.card,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    marginBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.hairline,
   },
   orbIndicator: {
     width: 36,
@@ -190,7 +188,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.35,
     shadowRadius: 10,
     elevation: 8,
   },
@@ -205,11 +203,11 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 14,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
   },
   dateText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.35)',
+    color: colors.textTertiary,
     marginTop: 2,
   },
   detailsContainer: {
@@ -229,7 +227,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 8,
     borderWidth: 1,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: '#FFFFFF',
   },
   tagLabel: {
     fontSize: 11,
@@ -237,7 +235,7 @@ const styles = StyleSheet.create({
   },
   noteText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textPrimary,
     fontStyle: 'italic',
   },
   deleteButton: {
