@@ -27,13 +27,9 @@ import {
   getQueuedAuditEvents,
 } from '../../lib/platform/trustCore';
 import type { AuditEvent } from '../../lib/platform/types';
+import { colors } from '../../theme/colors';
 
-const BACKGROUND = '#01020A';
-const GLASS_BG = 'rgba(255,255,255,0.07)';
-const GLASS_BORDER = 'rgba(255,255,255,0.15)';
-const TEXT_PRIMARY = '#FFFFFF';
-const TEXT_SECONDARY = 'rgba(255,255,255,0.7)';
-const TEAL = '#2DD4BF';
+const TEAL = colors.primary;
 
 // =============================================================================
 // ROW
@@ -46,19 +42,31 @@ function AuditRow({ event }: { event: AuditEvent }): React.ReactElement {
       accessibilityLabel={`Audit event: ${event.action} by ${event.actor} on ${event.target}`}
     >
       <View style={styles.rowHeader}>
-        <Text style={styles.action}>{event.action}</Text>
-        <Text style={styles.timestamp}>
+        <Text style={styles.action} maxFontSizeMultiplier={1.5}>
+          {event.action}
+        </Text>
+        <Text style={styles.timestamp} maxFontSizeMultiplier={1.5}>
           {new Date(event.timestamp).toLocaleString()}
         </Text>
       </View>
       <View style={styles.rowMeta}>
-        <Text style={styles.actor}>BY {event.actor.toUpperCase()}</Text>
-        <Text style={styles.target} numberOfLines={1}>
+        <Text style={styles.actor} maxFontSizeMultiplier={1.5}>
+          BY {event.actor.toUpperCase()}
+        </Text>
+        <Text
+          style={styles.target}
+          numberOfLines={1}
+          maxFontSizeMultiplier={1.5}
+        >
           → {event.target}
         </Text>
       </View>
       {event.metadata && Object.keys(event.metadata).length > 0 ? (
-        <Text style={styles.metadata} numberOfLines={2}>
+        <Text
+          style={styles.metadata}
+          numberOfLines={2}
+          maxFontSizeMultiplier={1.5}
+        >
           {JSON.stringify(event.metadata)}
         </Text>
       ) : null}
@@ -121,38 +129,48 @@ export default function AuditLogScreen(): React.ReactElement {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.eyebrow}>AUDIT LOG</Text>
-        <Text style={styles.title}>Every action, observable.</Text>
-        <Text style={styles.subtitle}>
+        <Text style={styles.eyebrow} maxFontSizeMultiplier={1.5}>
+          AUDIT LOG
+        </Text>
+        <Text style={styles.title} maxFontSizeMultiplier={1.5}>
+          Every action, observable.
+        </Text>
+        <Text style={styles.subtitle} maxFontSizeMultiplier={1.5}>
           Reverse-chronological. Filter by actor or action below.
         </Text>
 
         {/* FILTERS */}
         <View style={styles.filterRow}>
           <View style={styles.filterField}>
-            <Text style={styles.filterLabel}>ACTOR</Text>
+            <Text style={styles.filterLabel} maxFontSizeMultiplier={1.5}>
+              ACTOR
+            </Text>
             <TextInput
               value={actorFilter}
               onChangeText={setActorFilter}
               placeholder="user, system…"
-              placeholderTextColor="rgba(255,255,255,0.35)"
+              placeholderTextColor={colors.textTertiary}
               style={styles.input}
               accessibilityLabel="Filter audit log by actor"
               autoCapitalize="none"
               autoCorrect={false}
+              maxFontSizeMultiplier={1.5}
             />
           </View>
           <View style={styles.filterField}>
-            <Text style={styles.filterLabel}>ACTION</Text>
+            <Text style={styles.filterLabel} maxFontSizeMultiplier={1.5}>
+              ACTION
+            </Text>
             <TextInput
               value={actionFilter}
               onChangeText={setActionFilter}
               placeholder="capacity.logged…"
-              placeholderTextColor="rgba(255,255,255,0.35)"
+              placeholderTextColor={colors.textTertiary}
               style={styles.input}
               accessibilityLabel="Filter audit log by action"
               autoCapitalize="none"
               autoCorrect={false}
+              maxFontSizeMultiplier={1.5}
             />
           </View>
         </View>
@@ -170,17 +188,23 @@ export default function AuditLogScreen(): React.ReactElement {
               { opacity: pressed ? 0.6 : 1 },
             ]}
           >
-            <Text style={styles.clearLinkText}>Clear filters</Text>
+            <Text style={styles.clearLinkText} maxFontSizeMultiplier={1.5}>
+              Clear filters
+            </Text>
           </Pressable>
         )}
 
         {loading ? (
           <View style={styles.emptyCard}>
-            <Text style={styles.emptyText}>Loading…</Text>
+            <Text style={styles.emptyText} maxFontSizeMultiplier={1.5}>
+              Loading…
+            </Text>
           </View>
         ) : filtered.length === 0 ? (
           <View style={styles.emptyCard}>
-            <Text style={styles.emptyText}>No events match these filters.</Text>
+            <Text style={styles.emptyText} maxFontSizeMultiplier={1.5}>
+              No events match these filters.
+            </Text>
           </View>
         ) : (
           <View style={styles.list}>
@@ -199,7 +223,7 @@ export default function AuditLogScreen(): React.ReactElement {
 // =============================================================================
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: BACKGROUND },
+  safe: { flex: 1, backgroundColor: colors.background },
   scroll: {
     paddingHorizontal: 32,
     paddingTop: 16,
@@ -209,7 +233,7 @@ const styles = StyleSheet.create({
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 11,
     letterSpacing: 1.76,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     marginBottom: 8,
   },
@@ -217,13 +241,13 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_500Medium',
     fontWeight: '500',
     fontSize: 26,
-    color: TEXT_PRIMARY,
+    color: colors.textPrimary,
   },
   subtitle: {
     fontFamily: 'DMSans_400Regular',
     fontSize: 14,
     lineHeight: 20,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
     marginTop: 8,
     marginBottom: 24,
   },
@@ -238,18 +262,18 @@ const styles = StyleSheet.create({
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 9,
     letterSpacing: 1.44,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     marginBottom: 6,
   },
   input: {
     height: 44,
-    backgroundColor: GLASS_BG,
-    borderColor: GLASS_BORDER,
+    backgroundColor: colors.backgroundSubtle,
+    borderColor: colors.hairline,
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: 12,
-    color: TEXT_PRIMARY,
+    color: colors.textPrimary,
     fontFamily: 'DMSans_400Regular',
     fontSize: 14,
   },
@@ -268,11 +292,15 @@ const styles = StyleSheet.create({
 
   list: { gap: 12 },
   row: {
-    backgroundColor: GLASS_BG,
-    borderColor: GLASS_BORDER,
+    backgroundColor: colors.card,
+    borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 14,
     padding: 14,
+    shadowColor: colors.cardShadow,
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
   },
   rowHeader: {
     flexDirection: 'row',
@@ -284,13 +312,13 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_500Medium',
     fontWeight: '500',
     fontSize: 14,
-    color: TEXT_PRIMARY,
+    color: colors.textPrimary,
     flexShrink: 1,
   },
   timestamp: {
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 10,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
   },
   rowMeta: {
     flexDirection: 'row',
@@ -302,32 +330,32 @@ const styles = StyleSheet.create({
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 9,
     letterSpacing: 1.44,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
   },
   target: {
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 11,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
     flexShrink: 1,
   },
   metadata: {
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 10,
-    color: 'rgba(255,255,255,0.45)',
+    color: colors.textTertiary,
     marginTop: 6,
   },
 
   emptyCard: {
-    backgroundColor: GLASS_BG,
-    borderColor: GLASS_BORDER,
+    backgroundColor: colors.backgroundSubtle,
+    borderColor: colors.hairline,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 14,
     padding: 24,
     alignItems: 'center',
   },
   emptyText: {
     fontFamily: 'DMSans_400Regular',
     fontSize: 14,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
   },
 });
