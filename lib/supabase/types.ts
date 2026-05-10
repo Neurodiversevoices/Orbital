@@ -199,6 +199,10 @@ export interface Database {
           details: Record<string, unknown>;
           ip_address: string | null;
           user_agent: string | null;
+          // Platform overlay extensions (migration 00017) — nullable on existing rows.
+          actor: string | null;
+          target: string | null;
+          metadata: Record<string, unknown> | null;
         };
         Insert: {
           id?: string;
@@ -211,6 +215,9 @@ export interface Database {
           details?: Record<string, unknown>;
           ip_address?: string | null;
           user_agent?: string | null;
+          actor?: string | null;
+          target?: string | null;
+          metadata?: Record<string, unknown> | null;
         };
         Update: Record<string, never>; // Audit log is append-only
         Relationships: [];
@@ -581,6 +588,72 @@ export interface Database {
         };
         Relationships: [];
       };
+      // ---------------------------------------------------------------------
+      // Platform overlay backing tables (migration 00017_platform_overlay)
+      // ---------------------------------------------------------------------
+      permission_grants: {
+        Row: {
+          id: string;
+          user_id: string;
+          tool: string;
+          scope: string;
+          granted_at: string;
+          expires_at: string | null;
+          revoked_at: string | null;
+          metadata: Record<string, unknown> | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          tool: string;
+          scope: string;
+          granted_at?: string;
+          expires_at?: string | null;
+          revoked_at?: string | null;
+          metadata?: Record<string, unknown> | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          tool?: string;
+          scope?: string;
+          granted_at?: string;
+          expires_at?: string | null;
+          revoked_at?: string | null;
+          metadata?: Record<string, unknown> | null;
+        };
+        Relationships: [];
+      };
+      platform_memory_records: {
+        Row: {
+          id: string;
+          user_id: string;
+          scope: 'ephemeral' | 'workspace' | 'profile' | 'implicit';
+          content: string;
+          source: string | null;
+          user_editable: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          scope: 'ephemeral' | 'workspace' | 'profile' | 'implicit';
+          content: string;
+          source?: string | null;
+          user_editable?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          scope?: 'ephemeral' | 'workspace' | 'profile' | 'implicit';
+          content?: string;
+          source?: string | null;
+          user_editable?: boolean;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -627,9 +700,18 @@ export type UserDailyMetrics = Database['public']['Tables']['user_daily_metrics'
 export type OrgMembership = Database['public']['Tables']['org_memberships']['Row'];
 export type OrgAggregateSnapshot = Database['public']['Tables']['org_aggregate_snapshots']['Row'];
 export type AuditEvent = Database['public']['Tables']['audit_events']['Row'];
+export type AuditEventInsert = Database['public']['Tables']['audit_events']['Insert'];
 export type UserPreferences = Database['public']['Tables']['user_preferences']['Row'];
 export type ProofEvent = Database['public']['Tables']['proof_events']['Row'];
 export type CapacityBaseline = Database['public']['Tables']['capacity_baselines']['Row'];
+
+// Platform overlay (migration 00017)
+export type PermissionGrantRow = Database['public']['Tables']['permission_grants']['Row'];
+export type PermissionGrantInsert = Database['public']['Tables']['permission_grants']['Insert'];
+export type PermissionGrantUpdate = Database['public']['Tables']['permission_grants']['Update'];
+export type PlatformMemoryRecord = Database['public']['Tables']['platform_memory_records']['Row'];
+export type PlatformMemoryRecordInsert = Database['public']['Tables']['platform_memory_records']['Insert'];
+export type PlatformMemoryRecordUpdate = Database['public']['Tables']['platform_memory_records']['Update'];
 
 // Sync types
 export interface SyncStatus {

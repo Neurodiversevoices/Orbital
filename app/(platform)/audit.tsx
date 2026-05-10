@@ -11,7 +11,7 @@
  * Trust Core dashboard.
  */
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -22,6 +22,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import {
+  fetchAuditEvents,
+  getQueuedAuditEvents,
+} from '../../lib/platform/trustCore';
 import type { AuditEvent } from '../../lib/platform/types';
 
 const BACKGROUND = '#01020A';
@@ -30,52 +34,6 @@ const GLASS_BORDER = 'rgba(255,255,255,0.15)';
 const TEXT_PRIMARY = '#FFFFFF';
 const TEXT_SECONDARY = 'rgba(255,255,255,0.7)';
 const TEAL = '#2DD4BF';
-
-// =============================================================================
-// MOCK DATA
-// =============================================================================
-
-const MOCK_EVENTS: ReadonlyArray<AuditEvent> = [
-  {
-    id: 'evt_1',
-    actor: 'user',
-    action: 'capacity.logged',
-    target: 'log_2026_05_09_001',
-    timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-    metadata: { state: 'resourced' },
-  },
-  {
-    id: 'evt_2',
-    actor: 'user',
-    action: 'permission.granted',
-    target: 'grant_calendar',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-    metadata: { tool: 'calendar' },
-  },
-  {
-    id: 'evt_3',
-    actor: 'system',
-    action: 'baseline.recomputed',
-    target: 'capacity_baseline_v2',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(),
-    metadata: { window: '14d' },
-  },
-  {
-    id: 'evt_4',
-    actor: 'user',
-    action: 'memory.cleared',
-    target: 'scope:ephemeral',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-  },
-  {
-    id: 'evt_5',
-    actor: 'system',
-    action: 'audit.flush',
-    target: 'queue',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 30).toISOString(),
-    metadata: { count: 42 },
-  },
-];
 
 // =============================================================================
 // ROW
@@ -115,11 +73,37 @@ function AuditRow({ event }: { event: AuditEvent }): React.ReactElement {
 export default function AuditLogScreen(): React.ReactElement {
   const [actorFilter, setActorFilter] = useState<string>('');
   const [actionFilter, setActionFilter] = useState<string>('');
+  const [events, setEvents] = useState<AuditEvent[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const fetched = await fetchAuditEvents(200);
+        // Merge any local-queue events that haven't flushed yet so the UI
+        // stays current even when the network is slow.
+        const queued = getQueuedAuditEvents();
+        const seen = new Set(fetched.map((e) => e.id));
+        const merged = [
+          ...fetched,
+          ...queued.filter((e) => !seen.has(e.id)),
+        ];
+        if (!cancelled) setEvents(merged);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filtered = useMemo<ReadonlyArray<AuditEvent>>(() => {
     const normActor = actorFilter.trim().toLowerCase();
     const normAction = actionFilter.trim().toLowerCase();
-    const out = MOCK_EVENTS.filter((e) => {
+    const out = events.filter((e) => {
       if (normActor && !e.actor.toLowerCase().includes(normActor)) return false;
       if (normAction && !e.action.toLowerCase().includes(normAction))
         return false;
@@ -129,7 +113,7 @@ export default function AuditLogScreen(): React.ReactElement {
       (a, b) =>
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
     );
-  }, [actorFilter, actionFilter]);
+  }, [actorFilter, actionFilter, events]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
@@ -190,7 +174,11 @@ export default function AuditLogScreen(): React.ReactElement {
           </Pressable>
         )}
 
-        {filtered.length === 0 ? (
+        {loading ? (
+          <View style={styles.emptyCard}>
+            <Text style={styles.emptyText}>Loading…</Text>
+          </View>
+        ) : filtered.length === 0 ? (
           <View style={styles.emptyCard}>
             <Text style={styles.emptyText}>No events match these filters.</Text>
           </View>

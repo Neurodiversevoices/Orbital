@@ -21,9 +21,8 @@ layers ON TOP of the current app.
 | `types.ts` | All overlay types — `SubBrand`, `TrustPosture`, `MemoryRecord`, `PermissionGrant`, `AuditEvent` | DONE |
 | `subBrandConfig.ts` | The 6 sub-brand configs as exported constants | DONE |
 | `SubBrandProvider.tsx` | React context + AsyncStorage persistence (`orbital.subBrand`) | DONE |
-| `trustCore.ts` | `useTrustPosture`, `recordAuditEvent`, `requestPermissionGrant`, `revokeGrant` | SKELETON (TODOs) |
-| `memory.ts` | `useMemory`, `editMemory`, `deleteMemory`, `clearScope`, `setTemporaryChat` | SKELETON (TODOs) |
-| `useBrandAccent.ts` | `useBrandAccent()` — returns the active brand's themeAccent (with safe fallback) | DONE |
+| `trustCore.ts` | `useTrustPosture`, `recordAuditEvent`, `requestPermissionGrant`, `revokeGrant`, `fetchAuditEvents`, `fetchActiveGrants` | WIRED (Supabase) |
+| `memory.ts` | `useMemory`, `editMemory`, `deleteMemory`, `clearScope`, `setTemporaryChat` | WIRED (Supabase + AsyncStorage) |
 
 ## Routes
 
@@ -61,81 +60,32 @@ Memory default is **off** for every tier — opt-in only.
 - Glass-card pattern, capacity-spectrum accents, no orange.
 - Sticky sub-brand chip in the platform header.
 
-### TODO (backend wire-up)
-- `trustCore.recordAuditEvent` → flush to `audit_events` table; persist
-  the local queue to AsyncStorage; respect `posture.auditLogging`.
-- `trustCore.requestPermissionGrant` / `revokeGrant` → consent sheet UI
-  + new `permission_grants` Supabase table (not yet created).
-- `memory.useMemory` → real Supabase reads, scoped + tenant-isolated.
-- `memory.editMemory` / `deleteMemory` / `clearScope` → real writes,
-  with paired audit events.
-- `memory.setTemporaryChat` → AsyncStorage persistence + broadcast to
-  chat surfaces.
+### Wired (migration 00017_platform_overlay)
+- **Migration 00017** creates `permission_grants` and `platform_memory_records`,
+  and extends `audit_events` with `actor`, `target`, `metadata` columns.
+  RLS: every table is locked to `auth.uid() = user_id`. `permission_grants`
+  uses `revoked_at` (soft-delete) instead of DELETE to preserve the trail.
+- `trustCore.recordAuditEvent` flushes to the extended `audit_events` table.
+  Local queue retains events when the cloud insert fails (best-effort).
+- `trustCore.requestPermissionGrant` / `revokeGrant` insert / soft-delete
+  rows in `permission_grants` and pair with `grant.request` / `grant.revoke`
+  audit events.
+- `trustCore.fetchAuditEvents` / `fetchActiveGrants` are read helpers used
+  by `app/(platform)/audit.tsx` and `permissions.tsx`.
+- `memory.useMemory(scope)` reads from `platform_memory_records` filtered
+  by `auth.uid() = user_id` and the supplied scope. Returns loading + error.
+- `memory.editMemory` / `deleteMemory` / `clearScope` mutate Supabase rows
+  and pair each with a `memory.{edit,delete,clear}` audit event.
+- `memory.setTemporaryChat` persists to AsyncStorage under
+  `orbital.platform.temporaryChat` and pairs with a `memory.temporary_chat`
+  audit event. Sync mirror via `getTemporaryChat`, async via `getTemporaryChatAsync`.
+
+### Still TODO
 - `app/(platform)/memory.tsx` `handleEdit` → open an edit sheet (currently
   a no-op).
-- `app/(platform)/audit.tsx` → swap mock data for `audit_events` query.
-- `app/(platform)/permissions.tsx` → swap mock data for grants query.
-
-## Brand selection now affects behavior
-
-Selecting a sub-brand on `/sub-brand` (or programmatically via
-`useSubBrand().setBrand(id)`) is no longer a cosmetic-only choice — it
-now drives runtime behavior across the app:
-
-### 1. Theme accent (`useBrandAccent`)
-
-`lib/platform/useBrandAccent.ts` exposes a single hook that returns the
-current brand's `themeAccent` (capacity-spectrum hex) with a safe fallback
-to `#2DD4BF` whenever the SubBrandProvider is unavailable. Three
-representative surfaces are wired:
-
-| Surface | File | Effect |
-|---|---|---|
-| Active tab indicator | `app/(tabs)/_layout.tsx` | `tabBarActiveTintColor` follows brand |
-| Composer primary button | `components/Composer.tsx` | Default accent (when no `accentColor` prop) follows brand |
-| Settings header chip | `app/settings.tsx` | Logo orb + border tint follows brand (demo mode still wins) |
-
-The capacity spectrum on the orb (`crimson → amber → teal → cyan`) is
-fixed and unchanged — only the *accent* shifts. Primary teal stays teal.
-
-### 2. Audit logging (`posture.auditLogging`)
-
-- `SubBrandProvider.setBrand` now fires
-  `recordAuditEvent({ action: 'subbrand.set', target: brand })` on every
-  brand switch (wrapped in try/catch — audit never blocks the UI).
-- `app/(tabs)/index.tsx` `handleSave` fires
-  `recordAuditEvent({ action: 'capacity.log', target: 'self' })` when
-  `posture.auditLogging === true`. This is one representative call —
-  full coverage (memory edits, permission grants, etc.) is a followup.
-
-`recordAuditEvent` accepts a partial input (`{ action, target }`) and
-auto-fills `id`, `actor`, and `timestamp`. The full `AuditEvent` shape
-is still accepted for callers that already have one.
-
-### 3. Memory default (`posture.memoryDefault`)
-
-`memory.useMemory(scope)` now consults the active posture. When
-`memoryDefault === 'off'` (the case for ALL 6 brands today), the
-`implicit` scope returns `[]` — the inferred-pattern layer stays dark
-without an explicit user opt-in. Other scopes are unchanged.
-
-### 4. Compliance mode chip
-
-`app/(platform)/_layout.tsx` renders the compliance chip whenever
-`posture.complianceMode !== 'none'`. Labels are humanized
-(`SOC 2`, `HIPAA`, `FERPA`, `FedRAMP`) and carry an accessibility label.
-
-### 5. Tenancy isolation note
-
-`app/(platform)/memory.tsx` shows a "Workspace-scoped · Tenant isolated"
-chip above the memory list when `posture.tenancyIsolation === true`.
-Visual reassurance only — the SQL itself is already user-scoped.
-
-### Default behavior preserved
-
-The default brand is `personal`. Its posture is the most permissive
-(no audit, no tenancy, no compliance), so users who never visit the
-sub-brand picker see *zero* behavior change.
+- Local audit queue → AsyncStorage persistence (so unsynced events survive
+  a cold launch).
+- Realtime subscriptions on `platform_memory_records` for cross-device sync.
 
 ## Constraints honored
 

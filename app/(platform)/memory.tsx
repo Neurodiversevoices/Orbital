@@ -30,7 +30,7 @@ import {
   setTemporaryChat,
   useMemory,
 } from '../../lib/platform/memory';
-import { useSubBrand } from '../../lib/platform/SubBrandProvider';
+import { useOptionalSubBrand } from '../../lib/platform/SubBrandProvider';
 import type { MemoryRecord, MemoryScope } from '../../lib/platform/types';
 
 const BACKGROUND = '#01020A';
@@ -138,7 +138,7 @@ interface ScopeSectionProps {
 }
 
 function ScopeSection({ meta }: ScopeSectionProps): React.ReactElement {
-  const records = useMemory(meta.scope);
+  const { records, loading, refresh } = useMemory(meta.scope);
   const [usePastChats, setUsePastChats] = useState<boolean>(
     meta.scope !== 'ephemeral',
   );
@@ -148,21 +148,26 @@ function ScopeSection({ meta }: ScopeSectionProps): React.ReactElement {
     void id;
   }, []);
 
-  const handleDelete = useCallback(async (id: string): Promise<void> => {
-    try {
-      await deleteMemory(id);
-    } catch (err) {
-      console.warn('[memory.tsx] delete failed', err);
-    }
-  }, []);
+  const handleDelete = useCallback(
+    async (id: string): Promise<void> => {
+      try {
+        await deleteMemory(id);
+        await refresh();
+      } catch (err) {
+        console.warn('[memory.tsx] delete failed', err);
+      }
+    },
+    [refresh],
+  );
 
   const handleClearScope = useCallback(async (): Promise<void> => {
     try {
       await clearScope(meta.scope);
+      await refresh();
     } catch (err) {
       console.warn('[memory.tsx] clearScope failed', err);
     }
-  }, [meta.scope]);
+  }, [meta.scope, refresh]);
 
   return (
     <View style={styles.section}>
@@ -183,7 +188,11 @@ function ScopeSection({ meta }: ScopeSectionProps): React.ReactElement {
         </View>
       </View>
 
-      {records.length === 0 ? (
+      {loading ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyText}>Loading…</Text>
+        </View>
+      ) : records.length === 0 ? (
         <View style={styles.emptyCard}>
           <Text style={styles.emptyText}>No records in this scope.</Text>
         </View>
@@ -221,11 +230,12 @@ function ScopeSection({ meta }: ScopeSectionProps): React.ReactElement {
 
 export default function MemoryDashboardScreen(): React.ReactElement {
   const [tempChat, setTempChat] = useState<boolean>(false);
-  const { posture } = useSubBrand();
+  const subBrandCtx = useOptionalSubBrand();
+  const isTenantIsolated = subBrandCtx?.posture.tenancyIsolation ?? false;
 
   const handleTempChat = useCallback((next: boolean): void => {
     setTempChat(next);
-    setTemporaryChat(next);
+    void setTemporaryChat(next);
   }, []);
 
   return (
@@ -234,19 +244,18 @@ export default function MemoryDashboardScreen(): React.ReactElement {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* TENANT ISOLATION NOTE — visible reassurance for regulated tiers.
-            The query itself is already scoped server-side by user_id; this
-            chip only communicates the posture, it does not change any read. */}
-        {posture.tenancyIsolation ? (
+        {/* TENANT ISOLATION NOTE — appears on Workspace/Enterprise/Health/Edu/Gov */}
+        {isTenantIsolated && (
           <View
-            style={styles.tenancyNote}
-            accessibilityLabel="Workspace-scoped memory · tenant isolated"
+            style={styles.tenantNote}
+            accessibilityRole="text"
+            accessibilityLabel="Workspace-scoped, tenant isolated"
           >
-            <Text style={styles.tenancyNoteText}>
+            <Text style={styles.tenantNoteText}>
               Workspace-scoped · Tenant isolated
             </Text>
           </View>
-        ) : null}
+        )}
 
         {/* GLOBAL TEMPORARY CHAT */}
         <View style={styles.heroCard}>
@@ -287,22 +296,22 @@ const styles = StyleSheet.create({
     paddingBottom: 64,
   },
 
-  tenancyNote: {
+  tenantNote: {
     backgroundColor: GLASS_BG,
     borderColor: GLASS_BORDER,
     borderWidth: 1,
     borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 12,
-    alignItems: 'flex-start',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    marginBottom: 16,
   },
-  tenancyNoteText: {
-    fontFamily: 'SpaceMono_400Regular',
-    fontSize: 10,
-    letterSpacing: 1.6,
+  tenantNoteText: {
     color: TEXT_SECONDARY,
+    fontFamily: 'SpaceMono_400Regular',
+    fontSize: 11,
+    letterSpacing: 1.6,
     textTransform: 'uppercase',
+    textAlign: 'center',
   },
 
   heroCard: {

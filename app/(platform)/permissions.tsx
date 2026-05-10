@@ -5,10 +5,11 @@
  * with a destructive "Revoke" affordance. All grants are revocable by
  * design (TrustPosture contract).
  *
- * Backed by mock data until the `permission_grants` table lands.
+ * Reads from the `permission_grants` table (migration 00017) via the
+ * `fetchActiveGrants` helper in lib/platform/trustCore.
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -18,7 +19,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { revokeGrant } from '../../lib/platform/trustCore';
+import { fetchActiveGrants, revokeGrant } from '../../lib/platform/trustCore';
 import type { PermissionGrant } from '../../lib/platform/types';
 
 const BACKGROUND = '#01020A';
@@ -27,41 +28,6 @@ const GLASS_BORDER = 'rgba(255,255,255,0.15)';
 const TEXT_PRIMARY = '#FFFFFF';
 const TEXT_SECONDARY = 'rgba(255,255,255,0.7)';
 const DANGER = '#DC2626';
-
-// =============================================================================
-// MOCK DATA
-// =============================================================================
-
-const NOW_ISO = new Date().toISOString();
-const IN_30_DAYS = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-const IN_7_DAYS = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-
-const MOCK_GRANTS: ReadonlyArray<PermissionGrant> = [
-  {
-    id: 'grant_1',
-    tool: 'gmail',
-    scope: 'read:capacity-signals',
-    expiresAt: IN_30_DAYS,
-    grantedAt: NOW_ISO,
-    revocable: true,
-  },
-  {
-    id: 'grant_2',
-    tool: 'calendar',
-    scope: 'read:availability',
-    expiresAt: IN_7_DAYS,
-    grantedAt: NOW_ISO,
-    revocable: true,
-  },
-  {
-    id: 'grant_3',
-    tool: 'supabase',
-    scope: 'write:audit-events',
-    expiresAt: null,
-    grantedAt: NOW_ISO,
-    revocable: true,
-  },
-];
 
 // =============================================================================
 // HELPERS
@@ -110,16 +76,36 @@ function GrantRow({ grant, onRevoke }: RowProps): React.ReactElement {
 // =============================================================================
 
 export default function PermissionsScreen(): React.ReactElement {
-  const [grants, setGrants] = useState<PermissionGrant[]>([...MOCK_GRANTS]);
+  const [grants, setGrants] = useState<PermissionGrant[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const handleRevoke = useCallback(async (id: string): Promise<void> => {
+  const reload = useCallback(async (): Promise<void> => {
+    setLoading(true);
     try {
-      await revokeGrant(id);
-      setGrants((prev) => prev.filter((g) => g.id !== id));
-    } catch (err) {
-      console.warn('[permissions.tsx] revoke failed', err);
+      const next = await fetchActiveGrants();
+      setGrants(next);
+    } finally {
+      setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  const handleRevoke = useCallback(
+    async (id: string): Promise<void> => {
+      try {
+        await revokeGrant(id);
+        // Optimistic local removal; reload to stay authoritative.
+        setGrants((prev) => prev.filter((g) => g.id !== id));
+        void reload();
+      } catch (err) {
+        console.warn('[permissions.tsx] revoke failed', err);
+      }
+    },
+    [reload],
+  );
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
@@ -134,7 +120,11 @@ export default function PermissionsScreen(): React.ReactElement {
           immediate and audit-logged.
         </Text>
 
-        {grants.length === 0 ? (
+        {loading ? (
+          <View style={styles.emptyCard}>
+            <Text style={styles.emptyText}>Loading…</Text>
+          </View>
+        ) : grants.length === 0 ? (
           <View style={styles.emptyCard}>
             <Text style={styles.emptyText}>No active permission grants.</Text>
           </View>

@@ -7,163 +7,293 @@
  *   - profile:   persistent, user-owned, exportable
  *   - implicit:  inferred preferences/patterns (fully editable)
  *
- * Bodies here are skeletons. UI screens (app/(platform)/memory.tsx) read
- * via `useMemory(scope)`; mutation paths (`editMemory`, `deleteMemory`,
- * `clearScope`, `setTemporaryChat`) are TODOs pointing at the eventual
- * Supabase + AsyncStorage wiring.
- */
-
-import { useEffect, useState } from 'react';
-
-import type { MemoryRecord, MemoryScope } from './types';
-import { useOptionalSubBrand } from './SubBrandProvider';
-
-// =============================================================================
-// IN-MEMORY STORE (until backend wired)
-// =============================================================================
-
-/**
- * Module-scope mock store. Replaced once we have a real persistence layer.
+ * Wired against:
+ *   - platform_memory_records (Supabase, created in migration 00017)
+ *   - lib/supabase/client.ts  (singleton client + auth)
+ *   - AsyncStorage             ("orbital.platform.temporaryChat")
  *
- * TODO: replace with a (Supabase row → record) reader keyed by scope.
- * TODO: ephemeral records must NEVER persist — gate them on
- *       a session-only in-memory map.
+ * Every mutation pairs with a recordAuditEvent call so the action surfaces
+ * on the platform audit screen.
  */
-const MOCK_RECORDS: ReadonlyArray<MemoryRecord> = [
-  {
-    id: 'mem_demo_1',
-    scope: 'profile',
-    content: 'Prefers shorter mornings, deeper afternoon focus blocks.',
-    createdAt: new Date().toISOString(),
-    source: 'inferred',
-    userEditable: true,
-  },
-  {
-    id: 'mem_demo_2',
-    scope: 'implicit',
-    content: 'Capacity tends to dip around 3pm on Wednesdays.',
-    createdAt: new Date().toISOString(),
-    source: 'pattern-engine',
-    userEditable: true,
-  },
-];
 
-/**
- * Whether the user has flipped the global "Temporary chat mode" switch.
- * Module-scope so subscribers across screens see the same value until
- * the AsyncStorage hookup lands.
- */
-let TEMPORARY_CHAT_ENABLED = false;
+import { useCallback, useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { getSupabase, isSupabaseConfigured } from '../supabase/client';
+import { useOptionalSubBrand } from './SubBrandProvider';
+import { recordAuditEvent } from './trustCore';
+import type { MemoryRecord, MemoryScope } from './types';
+
+const TEMP_CHAT_KEY = 'orbital.platform.temporaryChat';
+
+// =============================================================================
+// HELPERS
+// =============================================================================
+
+interface MemoryRow {
+  id: string;
+  user_id: string;
+  scope: MemoryScope;
+  content: string;
+  source: string | null;
+  user_editable: boolean;
+  created_at: string;
+}
+
+function rowToRecord(row: MemoryRow): MemoryRecord {
+  return {
+    id: row.id,
+    scope: row.scope,
+    content: row.content,
+    createdAt: row.created_at,
+    source: row.source ?? 'unknown',
+    userEditable: row.user_editable,
+  };
+}
 
 // =============================================================================
 // READS
 // =============================================================================
 
+export interface UseMemoryResult {
+  records: MemoryRecord[];
+  loading: boolean;
+  error: string | null;
+  refresh: () => Promise<void>;
+}
+
 /**
  * Hook: read all memory records for a given scope.
  *
- * Currently returns mock data filtered by scope. Wire-up TODOs:
- *   - subscribe to Supabase realtime updates on the user's memory rows
- *   - filter by tenant when posture.tenancyIsolation is true
- *   - never return ephemeral records older than the current session
- *
- * Posture enforcement: when the active sub-brand's posture has
- * `memoryDefault === 'off'` (the case for ALL 6 brands today), the
- * `implicit` scope returns an empty list regardless of stored data.
- * Implicit memory is the inferred-pattern layer — keeping it dark by
- * default is the conservative privacy stance our regulated tiers expect.
- * The user can still opt-in per scope via the Memory dashboard.
- *
- * Other scopes (ephemeral / workspace / profile) are unchanged here —
- * they have their own per-scope toggles surfaced in the dashboard.
+ * Returns a structured object so callers can render loading / empty states.
+ * Subscribes to the user's records on mount and re-fetches when the scope
+ * argument changes.
  */
-export function useMemory(scope: MemoryScope): MemoryRecord[] {
+export function useMemory(scope: MemoryScope): UseMemoryResult {
+  const [records, setRecords] = useState<MemoryRecord[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  // Posture gate: if the active sub-brand has memoryDefault === 'off' (the
+  // case for all 6 brands today) and the caller is reading the implicit
+  // scope, short-circuit to an empty list. We respect the brand's stance
+  // on implicit pattern recall — UI toggles aren't enough.
   const subBrandCtx = useOptionalSubBrand();
   const memoryDefault = subBrandCtx?.posture.memoryDefault ?? 'off';
-  // When memory is off by posture and the caller is reading the implicit
-  // scope, short-circuit before we ever hit the (eventually Supabase-backed)
-  // store. This is the wire that makes brand selection actually shut down
-  // implicit pattern recall, not just hide the toggle.
   const isImplicitOff = scope === 'implicit' && memoryDefault === 'off';
 
-  const [records, setRecords] = useState<MemoryRecord[]>(() =>
-    isImplicitOff ? [] : MOCK_RECORDS.filter((r) => r.scope === scope),
-  );
-
-  useEffect(() => {
-    // TODO: wire to Supabase / AsyncStorage. For now, recompute when scope flips.
+  const refresh = useCallback(async (): Promise<void> => {
     if (isImplicitOff) {
       setRecords([]);
+      setLoading(false);
+      setError(null);
       return;
     }
-    setRecords(MOCK_RECORDS.filter((r) => r.scope === scope));
+    if (!isSupabaseConfigured()) {
+      setRecords([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const supabase = getSupabase();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setRecords([]);
+        setLoading(false);
+        return;
+      }
+      const { data, error: queryError } = await supabase
+        .from('platform_memory_records')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('scope', scope)
+        .order('created_at', { ascending: false });
+
+      if (queryError) {
+        setError(queryError.message);
+        setRecords([]);
+      } else {
+        setRecords((data ?? []).map((row: MemoryRow) => rowToRecord(row)));
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'unknown error';
+      setError(msg);
+      setRecords([]);
+      if (__DEV__) console.warn('[memory] useMemory refresh failed', err);
+    } finally {
+      setLoading(false);
+    }
   }, [scope, isImplicitOff]);
 
-  return records;
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
+
+  return { records, loading, error, refresh };
 }
 
 // =============================================================================
-// WRITES (skeletons)
+// WRITES
 // =============================================================================
 
 /**
  * Edit the content of a single memory record.
- * No-op stub — UI can call optimistically; the real path will sync.
+ * Pairs with a `memory.edit` audit event on success.
  */
 export async function editMemory(id: string, content: string): Promise<void> {
   try {
-    // TODO: update Supabase row + emit audit event { action: 'memory.edited' }.
-    void id;
-    void content;
+    if (!isSupabaseConfigured()) return;
+    const supabase = getSupabase();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('platform_memory_records')
+      .update({ content })
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (error) {
+      if (__DEV__) console.warn('[memory] editMemory failed', error.message);
+      return;
+    }
+    await recordAuditEvent({
+      action: 'memory.edit',
+      target: id,
+      metadata: { length: content.length },
+    });
   } catch (err) {
-    console.warn('[memory] editMemory failed', err);
+    if (__DEV__) console.warn('[memory] editMemory failed', err);
   }
 }
 
 /**
  * Delete a single memory record.
- * Profile/workspace records are soft-deleted; ephemeral are hard-deleted.
+ * Pairs with a `memory.delete` audit event on success.
  */
 export async function deleteMemory(id: string): Promise<void> {
   try {
-    // TODO: soft-delete in Supabase + audit { action: 'memory.deleted' }.
-    void id;
+    if (!isSupabaseConfigured()) return;
+    const supabase = getSupabase();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('platform_memory_records')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (error) {
+      if (__DEV__) console.warn('[memory] deleteMemory failed', error.message);
+      return;
+    }
+    await recordAuditEvent({ action: 'memory.delete', target: id });
   } catch (err) {
-    console.warn('[memory] deleteMemory failed', err);
+    if (__DEV__) console.warn('[memory] deleteMemory failed', err);
   }
 }
 
 /**
  * Clear ALL records in a given scope. Used by the "Clear scope" button
- * on the Memory Dashboard.
+ * on the Memory Dashboard. Pairs with a `memory.clear` audit event.
  */
 export async function clearScope(scope: MemoryScope): Promise<void> {
   try {
-    // TODO: bulk soft-delete in Supabase scoped to (user, scope).
-    // TODO: audit { action: 'memory.cleared', target: scope }.
-    void scope;
+    if (!isSupabaseConfigured()) return;
+    const supabase = getSupabase();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('platform_memory_records')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('scope', scope);
+
+    if (error) {
+      if (__DEV__) console.warn('[memory] clearScope failed', error.message);
+      return;
+    }
+    await recordAuditEvent({
+      action: 'memory.clear',
+      target: `scope:${scope}`,
+      metadata: { scope },
+    });
   } catch (err) {
-    console.warn('[memory] clearScope failed', err);
+    if (__DEV__) console.warn('[memory] clearScope failed', err);
+  }
+}
+
+// =============================================================================
+// TEMPORARY CHAT FLAG (AsyncStorage)
+// =============================================================================
+
+/**
+ * In-memory mirror of the persisted flag so synchronous reads stay cheap.
+ * Hydrated on first access via `getTemporaryChat()`.
+ */
+let TEMPORARY_CHAT_ENABLED = false;
+let TEMPORARY_CHAT_HYDRATED = false;
+
+async function hydrateTemporaryChat(): Promise<void> {
+  if (TEMPORARY_CHAT_HYDRATED) return;
+  try {
+    const stored = await AsyncStorage.getItem(TEMP_CHAT_KEY);
+    TEMPORARY_CHAT_ENABLED = stored === 'true';
+  } catch (err) {
+    if (__DEV__) console.warn('[memory] hydrateTemporaryChat failed', err);
+  } finally {
+    TEMPORARY_CHAT_HYDRATED = true;
   }
 }
 
 /**
  * Toggle the global "Temporary chat" mode. When enabled, all conversations
  * are forced into the ephemeral scope regardless of user preference.
+ *
+ * Persists to AsyncStorage and pairs with a `memory.temporary_chat` audit.
  */
-export function setTemporaryChat(enabled: boolean): void {
+export async function setTemporaryChat(enabled: boolean): Promise<void> {
   try {
     TEMPORARY_CHAT_ENABLED = enabled;
-    // TODO: persist to AsyncStorage under `orbital.memory.temporaryChat`.
-    // TODO: broadcast to chat surfaces via a small EventEmitter or context.
+    TEMPORARY_CHAT_HYDRATED = true;
+    await AsyncStorage.setItem(TEMP_CHAT_KEY, enabled ? 'true' : 'false');
+    await recordAuditEvent({
+      action: 'memory.temporary_chat',
+      target: enabled ? 'on' : 'off',
+    });
   } catch (err) {
-    console.warn('[memory] setTemporaryChat failed', err);
+    if (__DEV__) console.warn('[memory] setTemporaryChat failed', err);
   }
 }
 
 /**
- * Read the current Temporary chat flag.
+ * Read the current Temporary chat flag (synchronous mirror).
+ * Triggers a hydration on first call so the value is correct after a
+ * cold launch.
  */
 export function getTemporaryChat(): boolean {
+  if (!TEMPORARY_CHAT_HYDRATED) {
+    void hydrateTemporaryChat();
+  }
+  return TEMPORARY_CHAT_ENABLED;
+}
+
+/**
+ * Async variant — guarantees the AsyncStorage value has been read at
+ * least once before returning.
+ */
+export async function getTemporaryChatAsync(): Promise<boolean> {
+  await hydrateTemporaryChat();
   return TEMPORARY_CHAT_ENABLED;
 }
