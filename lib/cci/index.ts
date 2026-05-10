@@ -22,3 +22,4 @@ export type { CCINarrativeResult } from './dynamic/narrative';
 export type { CCIFunctionalImpact, SeverityLevel } from './dynamic/impact';
 export type { CCIPowerTemplateInput } from './powerTemplate';
 export type { CCIPdfResult, CCIPdfOptions } from './generateCCIPdf';
+export type { CCIWindowDays, CCIArtifactRenderOptions } from './artifact';

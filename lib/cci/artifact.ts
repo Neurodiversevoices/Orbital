@@ -17,6 +17,28 @@ import { CCIProjectionResult } from './dynamic/projection';
 import { CCINarrativeResult } from './dynamic/narrative';
 import { CCIFunctionalImpact, SeverityLevel, SEVERITY_COLORS } from './dynamic/impact';
 
+// =============================================================================
+// SHARED OPTIONS — therapist-facing PDF parameterization
+// =============================================================================
+
+/**
+ * Allowed observation window lengths for CCI templates.
+ * 30 / 60 / 90 are the supported clinical windows. Default = 90 (back-compat).
+ */
+export type CCIWindowDays = 30 | 60 | 90;
+
+/**
+ * Optional rendering options shared by the legacy and Power CCI templates.
+ *
+ * - `windowDays`: drives the period label rendered in headers and chart titles.
+ * - `recipientName`: when present, renders a "Prepared for: <name>" line in the
+ *   top RECIPIENT header (therapist-facing PDF hardening).
+ */
+export interface CCIArtifactRenderOptions {
+  windowDays?: CCIWindowDays;
+  recipientName?: string;
+}
+
 /**
  * Golden master display constants — exact values matching locked output.
  * When no dynamic data is provided, these reproduce the golden master byte-for-byte.
@@ -42,6 +64,7 @@ const GOLDEN_CONSTANTS: Omit<CCIFormattedStrings, 'chartSVG' | 'chartXLabels'> =
 function generateLegacyCCIArtifactHTML(
   metadata?: Partial<CCIIssuanceMetadata>,
   dynamicData?: CCIFormattedStrings | null,
+  options?: CCIArtifactRenderOptions,
 ): string {
   const now = new Date();
   const timestamp = metadata?.generatedAt || formatUTCTimestamp(now);
@@ -49,6 +72,11 @@ function generateLegacyCCIArtifactHTML(
 
   // Single resolution point: dynamic data or golden master constants
   const data = dynamicData ?? GOLDEN_CONSTANTS;
+
+  // Therapist-facing PDF hardening — window + optional recipient
+  const windowDays: CCIWindowDays = options?.windowDays ?? 90;
+  const recipientName = (options?.recipientName ?? '').trim();
+  const dateGenerated = formatHumanDate(now);
 
   // LOCKED HTML - matches output/cci_ultra.html EXACTLY
   return `<!DOCTYPE html>
@@ -459,6 +487,13 @@ function generateLegacyCCIArtifactHTML(
 <body>
 
 <div class="page">
+  <!-- RECIPIENT HEADER (therapist-facing) -->
+  <div style="padding:6px 8px;margin-bottom:8px;background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #2DD4BF;font-family:'JetBrains Mono','Consolas',monospace;font-size:8px;color:#0f172a;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+    ${recipientName ? `<span><strong style="font-weight:700;letter-spacing:0.5px;">PREPARED FOR:</strong> ${escapeHtml(recipientName)}</span>` : '<span></span>'}
+    <span><strong style="font-weight:700;letter-spacing:0.5px;">DATE GENERATED:</strong> ${dateGenerated}</span>
+    <span><strong style="font-weight:700;letter-spacing:0.5px;">WINDOW:</strong> ${windowDays} DAYS</span>
+  </div>
+
   <!-- HEADER -->
   <h1 class="artifact-title">Clinical Artifact Record [Locked]</h1>
 
@@ -675,6 +710,21 @@ function generateLegacyCCIArtifactHTML(
       </div>
     </div>
 
+    <!-- SIGNATURE LINE (therapist sign-off) -->
+    <div style="margin-top:10px;margin-bottom:8px;padding:8px 10px;border:1px dashed #94a3b8;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;font-family:'Inter',sans-serif;font-size:8px;color:#0f172a;">
+      <div style="flex:1;">
+        <div style="font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Reviewed by:</div>
+        <div style="border-bottom:1px solid #0f172a;height:14px;"></div>
+      </div>
+      <div style="width:120px;">
+        <div style="font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Date:</div>
+        <div style="border-bottom:1px solid #0f172a;height:14px;"></div>
+      </div>
+    </div>
+    <div style="text-align:center;font-family:'JetBrains Mono','Consolas',monospace;font-size:6.5px;color:#475569;letter-spacing:0.6px;text-transform:uppercase;margin-bottom:6px;">
+      For Clinical Documentation Use — Non-Diagnostic
+    </div>
+
     <div class="legal-block">
       <div class="legal-title">Confidential &amp; Proprietary Notice</div>
       <div class="legal-body">
@@ -776,7 +826,12 @@ export function generateCCIArtifactHTML(
   narrative: CCINarrativeResult,
   impact: CCIFunctionalImpact,
   driverStats?: { sensory: number; demand: number; social: number },
+  options?: CCIArtifactRenderOptions,
 ): string {
+  // Therapist-facing PDF hardening — window length + optional recipient
+  const windowDays: CCIWindowDays = options?.windowDays ?? 90;
+  const recipientName = (options?.recipientName ?? '').trim();
+  const dateGenerated = formatHumanDate(new Date());
   // --- Derived values ---
   const { resourced, stretched, depleted, total } = dynamicData.overallDistribution;
   const score = total > 0 ? Math.round((resourced * 100 + stretched * 50 + depleted * 0) / total) : 50;
@@ -877,6 +932,13 @@ export function generateCCIArtifactHTML(
 </head>
 <body>
 <div class="page">
+
+  <!-- RECIPIENT HEADER (therapist-facing) -->
+  <div style="margin-bottom:10px;padding:6px 10px;background:rgba(45,212,191,0.06);border:1px solid rgba(45,212,191,0.25);border-radius:4px;font-family:'JetBrains Mono','Consolas',monospace;font-size:7.5px;color:rgba(255,255,255,0.85);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;letter-spacing:0.4px;">
+    ${recipientName ? `<span><strong style="color:#2DD4BF;">PREPARED FOR:</strong> ${escapeHtml(recipientName)}</span>` : '<span></span>'}
+    <span><strong style="color:#2DD4BF;">DATE GENERATED:</strong> ${dateGenerated}</span>
+    <span><strong style="color:#2DD4BF;">WINDOW:</strong> ${windowDays} DAYS</span>
+  </div>
 
   <!-- HEADER -->
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
@@ -999,6 +1061,21 @@ export function generateCCIArtifactHTML(
     </div>
   </div>
 
+  <!-- SIGNATURE LINE (therapist sign-off) -->
+  <div style="margin-top:8px;padding:8px 10px;border:1px dashed rgba(255,255,255,0.25);border-radius:3px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;font-family:'Inter',sans-serif;font-size:7.5px;color:rgba(255,255,255,0.8);">
+    <div style="flex:1;">
+      <div style="font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;color:rgba(255,255,255,0.7);">Reviewed by:</div>
+      <div style="border-bottom:1px solid rgba(255,255,255,0.4);height:14px;"></div>
+    </div>
+    <div style="width:120px;">
+      <div style="font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;color:rgba(255,255,255,0.7);">Date:</div>
+      <div style="border-bottom:1px solid rgba(255,255,255,0.4);height:14px;"></div>
+    </div>
+  </div>
+  <div class="mono" style="text-align:center;font-size:6px;color:rgba(255,255,255,0.45);letter-spacing:0.6px;text-transform:uppercase;margin-top:4px;">
+    For Clinical Documentation Use — Non-Diagnostic
+  </div>
+
   <!-- FOOTER -->
   <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
@@ -1013,6 +1090,28 @@ export function generateCCIArtifactHTML(
 </div>
 </body>
 </html>`;
+}
+
+/**
+ * Format a Date as "Mon D, YYYY" (e.g. "May 10, 2026").
+ * Used by the therapist-facing recipient header.
+ */
+function formatHumanDate(date: Date): string {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+}
+
+/**
+ * Minimal HTML escape for user-supplied strings interpolated into the
+ * therapist-facing PDF (e.g. recipientName).
+ */
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 /**
@@ -1041,6 +1140,7 @@ function generatePlaceholderHash(): string {
 export function createCCIArtifact(
   metadata?: Partial<CCIIssuanceMetadata>,
   dynamicData?: CCIFormattedStrings | null,
+  options?: CCIArtifactRenderOptions,
 ): CCIArtifact {
   const now = new Date();
   const fullMetadata: CCIIssuanceMetadata = {
@@ -1055,7 +1155,7 @@ export function createCCIArtifact(
     id: `cci-q4-${Date.now()}`,
     version: 'Q4-2025',
     metadata: fullMetadata,
-    html: generateLegacyCCIArtifactHTML(fullMetadata, dynamicData),
+    html: generateLegacyCCIArtifactHTML(fullMetadata, dynamicData, options),
   };
 }
 
@@ -1097,10 +1197,18 @@ function generateMemberChartSVG(memberName: string, values: number[]): string {
  *
  * IMPORTANT: Uses renderCCI90DayToSVG from lib/charts for pixel-identical rendering.
  */
-export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMetadata>): string {
+export function generateCircleCCIArtifactHTML(
+  metadata?: Partial<CCIIssuanceMetadata>,
+  options?: CCIArtifactRenderOptions,
+): string {
   const now = new Date();
   const timestamp = metadata?.generatedAt || formatUTCTimestamp(now);
   const hash = metadata?.integrityHash || generatePlaceholderHash();
+  const windowDays: CCIWindowDays = options?.windowDays ?? 90;
+  // NOTE: The chart renderer (renderCCI90DayToSVG) draws a fixed 90 buckets for
+  // visual consistency. We label the section with the selected windowDays even
+  // though the chart geometry always shows the last 90 days. Known display
+  // tradeoff — see lib/charts/capacityOverTime90d.ts.
 
   // Generate chart SVGs using the unified chart system (same as app)
   const miaChart = generateMemberChartSVG('Mia', FABRICATED_HISTORIES.mia);
@@ -1221,8 +1329,8 @@ export function generateCircleCCIArtifactHTML(metadata?: Partial<CCIIssuanceMeta
     </div>
   </div>
 
-  <div class="section-title">Member Capacity — 90 Days</div>
-  <div class="section-subtitle">Non-diagnostic. Per-member view. Observation period: Oct 1, 2025 – Dec 31, 2025</div>
+  <div class="section-title">Member Capacity — ${windowDays} Days</div>
+  <div class="section-subtitle">Non-diagnostic. Per-member view. ${windowDays}-day observation window.</div>
 
   <div class="members-grid">
     <!-- Member 1: Mia - Stretched, Flat -->

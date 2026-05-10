@@ -1,15 +1,16 @@
 /**
  * CCI Report Generation Screen
  *
- * Temporary UI for calling the generate-cci Edge Function.
- * Displays structured CCI data — PDF renderer wired separately.
+ * Calls the generate-cci Edge Function and displays structured CCI data.
  *
- * Flow:
- *  1. Check entitlement on mount
- *  2. User taps "Generate Report"
- *  3. Edge Function called with user_id + last 90 days
- *  4. Display returned JSON in clinical summary layout
- *  5. Handle errors (no entitlement, not enough data, network)
+ * Light-theme repaint (May 2026): white background, hairline cards, teal
+ * primary action, DM Sans / Space Mono per project design system.
+ *
+ * Adds:
+ *  - Window picker (30 / 60 / 90) drives the Edge Function date range.
+ *  - Optional recipient field carried through to the regenerated artifact.
+ *  - Prominent display of selected window, recipient, generated date.
+ *  - "Print again" / "Share again" actions on the result panel.
  */
 
 import React, { useState, useCallback } from 'react';
@@ -21,6 +22,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Platform,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -34,9 +36,30 @@ import {
   ShieldCheck,
   Activity,
   Zap,
+  Printer,
+  Share2,
 } from 'lucide-react-native';
-import { colors, spacing, borderRadius, commonStyles } from '../theme';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase/client';
+import CCIWindowPicker from '../components/CCIWindowPicker';
+import type { CCIWindowDays } from '../lib/cci';
+
+// =============================================================================
+// LIGHT-THEME TOKENS (per project design system, May 2026)
+// =============================================================================
+
+const LIGHT = {
+  background: '#FFFFFF',
+  textPrimary: '#0F1624',
+  textSecondary: 'rgba(15, 22, 36, 0.62)',
+  textTertiary: 'rgba(15, 22, 36, 0.38)',
+  cardBorder: 'rgba(15, 22, 36, 0.10)',
+  cardShadow: 'rgba(15, 22, 36, 0.06)',
+  primary: '#2DD4BF',
+  primaryText: '#FFFFFF',
+  accentCyan: '#06B6D4',
+  warningAmber: '#F59E0B',
+  alertCrimson: '#DC2626',
+} as const;
 
 // =============================================================================
 // TYPES (mirrors Edge Function response)
@@ -117,11 +140,11 @@ function formatDate(iso: string): string {
 }
 
 function getCapacityColor(value: number | null): string {
-  if (value == null) return 'rgba(255,255,255,0.5)';
-  if (value >= 0.7) return '#06B6D4';
-  if (value >= 0.5) return '#2DD4BF';
-  if (value >= 0.3) return '#F59E0B';
-  return '#DC2626';
+  if (value == null) return LIGHT.textTertiary;
+  if (value >= 0.7) return LIGHT.accentCyan;
+  if (value >= 0.5) return LIGHT.primary;
+  if (value >= 0.3) return LIGHT.warningAmber;
+  return LIGHT.alertCrimson;
 }
 
 function getTrendIcon(direction: string) {
@@ -131,9 +154,9 @@ function getTrendIcon(direction: string) {
 }
 
 function getTrendColor(direction: string): string {
-  if (direction === 'improving') return '#2DD4BF';
-  if (direction === 'declining') return '#DC2626';
-  return '#F59E0B';
+  if (direction === 'improving') return LIGHT.primary;
+  if (direction === 'declining') return LIGHT.alertCrimson;
+  return LIGHT.warningAmber;
 }
 
 function getForecastLabel(slope: number): string {
@@ -151,6 +174,8 @@ export default function CCIReportScreen() {
   const [state, setState] = useState<ScreenState>('idle');
   const [payload, setPayload] = useState<CCIPayload | null>(null);
   const [errorInfo, setErrorInfo] = useState<ErrorInfo | null>(null);
+  const [windowDays, setWindowDays] = useState<CCIWindowDays>(90);
+  const [recipientName, setRecipientName] = useState<string>('');
 
   const generateReport = useCallback(async () => {
     if (!isSupabaseConfigured()) {
@@ -168,7 +193,6 @@ export default function CCIReportScreen() {
     try {
       const supabase = getSupabase();
 
-      // Get current user
       const { data: { user }, error: authErr } = await supabase.auth.getUser();
       if (authErr || !user) {
         setErrorInfo({
@@ -179,21 +203,22 @@ export default function CCIReportScreen() {
         return;
       }
 
-      // Call Edge Function with 90-day window
+      // Use the selected windowDays for the Edge Function call
       const now = new Date();
-      const ninetyDaysAgo = new Date();
-      ninetyDaysAgo.setDate(now.getDate() - 90);
+      const windowAgo = new Date();
+      windowAgo.setDate(now.getDate() - windowDays);
 
       const { data, error } = await supabase.functions.invoke('generate-cci', {
         body: {
           user_id: user.id,
-          date_start: ninetyDaysAgo.toISOString(),
+          date_start: windowAgo.toISOString(),
           date_end: now.toISOString(),
+          window_days: windowDays,
+          recipient_name: recipientName.trim() || undefined,
         },
       });
 
       if (error) {
-        // Check for entitlement error
         if (error.message?.includes('403') || (data as any)?.code === 'ENTITLEMENT_REQUIRED') {
           setErrorInfo({
             title: 'CCI Purchase Required',
@@ -210,7 +235,6 @@ export default function CCIReportScreen() {
         return;
       }
 
-      // Handle 403 returned as data (Supabase functions.invoke may return non-2xx as data)
       if (data?.code === 'ENTITLEMENT_REQUIRED' || data?.error) {
         setErrorInfo({
           title: data.code === 'ENTITLEMENT_REQUIRED' ? 'CCI Purchase Required' : 'Generation Failed',
@@ -230,24 +254,62 @@ export default function CCIReportScreen() {
       });
       setState('error');
     }
+  }, [windowDays, recipientName]);
+
+  // Print again (web) — kicks the print dialog with the current window/recipient.
+  const handlePrintAgain = useCallback(() => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      window.print();
+    }
   }, []);
+
+  // Share again — re-routes through generation (state already loaded).
+  const handleShareAgain = useCallback(() => {
+    // Lightweight: re-run generation so the artifact carries fresh signature/hash.
+    generateReport();
+  }, [generateReport]);
 
   // ─── RENDER ───
 
   const renderIdle = () => (
-    <View style={styles.centerContent}>
-      <View style={styles.iconContainer}>
-        <FileBarChart size={48} color="#2DD4BF" />
+    <ScrollView contentContainerStyle={styles.idleScroll}>
+      <View style={styles.heroCard}>
+        <View style={styles.iconContainer}>
+          <FileBarChart size={42} color={LIGHT.primary} />
+        </View>
+        <Text style={styles.heroTitle}>Capacity Composite Index</Text>
+        <Text style={styles.heroSubtitle}>
+          Generate a comprehensive analysis of your capacity patterns over the last {windowDays} days.
+        </Text>
       </View>
-      <Text style={styles.heroTitle}>Capacity Composite Index</Text>
-      <Text style={styles.heroSubtitle}>
-        Generate a comprehensive analysis of your capacity patterns over the last 90 days.
-      </Text>
+
+      <View style={styles.optionsCard}>
+        <CCIWindowPicker value={windowDays} onChange={setWindowDays} />
+
+        <View style={styles.recipientWrapper}>
+          <Text style={styles.eyebrow}>FOR (OPTIONAL)</Text>
+          <TextInput
+            style={styles.recipientInput}
+            value={recipientName}
+            onChangeText={setRecipientName}
+            placeholder="Therapist or clinician name"
+            placeholderTextColor={LIGHT.textTertiary}
+            autoCapitalize="words"
+            autoCorrect={false}
+            maxLength={120}
+            accessibilityLabel="Recipient name (optional)"
+            testID="cci-report-recipient-input"
+          />
+          <Text style={styles.recipientHint}>
+            Renders as "Prepared for: …" on the PDF header.
+          </Text>
+        </View>
+      </View>
 
       <View style={styles.infoCard}>
-        <Text style={styles.infoCardTitle}>What's included:</Text>
+        <Text style={styles.eyebrow}>INCLUDED IN REPORT</Text>
         <Text style={styles.infoItem}>• Current capacity score vs baseline</Text>
-        <Text style={styles.infoItem}>• Stability analysis & trend direction</Text>
+        <Text style={styles.infoItem}>• Stability analysis &amp; trend direction</Text>
         <Text style={styles.infoItem}>• Top driver attributions</Text>
         <Text style={styles.infoItem}>• Overload event detection</Text>
         <Text style={styles.infoItem}>• Recovery lag measurement</Text>
@@ -255,22 +317,21 @@ export default function CCIReportScreen() {
       </View>
 
       <Pressable
-        style={styles.generateButton}
+        style={styles.primaryButton}
         onPress={generateReport}
         accessibilityRole="button"
-        accessibilityLabel="Generate Instrument"
-        accessibilityHint="Generates a 90-day Capacity Composite Index report"
+        accessibilityLabel="Generate instrument"
       >
-        <Zap size={20} color="#000" />
-        <Text style={styles.generateButtonText}>Generate Instrument</Text>
+        <Zap size={18} color={LIGHT.primaryText} />
+        <Text style={styles.primaryButtonText}>Generate Instrument</Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 
   const renderLoading = () => (
     <View style={styles.centerContent}>
-      <ActivityIndicator size="large" color="#2DD4BF" />
-      <Text style={styles.loadingText}>Computing CCI...</Text>
+      <ActivityIndicator size="large" color={LIGHT.primary} />
+      <Text style={styles.loadingText}>Computing CCI…</Text>
       <Text style={styles.loadingSubtext}>
         Analyzing capacity logs, driver patterns, and recovery episodes
       </Text>
@@ -280,31 +341,29 @@ export default function CCIReportScreen() {
   const renderError = () => (
     <View style={styles.centerContent}>
       <View style={[styles.iconContainer, styles.iconContainerError]}>
-        <AlertTriangle size={48} color="#DC2626" />
+        <AlertTriangle size={42} color={LIGHT.alertCrimson} />
       </View>
       <Text style={styles.errorTitle}>{errorInfo?.title || 'Error'}</Text>
       <Text style={styles.errorMessage}>{errorInfo?.message || 'Something went wrong.'}</Text>
 
       {errorInfo?.code === 'ENTITLEMENT_REQUIRED' && (
         <Pressable
-          style={[styles.generateButton, styles.upgradeButton]}
+          style={[styles.primaryButton, styles.upgradeButton]}
           onPress={() => router.push('/upgrade')}
-          accessibilityRole="link"
-          accessibilityLabel="View Plans"
-          accessibilityHint="Opens the plans and pricing screen"
+          accessibilityRole="button"
+          accessibilityLabel="View plans"
         >
-          <Text style={styles.generateButtonText}>View Plans</Text>
+          <Text style={styles.primaryButtonText}>View Plans</Text>
         </Pressable>
       )}
 
       <Pressable
-        style={styles.retryButton}
+        style={styles.secondaryButton}
         onPress={() => setState('idle')}
         accessibilityRole="button"
-        accessibilityLabel="Try Again"
-        accessibilityHint="Returns to the report generation start"
+        accessibilityLabel="Try again"
       >
-        <Text style={styles.retryButtonText}>Try Again</Text>
+        <Text style={styles.secondaryButtonText}>Try Again</Text>
       </Pressable>
     </View>
   );
@@ -316,31 +375,37 @@ export default function CCIReportScreen() {
 
     return (
       <ScrollView style={styles.resultScroll} contentContainerStyle={styles.resultContent}>
-        {/* Header Card */}
-        <View style={styles.resultCard}>
-          <Text style={styles.resultCardLabel}>CCI GENERATED</Text>
-          <Text style={styles.resultCardDate}>{formatDate(meta.generated_at)}</Text>
-          <View style={styles.metaRow}>
-            <View style={styles.metaItem}>
-              <Text style={styles.metaItemValue}>{meta.total_signals}</Text>
-              <Text style={styles.metaItemLabel}>SIGNALS</Text>
+        {/* Prominent generation banner: window / recipient / date */}
+        <View style={styles.bannerCard}>
+          <Text style={styles.eyebrow}>CCI GENERATED</Text>
+          <Text style={styles.bannerDate}>{formatDate(meta.generated_at)}</Text>
+          <View style={styles.bannerMeta}>
+            <View style={styles.bannerMetaCell}>
+              <Text style={styles.bannerMetaLabel}>WINDOW</Text>
+              <Text style={styles.bannerMetaValue}>{meta.window_days || windowDays} days</Text>
             </View>
-            <View style={styles.metaDivider} />
-            <View style={styles.metaItem}>
-              <Text style={styles.metaItemValue}>{meta.unique_days}</Text>
-              <Text style={styles.metaItemLabel}>DAYS</Text>
+            {recipientName.trim().length > 0 && (
+              <View style={styles.bannerMetaCell}>
+                <Text style={styles.bannerMetaLabel}>PREPARED FOR</Text>
+                <Text style={styles.bannerMetaValue}>{recipientName.trim()}</Text>
+              </View>
+            )}
+            <View style={styles.bannerMetaCell}>
+              <Text style={styles.bannerMetaLabel}>SIGNALS</Text>
+              <Text style={styles.bannerMetaValue}>{meta.total_signals}</Text>
             </View>
-            <View style={styles.metaDivider} />
-            <View style={styles.metaItem}>
-              <Text style={styles.metaItemValue}>{(meta.data_quality_score * 100).toFixed(0)}</Text>
-              <Text style={styles.metaItemLabel}>QUALITY</Text>
+            <View style={styles.bannerMetaCell}>
+              <Text style={styles.bannerMetaLabel}>QUALITY</Text>
+              <Text style={styles.bannerMetaValue}>
+                {(meta.data_quality_score * 100).toFixed(0)}
+              </Text>
             </View>
           </View>
         </View>
 
         {/* Capacity Scores */}
         <View style={styles.resultCard}>
-          <Text style={styles.sectionLabel}>CAPACITY SCORES</Text>
+          <Text style={styles.eyebrow}>CAPACITY SCORES</Text>
           <View style={styles.scoreRow}>
             <View style={styles.scoreBlock}>
               <Text style={[styles.scoreBig, { color: getCapacityColor(scores.current_capacity) }]}>
@@ -349,7 +414,7 @@ export default function CCIReportScreen() {
               <Text style={styles.scoreLabel}>CURRENT</Text>
             </View>
             <View style={styles.scoreBlock}>
-              <Text style={[styles.scoreBig, { color: 'rgba(255,255,255,0.6)' }]}>
+              <Text style={[styles.scoreBig, { color: LIGHT.textSecondary }]}>
                 {formatCapacity(scores.baseline_capacity)}
               </Text>
               <Text style={styles.scoreLabel}>BASELINE</Text>
@@ -357,8 +422,8 @@ export default function CCIReportScreen() {
             <View style={styles.scoreBlock}>
               <Text style={[styles.scoreBig, {
                 color: scores.delta_from_baseline != null
-                  ? scores.delta_from_baseline > 0 ? '#2DD4BF' : scores.delta_from_baseline < 0 ? '#DC2626' : '#F59E0B'
-                  : 'rgba(255,255,255,0.5)',
+                  ? scores.delta_from_baseline > 0 ? LIGHT.primary : scores.delta_from_baseline < 0 ? LIGHT.alertCrimson : LIGHT.warningAmber
+                  : LIGHT.textTertiary,
               }]}>
                 {scores.delta_from_baseline != null
                   ? (scores.delta_from_baseline > 0 ? '+' : '') + (scores.delta_from_baseline * 100).toFixed(0)
@@ -371,10 +436,10 @@ export default function CCIReportScreen() {
 
         {/* Stability & Trend */}
         <View style={styles.resultCard}>
-          <Text style={styles.sectionLabel}>STABILITY & TREND</Text>
+          <Text style={styles.eyebrow}>STABILITY &amp; TREND</Text>
           <View style={styles.stabilityRow}>
             <View style={styles.stabilityBlock}>
-              <ShieldCheck size={20} color="#2DD4BF" />
+              <ShieldCheck size={20} color={LIGHT.primary} />
               <Text style={styles.stabilityValue}>
                 {scores.stability_score != null ? scores.stability_score.toFixed(0) : '—'}
               </Text>
@@ -394,7 +459,7 @@ export default function CCIReportScreen() {
 
         {/* Top Drivers */}
         <View style={styles.resultCard}>
-          <Text style={styles.sectionLabel}>TOP DRIVERS</Text>
+          <Text style={styles.eyebrow}>TOP DRIVERS</Text>
           {drivers.top_5.map((d, i) => (
             <View key={d.driver} style={styles.driverRow}>
               <Text style={styles.driverRank}>{i + 1}</Text>
@@ -417,17 +482,17 @@ export default function CCIReportScreen() {
 
         {/* Overload & Recovery */}
         <View style={styles.resultCard}>
-          <Text style={styles.sectionLabel}>OVERLOAD & RECOVERY</Text>
+          <Text style={styles.eyebrow}>OVERLOAD &amp; RECOVERY</Text>
           <View style={styles.stabilityRow}>
             <View style={styles.stabilityBlock}>
-              <AlertTriangle size={20} color={overload.event_count > 0 ? '#DC2626' : 'rgba(255,255,255,0.3)'} />
-              <Text style={[styles.stabilityValue, overload.event_count > 0 && { color: '#DC2626' }]}>
+              <AlertTriangle size={20} color={overload.event_count > 0 ? LIGHT.alertCrimson : LIGHT.textTertiary} />
+              <Text style={[styles.stabilityValue, overload.event_count > 0 && { color: LIGHT.alertCrimson }]}>
                 {overload.event_count}
               </Text>
               <Text style={styles.stabilityLabel}>OVERLOAD EVENTS</Text>
             </View>
             <View style={styles.stabilityBlock}>
-              <Activity size={20} color="#2DD4BF" />
+              <Activity size={20} color={LIGHT.primary} />
               <Text style={styles.stabilityValue}>
                 {recovery.avg_recovery_days != null ? recovery.avg_recovery_days.toFixed(1) : '—'}
               </Text>
@@ -445,12 +510,12 @@ export default function CCIReportScreen() {
 
         {/* Forecast */}
         <View style={styles.resultCard}>
-          <Text style={styles.sectionLabel}>6-WEEK FORECAST</Text>
+          <Text style={styles.eyebrow}>6-WEEK FORECAST</Text>
           {forecast.points.length > 0 ? (
             <>
               <Text style={[styles.forecastLabel, {
-                color: forecast.slope_per_day > 0.005 ? '#2DD4BF'
-                  : forecast.slope_per_day < -0.005 ? '#DC2626' : '#F59E0B',
+                color: forecast.slope_per_day > 0.005 ? LIGHT.primary
+                  : forecast.slope_per_day < -0.005 ? LIGHT.alertCrimson : LIGHT.warningAmber,
               }]}>
                 {getForecastLabel(forecast.slope_per_day)}
               </Text>
@@ -485,32 +550,51 @@ export default function CCIReportScreen() {
           )}
         </View>
 
+        {/* Print again / Share again — preserved actions */}
+        <View style={styles.actionsRow}>
+          <Pressable
+            style={styles.actionButton}
+            onPress={handlePrintAgain}
+            accessibilityRole="button"
+            accessibilityLabel="Print again"
+          >
+            <Printer size={18} color={LIGHT.primary} />
+            <Text style={styles.actionButtonText}>Print again</Text>
+          </Pressable>
+          <Pressable
+            style={styles.actionButton}
+            onPress={handleShareAgain}
+            accessibilityRole="button"
+            accessibilityLabel="Share again"
+          >
+            <Share2 size={18} color={LIGHT.primary} />
+            <Text style={styles.actionButtonText}>Share again</Text>
+          </Pressable>
+        </View>
+
         {/* Regenerate */}
         <Pressable
-          style={styles.regenerateButton}
+          style={styles.secondaryButton}
           onPress={() => { setState('idle'); setPayload(null); }}
           accessibilityRole="button"
-          accessibilityLabel="Generate New Report"
-          accessibilityHint="Discards this report and returns to the start screen"
+          accessibilityLabel="Generate new report"
         >
-          <Text style={styles.regenerateButtonText}>Generate New Report</Text>
+          <Text style={styles.secondaryButtonText}>Generate New Report</Text>
         </Pressable>
       </ScrollView>
     );
   };
 
   return (
-    <SafeAreaView style={commonStyles.screen} edges={['top', 'left', 'right']}>
-      {/* Header */}
+    <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <Pressable
           onPress={() => router.back()}
           style={styles.headerBack}
           accessibilityRole="button"
           accessibilityLabel="Back"
-          accessibilityHint="Returns to the previous screen"
         >
-          <ArrowLeft size={24} color={colors.textPrimary} />
+          <ArrowLeft size={24} color={LIGHT.textPrimary} />
         </Pressable>
         <Text style={styles.headerTitle}>CCI Report</Text>
         <View style={{ width: 40 }} />
@@ -525,195 +609,247 @@ export default function CCIReportScreen() {
 }
 
 // =============================================================================
-// STYLES
+// STYLES — light theme
 // =============================================================================
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: LIGHT.background,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.06)',
+    borderBottomColor: LIGHT.cardBorder,
   },
-  headerBack: { padding: spacing.sm },
+  headerBack: { padding: 8 },
   headerTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    fontWeight: '700',
+    color: LIGHT.textPrimary,
   },
-  centerContent: {
-    flex: 1,
-    justifyContent: 'center',
+  // Eyebrow
+  eyebrow: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: LIGHT.textSecondary,
+    letterSpacing: 1.6,
+    marginBottom: 8,
+    fontFamily: Platform.OS === 'web' ? 'monospace' : undefined,
+  },
+  // Idle layout
+  idleScroll: {
+    padding: 32,
+    gap: 16,
+    paddingBottom: 64,
+  },
+  heroCard: {
     alignItems: 'center',
-    padding: spacing.xl,
+    backgroundColor: LIGHT.background,
+    borderWidth: 1,
+    borderColor: LIGHT.cardBorder,
+    borderRadius: 14,
+    padding: 24,
+    shadowColor: LIGHT.cardShadow,
+    shadowOpacity: 1,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
   iconContainer: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: 'rgba(45,212,191,0.1)',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(45, 212, 191, 0.10)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: 16,
   },
   iconContainerError: {
-    backgroundColor: 'rgba(220,38,38,0.1)',
+    backgroundColor: 'rgba(220, 38, 38, 0.10)',
   },
   heroTitle: {
     fontSize: 22,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
-    marginBottom: spacing.sm,
+    fontWeight: '700',
+    color: LIGHT.textPrimary,
+    marginBottom: 6,
     textAlign: 'center',
   },
   heroSubtitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: LIGHT.textSecondary,
     textAlign: 'center',
-    marginBottom: spacing.lg,
     lineHeight: 20,
-    maxWidth: 300,
+    maxWidth: 320,
+  },
+  optionsCard: {
+    backgroundColor: LIGHT.background,
+    borderWidth: 1,
+    borderColor: LIGHT.cardBorder,
+    borderRadius: 14,
+    padding: 20,
+    gap: 16,
+    shadowColor: LIGHT.cardShadow,
+    shadowOpacity: 1,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  recipientWrapper: { width: '100%' },
+  recipientInput: {
+    height: 48,
+    borderWidth: 1,
+    borderColor: LIGHT.cardBorder,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    fontSize: 14,
+    color: LIGHT.textPrimary,
+    backgroundColor: LIGHT.background,
+  },
+  recipientHint: {
+    marginTop: 6,
+    fontSize: 11,
+    color: LIGHT.textTertiary,
   },
   infoCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderRadius: borderRadius.md,
+    backgroundColor: LIGHT.background,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
-    padding: spacing.md,
-    marginBottom: spacing.lg,
-    width: '100%',
-  },
-  infoCardTitle: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.6)',
-    marginBottom: spacing.sm,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    borderColor: LIGHT.cardBorder,
+    borderRadius: 14,
+    padding: 20,
   },
   infoItem: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: LIGHT.textPrimary,
     marginBottom: 4,
     lineHeight: 20,
   },
-  generateButton: {
+  primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#2DD4BF',
+    backgroundColor: LIGHT.primary,
     borderRadius: 14,
     height: 54,
-    paddingHorizontal: 32,
-    gap: spacing.sm,
-    width: '100%',
+    paddingHorizontal: 24,
+    gap: 10,
   },
-  generateButtonText: {
+  primaryButtonText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#000',
+    fontWeight: '700',
+    color: LIGHT.primaryText,
+    letterSpacing: 0.3,
   },
   upgradeButton: {
-    backgroundColor: '#06B6D4',
-    marginBottom: spacing.sm,
+    backgroundColor: LIGHT.accentCyan,
+    marginBottom: 12,
+    width: '100%',
   },
-  retryButton: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
+  secondaryButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14,
+    height: 54,
+    borderWidth: 1,
+    borderColor: LIGHT.cardBorder,
+    backgroundColor: LIGHT.background,
+    marginTop: 12,
   },
-  retryButtonText: {
+  secondaryButtonText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: LIGHT.textPrimary,
+    fontWeight: '600',
+  },
+  // Loading + error
+  centerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+    gap: 12,
   },
   loadingText: {
     fontSize: 18,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.8)',
-    marginTop: spacing.lg,
+    fontWeight: '600',
+    color: LIGHT.textPrimary,
+    marginTop: 16,
   },
   loadingSubtext: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.4)',
-    marginTop: spacing.sm,
+    color: LIGHT.textSecondary,
     textAlign: 'center',
     maxWidth: 280,
   },
   errorTitle: {
     fontSize: 20,
-    fontWeight: '600',
-    color: '#DC2626',
-    marginBottom: spacing.sm,
+    fontWeight: '700',
+    color: LIGHT.alertCrimson,
+    marginBottom: 8,
   },
   errorMessage: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
+    color: LIGHT.textSecondary,
     textAlign: 'center',
-    marginBottom: spacing.lg,
-    maxWidth: 300,
+    marginBottom: 16,
+    maxWidth: 320,
     lineHeight: 20,
   },
-  // Result styles
+  // Result panel
   resultScroll: { flex: 1 },
   resultContent: {
-    padding: spacing.md,
-    paddingBottom: spacing.xl * 2,
+    padding: 32,
+    paddingBottom: 64,
+    gap: 12,
   },
-  resultCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderRadius: borderRadius.md,
+  bannerCard: {
+    backgroundColor: LIGHT.background,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
-    padding: spacing.md,
-    marginBottom: spacing.md,
+    borderColor: LIGHT.cardBorder,
+    padding: 20,
+    shadowColor: LIGHT.cardShadow,
+    shadowOpacity: 1,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
-  resultCardLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#2DD4BF',
-    letterSpacing: 1,
-    marginBottom: 4,
+  bannerDate: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: LIGHT.textPrimary,
+    marginBottom: 12,
   },
-  resultCardDate: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.7)',
-    marginBottom: spacing.md,
-  },
-  metaRow: {
+  bannerMeta: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexWrap: 'wrap',
+    gap: 16,
   },
-  metaItem: {
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    minWidth: 80,
+  bannerMetaCell: {
+    minWidth: 90,
   },
-  metaItemValue: {
-    fontSize: 20,
-    fontWeight: '300',
-    color: 'rgba(255,255,255,0.8)',
-  },
-  metaItemLabel: {
+  bannerMetaLabel: {
     fontSize: 9,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
-    letterSpacing: 0.5,
-    marginTop: 2,
+    color: LIGHT.textTertiary,
+    letterSpacing: 1.2,
+    marginBottom: 2,
+    fontFamily: Platform.OS === 'web' ? 'monospace' : undefined,
   },
-  metaDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-  },
-  sectionLabel: {
-    fontSize: 10,
+  bannerMetaValue: {
+    fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
-    letterSpacing: 1,
-    marginBottom: spacing.md,
+    color: LIGHT.textPrimary,
+  },
+  resultCard: {
+    backgroundColor: LIGHT.background,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: LIGHT.cardBorder,
+    padding: 20,
   },
   scoreRow: {
     flexDirection: 'row',
@@ -724,14 +860,14 @@ const styles = StyleSheet.create({
   },
   scoreBig: {
     fontSize: 32,
-    fontWeight: '200',
-    color: 'rgba(255,255,255,0.8)',
+    fontWeight: '300',
+    color: LIGHT.textPrimary,
   },
   scoreLabel: {
     fontSize: 9,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
-    letterSpacing: 0.5,
+    color: LIGHT.textTertiary,
+    letterSpacing: 0.6,
     marginTop: 4,
   },
   stabilityRow: {
@@ -744,90 +880,88 @@ const styles = StyleSheet.create({
   },
   stabilityValue: {
     fontSize: 18,
-    fontWeight: '400',
-    color: 'rgba(255,255,255,0.8)',
+    fontWeight: '500',
+    color: LIGHT.textPrimary,
   },
   stabilityLabel: {
     fontSize: 9,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
-    letterSpacing: 0.5,
+    color: LIGHT.textTertiary,
+    letterSpacing: 0.6,
   },
-  // Drivers
   driverRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: 8,
   },
   driverRank: {
     width: 20,
     fontSize: 12,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    fontWeight: '700',
+    color: LIGHT.textTertiary,
   },
   driverName: {
     width: 80,
     fontSize: 11,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.7)',
+    fontWeight: '700',
+    color: LIGHT.textPrimary,
     letterSpacing: 0.5,
   },
   driverBarContainer: {
     flex: 1,
     height: 4,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(15, 22, 36, 0.06)',
     borderRadius: 2,
-    marginHorizontal: spacing.sm,
+    marginHorizontal: 8,
     overflow: 'hidden',
   },
   driverBar: {
     height: '100%',
-    backgroundColor: '#2DD4BF',
+    backgroundColor: LIGHT.primary,
     borderRadius: 2,
   },
   driverPct: {
     width: 36,
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    color: LIGHT.textSecondary,
     textAlign: 'right',
   },
   emptyText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: LIGHT.textTertiary,
     textAlign: 'center',
-    paddingVertical: spacing.md,
+    paddingVertical: 16,
   },
   recoveryDetail: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: LIGHT.textSecondary,
     textAlign: 'center',
-    marginTop: spacing.sm,
+    marginTop: 8,
   },
-  // Forecast
   forecastLabel: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
     letterSpacing: 1,
     textAlign: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: 8,
   },
   forecastMeta: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: spacing.md,
-    marginBottom: spacing.md,
+    gap: 16,
+    marginBottom: 12,
   },
   forecastMetaText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: LIGHT.textSecondary,
     fontFamily: Platform.OS === 'web' ? 'monospace' : undefined,
   },
   forecastPoints: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    paddingHorizontal: spacing.sm,
+    paddingHorizontal: 8,
   },
   forecastPoint: {
     alignItems: 'center',
@@ -835,7 +969,7 @@ const styles = StyleSheet.create({
   },
   forecastPointDate: {
     fontSize: 9,
-    color: 'rgba(255,255,255,0.5)',
+    color: LIGHT.textTertiary,
     fontWeight: '600',
   },
   forecastDot: {
@@ -846,19 +980,29 @@ const styles = StyleSheet.create({
   forecastPointValue: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.6)',
+    color: LIGHT.textPrimary,
   },
-  regenerateButton: {
+  // Action row (Print again / Share again)
+  actionsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8,
+  },
+  actionButton: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
-    height: 54,
+    gap: 8,
+    height: 48,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    marginTop: spacing.sm,
+    borderColor: LIGHT.cardBorder,
+    borderRadius: 14,
+    backgroundColor: LIGHT.background,
   },
-  regenerateButtonText: {
+  actionButtonText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    fontWeight: '600',
+    color: LIGHT.textPrimary,
   },
 });

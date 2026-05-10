@@ -28,7 +28,8 @@ import { computeCCIDynamicData, formatCCIDynamicData, assertGovernanceCompliance
 import { computeProjection } from './dynamic/projection';
 import { generateNarrative } from './dynamic/narrative';
 import { mapFunctionalImpact } from './dynamic/impact';
-import { generateCCIPowerHTML, CCIPowerTemplateInput } from './powerTemplate';
+import { generateCCIArtifactHTML } from './artifact';
+import type { CCIWindowDays, CCIArtifactRenderOptions } from './artifact';
 import { CCIIssuanceMetadata } from './types';
 import type { CCIComputeConfig, CCIDynamicData } from './dynamic/types';
 
@@ -44,16 +45,47 @@ export interface CCIPdfResult {
 }
 
 export interface CCIPdfOptions {
-  /** Override observation window (default: 90 days ending today) */
+  /**
+   * Observation window length in days. Drives both `windowStart` and the
+   * "minimum days" gate (unless overridden) and is passed to the HTML
+   * template so it can render the correct period label.
+   *
+   * Allowed: 30 | 60 | 90. Default: 90 (back-compat).
+   */
+  windowDays?: CCIWindowDays;
+  /** Override observation window start (takes precedence over windowDays). */
   windowStart?: string;
-  /** Override observation window end */
+  /** Override observation window end (default: today). */
   windowEnd?: string;
-  /** Minimum unique days with at least one entry (default: 90) */
+  /**
+   * Minimum unique days with at least one entry required.
+   * If omitted, defaults scale with `windowDays`:
+   *   30 → 14, 60 → 30, 90 → 60.
+   */
   minimumDays?: number;
   /** Seed for patient ID generation */
   patientIdSeed?: string;
   /** Skip sharing dialog (useful for testing) */
   skipShare?: boolean;
+  /**
+   * Optional therapist / provider recipient name. When supplied it is rendered
+   * in the "Prepared for:" line of the recipient header on the PDF.
+   */
+  recipientName?: string;
+}
+
+/**
+ * Default minimumDays threshold for a given window length.
+ * 30 → 14, 60 → 30, 90 → 60. These are the "enough data" floors used when
+ * the caller does not provide an explicit override.
+ */
+function defaultMinimumDaysFor(windowDays: CCIWindowDays): number {
+  switch (windowDays) {
+    case 30: return 14;
+    case 60: return 30;
+    case 90:
+    default: return 60;
+  }
 }
 
 // =============================================================================
@@ -132,15 +164,16 @@ export async function generateCCIPdf(
     // Step 1: Build compute config
     // =========================================================================
     const now = new Date();
+    const windowDays: CCIWindowDays = options.windowDays ?? 90;
     const windowEnd = options.windowEnd || formatDate(now);
     const windowStartDate = new Date(now);
-    windowStartDate.setDate(windowStartDate.getDate() - 90);
+    windowStartDate.setDate(windowStartDate.getDate() - windowDays);
     const windowStart = options.windowStart || formatDate(windowStartDate);
 
     const config: CCIComputeConfig = {
       windowStart,
       windowEnd,
-      minimumDays: options.minimumDays ?? 90,
+      minimumDays: options.minimumDays ?? defaultMinimumDaysFor(windowDays),
       patientIdSeed: options.patientIdSeed,
     };
 
@@ -205,19 +238,30 @@ export async function generateCCIPdf(
     };
 
     // =========================================================================
-    // Step 9: Generate HTML
+    // Step 9: Generate HTML — therapist-facing CCI artifact
+    //
+    // Uses generateCCIArtifactHTML (artifact.ts) so the rendered PDF includes:
+    //   - Recipient header (Prepared for / Date generated / Window N days)
+    //   - Signature line for therapist sign-off
+    //   - Parameterized window label (30 / 60 / 90 days)
+    //
+    // generateCCIPowerHTML remains available via the public API export for
+    // callers that want the powerTemplate variant.
     // =========================================================================
-    const templateInput: CCIPowerTemplateInput = {
+    const renderOptions: CCIArtifactRenderOptions = {
+      windowDays,
+      recipientName: options.recipientName,
+    };
+
+    const html = generateCCIArtifactHTML(
       metadata,
-      formatted,
       dynamicData,
       projection,
       narrative,
       impact,
       driverStats,
-    };
-
-    const html = generateCCIPowerHTML(templateInput);
+      renderOptions,
+    );
 
     // =========================================================================
     // Step 10: HTML → PDF via expo-print
