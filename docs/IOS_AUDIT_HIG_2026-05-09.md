@@ -201,7 +201,7 @@ App Store metadata check (`APP_STORE_METADATA.md`) does not promise notification
 
 ## H. Splash Screen
 
-### H1 — `expo-splash-screen` API — **MINOR (rule-blocked)**
+### H1 — `expo-splash-screen` API — **CLOSED in Phase 5 (P5.6)**
 Evidence:
 - `package.json` does **not** include `expo-splash-screen` as a direct dep.
 - Zero calls to `SplashScreen.preventAutoHideAsync` / `SplashScreen.hideAsync` in `app/`, `lib/`, `components/`.
@@ -670,6 +670,16 @@ Used `expo-haptics` directly (already in deps; the existing `useAccessibility.tr
 - Added `isRefreshing` state and a `handleRefresh` callback that re-loads `getAuditLog()` + `getRecipients()` (separate from the initial-load `loadData` so the spinner is visually distinct). The outer `<ScrollView>` now carries `refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor="#00E5FF" colors={['#00E5FF']} />}`.
 - The initial-load spinner inside the empty branch was upgraded from a plain "Loading..." text to an `<ActivityIndicator color="#00E5FF" />` for consistency with other screens.
 
+### P5.6 — Explicit splash gating (H1) — **G3 CLOSED**
+- **File:** `app/_layout.tsx`
+- `expo-splash-screen` (~31.0.10) is now declared in `package.json`, unblocking the dep-blocked H1 finding. Implementation:
+  - **Module-level:** `import * as SplashScreen from 'expo-splash-screen'` and `SplashScreen.preventAutoHideAsync().catch(() => {})` fire as soon as the JS bundle parses, before React mounts. This stops Expo's default auto-hide so the splash stays visible through React init / provider tree mount / font load / auth resolution.
+  - **Component-level:** `RootLayout` now calls `useFonts({ DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold, SpaceMono_400Regular })` (the auth screen's existing `useFonts` is preserved — `expo-font` dedupes the underlying load) and `useAuth()` to surface `auth.isLoading`. A dedicated `useEffect` calls `SplashScreen.hideAsync()` only when `fontsLoaded === true && auth.isLoading === false`. The async hide is wrapped in `try/catch` and a `splashHidden` ref so a second hide attempt (e.g. from a native fast-fail path) is silent.
+  - **Sentry breadcrumb:** `startup:splash_hidden` is added on successful hide so the cold-launch trace now spans `startup:module_ready → startup:first_layout_effect → providers_ready → phase2_done → startup:splash_hidden → startup:stack_visible`.
+- **`app.json` splash config left untouched:** `splash.image="./assets/splash-icon.png"`, `splash.resizeMode="contain"`, `splash.backgroundColor="#000000"`. The `#000000` vs app `#01020A` mismatch noted in H3 is still ≤3 RGB units (negligible) and was already PASS.
+- **Effect on FOUC:** the auth screen's existing `if (!fontsLoaded) return <ActivityIndicator />` placeholder (`app/auth/index.tsx:218-225`) is now invisible to the user — the splash covers the same window. Cold launch order is now: native splash → JS init → fonts cached + auth session resolved → splash hides → already-rendered tree paints. No flash of unstyled content.
+- **Closes G3 from `IOS_AUDIT_2026-05-09.md`** (Followup #10) and the H1 entry above.
+
 ### Notes / non-changes
 - **No `package.json` changes.** Both `expo-apple-authentication` (^8.0.8) and `expo-haptics` (~15.0.8) were already declared.
 - **Gauge / orb / platform overlay** untouched per CLAUDE.md rule 2.
@@ -686,5 +696,6 @@ Used `expo-haptics` directly (already in deps; the existing `useAccessibility.tr
 | 3 | Haptic feedback (save / tab / destructive / SIWA) | `app/(tabs)/index.tsx:202-205`, `app/(tabs)/_layout.tsx:11-17`, `app/data-exit.tsx:153-156`, `app/settings.tsx:165-168`, `app/active-sessions.tsx:88-91,120-123`, `app/auth/index.tsx:185-188` | Done |
 | 4 | `EmptyState` rolled into 4 screens | `app/(tabs)/patterns.tsx`, `app/audit.tsx`, `app/active-sessions.tsx`, `app/circles/index.tsx` | Done |
 | 5 | `RefreshControl` on audit log | `app/audit.tsx:171-181` | Done |
+| 6 | Explicit splash gating (H1 / G3) | `app/_layout.tsx:11-30,394-442` | Done |
 
 

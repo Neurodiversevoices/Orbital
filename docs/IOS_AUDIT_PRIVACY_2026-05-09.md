@@ -644,4 +644,132 @@ The chain prevents replay because the Apple JWT contains `sha256(rawNonce)`, and
 
 ---
 
-*End of privacy / permissions / security audit. No code changes applied — handoff to the iOS A+ push agent for fixes.*
+## Phase 5 — Keychain migration applied
+
+**Date applied:** 2026-05-10
+**Scope:** Closes the last MAJOR security finding (§F1 / §D.1) in this audit by
+moving Supabase auth tokens out of AsyncStorage and into the iOS Keychain
+(Android Keystore on Android) via `expo-secure-store@~15.0.8`.
+
+### Changes landed
+
+- **New file:** `lib/supabase/secureStorage.ts` — Storage adapter shaped
+  identically to the prior `customStorage` (`getItem` / `setItem` /
+  `removeItem`) but backed by `SecureStore.{getItem,setItem,deleteItem}Async`
+  on native and `localStorage` on web (web has no Keychain — behavior
+  matches prior plaintext baseline, which is acceptable since web storage
+  is already plaintext).
+- **Modified:** `lib/supabase/client.ts` — replaced `customStorage` with
+  the new adapter. All other Supabase client config is unchanged
+  (`autoRefreshToken`, `persistSession`, `detectSessionInUrl`,
+  `storageKey: 'orbital_supabase_auth'`, `x-client-info` header).
+  Direct `AsyncStorage` import removed from this file (it's still used
+  inside the adapter for the one-time migration only).
+
+### Chunking strategy
+
+`expo-secure-store` enforces a 2 KB ceiling on individual value sizes;
+Supabase session payloads (refresh + access JWT + user metadata)
+routinely exceed this. The adapter chunks transparently:
+
+- Threshold: **2000 chars** (leaves headroom for UTF-8 multi-byte chars
+  and a small JSON manifest).
+- Values ≤ threshold are stored at the primary key directly with no
+  manifest — fast path for typical small reads.
+- Values > threshold are split into N chunks at sub-keys
+  `${key}.0`, `${key}.1`, …, `${key}.N-1`; the primary key holds a
+  small manifest `{"__chunked":true,"count":N}`.
+- Reads inspect the primary key; if it parses as a manifest, the
+  adapter walks `0..count-1` and concatenates. Otherwise the raw
+  value is returned. Manifest detection uses a `startsWith` fast-path
+  before `JSON.parse` to avoid parsing every plain-string read.
+- Writes are ordered chunks-first, manifest-last, so a partial write
+  cannot be misread as a complete chunked value.
+- Pre-existing chunks from a prior chunked write are cleared before
+  a new write to avoid orphaned slices.
+
+### Migration logic (transparent — no logout required)
+
+On the first `getItem` call after upgrade, if `SecureStore` returns
+`null` for the requested key AND `AsyncStorage` has a value at the
+same key, the adapter:
+
+1. Writes the legacy value into SecureStore (with chunking if needed).
+2. Deletes the legacy AsyncStorage entry.
+3. Returns the value to Supabase as if SecureStore always had it.
+
+The order is **SecureStore-write-then-AsyncStorage-delete** to ensure
+no token is lost mid-migration. Migration is idempotent: subsequent
+reads find the value in SecureStore and skip the AsyncStorage check
+(no-op fast path). Existing logged-in users keep their session — no
+forced logout, no re-auth.
+
+`removeItem` (used on sign-out) clears both SecureStore and any legacy
+AsyncStorage residue to prevent a stale session from being resurrected
+by a later migration pass.
+
+### Error handling
+
+- **getItem:** any read failure returns `null`. Supabase treats `null`
+  as "no session" and the user re-auths on next app open. No data loss
+  because writes are atomic per chunk.
+- **setItem / removeItem:** errors are logged via `console.warn`, which
+  Sentry's RN integration captures as breadcrumbs.
+
+### F1 status: **CLOSED**
+
+Auth tokens (refresh + access JWT) are now stored in the iOS Keychain
+(`kSecClassGenericPassword`, app-only access) on iOS 12+ and the
+Android Keystore (AES-256-GCM) on Android 6+. They are no longer
+recoverable on jailbroken / rooted devices via the AsyncStorage SQLite
+file or NSUserDefaults plist.
+
+### Privacy / Security new grade: **A**
+
+Up from A− pre-Phase-5. Remaining MAJOR/CRITICAL findings:
+- §G.4 (Math.random sharing tokens): closed in a separate commit on this
+  branch (audit was pre-fix).
+- §B.4 (ITSAppUsesNonExemptEncryption): unchanged — pending legal
+  verification of vault crypto. Independent of this Phase 5 work.
+
+A → A+ requires the Universal Links migration (§E.1.c followup) and
+verification of B.4. Both are followups, not blockers.
+
+### Other AsyncStorage keys identified — NOT migrated this phase
+
+Per audit §D.2, the goal is **tokens/PII → SecureStore; preferences/
+cache → AsyncStorage**. The only TOKEN-class key was
+`orbital_supabase_auth` (now migrated). The following keys were
+audited and explicitly **NOT** migrated:
+
+**Candidates for future SecureStore migration (TOKEN-LIKE / device identity):**
+
+| Key | File | Reason flagged | Why deferred |
+|---|---|---|---|
+| `@orbital:shares` (accessToken field) | `lib/storage.ts:36` | Bearer token granting read access to capacity logs | Token entropy fix already shipped (G.4) — moving the storage location is hardening, not a CRITICAL. Followup. |
+| device ID / session ID | `lib/session/deviceRegistry.ts:44,93` | Stable device identifier — Apple guidance prefers Keychain | Followup. Borderline; CSPRNG-generated, no auth power. |
+
+**Candidates explicitly NOT for SecureStore (too large / not tokens):**
+
+| Key | File | Class | Why kept in AsyncStorage |
+|---|---|---|---|
+| `@orbital:logs` | `lib/storage.ts:32` | PII (capacity logs, notes) | Large blob, exceeds Keychain practical size; vault encryption (`lib/vault/crypto.ts`) is the right path for this data. |
+| `@orbital:vault` | `lib/storage.ts:40` | encrypted blob | Already pre-encrypted client-side. |
+| `pattern_history_v1` | `lib/patternHistory.ts:20` | PII | Large; encrypt-at-rest path, not Keychain. |
+| `@orbital:audit`, `@orbital:sensory_events`, `@orbital:recipients`, `@orbital:offline_queue` | `lib/storage.ts:37,43,35,47` | PII | Acceptable in AsyncStorage given iOS full-device encryption baseline (Data Protection class C). |
+| `@orbital:terms_acceptance`, `@orbital:institutional`, age cohort, consent records | `lib/storage.ts:56,39`, `lib/enterprise/*` | legal / config | MEDIUM sensitivity; AsyncStorage acceptable. |
+| `@orbital:locale`, `@orbital:preferences`, `@orbital:accessibility`, `@orbital:undo_stack`, `@orbital:demo_*`, `@orbital:team_*`, `@orbital:school_*`, `@orbital:app_mode`, `@orbital:first_app_open` | `lib/storage.ts:33,34,45-67` | preference / cache / config | LOW sensitivity; AsyncStorage is the correct location. |
+| `orbital_biometric_settings` | `lib/biometric/index.ts:36` | preference | LOW sensitivity. |
+| safe-mode flags, crash count, startup-complete | `lib/safeMode.ts` | telemetry state | LOW sensitivity. |
+| circles invites + storage | `lib/circles/invites.ts`, `lib/circles/storage.ts` | TOKEN-LIKE invites are CSPRNG-generated; circle storage is membership PII | Followup candidate for the invite codes; circle membership data is acceptable in AsyncStorage. |
+
+Followups #2 (sharing tokens to SecureStore) and #3 (device ID to
+SecureStore) are the next-priority migrations. Neither is a current
+finding; both are hardening.
+
+---
+
+*End of privacy / permissions / security audit. Phase 5 Keychain
+migration applied. Handoff continues to the iOS A+ push agent for
+remaining followups (B.4 verification, Universal Links, sharing-token
+storage migration).*

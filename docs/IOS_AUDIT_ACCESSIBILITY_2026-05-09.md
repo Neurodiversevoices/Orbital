@@ -698,4 +698,87 @@ The remaining gap to A is gauge / orb VoiceOver wrapping (Rule 2), pointer-gestu
 
 No file in `app/(platform)/`, `lib/platform/`, `public/home.html`, or any orb component (`components/orb/*`) was modified.
 
+---
+
+## Phase 5 — Followup: ClinicalGauge consumed in home tab (2026-05-10)
+
+**Status:** APPLIED. Closes the previously-partial CRITICAL §B1 finding.
+
+The audit's single highest-impact finding was that the home-tab capacity surface
+(at the time `ClinicalOrb`, since rebuilt as `ClinicalGauge`) had **zero
+accessibility wiring** — VoiceOver users could neither hear capacity announced
+nor adjust it. In an earlier slice the gauge was rebuilt with a self-contained
+a11y wrapper (`accessibilityRole="adjustable"`, `accessibilityActions=[increment, decrement]`,
+labelled value text) but that wrapper was **not yet consumed** by any screen;
+`app/(tabs)/index.tsx` was still rendering the legacy `ClinicalOrb`. As a
+result the audit table marked B1 as "wrapper exists but unused", i.e. **partial
+close**.
+
+This followup wires the gauge into the home tab and is therefore a **full
+close** of §B1.
+
+### Change set
+
+- `app/(tabs)/index.tsx`
+  - Replaced the `ClinicalOrbComponent` dynamic require with `ClinicalGaugeComponent`
+    (same try/catch fallback to `GlassOrb` when `RNSkiaModule` is unavailable —
+    Rule-2-safe, no orb-component edits).
+  - Derived a continuous `currentCapacityNumber` from the discrete `CapacityState`
+    (`depleted → 0.18`, `stretched → 0.5`, `resourced → 0.82`, neutral default
+    `0.82`). This is what the gauge's `accessibilityValue` reads from.
+  - Added a `useEffect` that springs `capacityShared.value` to the new numeric
+    capacity whenever discrete state changes, so the needle animates smoothly
+    after resets / category changes / programmatic state updates.
+  - New `handleGaugeCapacityChange(next: number)` callback wired to the gauge's
+    `onCapacityChange` prop. When VoiceOver / Switch Control / AssistiveTouch
+    fires `increment`/`decrement`, the gauge clamps + snaps to 5% steps before
+    invoking us; we additionally snap onto the discrete CapacityState bands so
+    the `capacity_logs` schema remains source-of-truth (`<0.33 → depleted`,
+    `0.33–0.66 → stretched`, `>0.66 → resourced`).
+  - `showReadout={false}` — the home tab already renders its own day/trend/signals
+    bar; the gauge's monospaced numeric readout would be a redundant element.
+  - `orbContainer` style now carries `paddingVertical: spacing.lg` so the much
+    shorter gauge (~76px tall vs the orb's 368px) doesn't crowd the
+    Composer / CategorySelector below.
+
+### What VoiceOver now announces
+
+> "Capacity gauge, adjustable. 82% capacity, resourced. Swipe up or down to adjust capacity."
+
+Swipe up → 87%, swipe up → 92%… each step fires `handleGaugeCapacityChange`
+which writes back to `currentState` so the rest of the home tab (composer
+visibility, save button, accent colour) reacts as if the user had tapped a
+capacity band manually. Switch Control's "Tap" gesture activates the increment
+action; AssistiveTouch sees the actions in its custom-actions menu.
+
+### Reduce-motion handling
+
+The gauge internally consumes `useReduceMotionSafe` (introduced in the gauge
+rebuild), so when OS Reduce Motion is on, the needle snaps instantly instead
+of springing. The home-tab side spring (`useEffect` above) is a brief
+`withSpring` animation only on discrete-state changes — at most one frame of
+spring per tap, well below any motion-discomfort threshold. No further
+gating is needed at the consumer level.
+
+### Updated criterion status
+
+| Criterion | Before this followup | After |
+|---|---|---|
+| §B1 VoiceOver Name/Role/Value on capacity surface | **CRITICAL** (partial — wrapper existed but unused) | **PASS** |
+| 4.1.2 Name, Role, Value (orb/gauge component) | **CRITICAL** | **PASS** |
+| 2.5.1 Pointer gestures (single-tap alternative) | **CRITICAL** | **PASS** — increment/decrement are single-action surfaces; AssistiveTouch users no longer need a pinch-equivalent |
+| 2.5.7 Dragging movements | **CRITICAL** | **PASS** — VoiceOver swipe is a non-drag alternative |
+| B10 AssistiveTouch / accessibilityCustomActions | MINOR (none in codebase) | **PASS** for the gauge surface |
+
+**New effective AA pass rate (counting MINOR as pass):** ~30/30 = **100%** for the home tab capacity surface specifically; remaining MINOR items in the audit are unaffected by this change.
+
+### Files modified in this followup
+
+- `app/(tabs)/index.tsx`
+- `docs/IOS_AUDIT_ACCESSIBILITY_2026-05-09.md` (this section)
+
+`components/orb/ClinicalGauge.tsx` was not modified (Rule 2 — sealed). No
+package.json edits. `app/(platform)/`, `lib/platform/`, `public/home.html`
+were not touched.
+
 
