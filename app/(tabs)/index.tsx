@@ -28,10 +28,12 @@ import * as Haptics from 'expo-haptics';
 import { SavePulse, CategorySelector, Composer, COMPOSER_HEIGHT, ModeInsightsPanel, OrgRoleBanner } from '../../components';
 import { GlassOrb } from '../../components/GlassOrb';
 
-// Dynamically load ClinicalOrb — falls back to GlassOrb when native Skia module isn't available
-let ClinicalOrbComponent: typeof import('../../components/orb/ClinicalOrb').default | null = null;
+// Dynamically load ClinicalGauge — falls back to GlassOrb when native Skia module isn't available.
+// Same dynamic-require pattern as the previous ClinicalOrb load: keeps non-Skia
+// build configurations (web preview, certain expo-go variants) working.
+let ClinicalGaugeComponent: typeof import('../../components/orb/ClinicalGauge').default | null = null;
 try {
-  ClinicalOrbComponent = require('../../components/orb/ClinicalOrb').default;
+  ClinicalGaugeComponent = require('../../components/orb/ClinicalGauge').default;
 } catch {
   // RNSkiaModule not in this build — GlassOrb will be used instead
 }
@@ -187,6 +189,38 @@ export default function HomeScreen() {
     setCurrentState(state);
   }, []);
 
+  // Bridge between discrete CapacityState (the persisted schema) and the gauge's
+  // continuous 0..1 value. The neutral midpoint (0.82) mirrors the previous
+  // ClinicalOrb default — it keeps the needle in "resourced" range until the
+  // user has explicitly logged a state.
+  const currentCapacityNumber = useMemo(() => {
+    if (currentState === 'depleted') return 0.18;
+    if (currentState === 'stretched') return 0.5;
+    if (currentState === 'resourced') return 0.82;
+    return 0.82;
+  }, [currentState]);
+
+  // Keep the shared value in sync with the discrete state so the needle
+  // animates smoothly whenever state changes (including resets after save).
+  useEffect(() => {
+    capacityShared.value = withSpring(currentCapacityNumber, {
+      damping: 18,
+      stiffness: 110,
+      mass: 1,
+    });
+  }, [currentCapacityNumber]);
+
+  // VoiceOver / Switch Control / AssistiveTouch increment + decrement come
+  // through here. The gauge itself already snaps `next` to GAUGE_A11Y_STEP
+  // (5%); we additionally snap onto the discrete CapacityState bands so the
+  // existing capacity_logs schema remains source-of-truth.
+  const handleGaugeCapacityChange = useCallback((next: number) => {
+    capacityShared.value = next;
+    if (next < 0.33) handleStateChange('depleted');
+    else if (next <= 0.66) handleStateChange('stretched');
+    else handleStateChange('resourced');
+  }, [capacityShared, handleStateChange]);
+
   const handleCategorySelect = useCallback((category: Category) => {
     setSelectedCategory((prev) => (prev === category ? null : category));
   }, []);
@@ -315,21 +349,12 @@ export default function HomeScreen() {
 
             <View style={styles.orbContainer}>
               {currentState && <SavePulse trigger={saveTrigger} state={currentState} />}
-              {ClinicalOrbComponent ? (
-                <ClinicalOrbComponent
-                  size={368}
-                  initialCapacity={0.82}
-                  onCapacityChange={(cap) => {
-                    capacityShared.value = cap;
-                    if (cap >= 0.7) handleStateChange('resourced');
-                    else if (cap >= 0.4) handleStateChange('stretched');
-                    else handleStateChange('depleted');
-                  }}
-                  onStateChange={(state) => {
-                    if (state === 'RESOURCED' || state === 'STABLE') handleStateChange('resourced');
-                    else if (state === 'ELEVATED') handleStateChange('stretched');
-                    else handleStateChange('depleted');
-                  }}
+              {ClinicalGaugeComponent ? (
+                <ClinicalGaugeComponent
+                  capacity={capacityShared}
+                  currentCapacity={currentCapacityNumber}
+                  onCapacityChange={handleGaugeCapacityChange}
+                  showReadout={false}
                 />
               ) : (
                 <GlassOrb state={currentState} onStateChange={handleStateChange} onSave={handleSave} />
@@ -413,7 +438,9 @@ const styles = StyleSheet.create({
   signalIconRow: { flexDirection: 'row', alignItems: 'center' },
   signalDivider: { width: 1, height: 28, backgroundColor: 'rgba(255,255,255,0.08)' },
   instruction: { fontSize: 14, fontWeight: '400', color: 'rgba(255, 255, 255, 0.5)', letterSpacing: 0.5, marginBottom: spacing.sm, textAlign: 'center' },
-  orbContainer: { justifyContent: 'center', alignItems: 'center', zIndex: 1 },
+  // Gauge is ~320×76; we pad vertically so the composer/category container
+  // doesn't crowd the gauge after the orb→gauge swap.
+  orbContainer: { justifyContent: 'center', alignItems: 'center', zIndex: 1, paddingVertical: spacing.lg },
   categoryContainer: { marginTop: spacing.md, zIndex: 10 },
   // Signal limit banner styles
   limitBanner: {

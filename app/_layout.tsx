@@ -8,6 +8,26 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Sentry from '@sentry/react-native';
 import * as Linking from 'expo-linking';
 import Constants from 'expo-constants';
+import * as SplashScreen from 'expo-splash-screen';
+import { useFonts } from 'expo-font';
+import {
+  DMSans_400Regular,
+  DMSans_500Medium,
+  DMSans_600SemiBold,
+  DMSans_700Bold,
+} from '@expo-google-fonts/dm-sans';
+import { SpaceMono_400Regular } from '@expo-google-fonts/space-mono';
+
+// =============================================================================
+// SPLASH SCREEN — Explicit gating per HIG audit §H1 (closes G3 / Followup #10)
+// =============================================================================
+// Prevent Expo's default auto-hide so the splash stays visible until BOTH:
+//   1. Fonts are loaded (DM Sans + Space Mono)
+//   2. Auth state has resolved (auth.isLoading === false)
+// hideAsync() is called from RootLayout's effect; .catch on the promise
+// silences the "already hidden" error if a sibling path hides it first.
+// -----------------------------------------------------------------------------
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 import { colors, spacing, borderRadius } from '../theme';
 import { LocaleProvider } from '../lib/hooks/useLocale';
@@ -372,8 +392,24 @@ const idleStyles = StyleSheet.create({
 
 function RootLayout() {
   const router = useRouter();
+  const auth = useAuth();
   const startupTracked = useRef(false);
+  const splashHidden = useRef(false);
   const [providersReady, setProvidersReady] = useState(false);
+
+  // -------------------------------------------------------------------------
+  // Font loading — gates the splash (HIG §H1). The auth screen has its own
+  // useFonts call for its placeholder logic; that path is unchanged. expo-font
+  // shares its loading cache across calls, so this hook does not duplicate
+  // network/disk work.
+  // -------------------------------------------------------------------------
+  const [fontsLoaded] = useFonts({
+    DMSans_400Regular,
+    DMSans_500Medium,
+    DMSans_600SemiBold,
+    DMSans_700Bold,
+    SpaceMono_400Regular,
+  });
 
   useEffect(() => {
     if (!startupTracked.current) {
@@ -382,6 +418,28 @@ function RootLayout() {
     }
     Sentry.addBreadcrumb({ message: 'App mounted', category: 'lifecycle' });
   }, []);
+
+  // -------------------------------------------------------------------------
+  // Hide splash once fonts are loaded AND auth has resolved.
+  // hideAsync() can throw if the splash was already hidden by another path
+  // (e.g. a fast-failing native init), so we wrap in try/catch and also gate
+  // on splashHidden.current to avoid the "already hidden" warning on re-renders.
+  // -------------------------------------------------------------------------
+  useEffect(() => {
+    if (splashHidden.current) return;
+    if (!fontsLoaded) return;
+    if (auth.isLoading) return;
+
+    splashHidden.current = true;
+    (async () => {
+      try {
+        await SplashScreen.hideAsync();
+        startupBreadcrumb('startup:splash_hidden');
+      } catch {
+        // Splash may have been hidden by another path; ignore.
+      }
+    })();
+  }, [fontsLoaded, auth.isLoading]);
 
   // Phase 2 complete: fires ONLY after providersReady=true is committed to the UI
   useEffect(() => {

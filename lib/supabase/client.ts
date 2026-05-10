@@ -8,9 +8,9 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { Database } from './types';
+import { secureStorage } from './secureStorage';
 
 // =============================================================================
 // CONFIGURATION
@@ -25,35 +25,17 @@ const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'YOUR_ANO
 const STORAGE_KEY = 'orbital_supabase_auth';
 
 // =============================================================================
-// CUSTOM AUTH STORAGE
+// AUTH STORAGE
 // =============================================================================
 
-/**
- * Custom storage adapter for Supabase auth that works with Expo/React Native.
- * Uses AsyncStorage for native platforms and localStorage for web.
- */
-const customStorage = {
-  getItem: async (key: string): Promise<string | null> => {
-    if (Platform.OS === 'web') {
-      return localStorage.getItem(key);
-    }
-    return AsyncStorage.getItem(key);
-  },
-  setItem: async (key: string, value: string): Promise<void> => {
-    if (Platform.OS === 'web') {
-      localStorage.setItem(key, value);
-      return;
-    }
-    await AsyncStorage.setItem(key, value);
-  },
-  removeItem: async (key: string): Promise<void> => {
-    if (Platform.OS === 'web') {
-      localStorage.removeItem(key);
-      return;
-    }
-    await AsyncStorage.removeItem(key);
-  },
-};
+// Auth tokens are persisted via the SecureStore-backed adapter
+// (lib/supabase/secureStorage.ts). On native this maps to iOS Keychain /
+// Android Keystore (AES-256). On web it falls back to localStorage,
+// which matches the prior behavior. The adapter performs a one-time
+// transparent migration of any pre-existing AsyncStorage token on the
+// first read after install — existing logged-in users keep their session.
+//
+// See docs/IOS_AUDIT_PRIVACY_2026-05-09.md §F1 — Phase 5 Keychain migration.
 
 // =============================================================================
 // SUPABASE CLIENT
@@ -76,7 +58,7 @@ export function getSupabase(): SupabaseClient<Database> {
 
   supabaseClient = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
-      storage: customStorage,
+      storage: secureStorage,
       storageKey: STORAGE_KEY,
       autoRefreshToken: true,
       persistSession: true,
