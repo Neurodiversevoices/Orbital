@@ -348,7 +348,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
 const idleStyles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.8)',
+    backgroundColor: 'rgba(15,22,36,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.lg,
@@ -361,23 +361,23 @@ const idleStyles = StyleSheet.create({
     maxWidth: 320,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(245,158,11,0.3)',
+    borderColor: colors.hairline,
   },
   title: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#F59E0B',
+    color: colors.textPrimary,
     marginBottom: spacing.md,
   },
   message: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.lg,
     lineHeight: 22,
   },
   button: {
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.xl,
     borderRadius: borderRadius.md,
@@ -385,7 +385,7 @@ const idleStyles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: '#FFFFFF',
   },
 });
 
@@ -516,7 +516,7 @@ function RootLayout() {
                 <AgeGate>
                 <AuthGate>
                 <IdleTimeoutWrapper>
-                <StatusBar style="light" />
+                <StatusBar style="dark" />
                 <Stack
                   screenOptions={{
                     headerShown: false,
