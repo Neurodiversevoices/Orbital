@@ -498,7 +498,7 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   driverRow: {
     flexDirection: 'row',
@@ -508,12 +508,12 @@ const styles = StyleSheet.create({
   driverName: {
     width: 70,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
   },
   driverBar: {
     flex: 1,
     height: 8,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: 4,
     marginHorizontal: spacing.sm,
     overflow: 'hidden',
@@ -526,7 +526,7 @@ const styles = StyleSheet.create({
   driverPercent: {
     width: 40,
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'right',
   },
   patternRow: {
@@ -545,24 +545,24 @@ const styles = StyleSheet.create({
   patternText: {
     flex: 1,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   disclaimerCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: spacing.md,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: 12,
     padding: spacing.md,
     marginTop: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.hairline,
   },
   disclaimerText: {
     flex: 1,
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   footer: {
@@ -572,7 +572,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   emptyState: {
     alignItems: 'center',
@@ -582,11 +582,11 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   emptyText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     textAlign: 'center',
   },
 });

@@ -15,9 +15,9 @@ import { Experiment, OBSERVATIONAL_LANGUAGE } from '../../lib/experiments/types'
 
 function ExperimentCard({ experiment, onPress }: { experiment: Experiment; onPress: () => void }) {
   const statusColors = {
-    active: '#00E5FF',
-    concluded: '#4CAF50',
-    abandoned: '#666',
+    active: colors.primary,
+    concluded: '#0E8C7B',
+    abandoned: colors.textTertiary,
   };
 
   const statusLabels = {
@@ -39,29 +39,29 @@ function ExperimentCard({ experiment, onPress }: { experiment: Experiment; onPre
             {statusLabels[experiment.status]}
           </Text>
         </View>
-        <ChevronRight color="rgba(255,255,255,0.3)" size={18} />
+        <ChevronRight color={colors.textTertiary} size={18} />
       </View>
 
-      <Text style={styles.hypothesis} numberOfLines={2}>{experiment.hypothesis}</Text>
-      <Text style={styles.trigger}>{experiment.triggerDescription}</Text>
+      <Text style={styles.hypothesis} numberOfLines={2} maxFontSizeMultiplier={1.5}>{experiment.hypothesis}</Text>
+      <Text style={styles.trigger} maxFontSizeMultiplier={1.5}>{experiment.triggerDescription}</Text>
 
       {experiment.status === 'active' && (
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
             <View style={[styles.progressFill, { width: `${progress}%` }]} />
           </View>
-          <Text style={styles.progressText}>Day {daysActive} of {totalDays}</Text>
+          <Text style={styles.progressText} maxFontSizeMultiplier={1.5}>Day {daysActive} of {totalDays}</Text>
         </View>
       )}
 
       <View style={styles.stats}>
         <View style={styles.stat}>
-          <Check color="#4CAF50" size={14} />
-          <Text style={styles.statText}>{experiment.followedCount} followed</Text>
+          <Check color="#0E8C7B" size={14} />
+          <Text style={styles.statText} maxFontSizeMultiplier={1.5}>{experiment.followedCount} followed</Text>
         </View>
         <View style={styles.stat}>
-          <XCircle color="#F44336" size={14} />
-          <Text style={styles.statText}>{experiment.notFollowedCount} not followed</Text>
+          <XCircle color="#DC2626" size={14} />
+          <Text style={styles.statText} maxFontSizeMultiplier={1.5}>{experiment.notFollowedCount} not followed</Text>
         </View>
       </View>
     </Pressable>
@@ -79,20 +79,20 @@ export default function ExperimentScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <FlaskConical color="#00E5FF" size={24} />
-          <Text style={styles.title}>Experiments</Text>
+          <FlaskConical color={colors.primary} size={24} />
+          <Text style={styles.title} maxFontSizeMultiplier={1.5}>Experiments</Text>
         </View>
         <Pressable onPress={() => router.back()} style={styles.closeButton}>
-          <X color="rgba(255,255,255,0.7)" size={24} />
+          <X color={colors.textSecondary} size={24} />
         </Pressable>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.intro}>{OBSERVATIONAL_LANGUAGE.noJudgment}</Text>
+        <Text style={styles.intro} maxFontSizeMultiplier={1.5}>{OBSERVATIONAL_LANGUAGE.noJudgment}</Text>
 
         {activeExperiment ? (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>CURRENT EXPERIMENT</Text>
+            <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>CURRENT EXPERIMENT</Text>
             <ExperimentCard
               experiment={activeExperiment}
               onPress={() => router.push(`/experiment/${activeExperiment.id}`)}
@@ -103,14 +103,14 @@ export default function ExperimentScreen() {
             style={styles.startButton}
             onPress={() => router.push('/experiment/new')}
           >
-            <Plus color="#000" size={20} />
-            <Text style={styles.startButtonText}>Start an Experiment</Text>
+            <Plus color="#FFFFFF" size={20} />
+            <Text style={styles.startButtonText} maxFontSizeMultiplier={1.5}>Start an Experiment</Text>
           </Pressable>
         )}
 
         {concludedExperiments.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>CONCLUDED</Text>
+            <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>CONCLUDED</Text>
             {concludedExperiments.map(exp => (
               <ExperimentCard
                 key={exp.id}
@@ -123,7 +123,7 @@ export default function ExperimentScreen() {
 
         {abandonedExperiments.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>ABANDONED</Text>
+            <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>ABANDONED</Text>
             {abandonedExperiments.map(exp => (
               <ExperimentCard
                 key={exp.id}
@@ -136,16 +136,16 @@ export default function ExperimentScreen() {
 
         {experiments.length === 0 && !isLoading && (
           <View style={styles.emptyState}>
-            <FlaskConical color="rgba(255,255,255,0.2)" size={48} />
-            <Text style={styles.emptyTitle}>No experiments yet</Text>
-            <Text style={styles.emptyText}>
+            <FlaskConical color={colors.textTertiary} size={48} />
+            <Text style={styles.emptyTitle} maxFontSizeMultiplier={1.5}>No experiments yet</Text>
+            <Text style={styles.emptyText} maxFontSizeMultiplier={1.5}>
               When patterns emerge in your capacity data, you can run experiments to explore what helps.
             </Text>
           </View>
         )}
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
+          <Text style={styles.footerText} maxFontSizeMultiplier={1.5}>
             Experiments help you explore patterns without judgment.{'\n'}
             You observe. You decide what it means.
           </Text>
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: colors.hairline,
   },
   headerLeft: {
     flexDirection: 'row',
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.xs,
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   },
   intro: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginVertical: spacing.lg,
     fontStyle: 'italic',
@@ -199,15 +199,15 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.35)',
+    color: colors.textTertiary,
     letterSpacing: 1,
     marginBottom: spacing.sm,
   },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.sm,
   },
@@ -237,12 +237,12 @@ const styles = StyleSheet.create({
   hypothesis: {
     fontSize: 15,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: 4,
   },
   trigger: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginBottom: spacing.sm,
   },
   progressContainer: {
@@ -250,18 +250,18 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 4,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.hairline,
     borderRadius: 2,
     marginBottom: 4,
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     borderRadius: 2,
   },
   progressText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
   stats: {
     flexDirection: 'row',
@@ -274,14 +274,14 @@ const styles = StyleSheet.create({
   },
   statText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   startButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     borderRadius: borderRadius.lg,
     paddingVertical: spacing.md,
     marginBottom: spacing.xl,
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
   startButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: '#FFFFFF',
   },
   emptyState: {
     alignItems: 'center',
@@ -298,13 +298,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     marginTop: spacing.md,
     marginBottom: spacing.sm,
   },
   emptyText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textAlign: 'center',
     paddingHorizontal: spacing.xl,
     lineHeight: 20,
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 18,
   },

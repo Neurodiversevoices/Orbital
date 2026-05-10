@@ -81,7 +81,7 @@ const ADD_ONS: AddOnDefinition[] = [
   {
     id: 'healthcare-sentinel',
     icon: Stethoscope,
-    color: '#F44336',
+    color: '#DC2626',
     title: 'Healthcare Nursing Sentinel\u2122 + Clinical Briefs+\u2122',
     subtitle: 'Fastest close, operational + legal relevance',
     demoLabel: 'Sentinel\u2122 Alert (DEMO)',
@@ -129,7 +129,7 @@ const ADD_ONS: AddOnDefinition[] = [
   {
     id: 'compliance-pack',
     icon: ShieldCheck,
-    color: '#00BCD4',
+    color: '#06B6D4',
     title: 'Compliance / Vendor Risk Pack',
     subtitle: 'Deal-unblocker, margin accelerator',
     demoLabel: 'Governance Sample (DEMO)',
@@ -171,7 +171,7 @@ export default function B2BAddOnsScreen() {
 
       {/* Governance Notice */}
       <View style={styles.governanceNotice}>
-        <AlertTriangle size={16} color="#E8A830" />
+        <AlertTriangle size={16} color="#F59E0B" />
         <Text style={styles.governanceText}>
           All features below are demo-only previews. Real institutional access
           requires direct engagement with Orbital.
@@ -260,7 +260,7 @@ function AddOnCard({ addon }: { addon: AddOnDefinition }) {
 
 const styles = StyleSheet.create({
   demoBanner: {
-    backgroundColor: '#7A9AAA',
+    backgroundColor: '#F59E0B',
     paddingVertical: 8,
     paddingHorizontal: 16,
     alignItems: 'center',
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.06)',
+    borderBottomColor: colors.hairline,
   },
   headerBack: {
     padding: spacing.sm,
@@ -294,11 +294,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   headerSubtitle: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   headerSpacer: {
@@ -308,17 +308,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: spacing.sm,
-    backgroundColor: 'rgba(232,168,48,0.1)',
+    backgroundColor: 'rgba(245,158,11,0.10)',
     margin: spacing.md,
     padding: spacing.md,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(232,168,48,0.3)',
+    borderColor: 'rgba(245,158,11,0.30)',
   },
   governanceText: {
     flex: 1,
     fontSize: 12,
-    color: 'rgba(232,168,48,0.9)',
+    color: '#9A6A0A',
     lineHeight: 18,
   },
   content: {
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
     padding: spacing.lg,
@@ -351,12 +351,12 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: 4,
   },
   cardSubtitle: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   demoLabelContainer: {
     paddingVertical: spacing.sm,
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   sampleAlertContainer: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.sm,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -379,14 +379,14 @@ const styles = StyleSheet.create({
   sampleAlertLabel: {
     fontSize: 10,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: spacing.xs,
   },
   sampleAlertText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     fontStyle: 'italic',
     lineHeight: 18,
   },
@@ -396,14 +396,14 @@ const styles = StyleSheet.create({
   mustNotShowLabel: {
     fontSize: 10,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: spacing.xs,
   },
   mustNotShowText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
   ctaButton: {
     flexDirection: 'row',
@@ -425,12 +425,12 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textAlign: 'center',
   },
   footerTextEmphasis: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     textAlign: 'center',
     fontStyle: 'italic',
     marginTop: spacing.xs,

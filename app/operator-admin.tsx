@@ -81,17 +81,17 @@ const AGE_COHORTS = [
 ];
 
 const SYSTEM_STATE_CONFIG: Record<SystemState, { label: string; color: string; bgColor: string }> = {
-  baseline: { label: 'Baseline', color: '#4CAF50', bgColor: 'rgba(76,175,80,0.15)' },
+  baseline: { label: 'Baseline', color: '#0E8C7B', bgColor: 'rgba(14,140,123,0.12)' },
   elevated: { label: 'Elevated', color: '#F59E0B', bgColor: 'rgba(245,158,11,0.15)' },
-  sustained_volatility: { label: 'Sustained Volatility', color: '#F44336', bgColor: 'rgba(244,67,54,0.15)' },
+  sustained_volatility: { label: 'Sustained Volatility', color: '#DC2626', bgColor: 'rgba(220,38,38,0.12)' },
 };
 
 const MARKER_CONFIG = {
   sleep: { icon: Moon, color: '#5C6BC0', label: 'Sleep' },
-  energy: { icon: Zap, color: '#FFD700', label: 'Energy' },
+  energy: { icon: Zap, color: '#F59E0B', label: 'Energy' },
   brain: { icon: Brain, color: '#9C27B0', label: 'Brain' },
-  sensory: { icon: Radio, color: '#00BCD4', label: 'Sensory' },
-  social: { icon: UserCheck, color: '#4CAF50', label: 'Social' },
+  sensory: { icon: Radio, color: '#06B6D4', label: 'Sensory' },
+  social: { icon: UserCheck, color: '#0E8C7B', label: 'Social' },
   demand: { icon: ClipboardList, color: '#FF5722', label: 'Demand' },
 };
 
@@ -172,7 +172,7 @@ function CohortCard({ cohort, index }: CohortCardProps) {
     >
       <View style={styles.cohortHeader}>
         <View style={styles.cohortAgeContainer}>
-          <Users size={16} color="rgba(255,255,255,0.5)" />
+          <Users size={16} color={colors.textSecondary} />
           <Text style={styles.cohortAgeLabel}>{cohort.ageRange}</Text>
         </View>
         <View style={styles.participantBadge}>
@@ -252,7 +252,7 @@ export default function OperatorAdminScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.blockedContainer}>
-          <AlertTriangle size={48} color="#F44336" />
+          <AlertTriangle size={48} color="#DC2626" />
           <Text style={styles.blockedTitle}>Access Denied</Text>
           <Text style={styles.blockedText}>
             This screen is only available in founder mode.
@@ -306,7 +306,7 @@ export default function OperatorAdminScreen() {
 
       {/* Aggregate Notice */}
       <View style={styles.aggregateNotice}>
-        <Minus size={14} color="#7A9AAA" />
+        <Minus size={14} color={colors.textSecondary} />
         <Text style={styles.aggregateNoticeText}>
           All data shown is aggregate. No individual identities or drill-down available.
         </Text>
@@ -314,7 +314,7 @@ export default function OperatorAdminScreen() {
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#00E5FF" />
+          <ActivityIndicator size="large" color="#2DD4BF" />
           <Text style={styles.loadingText}>Loading aggregate data...</Text>
         </View>
       ) : (
@@ -402,12 +402,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     letterSpacing: 1,
   },
   subtitle: {
     fontSize: 9,
-    color: '#7A9AAA',
+    color: colors.textSecondary,
     marginTop: 4,
     letterSpacing: 0.5,
     fontWeight: '600',
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: spacing.md,
     marginBottom: spacing.md,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     padding: 4,
   },
@@ -432,15 +432,15 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.sm,
   },
   timeWindowButtonActive: {
-    backgroundColor: '#00E5FF',
+    backgroundColor: '#2DD4BF',
   },
   timeWindowText: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   timeWindowTextActive: {
-    color: '#000',
+    color: '#FFFFFF',
   },
 
   // Aggregate Notice
@@ -452,15 +452,15 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.sm,
-    backgroundColor: 'rgba(122,154,170,0.1)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.sm,
     borderWidth: 1,
-    borderColor: 'rgba(122,154,170,0.2)',
+    borderColor: colors.hairline,
   },
   aggregateNoticeText: {
     flex: 1,
     fontSize: 11,
-    color: '#7A9AAA',
+    color: colors.textSecondary,
     fontStyle: 'italic',
   },
 
@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: spacing.md,
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
 
   // Scroll
@@ -484,10 +484,10 @@ const styles = StyleSheet.create({
 
   // Summary Card
   summaryCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.lg,
     marginBottom: spacing.lg,
   },
@@ -502,17 +502,17 @@ const styles = StyleSheet.create({
   summaryDivider: {
     width: 1,
     height: 40,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.hairline,
     marginHorizontal: spacing.md,
   },
   summaryValue: {
     fontSize: 32,
     fontWeight: '300',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
   },
   summaryLabel: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 4,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -534,24 +534,24 @@ const styles = StyleSheet.create({
   stateBreakdownValue: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
 
   // Section Title
   sectionTitle: {
     fontSize: 11,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     letterSpacing: 1,
     marginBottom: spacing.sm,
   },
 
   // Cohort Card
   cohortCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.sm,
   },
@@ -569,7 +569,7 @@ const styles = StyleSheet.create({
   cohortAgeLabel: {
     fontSize: 18,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   participantBadge: {
     flexDirection: 'row',
@@ -579,11 +579,11 @@ const styles = StyleSheet.create({
   participantCount: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#00E5FF',
+    color: '#0E8C7B',
   },
   participantLabel: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
 
   // System State
@@ -605,12 +605,12 @@ const styles = StyleSheet.create({
   // Markers
   markersContainer: {
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)',
+    borderTopColor: colors.hairline,
     paddingTop: spacing.sm,
   },
   markersTitle: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     marginBottom: spacing.xs,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -623,13 +623,13 @@ const styles = StyleSheet.create({
   },
   markerLabel: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
     width: 60,
   },
   markerBarContainer: {
     flex: 1,
     height: 6,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -639,7 +639,7 @@ const styles = StyleSheet.create({
   },
   markerPercentage: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     width: 32,
     textAlign: 'right',
   },
@@ -650,11 +650,11 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     paddingVertical: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)',
+    borderTopColor: colors.hairline,
   },
   footerText: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: 4,
   },
 
@@ -668,12 +668,12 @@ const styles = StyleSheet.create({
   blockedTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#F44336',
+    color: '#DC2626',
     marginTop: spacing.md,
   },
   blockedText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
@@ -681,12 +681,14 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
   },
   backButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
   },
 });

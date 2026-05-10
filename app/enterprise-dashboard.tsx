@@ -51,6 +51,7 @@ import {
 } from '../lib/enterprise/kAnonymity';
 import { INSTITUTIONAL_DASHBOARD_HEADER } from '../lib/enterprise/termsEnforcement';
 import { K_ANONYMITY_THRESHOLD } from '../lib/enterprise/types';
+import { colors } from '../theme';
 
 // =============================================================================
 // MOCK DATA (Replace with Supabase query in production)
@@ -154,7 +155,7 @@ export default function EnterpriseDashboard() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#00FFFF" />
+          <ActivityIndicator size="large" color="#2DD4BF" />
           <Text style={styles.loadingText}>Loading dashboard...</Text>
         </View>
       </SafeAreaView>
@@ -318,10 +319,10 @@ function UnitRow({ unit }: UnitRowProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#05060A',
+    backgroundColor: colors.background,
   },
   demoBanner: {
-    backgroundColor: '#7A9AAA',
+    backgroundColor: '#F59E0B',
     paddingVertical: 8,
     paddingHorizontal: 16,
     alignItems: 'center',
@@ -343,29 +344,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    color: '#9CA3AF',
+    color: colors.textSecondary,
     marginTop: 12,
     fontSize: 14,
   },
   privacyHeader: {
-    backgroundColor: '#1E40AF', // Blue
+    backgroundColor: colors.backgroundSubtle,
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#1E3A8A',
+    borderBottomColor: colors.hairline,
   },
   privacyHeaderText: {
-    color: '#FFFFFF',
+    color: colors.textPrimary,
     fontSize: 13,
     textAlign: 'center',
     fontWeight: '500',
   },
   delayNotice: {
-    backgroundColor: '#1F2937',
+    backgroundColor: colors.backgroundSubtle,
     paddingVertical: 8,
     paddingHorizontal: 16,
   },
   delayNoticeText: {
-    color: '#9CA3AF',
+    color: colors.textSecondary,
     fontSize: 12,
     textAlign: 'center',
   },
@@ -374,11 +375,11 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     flexDirection: 'row',
-    backgroundColor: '#111827',
+    backgroundColor: colors.backgroundSubtle,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#374151',
+    borderBottomColor: colors.hairline,
   },
   unitColumn: {
     flex: 2,
@@ -388,7 +389,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerText: {
-    color: '#9CA3AF',
+    color: colors.textSecondary,
     fontSize: 12,
     fontWeight: '600',
     textTransform: 'uppercase',
@@ -398,24 +399,24 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#1F2937',
+    borderBottomColor: colors.hairline,
     alignItems: 'center',
   },
   suppressedRow: {
-    backgroundColor: '#1F293740',
+    backgroundColor: colors.backgroundSubtle,
   },
   unitName: {
-    color: '#FFFFFF',
+    color: colors.textPrimary,
     fontSize: 15,
     fontWeight: '500',
   },
   signalCount: {
-    color: '#6B7280',
+    color: colors.textSecondary,
     fontSize: 12,
     marginTop: 2,
   },
   suppressedBadge: {
-    color: '#9CA3AF',
+    color: colors.textSecondary,
     fontSize: 10,
     marginTop: 4,
     fontStyle: 'italic',
@@ -423,33 +424,34 @@ const styles = StyleSheet.create({
   metricValue: {
     fontSize: 16,
     fontWeight: '600',
+    color: colors.textPrimary,
   },
   suppressedValue: {
-    color: '#6B7280',
+    color: colors.textTertiary,
     fontSize: 11,
     textAlign: 'center',
   },
   improvingTrend: {
-    color: '#22C55E',
+    color: '#0E8C7B',
   },
   decliningTrend: {
-    color: '#EF4444',
+    color: '#DC2626',
   },
   freshIndicator: {
-    color: '#22C55E',
+    color: '#0E8C7B',
   },
   staleIndicator: {
-    color: '#EAB308',
+    color: '#F59E0B',
   },
   dormantIndicator: {
-    color: '#6B7280',
+    color: colors.textTertiary,
   },
   footer: {
     padding: 16,
     alignItems: 'center',
   },
   footerText: {
-    color: '#6B7280',
+    color: colors.textSecondary,
     fontSize: 12,
     marginTop: 4,
   },

@@ -130,7 +130,7 @@ export default function TeamModeScreen() {
     <SafeAreaView style={commonStyles.screen}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color="rgba(255,255,255,0.8)" />
+          <ArrowLeft size={24} color={colors.textPrimary} />
         </Pressable>
         <Text style={styles.title}>Team Mode</Text>
         <View style={styles.headerSpacer} />
@@ -139,7 +139,7 @@ export default function TeamModeScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Privacy Notice */}
         <View style={styles.privacyBanner}>
-          <Shield size={16} color="#00E5FF" />
+          <Shield size={16} color="#0E8C7B" />
           <Text style={styles.privacyText}>
             Your individual data is never shown. Only aggregate team capacity is visible.
           </Text>
@@ -148,7 +148,7 @@ export default function TeamModeScreen() {
         {/* No Team - Join Form */}
         {!currentTeam && !showJoinForm && (
           <View style={styles.emptyState}>
-            <Users size={48} color="rgba(255,255,255,0.2)" />
+            <Users size={48} color={colors.textTertiary} />
             <Text style={styles.emptyTitle}>Join a Team</Text>
             <Text style={styles.emptyBody}>
               Opt in to share your capacity signals with your team. Your individual entries remain
@@ -174,7 +174,7 @@ export default function TeamModeScreen() {
               value={teamCode}
               onChangeText={setTeamCode}
               placeholder="Team Code (e.g., ACME-2024)"
-              placeholderTextColor="rgba(255,255,255,0.5)"
+              placeholderTextColor={colors.textTertiary}
               autoCapitalize="characters"
             />
 
@@ -183,7 +183,7 @@ export default function TeamModeScreen() {
               value={teamName}
               onChangeText={setTeamName}
               placeholder="Team Name (optional)"
-              placeholderTextColor="rgba(255,255,255,0.5)"
+              placeholderTextColor={colors.textTertiary}
             />
 
             <View style={styles.formButtons}>
@@ -220,7 +220,7 @@ export default function TeamModeScreen() {
                 <Text style={styles.teamCode}>Code: {currentTeam.teamCode}</Text>
               </View>
               <Pressable style={styles.leaveButton} onPress={handleLeaveTeam}>
-                <LogOut size={16} color="#F44336" />
+                <LogOut size={16} color="#DC2626" />
                 <Text style={styles.leaveButtonText}>Leave</Text>
               </Pressable>
             </View>
@@ -228,7 +228,7 @@ export default function TeamModeScreen() {
             {/* Privacy Threshold Warning */}
             {!aggregate.hasEnoughParticipants && (
               <View style={styles.thresholdWarning}>
-                <AlertCircle size={20} color="#E8A830" />
+                <AlertCircle size={20} color="#F59E0B" />
                 <View style={styles.thresholdContent}>
                   <Text style={styles.thresholdTitle}>
                     Not enough participants to protect privacy
@@ -254,7 +254,7 @@ export default function TeamModeScreen() {
                           styles.distributionSegment,
                           {
                             flex: aggregate.capacityDistribution.plenty,
-                            backgroundColor: '#00E5FF',
+                            backgroundColor: '#2DD4BF',
                             borderTopLeftRadius: 4,
                             borderBottomLeftRadius: 4,
                           },
@@ -267,7 +267,7 @@ export default function TeamModeScreen() {
                           styles.distributionSegment,
                           {
                             flex: aggregate.capacityDistribution.elevated,
-                            backgroundColor: '#E8A830',
+                            backgroundColor: '#F59E0B',
                           },
                         ]}
                       />
@@ -278,7 +278,7 @@ export default function TeamModeScreen() {
                           styles.distributionSegment,
                           {
                             flex: aggregate.capacityDistribution.nearLimit,
-                            backgroundColor: '#F44336',
+                            backgroundColor: '#DC2626',
                             borderTopRightRadius: 4,
                             borderBottomRightRadius: 4,
                           },
@@ -288,19 +288,19 @@ export default function TeamModeScreen() {
                   </View>
                   <View style={styles.distributionLegend}>
                     <View style={styles.legendItem}>
-                      <View style={[styles.legendDot, { backgroundColor: '#00E5FF' }]} />
+                      <View style={[styles.legendDot, { backgroundColor: '#2DD4BF' }]} />
                       <Text style={styles.legendText}>
                         Plenty {aggregate.capacityDistribution.plenty}%
                       </Text>
                     </View>
                     <View style={styles.legendItem}>
-                      <View style={[styles.legendDot, { backgroundColor: '#E8A830' }]} />
+                      <View style={[styles.legendDot, { backgroundColor: '#F59E0B' }]} />
                       <Text style={styles.legendText}>
                         Elevated {aggregate.capacityDistribution.elevated}%
                       </Text>
                     </View>
                     <View style={styles.legendItem}>
-                      <View style={[styles.legendDot, { backgroundColor: '#F44336' }]} />
+                      <View style={[styles.legendDot, { backgroundColor: '#DC2626' }]} />
                       <Text style={styles.legendText}>
                         Near Limit {aggregate.capacityDistribution.nearLimit}%
                       </Text>
@@ -316,7 +316,7 @@ export default function TeamModeScreen() {
                       const Icon = categoryIcons[driver.driver];
                       return (
                         <View key={driver.driver} style={styles.driverItem}>
-                          <Icon size={20} color="rgba(255,255,255,0.7)" />
+                          <Icon size={20} color={colors.textSecondary} />
                           <Text style={styles.driverLabel}>{driver.driver}</Text>
                           <Text style={styles.driverPercent}>{driver.percentage}%</Text>
                         </View>
@@ -334,20 +334,20 @@ export default function TeamModeScreen() {
                   <View style={styles.trendRow}>
                     {aggregate.weeklyTrend === 'improving' && (
                       <>
-                        <TrendingUp size={24} color="#00E5FF" />
-                        <Text style={[styles.trendText, { color: '#00E5FF' }]}>Improving</Text>
+                        <TrendingUp size={24} color="#0E8C7B" />
+                        <Text style={[styles.trendText, { color: '#0E8C7B' }]}>Improving</Text>
                       </>
                     )}
                     {aggregate.weeklyTrend === 'declining' && (
                       <>
-                        <TrendingDown size={24} color="#F44336" />
-                        <Text style={[styles.trendText, { color: '#F44336' }]}>Declining</Text>
+                        <TrendingDown size={24} color="#DC2626" />
+                        <Text style={[styles.trendText, { color: '#DC2626' }]}>Declining</Text>
                       </>
                     )}
                     {aggregate.weeklyTrend === 'stable' && (
                       <>
-                        <Minus size={24} color="#E8A830" />
-                        <Text style={[styles.trendText, { color: '#E8A830' }]}>Stable</Text>
+                        <Minus size={24} color="#F59E0B" />
+                        <Text style={[styles.trendText, { color: '#F59E0B' }]}>Stable</Text>
                       </>
                     )}
                     {aggregate.weeklyTrend === null && (
@@ -363,7 +363,7 @@ export default function TeamModeScreen() {
                 {suggestions.length > 0 && (
                   <View style={styles.card}>
                     <View style={styles.cardTitleRow}>
-                      <Lightbulb size={18} color="#E8A830" />
+                      <Lightbulb size={18} color="#F59E0B" />
                       <Text style={styles.cardTitle}>Suggested Actions</Text>
                     </View>
                     {suggestions.map((suggestion) => (

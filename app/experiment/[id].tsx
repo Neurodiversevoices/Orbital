@@ -86,9 +86,9 @@ export default function ExperimentDetailScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} style={styles.backButton}>
-            <ChevronLeft color="rgba(255,255,255,0.7)" size={24} />
+            <ChevronLeft color={colors.textSecondary} size={24} />
           </Pressable>
-          <Text style={styles.title}>Loading...</Text>
+          <Text style={styles.title} maxFontSizeMultiplier={1.5}>Loading...</Text>
           <View style={styles.headerSpacer} />
         </View>
       </SafeAreaView>
@@ -105,25 +105,25 @@ export default function ExperimentDetailScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} style={styles.backButton}>
-            <ChevronLeft color="rgba(255,255,255,0.7)" size={24} />
+            <ChevronLeft color={colors.textSecondary} size={24} />
           </Pressable>
-          <Text style={styles.title}>{OBSERVATIONAL_LANGUAGE.tracking}</Text>
+          <Text style={styles.title} maxFontSizeMultiplier={1.5}>{OBSERVATIONAL_LANGUAGE.tracking}</Text>
           <View style={styles.headerSpacer} />
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.experimentCard}>
             <View style={styles.beakerBadge}>
-              <FlaskConical color="#00E5FF" size={20} />
+              <FlaskConical color={colors.primary} size={20} />
             </View>
-            <Text style={styles.hypothesis}>{experiment.hypothesis}</Text>
-            <Text style={styles.trigger}>{experiment.triggerDescription}</Text>
+            <Text style={styles.hypothesis} maxFontSizeMultiplier={1.5}>{experiment.hypothesis}</Text>
+            <Text style={styles.trigger} maxFontSizeMultiplier={1.5}>{experiment.triggerDescription}</Text>
           </View>
 
           <View style={styles.progressSection}>
             <View style={styles.progressHeader}>
-              <Text style={styles.progressLabel}>Day {daysActive} of {totalDays}</Text>
-              <Text style={styles.progressRemaining}>{daysRemaining} days remaining</Text>
+              <Text style={styles.progressLabel} maxFontSizeMultiplier={1.5}>Day {daysActive} of {totalDays}</Text>
+              <Text style={styles.progressRemaining} maxFontSizeMultiplier={1.5}>{daysRemaining} days remaining</Text>
             </View>
             <View style={styles.progressBar}>
               <View style={[styles.progressFill, { width: `${progress}%` }]} />
@@ -132,48 +132,48 @@ export default function ExperimentDetailScreen() {
 
           <View style={styles.statsRow}>
             <View style={styles.statBox}>
-              <Text style={styles.statValue}>{experiment.followedCount}</Text>
-              <Text style={styles.statLabel}>Followed</Text>
+              <Text style={styles.statValue} maxFontSizeMultiplier={1.5}>{experiment.followedCount}</Text>
+              <Text style={styles.statLabel} maxFontSizeMultiplier={1.5}>Followed</Text>
             </View>
             <View style={styles.statBox}>
-              <Text style={styles.statValue}>{experiment.notFollowedCount}</Text>
-              <Text style={styles.statLabel}>Not Followed</Text>
+              <Text style={styles.statValue} maxFontSizeMultiplier={1.5}>{experiment.notFollowedCount}</Text>
+              <Text style={styles.statLabel} maxFontSizeMultiplier={1.5}>Not Followed</Text>
             </View>
             <View style={styles.statBox}>
-              <Text style={styles.statValue}>{experiment.skippedCount}</Text>
-              <Text style={styles.statLabel}>Skipped</Text>
+              <Text style={styles.statValue} maxFontSizeMultiplier={1.5}>{experiment.skippedCount}</Text>
+              <Text style={styles.statLabel} maxFontSizeMultiplier={1.5}>Skipped</Text>
             </View>
           </View>
 
           <View style={styles.followupSection}>
-            <Text style={styles.followupQuestion}>{OBSERVATIONAL_LANGUAGE.followup}</Text>
+            <Text style={styles.followupQuestion} maxFontSizeMultiplier={1.5}>{OBSERVATIONAL_LANGUAGE.followup}</Text>
             <View style={styles.followupButtons}>
               <Pressable style={[styles.followupButton, styles.followupYes]} onPress={() => handleFollowup('yes')}>
                 <Check color="#fff" size={20} />
-                <Text style={styles.followupButtonText}>Yes</Text>
+                <Text style={styles.followupButtonText} maxFontSizeMultiplier={1.5}>Yes</Text>
               </Pressable>
               <Pressable style={[styles.followupButton, styles.followupNo]} onPress={() => handleFollowup('no')}>
                 <XIcon color="#fff" size={20} />
-                <Text style={styles.followupButtonText}>No</Text>
+                <Text style={styles.followupButtonText} maxFontSizeMultiplier={1.5}>No</Text>
               </Pressable>
               <Pressable style={[styles.followupButton, styles.followupSkip]} onPress={() => handleFollowup('skipped')}>
-                <SkipForward color="#fff" size={20} />
-                <Text style={styles.followupButtonText}>Skip</Text>
+                <SkipForward color={colors.textPrimary} size={20} />
+                <Text style={[styles.followupButtonText, styles.followupSkipText]} maxFontSizeMultiplier={1.5}>Skip</Text>
               </Pressable>
             </View>
           </View>
 
           <View style={styles.actions}>
             <Pressable style={styles.concludeButton} onPress={handleConclude}>
-              <Text style={styles.concludeButtonText}>Conclude Early & View Results</Text>
+              <Text style={styles.concludeButtonText} maxFontSizeMultiplier={1.5}>Conclude Early & View Results</Text>
             </Pressable>
             <Pressable style={styles.abandonButton} onPress={handleAbandon}>
-              <Trash2 color="#F44336" size={16} />
-              <Text style={styles.abandonButtonText}>Abandon Experiment</Text>
+              <Trash2 color="#DC2626" size={16} />
+              <Text style={styles.abandonButtonText} maxFontSizeMultiplier={1.5}>Abandon Experiment</Text>
             </Pressable>
           </View>
 
-          <Text style={styles.disclaimer}>{OBSERVATIONAL_LANGUAGE.noJudgment}</Text>
+          <Text style={styles.disclaimer} maxFontSizeMultiplier={1.5}>{OBSERVATIONAL_LANGUAGE.noJudgment}</Text>
         </ScrollView>
       </SafeAreaView>
     );
@@ -186,21 +186,21 @@ export default function ExperimentDetailScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <ChevronLeft color="rgba(255,255,255,0.7)" size={24} />
+          <ChevronLeft color={colors.textSecondary} size={24} />
         </Pressable>
-        <Text style={styles.title}>Experiment Results</Text>
+        <Text style={styles.title} maxFontSizeMultiplier={1.5}>Experiment Results</Text>
         <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.experimentCard}>
           <View style={[styles.beakerBadge, experiment.status === 'abandoned' && styles.beakerAbandoned]}>
-            <FlaskConical color={experiment.status === 'abandoned' ? '#666' : '#4CAF50'} size={20} />
+            <FlaskConical color={experiment.status === 'abandoned' ? colors.textTertiary : '#0E8C7B'} size={20} />
           </View>
-          <Text style={styles.hypothesis}>{experiment.hypothesis}</Text>
-          <Text style={styles.trigger}>{experiment.triggerDescription}</Text>
+          <Text style={styles.hypothesis} maxFontSizeMultiplier={1.5}>{experiment.hypothesis}</Text>
+          <Text style={styles.trigger} maxFontSizeMultiplier={1.5}>{experiment.triggerDescription}</Text>
           <View style={[styles.statusPill, experiment.status === 'abandoned' && styles.statusAbandoned]}>
-            <Text style={[styles.statusPillText, experiment.status === 'abandoned' && styles.statusAbandoned]}>
+            <Text style={[styles.statusPillText, experiment.status === 'abandoned' && styles.statusAbandonedText]} maxFontSizeMultiplier={1.5}>
               {experiment.status === 'concluded' ? 'Concluded' : 'Abandoned'}
             </Text>
           </View>
@@ -209,41 +209,41 @@ export default function ExperimentDetailScreen() {
         {result && formatted && experiment.status === 'concluded' && (
           <>
             <View style={styles.resultSection}>
-              <Text style={styles.resultIntro}>{OBSERVATIONAL_LANGUAGE.resultIntro}</Text>
-              <Text style={styles.resultHeadline}>{formatted.headline}</Text>
+              <Text style={styles.resultIntro} maxFontSizeMultiplier={1.5}>{OBSERVATIONAL_LANGUAGE.resultIntro}</Text>
+              <Text style={styles.resultHeadline} maxFontSizeMultiplier={1.5}>{formatted.headline}</Text>
             </View>
 
             <View style={styles.comparisonRow}>
               <View style={[styles.comparisonBox, styles.comparisonFollowed]}>
-                <Text style={styles.comparisonTitle}>When Followed</Text>
-                <Text style={styles.comparisonDetail}>{formatted.followedSummary}</Text>
+                <Text style={styles.comparisonTitle} maxFontSizeMultiplier={1.5}>When Followed</Text>
+                <Text style={styles.comparisonDetail} maxFontSizeMultiplier={1.5}>{formatted.followedSummary}</Text>
               </View>
               <View style={[styles.comparisonBox, styles.comparisonNotFollowed]}>
-                <Text style={styles.comparisonTitle}>When Not Followed</Text>
-                <Text style={styles.comparisonDetail}>{formatted.notFollowedSummary}</Text>
+                <Text style={styles.comparisonTitle} maxFontSizeMultiplier={1.5}>When Not Followed</Text>
+                <Text style={styles.comparisonDetail} maxFontSizeMultiplier={1.5}>{formatted.notFollowedSummary}</Text>
               </View>
             </View>
 
             <View style={styles.conclusionBox}>
-              <Text style={styles.conclusionText}>{formatted.conclusion}</Text>
+              <Text style={styles.conclusionText} maxFontSizeMultiplier={1.5}>{formatted.conclusion}</Text>
             </View>
           </>
         )}
 
         {experiment.status === 'abandoned' && (
           <View style={styles.abandonedBox}>
-            <Text style={styles.abandonedText}>
+            <Text style={styles.abandonedText} maxFontSizeMultiplier={1.5}>
               This experiment was stopped before completion. No results were calculated.
             </Text>
           </View>
         )}
 
         <Pressable style={styles.newExperimentButton} onPress={() => router.push('/experiment/new')}>
-          <FlaskConical color="#000" size={18} />
-          <Text style={styles.newExperimentText}>Start New Experiment</Text>
+          <FlaskConical color="#FFFFFF" size={18} />
+          <Text style={styles.newExperimentText} maxFontSizeMultiplier={1.5}>Start New Experiment</Text>
         </Pressable>
 
-        <Text style={styles.disclaimer}>{OBSERVATIONAL_LANGUAGE.closing}</Text>
+        <Text style={styles.disclaimer} maxFontSizeMultiplier={1.5}>{OBSERVATIONAL_LANGUAGE.closing}</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: colors.hairline,
   },
   backButton: {
     padding: spacing.xs,
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 17,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   headerSpacer: {
     width: 32,
@@ -280,10 +280,10 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
   },
   experimentCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.lg,
     alignItems: 'center',
     marginBottom: spacing.lg,
@@ -292,41 +292,43 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.16)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
   },
   beakerAbandoned: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
   },
   hypothesis: {
     fontSize: 17,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: spacing.xs,
   },
   trigger: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textAlign: 'center',
   },
   statusPill: {
     marginTop: spacing.md,
     paddingHorizontal: spacing.md,
     paddingVertical: 4,
-    backgroundColor: 'rgba(76,175,80,0.15)',
+    backgroundColor: 'rgba(14,140,123,0.14)',
     borderRadius: 12,
   },
   statusAbandoned: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    color: 'rgba(255,255,255,0.4)',
+    backgroundColor: colors.backgroundSubtle,
+  },
+  statusAbandonedText: {
+    color: colors.textTertiary,
   },
   statusPillText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#4CAF50',
+    color: '#0E8C7B',
   },
   progressSection: {
     marginBottom: spacing.lg,
@@ -339,20 +341,20 @@ const styles = StyleSheet.create({
   progressLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   progressRemaining: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
   progressBar: {
     height: 6,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.hairline,
     borderRadius: 3,
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     borderRadius: 3,
   },
   statsRow: {
@@ -362,33 +364,35 @@ const styles = StyleSheet.create({
   },
   statBox: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     alignItems: 'center',
   },
   statValue: {
     fontSize: 24,
     fontWeight: '300',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   statLabel: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginTop: 2,
   },
   followupSection: {
-    backgroundColor: 'rgba(0,229,255,0.05)',
+    backgroundColor: 'rgba(45,212,191,0.08)',
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.2)',
+    borderColor: 'rgba(45,212,191,0.25)',
     padding: spacing.lg,
     marginBottom: spacing.xl,
   },
   followupQuestion: {
     fontSize: 16,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: spacing.md,
   },
@@ -406,18 +410,23 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
   },
   followupYes: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0E8C7B',
   },
   followupNo: {
-    backgroundColor: '#F44336',
+    backgroundColor: '#DC2626',
   },
   followupSkip: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: colors.backgroundSubtle,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
   },
   followupButtonText: {
     fontSize: 14,
     fontWeight: '600',
     color: '#fff',
+  },
+  followupSkipText: {
+    color: colors.textPrimary,
   },
   actions: {
     gap: spacing.sm,
@@ -426,12 +435,14 @@ const styles = StyleSheet.create({
   concludeButton: {
     alignItems: 'center',
     paddingVertical: spacing.md,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
   },
   concludeButtonText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   abandonButton: {
     flexDirection: 'row',
@@ -442,11 +453,11 @@ const styles = StyleSheet.create({
   },
   abandonButtonText: {
     fontSize: 14,
-    color: '#F44336',
+    color: '#DC2626',
   },
   disclaimer: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.xl,
     fontStyle: 'italic',
@@ -456,14 +467,14 @@ const styles = StyleSheet.create({
   },
   resultIntro: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.xs,
   },
   resultHeadline: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     textAlign: 'center',
   },
   comparisonRow: {
@@ -471,49 +482,53 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   comparisonBox: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     borderWidth: 1,
     padding: spacing.md,
   },
   comparisonFollowed: {
-    borderColor: 'rgba(76,175,80,0.3)',
+    borderColor: 'rgba(14,140,123,0.4)',
   },
   comparisonNotFollowed: {
-    borderColor: 'rgba(244,67,54,0.3)',
+    borderColor: 'rgba(220,38,38,0.4)',
   },
   comparisonTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
   comparisonDetail: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
     lineHeight: 20,
   },
   conclusionBox: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
     padding: spacing.lg,
     marginBottom: spacing.xl,
   },
   conclusionText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     lineHeight: 22,
     textAlign: 'center',
   },
   abandonedBox: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
     padding: spacing.lg,
     marginBottom: spacing.xl,
   },
   abandonedText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   newExperimentButton: {
@@ -521,7 +536,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     borderRadius: borderRadius.lg,
     paddingVertical: spacing.md,
     marginBottom: spacing.lg,
@@ -529,6 +544,6 @@ const styles = StyleSheet.create({
   newExperimentText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: '#FFFFFF',
   },
 });

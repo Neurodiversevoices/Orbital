@@ -67,20 +67,20 @@ export default function NewExperimentScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} style={styles.backButton}>
-            <ChevronLeft color="rgba(255,255,255,0.7)" size={24} />
+            <ChevronLeft color={colors.textSecondary} size={24} />
           </Pressable>
-          <Text style={styles.title}>New Experiment</Text>
+          <Text style={styles.title} maxFontSizeMultiplier={1.5}>New Experiment</Text>
           <View style={styles.headerSpacer} />
         </View>
 
         <View style={styles.emptyState}>
-          <FlaskConical color="rgba(255,255,255,0.2)" size={48} />
-          <Text style={styles.emptyTitle}>No patterns detected yet</Text>
-          <Text style={styles.emptyText}>
+          <FlaskConical color={colors.textTertiary} size={48} />
+          <Text style={styles.emptyTitle} maxFontSizeMultiplier={1.5}>No patterns detected yet</Text>
+          <Text style={styles.emptyText} maxFontSizeMultiplier={1.5}>
             Keep logging your capacity. When patterns emerge, experiment suggestions will appear here.
           </Text>
           <Pressable style={styles.backButtonLarge} onPress={() => router.back()}>
-            <Text style={styles.backButtonText}>Go Back</Text>
+            <Text style={styles.backButtonText} maxFontSizeMultiplier={1.5}>Go Back</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -91,26 +91,26 @@ export default function NewExperimentScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <ChevronLeft color="rgba(255,255,255,0.7)" size={24} />
+          <ChevronLeft color={colors.textSecondary} size={24} />
         </Pressable>
-        <Text style={styles.title}>New Experiment</Text>
+        <Text style={styles.title} maxFontSizeMultiplier={1.5}>New Experiment</Text>
         <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.patternCard}>
           <View style={styles.patternIcon}>
-            <FlaskConical color="#00E5FF" size={24} />
+            <FlaskConical color={colors.primary} size={24} />
           </View>
-          <Text style={styles.patternIntro}>{OBSERVATIONAL_LANGUAGE.intro}</Text>
-          <Text style={styles.patternDescription}>{suggestion.patternDescription}</Text>
+          <Text style={styles.patternIntro} maxFontSizeMultiplier={1.5}>{OBSERVATIONAL_LANGUAGE.intro}</Text>
+          <Text style={styles.patternDescription} maxFontSizeMultiplier={1.5}>{suggestion.patternDescription}</Text>
         </View>
 
-        <Text style={styles.question}>{suggestion.question}</Text>
+        <Text style={styles.question} maxFontSizeMultiplier={1.5}>{suggestion.question}</Text>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>HYPOTHESIS</Text>
-          <Text style={styles.sectionSubtitle}>{OBSERVATIONAL_LANGUAGE.hypothesis}</Text>
+          <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>HYPOTHESIS</Text>
+          <Text style={styles.sectionSubtitle} maxFontSizeMultiplier={1.5}>{OBSERVATIONAL_LANGUAGE.hypothesis}</Text>
 
           {suggestion.hypotheses.map((hyp, index) => {
             const isCustom = hyp.toLowerCase().includes('write your own');
@@ -123,9 +123,9 @@ export default function NewExperimentScreen() {
                 onPress={() => setSelectedHypothesis(isCustom ? 'custom' : hyp)}
               >
                 <View style={[styles.radio, isSelected && styles.radioSelected]}>
-                  {isSelected && <Check color="#000" size={14} />}
+                  {isSelected && <Check color="#FFFFFF" size={14} />}
                 </View>
-                <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+                <Text style={[styles.optionText, isSelected && styles.optionTextSelected]} maxFontSizeMultiplier={1.5}>
                   {isCustom ? 'Write your own...' : hyp}
                 </Text>
               </Pressable>
@@ -136,17 +136,18 @@ export default function NewExperimentScreen() {
             <TextInput
               style={styles.customInput}
               placeholder="Describe what you want to try..."
-              placeholderTextColor="rgba(255,255,255,0.5)"
+              placeholderTextColor={colors.textTertiary}
               value={customHypothesis}
               onChangeText={setCustomHypothesis}
               multiline
               autoFocus
+              maxFontSizeMultiplier={1.5}
             />
           )}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>DURATION</Text>
+          <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>DURATION</Text>
           <View style={styles.durationOptions}>
             {DURATION_OPTIONS.map(opt => (
               <Pressable
@@ -154,7 +155,7 @@ export default function NewExperimentScreen() {
                 style={[styles.durationOption, durationWeeks === opt.weeks && styles.durationSelected]}
                 onPress={() => setDurationWeeks(opt.weeks)}
               >
-                <Text style={[styles.durationText, durationWeeks === opt.weeks && styles.durationTextSelected]}>
+                <Text style={[styles.durationText, durationWeeks === opt.weeks && styles.durationTextSelected]} maxFontSizeMultiplier={1.5}>
                   {opt.label}
                 </Text>
               </Pressable>
@@ -168,18 +169,18 @@ export default function NewExperimentScreen() {
             onPress={handleStart}
             disabled={!canStart || isStarting}
           >
-            <FlaskConical color="#000" size={20} />
-            <Text style={styles.startButtonText}>
+            <FlaskConical color="#FFFFFF" size={20} />
+            <Text style={styles.startButtonText} maxFontSizeMultiplier={1.5}>
               {isStarting ? 'Starting...' : 'Start Experiment'}
             </Text>
           </Pressable>
 
           <Pressable style={styles.declineButton} onPress={handleDecline}>
-            <Text style={styles.declineButtonText}>Not right now</Text>
+            <Text style={styles.declineButtonText} maxFontSizeMultiplier={1.5}>Not right now</Text>
           </Pressable>
         </View>
 
-        <Text style={styles.disclaimer}>{OBSERVATIONAL_LANGUAGE.abandon}</Text>
+        <Text style={styles.disclaimer} maxFontSizeMultiplier={1.5}>{OBSERVATIONAL_LANGUAGE.abandon}</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -197,7 +198,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: colors.hairline,
   },
   backButton: {
     padding: spacing.xs,
@@ -205,7 +206,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 17,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   headerSpacer: {
     width: 32,
@@ -216,10 +217,10 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
   },
   patternCard: {
-    backgroundColor: 'rgba(0,229,255,0.05)',
+    backgroundColor: 'rgba(45,212,191,0.08)',
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.2)',
+    borderColor: 'rgba(45,212,191,0.25)',
     padding: spacing.lg,
     alignItems: 'center',
     marginBottom: spacing.lg,
@@ -228,26 +229,26 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.16)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
   },
   patternIntro: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
   patternDescription: {
     fontSize: 16,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     textAlign: 'center',
   },
   question: {
     fontSize: 18,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: spacing.xl,
     lineHeight: 26,
@@ -258,60 +259,60 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.35)',
+    color: colors.textTertiary,
     letterSpacing: 1,
     marginBottom: 4,
   },
   sectionSubtitle: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.md,
   },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.sm,
     gap: spacing.md,
   },
   optionSelected: {
-    backgroundColor: 'rgba(0,229,255,0.08)',
-    borderColor: 'rgba(0,229,255,0.3)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
+    borderColor: 'rgba(45,212,191,0.4)',
   },
   radio: {
     width: 24,
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderColor: colors.textTertiary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   radioSelected: {
-    backgroundColor: '#00E5FF',
-    borderColor: '#00E5FF',
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   optionText: {
     flex: 1,
     fontSize: 15,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
   },
   optionTextSelected: {
-    color: '#00E5FF',
+    color: '#0E8C7B',
     fontWeight: '500',
   },
   customInput: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.3)',
+    borderColor: 'rgba(45,212,191,0.4)',
     padding: spacing.md,
     fontSize: 15,
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     minHeight: 80,
     textAlignVertical: 'top',
   },
@@ -322,22 +323,22 @@ const styles = StyleSheet.create({
   durationOption: {
     flex: 1,
     paddingVertical: spacing.sm,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     alignItems: 'center',
   },
   durationSelected: {
-    backgroundColor: 'rgba(0,229,255,0.08)',
-    borderColor: 'rgba(0,229,255,0.3)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
+    borderColor: 'rgba(45,212,191,0.4)',
   },
   durationText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   durationTextSelected: {
-    color: '#00E5FF',
+    color: '#0E8C7B',
     fontWeight: '500',
   },
   actions: {
@@ -349,7 +350,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     borderRadius: borderRadius.lg,
     paddingVertical: spacing.md,
   },
@@ -359,7 +360,7 @@ const styles = StyleSheet.create({
   startButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: '#FFFFFF',
   },
   declineButton: {
     alignItems: 'center',
@@ -367,11 +368,11 @@ const styles = StyleSheet.create({
   },
   declineButtonText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
   disclaimer: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.xl,
   },
@@ -384,13 +385,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     marginTop: spacing.md,
     marginBottom: spacing.sm,
   },
   emptyText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: spacing.xl,
@@ -398,11 +399,13 @@ const styles = StyleSheet.create({
   backButtonLarge: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
   },
   backButtonText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
   },
 });

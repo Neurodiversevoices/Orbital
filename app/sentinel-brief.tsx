@@ -63,8 +63,8 @@ export default function SentinelBriefScreen() {
     <SafeAreaView style={commonStyles.screen}>
       {/* DEMO Banner — Required */}
       <View style={styles.demoBanner}>
-        <Text style={styles.demoBannerText}>{UNIVERSITY_SENTINEL.demoBanner}</Text>
-        <Text style={styles.demoBannerSubtext}>
+        <Text style={styles.demoBannerText} maxFontSizeMultiplier={1.5}>{UNIVERSITY_SENTINEL.demoBanner}</Text>
+        <Text style={styles.demoBannerSubtext} maxFontSizeMultiplier={1.5}>
           Synthetic data · Non-operational · Contact Orbital for access
         </Text>
       </View>
@@ -75,16 +75,16 @@ export default function SentinelBriefScreen() {
           <ArrowLeft size={24} color={colors.textPrimary} />
         </Pressable>
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>Sentinel Brief</Text>
-          <Text style={styles.headerSubtitle}>{UNIVERSITY_SENTINEL.vertical}</Text>
+          <Text style={styles.headerTitle} maxFontSizeMultiplier={1.5}>Sentinel Brief</Text>
+          <Text style={styles.headerSubtitle} maxFontSizeMultiplier={1.5}>{UNIVERSITY_SENTINEL.vertical}</Text>
         </View>
         <View style={styles.headerSpacer} />
       </View>
 
       {/* Governance Notice */}
       <View style={styles.governanceNotice}>
-        <AlertTriangle size={16} color="#E8A830" />
-        <Text style={styles.governanceText}>
+        <AlertTriangle size={16} color="#F59E0B" />
+        <Text style={styles.governanceText} maxFontSizeMultiplier={1.5}>
           This is a demo-only preview. Real institutional access requires direct
           engagement with Orbital.
         </Text>
@@ -93,7 +93,7 @@ export default function SentinelBriefScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Cohort Selector */}
         <View style={styles.cohortSelector}>
-          <Text style={styles.cohortSelectorLabel}>SELECT COHORT</Text>
+          <Text style={styles.cohortSelectorLabel} maxFontSizeMultiplier={1.5}>SELECT COHORT</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.cohortPills}>
             {UNIVERSITY_AGE_COHORTS.map((cohort) => (
               <Pressable
@@ -109,6 +109,7 @@ export default function SentinelBriefScreen() {
                     styles.cohortPillText,
                     selectedCohort === cohort && styles.cohortPillTextSelected,
                   ]}
+                  maxFontSizeMultiplier={1.5}
                 >
                   {UNIVERSITY_AGE_COHORT_LABELS[cohort]}
                 </Text>
@@ -131,7 +132,7 @@ export default function SentinelBriefScreen() {
 
         {/* Assessments */}
         <View style={styles.assessmentsSection}>
-          <Text style={styles.assessmentsTitle}>ASSESSMENT</Text>
+          <Text style={styles.assessmentsTitle} maxFontSizeMultiplier={1.5}>ASSESSMENT</Text>
           {sentinelData.assessments.map((assessment, index) => (
             <View key={index} style={styles.assessmentItem}>
               <View
@@ -140,15 +141,15 @@ export default function SentinelBriefScreen() {
                   assessment.severity === 'warning' && styles.assessmentDotWarning,
                 ]}
               />
-              <Text style={styles.assessmentText}>{assessment.text}</Text>
+              <Text style={styles.assessmentText} maxFontSizeMultiplier={1.5}>{assessment.text}</Text>
             </View>
           ))}
         </View>
 
         {/* Demo Notice */}
         <View style={styles.demoNoticeSection}>
-          <Text style={styles.demoNoticeTitle}>DEMO CONSTRAINTS</Text>
-          <Text style={styles.demoNoticeText}>
+          <Text style={styles.demoNoticeTitle} maxFontSizeMultiplier={1.5}>DEMO CONSTRAINTS</Text>
+          <Text style={styles.demoNoticeText} maxFontSizeMultiplier={1.5}>
             • Synthetic, aggregate data only{'\n'}
             • No individual tracking or identification{'\n'}
             • Non-operational — monitoring demo only{'\n'}
@@ -159,13 +160,13 @@ export default function SentinelBriefScreen() {
 
         {/* CTA Button */}
         <Pressable style={styles.ctaButton} onPress={handleContact}>
-          <Text style={styles.ctaButtonText}>Contact Orbital for Institutional Access</Text>
-          <ExternalLink size={14} color="#000" />
+          <Text style={styles.ctaButtonText} maxFontSizeMultiplier={1.5}>Contact Orbital for Institutional Access</Text>
+          <ExternalLink size={14} color="#FFFFFF" />
         </Pressable>
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>{UNIVERSITY_SENTINEL.footerText}</Text>
+          <Text style={styles.footerText} maxFontSizeMultiplier={1.5}>{UNIVERSITY_SENTINEL.footerText}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -178,20 +179,22 @@ export default function SentinelBriefScreen() {
 
 const styles = StyleSheet.create({
   demoBanner: {
-    backgroundColor: '#7A9AAA',
+    backgroundColor: colors.backgroundSubtle,
     paddingVertical: 8,
     paddingHorizontal: 16,
     alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.hairline,
   },
   demoBannerText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#000',
+    color: colors.textPrimary,
     letterSpacing: 1,
   },
   demoBannerSubtext: {
     fontSize: 10,
-    color: 'rgba(0,0,0,0.7)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   header: {
@@ -201,7 +204,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.06)',
+    borderBottomColor: colors.hairline,
   },
   headerBack: {
     padding: spacing.sm,
@@ -212,11 +215,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   headerSubtitle: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   headerSpacer: {
@@ -226,17 +229,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: spacing.sm,
-    backgroundColor: 'rgba(232,168,48,0.1)',
+    backgroundColor: 'rgba(245,158,11,0.10)',
     margin: spacing.md,
     padding: spacing.md,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(232,168,48,0.3)',
+    borderColor: 'rgba(245,158,11,0.30)',
   },
   governanceText: {
     flex: 1,
     fontSize: 12,
-    color: 'rgba(232,168,48,0.9)',
+    color: '#9A6B0E',
     lineHeight: 18,
   },
   content: {
@@ -249,7 +252,7 @@ const styles = StyleSheet.create({
   cohortSelectorLabel: {
     fontSize: 10,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     letterSpacing: 0.5,
     marginBottom: spacing.sm,
   },
@@ -259,39 +262,39 @@ const styles = StyleSheet.create({
   cohortPill: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.sm,
     marginRight: spacing.sm,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
   },
   cohortPillSelected: {
-    backgroundColor: 'rgba(0,229,255,0.15)',
-    borderColor: 'rgba(0,229,255,0.4)',
+    backgroundColor: 'rgba(45,212,191,0.12)',
+    borderColor: 'rgba(45,212,191,0.4)',
   },
   cohortPillText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
   },
   cohortPillTextSelected: {
-    color: '#00E5FF',
+    color: '#0E8C7B',
     fontWeight: '600',
   },
   chartSection: {
     marginBottom: spacing.lg,
   },
   assessmentsSection: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
   },
   assessmentsTitle: {
     fontSize: 10,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     letterSpacing: 0.5,
     marginBottom: spacing.sm,
   },
@@ -304,37 +307,37 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(0,229,255,0.6)',
+    backgroundColor: colors.primary,
     marginTop: 5,
     marginRight: spacing.sm,
   },
   assessmentDotWarning: {
-    backgroundColor: '#E8A830',
+    backgroundColor: '#F59E0B',
   },
   assessmentText: {
     flex: 1,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     lineHeight: 20,
   },
   demoNoticeSection: {
-    backgroundColor: 'rgba(122,154,170,0.1)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     padding: spacing.md,
     marginBottom: spacing.lg,
     borderWidth: 1,
-    borderColor: 'rgba(122,154,170,0.3)',
+    borderColor: colors.cardBorder,
   },
   demoNoticeTitle: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#7A9AAA',
+    color: colors.textSecondary,
     letterSpacing: 0.5,
     marginBottom: spacing.sm,
   },
   demoNoticeText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 20,
   },
   ctaButton: {
@@ -342,7 +345,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     paddingVertical: spacing.md,
     borderRadius: borderRadius.md,
     marginBottom: spacing.lg,
@@ -350,7 +353,7 @@ const styles = StyleSheet.create({
   ctaButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
+    color: '#FFFFFF',
   },
   footer: {
     alignItems: 'center',
@@ -360,7 +363,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textAlign: 'center',
     lineHeight: 18,
   },
