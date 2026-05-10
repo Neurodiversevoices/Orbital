@@ -27,6 +27,7 @@ import {
   Label,
 } from './_ui';
 import { EmptyState } from '../../components';
+import { colors } from '../../theme';
 
 export default function CirclesHome() {
   const router = useRouter();
@@ -89,7 +90,7 @@ export default function CirclesHome() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#19D3FF"
+            tintColor={colors.primary}
           />
         }
       >
@@ -120,8 +121,9 @@ export default function CirclesHome() {
                 {index > 0 && <Divider />}
                 <View style={{ paddingVertical: 8 }}>
                   <Text
+                    maxFontSizeMultiplier={1.5}
                     style={{
-                      color: '#D8E5FF',
+                      color: colors.textPrimary,
                       fontWeight: '800',
                       marginBottom: 8,
                     }}
@@ -162,8 +164,9 @@ export default function CirclesHome() {
                 {index > 0 && <Divider />}
                 <View style={{ paddingVertical: 8 }}>
                   <Text
+                    maxFontSizeMultiplier={1.5}
                     style={{
-                      color: '#D8E5FF',
+                      color: colors.textPrimary,
                       fontWeight: '800',
                     }}
                   >

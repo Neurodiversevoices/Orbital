@@ -70,7 +70,7 @@ export default function DashboardScreen() {
   };
 
   const getTrendColor = () => {
-    if (!reportData) return 'rgba(255,255,255,0.5)';
+    if (!reportData) return colors.textSecondary;
     switch (reportData.trajectory.trend) {
       case 'improving': return DASHBOARD_STATE_COLORS.high;
       case 'declining': return DASHBOARD_STATE_COLORS.low;
@@ -294,7 +294,7 @@ export default function DashboardScreen() {
 
             {/* Disclaimer */}
             <View style={styles.disclaimerCard}>
-              <AlertTriangle color="rgba(255,255,255,0.3)" size={20} />
+              <AlertTriangle color={colors.textTertiary} size={20} />
               <Text style={styles.disclaimerText}>
                 {reportData.watermark.disclaimer}
               </Text>
@@ -309,7 +309,7 @@ export default function DashboardScreen() {
           </>
         ) : (
           <View style={styles.emptyState}>
-            <Building2 color="rgba(255,255,255,0.2)" size={48} />
+            <Building2 color={colors.textTertiary} size={48} />
             <Text style={styles.emptyTitle}>No Brief Available</Text>
             <Text style={styles.emptyText}>
               Capacity data for the selected period will appear here.
@@ -338,13 +338,13 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.sm,
   },
   demoBanner: {
-    backgroundColor: '#7A9AAA',
+    backgroundColor: '#F59E0B',
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     marginHorizontal: spacing.md,
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: 'rgba(232,168,48,0.15)',
+    backgroundColor: 'rgba(245,158,11,0.15)',
     paddingVertical: spacing.sm,
     marginHorizontal: spacing.md,
     borderRadius: 8,
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
   periodSelector: {
     flexDirection: 'row',
     marginHorizontal: spacing.md,
-    backgroundColor: colors.card,
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: 10,
     padding: 4,
     marginBottom: spacing.md,
@@ -394,15 +394,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   periodButtonActive: {
-    backgroundColor: 'rgba(0,229,255,0.2)',
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
   },
   periodButtonText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     fontWeight: '500',
   },
   periodButtonTextActive: {
-    color: DASHBOARD_STATE_COLORS.high,
+    color: '#0E8C7B',
   },
   content: {
     flex: 1,
@@ -414,7 +416,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
   metricsGrid: {
     flexDirection: 'row',
@@ -438,17 +440,17 @@ const styles = StyleSheet.create({
   },
   metricLabel: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     fontWeight: '500',
   },
   metricValue: {
     fontSize: 28,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   metricSubtext: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.35)',
+    color: colors.textTertiary,
     marginTop: 2,
   },
   section: {
@@ -468,7 +470,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
   },
   distributionBar: {
     flexDirection: 'row',
