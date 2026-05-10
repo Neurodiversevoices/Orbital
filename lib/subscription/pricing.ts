@@ -102,7 +102,7 @@ export const STARTER_TIER = {
   name: 'Starter',
   limits: {
     maxSignalsPerMonth: Infinity,  // Unlimited signals for all users
-    maxPatternHistoryDays: 7,      // Free users see 7 days; Pro unlocks full history
+    maxPatternHistoryDays: 30,     // Free: 30-day window (was 7); Pro unlocks full history
   },
 } as const;
 
@@ -182,9 +182,9 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
     shortName: 'Pro',
     description: 'Private capacity tracking for personal use',
     pricing: {
-      monthly: 29,
-      annual: 290,
-      annualSavingsPercent: 17,
+      monthly: 9.99,
+      annual: 79,
+      annualSavingsPercent: 34,
     },
     seats: 1,
     features: [
@@ -214,9 +214,9 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
     shortName: 'Family',
     description: 'Full Pro for the whole household',
     pricing: {
-      monthly: 49,
-      annual: 490,
-      annualSavingsPercent: 17,
+      monthly: 14.99,
+      annual: 129,
+      annualSavingsPercent: 28,
     },
     seats: 5,
     features: [
@@ -245,9 +245,9 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
     shortName: 'Family+',
     description: 'For larger or blended families',
     pricing: {
-      monthly: 69,
-      annual: 690,
-      annualSavingsPercent: 17,
+      monthly: 19.99,
+      annual: 169,
+      annualSavingsPercent: 30,
     },
     seats: 8,
     features: [
@@ -276,9 +276,9 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
     shortName: 'Circle',
     description: 'Mesh visibility for families and trusted groups',
     pricing: {
-      monthly: 79,
-      annual: 790,
-      annualSavingsPercent: 17,
+      monthly: 17.99,
+      annual: 149,
+      annualSavingsPercent: 31,
     },
     seats: 5,
     features: [
@@ -294,9 +294,9 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
     hasAdminDashboard: false,
     isBundle: false,
     expansionPricing: {
-      monthly: 10,
-      annual: 100,
-      annualSavingsPercent: 17,
+      monthly: 3.99,
+      annual: 39,
+      annualSavingsPercent: 18,
     },
     productIds: {
       monthly: PRODUCT_IDS.CIRCLE_MONTHLY,
@@ -314,7 +314,7 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
     description: 'Full Pro access for each member',
     pricing: {
       monthly: 0, // ANNUAL-ONLY
-      annual: 2700,
+      annual: 990,
       annualSavingsPercent: 0,
     },
     seats: 10,
@@ -347,7 +347,7 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
     description: 'Full Pro access for each member',
     pricing: {
       monthly: 0, // ANNUAL-ONLY
-      annual: 4000,
+      annual: 1390,
       annualSavingsPercent: 0,
     },
     seats: 15,
@@ -380,7 +380,7 @@ export const PRICING_TIERS: Record<string, PricingTier> = {
     description: 'Full Pro access for each member',
     pricing: {
       monthly: 0, // ANNUAL-ONLY
-      annual: 5200,
+      annual: 1790,
       annualSavingsPercent: 0,
     },
     seats: 20,
@@ -425,9 +425,10 @@ export const QCR_PRODUCTS: Record<string, QCRProduct> = {
   // ===========================================================================
   qcr_individual: {
     id: 'qcr_individual',
+    // PRICE_REPRICE_2026_05: was $149 — now $24/quarter (matches CCI 30-day)
     productId: PRODUCT_IDS.QCR_INDIVIDUAL,
     name: 'Individual QCR',
-    price: 149,
+    price: 24,
     scope: 'individual',
     description: 'Personal quarterly capacity analysis',
     features: [
@@ -448,7 +449,7 @@ export const QCR_PRODUCTS: Record<string, QCRProduct> = {
     id: 'qcr_circle',
     productId: PRODUCT_IDS.QCR_CIRCLE,
     name: 'Circle QCR',
-    price: 299,
+    price: 79,
     scope: 'circle',
     description: 'Circle-wide capacity analysis with relational dynamics',
     features: [
@@ -469,7 +470,7 @@ export const QCR_PRODUCTS: Record<string, QCRProduct> = {
     id: 'qcr_bundle',
     productId: PRODUCT_IDS.QCR_BUNDLE,
     name: 'Bundle QCR',
-    price: 499,
+    price: 159,
     scope: 'bundle',
     description: 'Program-level capacity analysis for administrators',
     features: [
@@ -571,10 +572,10 @@ export const ADMIN_ADDON_PRICING = {
  * CCI milestone tier pricing (one-time, by report duration)
  */
 export const CCI_PRICING = {
-  thirtyDay: 99,   // 30-day report  — orbital_cci_30
-  sixtyDay: 149,   // 60-day report  — orbital_cci_60
-  ninetyDay: 199,  // 90-day report  — orbital_cci_90
-  bundle: 349,     // Full bundle    — orbital_cci_bundle
+  thirtyDay: 24,   // 30-day report  — orbital_cci_30
+  sixtyDay: 34,    // 60-day report  — orbital_cci_60
+  ninetyDay: 49,   // 90-day report  — orbital_cci_90 (Pro users see $39 via paid-user discount)
+  bundle: 79,      // Full bundle    — orbital_cci_bundle (saves $28 vs buying separately)
 } as const;
 
 /**
@@ -583,8 +584,8 @@ export const CCI_PRICING = {
  * - Bundle: $999 flat rate for any bundle size
  */
 export const CCI_GROUP_PRICING = {
-  circleAll: 399,   // All circle members on one CCI
-  bundleAll: 999,   // All bundle members on one CCI (flat)
+  circleAll: 99,    // All circle members on one CCI
+  bundleAll: 249,   // All bundle members on one CCI (flat)
 } as const;
 
 /**

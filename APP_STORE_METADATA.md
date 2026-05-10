@@ -61,10 +61,11 @@ BUILT FOR PEOPLE WHO THINK DIFFERENTLY
 Designed from the ground up for neurodivergent adults, people with chronic fluctuations, caregivers, and high-performance professionals whose capacity varies in ways that standard tools don't capture.
 
 PRICING
-• Starter (Free): Unlimited logging, 7-day pattern history
-• Pro ($29/month or $290/year): Full pattern history, trend analysis, data export
-• Circle ($79/month or $790/year): Shared visibility for up to 5 people
-• CCI: One-time purchase for capacity credential generation
+• Starter (Free): Unlimited logging, 30-day pattern history
+• Pro ($9.99/month or $79/year): Full pattern history, trend analysis, data export
+• Family ($14.99/month or $129/year): Full Pro for up to 5 seats
+• Circle ($17.99/month or $149/year): Shared visibility + relational view for up to 5 people
+• CCI reports (one-time): 30-day $24, 60-day $34, 90-day $49, full bundle $79
 
 OFFLINE-FIRST
 Works without internet. Your data is stored locally first, always. Cloud sync happens automatically when you're connected.
@@ -123,10 +124,11 @@ BUILT FOR PEOPLE WHO THINK DIFFERENTLY
 Designed from the ground up for neurodivergent individuals, people with chronic fluctuations, caregivers, and anyone whose capacity shifts in ways that standard tools don't capture.
 
 PRICING
-- Starter (Free): Unlimited logging, 7-day pattern history
-- Pro ($29/month or $290/year): Full pattern history, trend analysis, data export
-- Circle ($79/month or $790/year): Shared visibility for up to 5 people
-- CCI: One-time purchase for capacity credential generation
+- Starter (Free): Unlimited logging, 30-day pattern history
+- Pro ($9.99/month or $79/year): Full pattern history, trend analysis, data export
+- Family ($14.99/month or $129/year): Full Pro for up to 5 seats
+- Circle ($17.99/month or $149/year): Shared visibility + relational view for up to 5 people
+- CCI reports (one-time): 30-day $24, 60-day $34, 90-day $49, full bundle $79
 
 OFFLINE-FIRST
 Works without internet. Your data is stored locally first, always. Cloud sync happens automatically when you're connected.
