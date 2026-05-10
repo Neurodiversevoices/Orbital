@@ -160,7 +160,7 @@ export function ModeSelector({ compact = false }: ModeSelectorProps) {
             </View>
           )}
         </View>
-        <ChevronDown size={compact ? 14 : 16} color="rgba(255,255,255,0.5)" />
+        <ChevronDown size={compact ? 14 : 16} color={colors.textSecondary} />
       </Pressable>
 
       {/* Mode Selection Modal */}
@@ -180,7 +180,7 @@ export function ModeSelector({ compact = false }: ModeSelectorProps) {
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Explore Orbital Modes</Text>
                 <Pressable onPress={() => setIsOpen(false)} style={styles.closeButton}>
-                  <X size={20} color="rgba(255,255,255,0.6)" />
+                  <X size={20} color={colors.textSecondary} />
                 </Pressable>
               </View>
 
@@ -282,7 +282,7 @@ export function ModeSelector({ compact = false }: ModeSelectorProps) {
                   <TextInput
                     style={styles.orgInput}
                     placeholder="ORG CODE"
-                    placeholderTextColor="rgba(255,255,255,0.5)"
+                    placeholderTextColor={colors.textTertiary}
                     value={orgCodeInput}
                     onChangeText={setOrgCodeInput}
                     autoCapitalize="characters"
@@ -292,7 +292,7 @@ export function ModeSelector({ compact = false }: ModeSelectorProps) {
                   <TextInput
                     style={styles.orgInput}
                     placeholder="Organization Name (optional)"
-                    placeholderTextColor="rgba(255,255,255,0.5)"
+                    placeholderTextColor={colors.textTertiary}
                     value={orgNameInput}
                     onChangeText={setOrgNameInput}
                     autoCorrect={false}
@@ -328,10 +328,10 @@ const styles = StyleSheet.create({
   selectorButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.hairline,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     gap: spacing.xs,
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(15,22,36,0.45)',
     justifyContent: 'flex-end',
   },
   modalContent: {
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.xs,
@@ -413,15 +413,15 @@ const styles = StyleSheet.create({
   modeLabel: {
     fontSize: 15,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: 2,
   },
   modeDescription: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   orgRequiredBadge: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.hairline,
     borderRadius: 4,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
   orgRequiredText: {
     fontSize: 9,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     letterSpacing: 0.5,
   },
   orgInputModal: {
@@ -445,29 +445,29 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 320,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.hairline,
   },
   orgInputTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: spacing.xs,
   },
   orgInputSubtitle: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.lg,
   },
   orgInput: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.hairline,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     fontSize: 15,
     marginBottom: spacing.sm,
   },
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
   },
   orgCancelButton: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.hairline,
     borderRadius: borderRadius.md,
     paddingVertical: spacing.sm,
     alignItems: 'center',
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
   orgCancelText: {
     fontSize: 14,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   orgSubmitButton: {
     flex: 1,
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
   },
   governanceText: {
     fontSize: 11,
-    color: '#E8A830',
+    color: '#F59E0B',
     textAlign: 'center',
   },
   modeLabelRow: {
@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
   demoBadgeText: {
     fontSize: 9,
     fontWeight: '700',
-    color: '#E8A830',
+    color: '#F59E0B',
     letterSpacing: 0.5,
   },
   liveBadge: {
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
   liveBadgeText: {
     fontSize: 9,
     fontWeight: '700',
-    color: '#4CAF50',
+    color: '#0E8C7B',
     letterSpacing: 0.5,
   },
   institutionalCta: {

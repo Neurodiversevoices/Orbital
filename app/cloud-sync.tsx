@@ -233,7 +233,7 @@ export default function CloudSyncScreen() {
         </View>
 
         <View style={styles.notConfigured}>
-          <Cloud size={48} color="rgba(255,255,255,0.3)" />
+          <Cloud size={48} color={colors.textTertiary} />
           <Text style={styles.notConfiguredTitle}>Cloud Not Available</Text>
           <Text style={styles.notConfiguredText}>
             Cloud services are not configured in this build.
@@ -262,7 +262,7 @@ export default function CloudSyncScreen() {
           <Animated.View entering={FadeInDown.duration(400)} style={styles.syncCard}>
             <View style={styles.syncCardHeader}>
               <View style={styles.syncIconContainer}>
-                <Cloud size={24} color="#00E5FF" />
+                <Cloud size={24} color={colors.primary} />
               </View>
               <View style={styles.syncCardText}>
                 <Text style={styles.syncCardTitle}>Cloud Sync Active</Text>
@@ -274,7 +274,7 @@ export default function CloudSyncScreen() {
 
             <View style={styles.syncStatus}>
               <View style={styles.syncStatusRow}>
-                <Clock size={14} color="rgba(255,255,255,0.4)" />
+                <Clock size={14} color={colors.textSecondary} />
                 <Text style={styles.syncStatusText}>
                   Last sync: {cloudSync.status.lastPushAt
                     ? formatRelativeTime(cloudSync.status.lastPushAt)
@@ -291,8 +291,8 @@ export default function CloudSyncScreen() {
               )}
               {cloudSync.status.failedCount > 0 && (
                 <View style={styles.syncStatusRow}>
-                  <AlertCircle size={14} color="#FF5252" />
-                  <Text style={[styles.syncStatusText, { color: '#FF5252' }]}>
+                  <AlertCircle size={14} color="#DC2626" />
+                  <Text style={[styles.syncStatusText, { color: '#DC2626' }]}>
                     {cloudSync.status.failedCount} failed
                   </Text>
                 </View>
@@ -304,7 +304,7 @@ export default function CloudSyncScreen() {
               >
                 <RefreshCw
                   size={14}
-                  color="#00E5FF"
+                  color={colors.primary}
                   style={cloudSync.status.isSyncing ? { opacity: 0.5 } : undefined}
                 />
                 <Text style={styles.syncNowText}>
@@ -325,7 +325,7 @@ export default function CloudSyncScreen() {
           <Animated.View entering={FadeInDown.delay(150).duration(400)} style={styles.accountCard}>
             <View style={styles.accountHeader}>
               <View style={styles.avatarContainer}>
-                <User size={24} color="#00E5FF" />
+                <User size={24} color={colors.primary} />
               </View>
               <View style={styles.accountInfo}>
                 <Text style={styles.accountEmail}>{auth.user?.email || 'Anonymous User'}</Text>
@@ -335,13 +335,13 @@ export default function CloudSyncScreen() {
 
             {/* Device Info */}
             <View style={styles.deviceInfo}>
-              <Smartphone size={14} color="rgba(255,255,255,0.4)" />
+              <Smartphone size={14} color={colors.textSecondary} />
               <Text style={styles.deviceText}>Device: {deviceId.slice(0, 16)}...</Text>
             </View>
 
             <View style={styles.accountActions}>
               <Pressable style={styles.accountAction} onPress={handleSignOut}>
-                <LogOut size={18} color="rgba(255,255,255,0.7)" />
+                <LogOut size={18} color={colors.textPrimary} />
                 <Text style={styles.accountActionText}>Sign Out</Text>
               </Pressable>
             </View>
@@ -354,11 +354,11 @@ export default function CloudSyncScreen() {
             </Text>
 
             <View style={styles.inputContainer}>
-              <Mail size={18} color="rgba(255,255,255,0.4)" />
+              <Mail size={18} color={colors.textSecondary} />
               <TextInput
                 style={styles.input}
                 placeholder="Email"
-                placeholderTextColor="rgba(255,255,255,0.5)"
+                placeholderTextColor={colors.textTertiary}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -370,20 +370,20 @@ export default function CloudSyncScreen() {
             {authMode !== 'magic' && (
               <>
                 <View style={styles.inputContainer}>
-                  <Lock size={18} color="rgba(255,255,255,0.4)" />
+                  <Lock size={18} color={colors.textSecondary} />
                   <TextInput
                     style={styles.input}
                     placeholder="Password"
-                    placeholderTextColor="rgba(255,255,255,0.5)"
+                    placeholderTextColor={colors.textTertiary}
                     value={password}
                     onChangeText={setPassword}
                     {...{ [_HIDDEN]: !showPassword }}
                   />
                   <Pressable onPress={() => setShowPassword(!showPassword)}>
                     {showPassword ? (
-                      <EyeOff size={18} color="rgba(255,255,255,0.4)" />
+                      <EyeOff size={18} color={colors.textSecondary} />
                     ) : (
-                      <Eye size={18} color="rgba(255,255,255,0.4)" />
+                      <Eye size={18} color={colors.textSecondary} />
                     )}
                   </Pressable>
                 </View>
@@ -399,9 +399,9 @@ export default function CloudSyncScreen() {
                             width: passwordValidation.strength === 'weak' ? '25%' :
                                    passwordValidation.strength === 'fair' ? '50%' :
                                    passwordValidation.strength === 'strong' ? '75%' : '100%',
-                            backgroundColor: passwordValidation.strength === 'weak' ? '#F44336' :
+                            backgroundColor: passwordValidation.strength === 'weak' ? '#DC2626' :
                                              passwordValidation.strength === 'fair' ? '#F59E0B' :
-                                             passwordValidation.strength === 'strong' ? '#4CAF50' : '#00E5FF',
+                                             passwordValidation.strength === 'strong' ? '#0E8C7B' : colors.primary,
                           },
                         ]}
                       />
@@ -409,9 +409,9 @@ export default function CloudSyncScreen() {
                     <Text style={[
                       styles.strengthText,
                       {
-                        color: passwordValidation.strength === 'weak' ? '#F44336' :
+                        color: passwordValidation.strength === 'weak' ? '#DC2626' :
                                passwordValidation.strength === 'fair' ? '#F59E0B' :
-                               passwordValidation.strength === 'strong' ? '#4CAF50' : '#00E5FF',
+                               passwordValidation.strength === 'strong' ? '#0E8C7B' : '#0E8C7B',
                       }
                     ]}>
                       {passwordValidation.strength.charAt(0).toUpperCase() + passwordValidation.strength.slice(1)}
@@ -429,9 +429,9 @@ export default function CloudSyncScreen() {
             {message && (
               <View style={[styles.messageBox, message.type === 'error' ? styles.errorBox : styles.successBox]}>
                 {message.type === 'error' ? (
-                  <AlertCircle size={14} color="#FF5252" />
+                  <AlertCircle size={14} color="#DC2626" />
                 ) : (
-                  <CheckCircle size={14} color="#4CAF50" />
+                  <CheckCircle size={14} color="#0E8C7B" />
                 )}
                 <Text style={[styles.messageText, message.type === 'error' ? styles.errorText : styles.successText]}>
                   {message.text}
@@ -445,7 +445,7 @@ export default function CloudSyncScreen() {
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                <ActivityIndicator size="small" color="#000" />
+                <ActivityIndicator size="small" color={colors.textPrimary} />
               ) : (
                 <Text style={styles.authButtonText}>
                   {authMode === 'signin' ? 'Sign In' : authMode === 'signup' ? 'Create Account' : 'Send Magic Link'}
@@ -484,7 +484,7 @@ export default function CloudSyncScreen() {
             )}
 
             <Pressable style={styles.authOptionCard} onPress={() => setAuthMode('signin')}>
-              <User size={20} color="#00E5FF" />
+              <User size={20} color={colors.primary} />
               <View style={styles.authOptionText}>
                 <Text style={styles.authOptionTitle}>Sign In</Text>
                 <Text style={styles.authOptionDesc}>Use existing account</Text>
@@ -492,7 +492,7 @@ export default function CloudSyncScreen() {
             </Pressable>
 
             <Pressable style={styles.authOptionCard} onPress={() => setAuthMode('signup')}>
-              <UserPlus size={20} color="#00E5FF" />
+              <UserPlus size={20} color={colors.primary} />
               <View style={styles.authOptionText}>
                 <Text style={styles.authOptionTitle}>Create Account</Text>
                 <Text style={styles.authOptionDesc}>New to Orbital cloud sync</Text>
@@ -500,7 +500,7 @@ export default function CloudSyncScreen() {
             </Pressable>
 
             <Pressable style={styles.authOptionCard} onPress={() => setAuthMode('magic')}>
-              <Wand2 size={20} color="#00E5FF" />
+              <Wand2 size={20} color={colors.primary} />
               <View style={styles.authOptionText}>
                 <Text style={styles.authOptionTitle}>Magic Link</Text>
                 <Text style={styles.authOptionDesc}>Passwordless sign in via email</Text>
@@ -521,7 +521,7 @@ export default function CloudSyncScreen() {
               <View style={styles.securityItem}>
                 <View style={styles.securityItemLeft}>
                   <View style={[styles.securityIconContainer, mfaFactors.length > 0 && styles.securityIconEnabled]}>
-                    <Shield size={20} color={mfaFactors.length > 0 ? '#00E5FF' : 'rgba(255,255,255,0.5)'} />
+                    <Shield size={20} color={mfaFactors.length > 0 ? colors.primary : colors.textSecondary} />
                   </View>
                   <View style={styles.securityItemText}>
                     <Text style={styles.securityItemTitle}>Two-Factor Authentication</Text>
@@ -536,7 +536,7 @@ export default function CloudSyncScreen() {
                     onPress={() => handleRemoveMFA(mfaFactors[0].id)}
                     disabled={isSubmitting}
                   >
-                    <Trash2 size={16} color="#FF5252" />
+                    <Trash2 size={16} color="#DC2626" />
                   </Pressable>
                 ) : (
                   <Pressable
@@ -545,7 +545,7 @@ export default function CloudSyncScreen() {
                     disabled={isSubmitting}
                   >
                     <Text style={styles.securityEnableText}>Enable</Text>
-                    <ChevronRight size={16} color="#00E5FF" />
+                    <ChevronRight size={16} color={colors.primary} />
                   </Pressable>
                 )}
               </View>
@@ -565,11 +565,11 @@ export default function CloudSyncScreen() {
                   </View>
 
                   <View style={styles.mfaCodeInput}>
-                    <Key size={18} color="rgba(255,255,255,0.4)" />
+                    <Key size={18} color={colors.textSecondary} />
                     <TextInput
                       style={styles.input}
                       placeholder="Enter 6-digit code"
-                      placeholderTextColor="rgba(255,255,255,0.5)"
+                      placeholderTextColor={colors.textTertiary}
                       value={mfaCode}
                       onChangeText={setMfaCode}
                       keyboardType="number-pad"
@@ -594,7 +594,7 @@ export default function CloudSyncScreen() {
                       disabled={mfaCode.length !== 6 || isSubmitting}
                     >
                       {isSubmitting ? (
-                        <ActivityIndicator size="small" color="#000" />
+                        <ActivityIndicator size="small" color={colors.textPrimary} />
                       ) : (
                         <Text style={styles.mfaVerifyText}>Verify</Text>
                       )}
@@ -610,7 +610,7 @@ export default function CloudSyncScreen() {
                   <View style={styles.securityItem}>
                     <View style={styles.securityItemLeft}>
                       <View style={[styles.securityIconContainer, biometric.settings.enabled && styles.securityIconEnabled]}>
-                        <Fingerprint size={20} color={biometric.settings.enabled ? '#00E5FF' : 'rgba(255,255,255,0.5)'} />
+                        <Fingerprint size={20} color={biometric.settings.enabled ? colors.primary : colors.textSecondary} />
                       </View>
                       <View style={styles.securityItemText}>
                         <Text style={styles.securityItemTitle}>{biometric.displayName}</Text>
@@ -642,9 +642,9 @@ export default function CloudSyncScreen() {
             {message && (
               <Animated.View entering={FadeInDown.duration(200)} style={[styles.messageBox, message.type === 'error' ? styles.errorBox : styles.successBox, { marginTop: spacing.md }]}>
                 {message.type === 'error' ? (
-                  <AlertCircle size={14} color="#FF5252" />
+                  <AlertCircle size={14} color="#DC2626" />
                 ) : (
-                  <CheckCircle size={14} color="#4CAF50" />
+                  <CheckCircle size={14} color="#0E8C7B" />
                 )}
                 <Text style={[styles.messageText, message.type === 'error' ? styles.errorText : styles.successText]}>
                   {message.text}
@@ -702,7 +702,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.sm,
@@ -720,27 +720,27 @@ const styles = StyleSheet.create({
   notConfiguredTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
   },
   notConfiguredText: {
     fontSize: 14,
     lineHeight: 22,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   notConfiguredSubtext: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.lg,
   },
   syncCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.15)',
+    borderColor: 'rgba(45,212,191,0.22)',
     padding: spacing.lg,
     marginBottom: spacing.lg,
   },
@@ -753,7 +753,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -764,16 +764,16 @@ const styles = StyleSheet.create({
   syncCardTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#00E5FF',
+    color: colors.textPrimary,
   },
   syncCardSubtitle: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   syncStatus: {
     paddingTop: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.06)',
+    borderTopColor: colors.hairline,
   },
   syncStatusRow: {
     flexDirection: 'row',
@@ -783,7 +783,7 @@ const styles = StyleSheet.create({
   },
   syncStatusText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   syncNowButton: {
     flexDirection: 'row',
@@ -792,15 +792,15 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginTop: spacing.sm,
     paddingVertical: spacing.sm,
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.2)',
+    borderColor: 'rgba(45,212,191,0.22)',
   },
   syncNowText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#00E5FF',
+    color: '#0E8C7B',
   },
   section: {
     marginBottom: spacing.md,
@@ -808,15 +808,15 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   accountCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: colors.cardBorder,
     padding: spacing.lg,
   },
   accountHeader: {
@@ -829,9 +829,9 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.2)',
+    borderColor: 'rgba(45,212,191,0.22)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -841,11 +841,11 @@ const styles = StyleSheet.create({
   accountEmail: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   accountId: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     fontFamily: 'monospace',
   },
   deviceInfo: {
@@ -854,18 +854,18 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingVertical: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.06)',
+    borderTopColor: colors.hairline,
   },
   deviceText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     fontFamily: 'monospace',
   },
   accountActions: {
     marginTop: spacing.sm,
     paddingTop: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.06)',
+    borderTopColor: colors.hairline,
   },
   accountAction: {
     flexDirection: 'row',
@@ -875,19 +875,19 @@ const styles = StyleSheet.create({
   },
   accountActionText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   authCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: colors.cardBorder,
     padding: spacing.lg,
   },
   authTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: spacing.lg,
     textAlign: 'center',
   },
@@ -895,10 +895,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: colors.background,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.hairline,
     paddingHorizontal: spacing.md,
     marginBottom: spacing.md,
   },
@@ -906,7 +906,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 48,
     fontSize: 16,
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   messageBox: {
     flexDirection: 'row',
@@ -917,23 +917,23 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   errorBox: {
-    backgroundColor: 'rgba(255,82,82,0.1)',
+    backgroundColor: 'rgba(220,38,38,0.08)',
   },
   successBox: {
-    backgroundColor: 'rgba(76,175,80,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
   },
   messageText: {
     flex: 1,
     fontSize: 12,
   },
   errorText: {
-    color: '#FF5252',
+    color: '#DC2626',
   },
   successText: {
-    color: '#4CAF50',
+    color: '#0E8C7B',
   },
   authButton: {
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     borderRadius: borderRadius.md,
     paddingVertical: spacing.md,
     alignItems: 'center',
@@ -945,7 +945,7 @@ const styles = StyleSheet.create({
   authButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: colors.textPrimary,
   },
   cancelButton: {
     paddingVertical: spacing.md,
@@ -953,16 +953,16 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   authOptionCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: colors.cardBorder,
     padding: spacing.lg,
     marginBottom: spacing.sm,
   },
@@ -972,50 +972,50 @@ const styles = StyleSheet.create({
   authOptionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   authOptionDesc: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   privacyNote: {
     marginTop: spacing.xl,
     paddingTop: spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.06)',
+    borderTopColor: colors.hairline,
   },
   privacyTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   privacyText: {
     fontSize: 12,
     lineHeight: 18,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
   },
   appleAuthCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#000000',
     borderRadius: borderRadius.lg,
     padding: spacing.lg,
     marginBottom: spacing.md,
   },
   appleIcon: {
     fontSize: 24,
-    color: '#000000',
+    color: '#FFFFFF',
   },
   appleAuthTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000000',
+    color: '#FFFFFF',
   },
   appleAuthDesc: {
     fontSize: 12,
-    color: 'rgba(0,0,0,0.6)',
+    color: 'rgba(255,255,255,0.7)',
   },
   // Password strength styles
   passwordStrength: {
@@ -1023,7 +1023,7 @@ const styles = StyleSheet.create({
   },
   strengthBar: {
     height: 4,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.hairline,
     borderRadius: 2,
     marginBottom: spacing.xs,
     overflow: 'hidden',
@@ -1038,15 +1038,15 @@ const styles = StyleSheet.create({
   },
   passwordHint: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: spacing.xs,
   },
   // Security section styles
   securityCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: colors.cardBorder,
     padding: spacing.lg,
     marginBottom: spacing.md,
   },
@@ -1065,12 +1065,12 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     justifyContent: 'center',
     alignItems: 'center',
   },
   securityIconEnabled: {
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
   },
   securityItemText: {
     flex: 1,
@@ -1078,11 +1078,11 @@ const styles = StyleSheet.create({
   securityItemTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   securityItemDesc: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   securityEnableButton: {
@@ -1095,35 +1095,43 @@ const styles = StyleSheet.create({
   securityEnableText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#00E5FF',
+    color: '#0E8C7B',
   },
   securityRemoveButton: {
     padding: spacing.sm,
   },
   securityDivider: {
     height: 1,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: colors.hairline,
     marginVertical: spacing.md,
   },
   securityToggle: {
     width: 50,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
     padding: 2,
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
   },
   securityToggleEnabled: {
-    backgroundColor: 'rgba(0,229,255,0.3)',
+    backgroundColor: 'rgba(45,212,191,0.30)',
+    borderColor: 'rgba(45,212,191,0.50)',
   },
   securityToggleKnob: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.5)',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#0F1624',
+    shadowOpacity: 0.15,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
   },
   securityToggleKnobEnabled: {
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     alignSelf: 'flex-end',
   },
   // MFA setup styles
@@ -1131,46 +1139,46 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     paddingTop: spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.06)',
+    borderTopColor: colors.hairline,
   },
   mfaSetupTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   mfaSetupDesc: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     lineHeight: 18,
     marginBottom: spacing.lg,
   },
   qrContainer: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     padding: spacing.lg,
     marginBottom: spacing.lg,
   },
   qrPlaceholder: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
   secretCode: {
     fontSize: 12,
     fontFamily: 'monospace',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textPrimary,
     textAlign: 'center',
   },
   mfaCodeInput: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: colors.background,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.hairline,
     paddingHorizontal: spacing.md,
     marginBottom: spacing.md,
   },
@@ -1184,18 +1192,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
   },
   mfaCancelText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textPrimary,
   },
   mfaVerifyButton: {
     flex: 1,
     paddingVertical: spacing.md,
     alignItems: 'center',
     borderRadius: borderRadius.md,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
   },
   mfaVerifyDisabled: {
     opacity: 0.5,
@@ -1203,6 +1211,6 @@ const styles = StyleSheet.create({
   mfaVerifyText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
+    color: colors.textPrimary,
   },
 });

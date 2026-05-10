@@ -41,10 +41,10 @@ interface DataPointProps {
 
 function DataPoint({ icon: Icon, title, description, type, delay = 0 }: DataPointProps) {
   const typeConfig = {
-    kept: { color: '#00E5FF', badge: 'Kept', icon: CheckCircle },
-    deidentified: { color: '#F59E0B', badge: 'De-identified', icon: Eye },
-    never: { color: '#4CAF50', badge: 'Never stored', icon: EyeOff },
-    protected: { color: '#9C27B0', badge: 'Protected', icon: Lock },
+    kept: { color: '#0E8C7B', badge: 'Kept', icon: CheckCircle },
+    deidentified: { color: '#B7791F', badge: 'De-identified', icon: Eye },
+    never: { color: '#0E8C7B', badge: 'Never stored', icon: EyeOff },
+    protected: { color: '#7B1FA2', badge: 'Protected', icon: Lock },
   };
 
   const config = typeConfig[type];
@@ -86,7 +86,7 @@ export default function YourDataScreen() {
         {/* Hero Section */}
         <Animated.View entering={FadeInDown.duration(400)} style={styles.hero}>
           <View style={styles.heroIconContainer}>
-            <Shield size={40} color="#00E5FF" />
+            <Shield size={40} color={colors.primary} />
           </View>
           <Text style={styles.heroTitle}>Privacy by Design</Text>
           <Text style={styles.heroSubtitle}>
@@ -178,19 +178,19 @@ export default function YourDataScreen() {
         <Animated.View entering={FadeInDown.delay(650).duration(400)} style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>The Short Version</Text>
           <View style={styles.summaryItem}>
-            <CheckCircle size={16} color="#4CAF50" />
+            <CheckCircle size={16} color="#0E8C7B" />
             <Text style={styles.summaryText}>Patterns are kept to help you discover trends</Text>
           </View>
           <View style={styles.summaryItem}>
-            <CheckCircle size={16} color="#4CAF50" />
+            <CheckCircle size={16} color="#0E8C7B" />
             <Text style={styles.summaryText}>Delete = de-identified, not erased (for your history)</Text>
           </View>
           <View style={styles.summaryItem}>
-            <CheckCircle size={16} color="#4CAF50" />
+            <CheckCircle size={16} color="#0E8C7B" />
             <Text style={styles.summaryText}>Raw notes never leave your device</Text>
           </View>
           <View style={styles.summaryItem}>
-            <CheckCircle size={16} color="#4CAF50" />
+            <CheckCircle size={16} color="#0E8C7B" />
             <Text style={styles.summaryText}>Organizations see only aggregates, never you</Text>
           </View>
         </Animated.View>
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.sm,
@@ -246,9 +246,9 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.2)',
+    borderColor: 'rgba(45,212,191,0.22)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
@@ -256,13 +256,13 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#00E5FF',
+    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   heroSubtitle: {
     fontSize: 14,
     lineHeight: 22,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   section: {
@@ -272,19 +272,19 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
   sectionSubtitle: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
   },
   dataPoint: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.sm,
   },
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   dataPointTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     flex: 1,
   },
   badge: {
@@ -326,20 +326,20 @@ const styles = StyleSheet.create({
   dataPointDescription: {
     fontSize: 12,
     lineHeight: 18,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   summaryCard: {
-    backgroundColor: 'rgba(76,175,80,0.08)',
+    backgroundColor: 'rgba(45,212,191,0.08)',
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(76,175,80,0.2)',
+    borderColor: 'rgba(45,212,191,0.22)',
     padding: spacing.lg,
     marginTop: spacing.lg,
   },
   summaryTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#4CAF50',
+    color: '#0E8C7B',
     marginBottom: spacing.md,
   },
   summaryItem: {
@@ -352,18 +352,18 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     lineHeight: 18,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   trustStatement: {
     marginTop: spacing.lg,
     paddingVertical: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.06)',
+    borderTopColor: colors.hairline,
   },
   trustText: {
     fontSize: 12,
     lineHeight: 18,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     textAlign: 'center',
     fontStyle: 'italic',
   },

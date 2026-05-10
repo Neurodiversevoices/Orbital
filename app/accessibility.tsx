@@ -107,7 +107,7 @@ export default function AccessibilityScreen() {
           <View style={styles.simpleModeCard}>
             <View style={styles.simpleModeHeader}>
               <View style={[styles.simpleModeIcon, settings.simpleMode && styles.simpleModeIconActive]}>
-                <Accessibility color={settings.simpleMode ? '#000' : '#00E5FF'} size={28} />
+                <Accessibility color={settings.simpleMode ? colors.textPrimary : colors.primary} size={28} />
               </View>
               <View style={styles.simpleModeContent}>
                 <Text style={[styles.simpleModeTitle, { fontSize: 17 * textScale }]}>
@@ -121,8 +121,8 @@ export default function AccessibilityScreen() {
             <Switch
               value={settings.simpleMode}
               onValueChange={handleSimpleModeToggle}
-              trackColor={{ false: 'rgba(255,255,255,0.1)', true: 'rgba(0,229,255,0.3)' }}
-              thumbColor={settings.simpleMode ? '#00E5FF' : 'rgba(255,255,255,0.5)'}
+              trackColor={{ false: colors.hairline, true: 'rgba(45,212,191,0.40)' }}
+              thumbColor={settings.simpleMode ? colors.primary : colors.textSecondary}
             />
           </View>
           {settings.simpleMode && (
@@ -137,7 +137,7 @@ export default function AccessibilityScreen() {
         {/* Visual Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Eye color="rgba(255,255,255,0.5)" size={16} />
+            <Eye color={colors.textSecondary} size={16} />
             <Text style={styles.sectionLabel}>
               {t.accessibility?.visualSection || 'VISUAL'}
             </Text>
@@ -185,7 +185,7 @@ export default function AccessibilityScreen() {
         {/* Motor Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Hand color="rgba(255,255,255,0.5)" size={16} />
+            <Hand color={colors.textSecondary} size={16} />
             <Text style={styles.sectionLabel}>
               {t.accessibility?.motorSection || 'MOTOR & INPUT'}
             </Text>
@@ -246,7 +246,7 @@ export default function AccessibilityScreen() {
         {/* Cognitive Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Brain color="rgba(255,255,255,0.5)" size={16} />
+            <Brain color={colors.textSecondary} size={16} />
             <Text style={styles.sectionLabel}>
               {t.accessibility?.cognitiveSection || 'COGNITIVE'}
             </Text>
@@ -296,7 +296,7 @@ export default function AccessibilityScreen() {
         {/* Audio Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Volume2 color="rgba(255,255,255,0.5)" size={16} />
+            <Volume2 color={colors.textSecondary} size={16} />
             <Text style={styles.sectionLabel}>
               {t.accessibility?.audioSection || 'AUDIO'}
             </Text>
@@ -336,7 +336,7 @@ export default function AccessibilityScreen() {
         {/* Data Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Wifi color="rgba(255,255,255,0.5)" size={16} />
+            <Wifi color={colors.textSecondary} size={16} />
             <Text style={styles.sectionLabel}>
               {t.accessibility?.dataSection || 'DATA & CONNECTIVITY'}
             </Text>
@@ -494,7 +494,7 @@ function ToggleRow({
       style={[styles.row, animatedStyle, { minHeight: 56 * buttonScale }]}
     >
       <View style={[styles.iconContainer, { width: 36 * buttonScale, height: 36 * buttonScale }]}>
-        <Icon color="rgba(255,255,255,0.6)" size={20 * buttonScale} />
+        <Icon color={colors.textSecondary} size={20 * buttonScale} />
       </View>
       <View style={styles.rowContent}>
         <Text style={[styles.rowLabel, { fontSize: 15 * textScale }]}>{label}</Text>
@@ -505,8 +505,8 @@ function ToggleRow({
       <Switch
         value={value}
         onValueChange={onToggle}
-        trackColor={{ false: 'rgba(255,255,255,0.1)', true: 'rgba(0,229,255,0.3)' }}
-        thumbColor={value ? '#00E5FF' : 'rgba(255,255,255,0.5)'}
+        trackColor={{ false: colors.hairline, true: 'rgba(45,212,191,0.40)' }}
+        thumbColor={value ? colors.primary : colors.textSecondary}
       />
     </AnimatedPressable>
   );
@@ -542,13 +542,13 @@ function PickerRow({
       style={[styles.row, animatedStyle, { minHeight: 56 * buttonScale }]}
     >
       <View style={[styles.iconContainer, { width: 36 * buttonScale, height: 36 * buttonScale }]}>
-        <Icon color="rgba(255,255,255,0.6)" size={20 * buttonScale} />
+        <Icon color={colors.textSecondary} size={20 * buttonScale} />
       </View>
       <View style={styles.rowContent}>
         <Text style={[styles.rowLabel, { fontSize: 15 * textScale }]}>{label}</Text>
         <Text style={[styles.rowValue, { fontSize: 13 * textScale }]}>{value}</Text>
       </View>
-      <ChevronRight color="rgba(255,255,255,0.2)" size={18} />
+      <ChevronRight color={colors.textTertiary} size={18} />
     </AnimatedPressable>
   );
 }
@@ -597,7 +597,7 @@ function OptionPicker({
                 >
                   {option.label}
                 </Text>
-                {option.value === selected && <Check color="#00E5FF" size={18} />}
+                {option.value === selected && <Check color={colors.primary} size={18} />}
               </Pressable>
             ))}
           </ScrollView>
@@ -610,7 +610,7 @@ function OptionPicker({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -631,7 +631,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.sm,
@@ -653,7 +653,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.35)',
+    color: colors.textSecondary,
     letterSpacing: 1,
   },
   row: {
@@ -671,7 +671,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -682,16 +682,16 @@ const styles = StyleSheet.create({
   rowLabel: {
     fontSize: 15,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   rowSublabel: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   rowValue: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   bottomPadding: {
@@ -705,11 +705,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(0,229,255,0.08)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     borderRadius: 16,
     padding: spacing.md,
     borderWidth: 2,
-    borderColor: 'rgba(0,229,255,0.3)',
+    borderColor: 'rgba(45,212,191,0.40)',
   },
   simpleModeHeader: {
     flexDirection: 'row',
@@ -720,13 +720,13 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 14,
-    backgroundColor: 'rgba(0,229,255,0.15)',
+    backgroundColor: 'rgba(45,212,191,0.18)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
   },
   simpleModeIconActive: {
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
   },
   simpleModeContent: {
     flex: 1,
@@ -734,29 +734,29 @@ const styles = StyleSheet.create({
   simpleModeTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#00E5FF',
+    color: colors.primary,
   },
   simpleModeDesc: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   simpleModeInfo: {
-    backgroundColor: 'rgba(0,229,255,0.05)',
+    backgroundColor: 'rgba(45,212,191,0.06)',
     borderRadius: 10,
     padding: spacing.sm,
     marginTop: spacing.sm,
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.1)',
+    borderColor: 'rgba(45,212,191,0.10)',
   },
   simpleModeInfoText: {
     fontSize: 12,
-    color: 'rgba(0,229,255,0.7)',
+    color: '#0E8C7B',
     textAlign: 'center',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(15,22,36,0.45)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.lg,
@@ -776,12 +776,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
+    borderBottomColor: colors.hairline,
   },
   pickerTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   optionsList: {
     padding: spacing.sm,
@@ -795,14 +795,14 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   optionRowSelected: {
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
   },
   optionLabel: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   optionLabelSelected: {
-    color: '#00E5FF',
+    color: colors.primary,
     fontWeight: '500',
   },
 });

@@ -103,7 +103,7 @@ export default function AccountScreen() {
               )}
             </View>
             <View style={styles.editBadge}>
-              <Pencil size={12} color="#000" />
+              <Pencil size={12} color={colors.textPrimary} />
             </View>
           </Pressable>
           <Pressable onPress={() => setShowAvatarPicker(true)}>
@@ -116,7 +116,7 @@ export default function AccountScreen() {
         {/* Display Name Section */}
         <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.section}>
           <View style={styles.sectionHeader}>
-            <User size={18} color="rgba(255,255,255,0.6)" />
+            <User size={18} color={colors.textSecondary} />
             <Text style={styles.sectionTitle}>Display Name</Text>
             <Text style={styles.optionalBadge}>Optional</Text>
           </View>
@@ -128,14 +128,14 @@ export default function AccountScreen() {
               onChangeText={setNameInput}
               onBlur={handleSave}
               placeholder="Enter your name"
-              placeholderTextColor="rgba(255,255,255,0.5)"
+              placeholderTextColor={colors.textTertiary}
               maxLength={50}
               autoCapitalize="words"
               autoCorrect={false}
             />
             {showSuccess && (
               <View style={styles.successBadge}>
-                <Check size={14} color="#4CAF50" />
+                <Check size={14} color="#0E8C7B" />
               </View>
             )}
           </View>
@@ -150,14 +150,14 @@ export default function AccountScreen() {
         {auth.user?.email && (
           <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Shield size={18} color="rgba(255,255,255,0.6)" />
+              <Shield size={18} color={colors.textSecondary} />
               <Text style={styles.sectionTitle}>Email</Text>
             </View>
 
             <View style={styles.emailRow}>
               <Text style={styles.emailText}>{auth.user.email}</Text>
               <View style={styles.verifiedBadge}>
-                <Check size={12} color="#4CAF50" />
+                <Check size={12} color="#0E8C7B" />
                 <Text style={styles.verifiedText}>Verified</Text>
               </View>
             </View>
@@ -177,19 +177,19 @@ export default function AccountScreen() {
             onPress={() => router.push('/active-sessions')}
           >
             <View style={styles.iconContainer}>
-              <Smartphone size={20} color="rgba(255,255,255,0.6)" />
+              <Smartphone size={20} color={colors.textSecondary} />
             </View>
             <View style={styles.rowContent}>
               <Text style={styles.rowLabel}>Active Sessions</Text>
               <Text style={styles.rowSublabel}>View and manage device sessions</Text>
             </View>
-            <ChevronRight size={18} color="rgba(255,255,255,0.2)" />
+            <ChevronRight size={18} color={colors.textTertiary} />
           </Pressable>
         </Animated.View>
 
         {/* Privacy Info */}
         <Animated.View entering={FadeInDown.delay(400).duration(400)} style={styles.infoCard}>
-          <Shield size={20} color="#4CAF50" />
+          <Shield size={20} color="#0E8C7B" />
           <View style={styles.infoContent}>
             <Text style={styles.infoTitle}>Privacy-First Identity</Text>
             <Text style={styles.infoText}>
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.sm,
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   },
   avatarHint: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
   },
   avatarPressable: {
     position: 'relative',
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
+    borderBottomColor: colors.hairline,
   },
   modalClose: {
     padding: spacing.xs,
@@ -361,21 +361,21 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     flex: 1,
   },
   sectionLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.35)',
+    color: colors.textSecondary,
     letterSpacing: 1,
     marginBottom: spacing.sm,
   },
   optionalBadge: {
     fontSize: 10,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.4)',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    color: colors.textSecondary,
+    backgroundColor: colors.backgroundSubtle,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 4,
@@ -390,25 +390,25 @@ const styles = StyleSheet.create({
   nameInput: {
     flex: 1,
     height: 48,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: colors.background,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.hairline,
     paddingHorizontal: spacing.md,
     fontSize: 16,
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   successBadge: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(76,175,80,0.15)',
+    backgroundColor: 'rgba(45,212,191,0.15)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   helperText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     marginTop: spacing.sm,
     lineHeight: 18,
   },
@@ -416,22 +416,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: colors.background,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.hairline,
     paddingHorizontal: spacing.md,
     height: 48,
   },
   emailText: {
     fontSize: 16,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   verifiedBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(76,175,80,0.15)',
+    backgroundColor: 'rgba(45,212,191,0.15)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
   verifiedText: {
     fontSize: 11,
     fontWeight: '500',
-    color: '#4CAF50',
+    color: '#0E8C7B',
   },
   row: {
     flexDirection: 'row',
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -465,20 +465,20 @@ const styles = StyleSheet.create({
   rowLabel: {
     fontSize: 15,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   rowSublabel: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   infoCard: {
     flexDirection: 'row',
     gap: spacing.md,
-    backgroundColor: 'rgba(76,175,80,0.08)',
+    backgroundColor: 'rgba(45,212,191,0.08)',
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(76,175,80,0.2)',
+    borderColor: 'rgba(45,212,191,0.22)',
     padding: spacing.md,
   },
   infoContent: {
@@ -487,12 +487,12 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#4CAF50',
+    color: '#0E8C7B',
     marginBottom: spacing.xs,
   },
   infoText: {
     fontSize: 12,
     lineHeight: 18,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
 });

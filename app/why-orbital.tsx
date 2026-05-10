@@ -37,7 +37,7 @@ function Principle({ icon: Icon, title, description, delay }: PrincipleProps) {
   return (
     <Animated.View entering={FadeInDown.delay(delay).duration(500)} style={styles.principle}>
       <View style={styles.principleIcon}>
-        <Icon color="#00E5FF" size={20} />
+        <Icon color={colors.primary} size={20} />
       </View>
       <View style={styles.principleContent}>
         <Text style={styles.principleTitle}>{title}</Text>
@@ -110,7 +110,7 @@ export default function WhyOrbitalScreen() {
           hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
           activeOpacity={0.6}
         >
-          <X color="rgba(255,255,255,0.7)" size={24} />
+          <X color={colors.textPrimary} size={24} />
         </TouchableOpacity>
       </View>
 
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: 22,
   },
   scrollView: {
@@ -248,9 +248,9 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: 'rgba(0,229,255,0.08)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.2)',
+    borderColor: 'rgba(45,212,191,0.22)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -258,12 +258,12 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
   },
   heroTitle: {
     fontSize: 22,
-    fontWeight: '300',
-    color: 'rgba(255,255,255,0.9)',
+    fontWeight: '600',
+    color: colors.textPrimary,
     letterSpacing: 0.5,
   },
   statement: {
@@ -272,16 +272,17 @@ const styles = StyleSheet.create({
   statementText: {
     fontSize: 15,
     lineHeight: 24,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: spacing.sm,
   },
   statementTextEmphasis: {
     fontSize: 15,
     lineHeight: 24,
-    color: '#00E5FF',
+    color: '#0E8C7B',
     textAlign: 'center',
     marginTop: spacing.sm,
+    fontWeight: '600',
   },
   principlesContainer: {
     marginBottom: spacing.xl,
@@ -294,7 +295,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0,229,255,0.08)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -305,31 +306,31 @@ const styles = StyleSheet.create({
   principleTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: 4,
   },
   principleDescription: {
     fontSize: 12,
     lineHeight: 18,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   closing: {
     alignItems: 'center',
     paddingTop: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)',
+    borderTopColor: colors.hairline,
   },
   closingText: {
     fontSize: 13,
     lineHeight: 20,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.md,
   },
   closingTextFinal: {
     fontSize: 14,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     textAlign: 'center',
     fontStyle: 'italic',
   },
@@ -341,7 +342,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   primaryButton: {
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     borderRadius: borderRadius.lg,
     paddingVertical: spacing.md + 2,
     alignItems: 'center',
@@ -349,11 +350,11 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: colors.textPrimary,
   },
   fallbackHintText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.sm,
   },

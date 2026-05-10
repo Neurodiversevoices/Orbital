@@ -151,12 +151,12 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm,
     paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
+    borderBottomColor: colors.hairline,
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.sm,
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   featureTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#00E5FF',
+    color: colors.textPrimary,
     marginBottom: spacing.lg,
   },
   overviewSection: {
@@ -178,18 +178,18 @@ const styles = StyleSheet.create({
   overviewTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   overviewText: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     lineHeight: 22,
     marginBottom: spacing.md,
   },
   overviewEmphasis: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.85)',
+    color: colors.textPrimary,
     lineHeight: 22,
     fontStyle: 'italic',
   },
@@ -199,12 +199,12 @@ const styles = StyleSheet.create({
   sectionNumber: {
     fontSize: 17,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   sectionDesc: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     lineHeight: 22,
     marginBottom: spacing.md,
   },
@@ -215,12 +215,12 @@ const styles = StyleSheet.create({
   },
   bullet: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 20,
   },
   sectionNote: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     fontStyle: 'italic',
     lineHeight: 20,
   },
@@ -228,13 +228,13 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xl,
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.1)',
+    borderTopColor: colors.hairline,
     marginTop: spacing.lg,
     marginBottom: spacing.xl,
     gap: spacing.xs,
   },
   footerText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
   },
 });

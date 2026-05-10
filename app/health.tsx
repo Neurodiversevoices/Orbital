@@ -49,13 +49,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0a0a0f',
+    backgroundColor: '#FFFFFF',
     padding: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#00D7FF',
+    color: '#0F1624',
     marginBottom: 24,
   },
   statusRow: {
@@ -64,12 +64,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.5)',
+    color: 'rgba(15, 22, 36, 0.62)',
     width: 100,
   },
   value: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: '#0F1624',
     fontFamily: 'monospace',
   },
 });

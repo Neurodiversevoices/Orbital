@@ -35,12 +35,12 @@ const POLICY_ICONS: Record<string, React.ComponentType<{ color: string; size: nu
 };
 
 const POLICY_COLORS: Record<string, string> = {
-  terms_of_service: '#00E5FF',
-  privacy_policy: '#4CAF50',
-  data_retention_policy: '#9C27B0',
-  non_diagnostic_disclaimer: '#E8A830',
-  cancellation_refund_policy: '#2196F3',
-  jurisdiction_governing_law: '#FF5722',
+  terms_of_service: '#0E8C7B',
+  privacy_policy: '#0E8C7B',
+  data_retention_policy: '#7B1FA2',
+  non_diagnostic_disclaimer: '#B7791F',
+  cancellation_refund_policy: '#1D4ED8',
+  jurisdiction_governing_law: '#DC2626',
 };
 
 export default function LegalScreen() {
@@ -61,7 +61,7 @@ export default function LegalScreen() {
     <SafeAreaView style={commonStyles.screen}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Scale color="#00E5FF" size={24} />
+          <Scale color={colors.primary} size={24} />
           <Text style={styles.headerTitle}>Legal & Policies</Text>
         </View>
         <Pressable onPress={() => router.back()} style={styles.closeButton}>
@@ -80,7 +80,7 @@ export default function LegalScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {policies.map((policy) => {
           const Icon = POLICY_ICONS[policy.id] || FileText;
-          const color = POLICY_COLORS[policy.id] || '#00E5FF';
+          const color = POLICY_COLORS[policy.id] || '#0E8C7B';
 
           return (
             <Pressable
@@ -97,14 +97,14 @@ export default function LegalScreen() {
                   v{policy.version} | Effective {policy.effectiveDate}
                 </Text>
               </View>
-              <ChevronRight color="rgba(255,255,255,0.3)" size={18} />
+              <ChevronRight color={colors.textTertiary} size={18} />
             </Pressable>
           );
         })}
 
         {/* PATCH 2: Enhanced Not Medical Advice Disclaimer */}
         <View style={styles.disclaimerSection}>
-          <AlertTriangle color="rgba(255,255,255,0.3)" size={20} />
+          <AlertTriangle color="#B7791F" size={20} />
           <View style={styles.disclaimerContent}>
             <Text style={styles.disclaimerText}>
               Orbital does not provide clinical advice, professional evaluation, or care recommendations.
@@ -137,7 +137,7 @@ export default function LegalScreen() {
                 <>
                   {(() => {
                     const Icon = POLICY_ICONS[selectedPolicy.id] || FileText;
-                    const color = POLICY_COLORS[selectedPolicy.id] || '#00E5FF';
+                    const color = POLICY_COLORS[selectedPolicy.id] || '#0E8C7B';
                     return <Icon color={color} size={24} />;
                   })()}
                   <View>
@@ -188,29 +188,29 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.sm,
   },
   infoCard: {
     marginHorizontal: spacing.md,
-    backgroundColor: 'rgba(0,229,255,0.08)',
+    backgroundColor: 'rgba(45,212,191,0.08)',
     borderRadius: 12,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.2)',
+    borderColor: 'rgba(45,212,191,0.22)',
     marginBottom: spacing.md,
   },
   infoTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#00E5FF',
+    color: '#0E8C7B',
     marginBottom: spacing.xs,
   },
   infoDesc: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textPrimary,
     lineHeight: 18,
   },
   content: {
@@ -241,36 +241,36 @@ const styles = StyleSheet.create({
   policyTitle: {
     fontSize: 15,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   policyMeta: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   disclaimerSection: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: spacing.md,
-    backgroundColor: 'rgba(232,168,48,0.08)',
+    backgroundColor: 'rgba(245,158,11,0.08)',
     borderRadius: 12,
     padding: spacing.md,
     marginTop: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(232,168,48,0.2)',
+    borderColor: 'rgba(245,158,11,0.30)',
   },
   disclaimerContent: {
     flex: 1,
   },
   disclaimerText: {
     fontSize: 12,
-    color: 'rgba(232,168,48,0.9)',
+    color: '#B7791F',
     lineHeight: 18,
     fontWeight: '500',
   },
   disclaimerTextSecondary: {
     fontSize: 11,
-    color: 'rgba(232,168,48,0.7)',
+    color: '#B7791F',
     lineHeight: 16,
     marginTop: spacing.xs,
   },
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   // Modal styles
   modalContainer: {
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm,
     paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
+    borderBottomColor: colors.hairline,
   },
   modalHeaderLeft: {
     flexDirection: 'row',
@@ -306,11 +306,11 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   modalMeta: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   modalContent: {
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   },
   policyText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     lineHeight: 22,
     fontFamily: 'monospace',
   },
@@ -327,12 +327,12 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
     paddingTop: spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.1)',
+    borderTopColor: colors.hairline,
     paddingBottom: spacing.xl * 2,
   },
   modalFooterText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
 });

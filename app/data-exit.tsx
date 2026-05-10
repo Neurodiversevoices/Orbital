@@ -217,7 +217,7 @@ export default function DataExitScreen() {
     <SafeAreaView style={commonStyles.screen}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Trash2 color="#F44336" size={24} />
+          <Trash2 color="#DC2626" size={24} />
           <Text style={styles.headerTitle}>Data Exit</Text>
         </View>
         <Pressable onPress={handleClose} style={styles.closeButton}>
@@ -229,7 +229,7 @@ export default function DataExitScreen() {
         {step === 'overview' && (
           <>
             <View style={styles.warningCard}>
-              <AlertTriangle color="#F44336" size={32} />
+              <AlertTriangle color="#DC2626" size={32} />
               <Text style={styles.warningTitle}>Permanent Data Deletion</Text>
               <Text style={styles.warningText}>
                 This process will permanently delete all your capacity data.
@@ -276,7 +276,7 @@ export default function DataExitScreen() {
         {step === 'export' && (
           <>
             <View style={styles.stepCard}>
-              <Download color="#00E5FF" size={32} />
+              <Download color={colors.primary} size={32} />
               <Text style={styles.stepTitle}>Step 1: Export Your Data</Text>
               <Text style={styles.stepText}>
                 Before deletion, you may export your data for personal records.
@@ -289,12 +289,12 @@ export default function DataExitScreen() {
               onPress={handleExportJson}
               disabled={isProcessing}
             >
-              <FileText color="#00E5FF" size={20} />
+              <FileText color={colors.primary} size={20} />
               <View style={styles.exportButtonContent}>
                 <Text style={styles.exportButtonTitle}>Export as JSON</Text>
                 <Text style={styles.exportButtonSubtitle}>Full data backup</Text>
               </View>
-              {hasExported && <CheckCircle color="#4CAF50" size={20} />}
+              {hasExported && <CheckCircle color="#0E8C7B" size={20} />}
             </Pressable>
 
             <Pressable
@@ -302,12 +302,12 @@ export default function DataExitScreen() {
               onPress={handleExportCsv}
               disabled={isProcessing}
             >
-              <FileText color="#4CAF50" size={20} />
+              <FileText color="#0E8C7B" size={20} />
               <View style={styles.exportButtonContent}>
                 <Text style={styles.exportButtonTitle}>Export as CSV</Text>
                 <Text style={styles.exportButtonSubtitle}>Spreadsheet format</Text>
               </View>
-              {hasExported && <CheckCircle color="#4CAF50" size={20} />}
+              {hasExported && <CheckCircle color="#0E8C7B" size={20} />}
             </Pressable>
 
             <View style={styles.stepIndicator}>
@@ -338,7 +338,7 @@ export default function DataExitScreen() {
         {step === 'confirm' && (
           <>
             <View style={styles.stepCard}>
-              <AlertTriangle color="#F44336" size={32} />
+              <AlertTriangle color="#DC2626" size={32} />
               <Text style={styles.stepTitle}>Step 2: Confirm Deletion</Text>
               <Text style={styles.stepText}>
                 You are about to permanently delete {logs.length} capacity signals.
@@ -378,7 +378,7 @@ export default function DataExitScreen() {
                 onPress={handleConfirmDeletion}
                 disabled={isProcessing}
               >
-                <Trash2 color="#FFF" size={18} />
+                <Trash2 color="#FFFFFF" size={18} />
                 <Text style={styles.dangerButtonText}>Delete All Data</Text>
               </Pressable>
             </View>
@@ -388,7 +388,7 @@ export default function DataExitScreen() {
         {step === 'complete' && (
           <>
             <View style={styles.completeCard}>
-              <CheckCircle color="#4CAF50" size={48} />
+              <CheckCircle color="#0E8C7B" size={48} />
               <Text style={styles.completeTitle}>Deletion Complete</Text>
               <Text style={styles.completeText}>
                 All your capacity data has been permanently deleted.
@@ -398,7 +398,7 @@ export default function DataExitScreen() {
 
             <View style={styles.certificatePreview}>
               <View style={styles.certificateHeader}>
-                <Shield color="#00E5FF" size={20} />
+                <Shield color={colors.primary} size={20} />
                 <Text style={styles.certificateTitle}>Deletion Certificate</Text>
               </View>
               <Text style={styles.certificateText} numberOfLines={8}>
@@ -410,7 +410,7 @@ export default function DataExitScreen() {
               style={styles.primaryButton}
               onPress={handleShareCertificate}
             >
-              <Download color="#000" size={18} />
+              <Download color={colors.textPrimary} size={18} />
               <Text style={styles.primaryButtonText}>Save Certificate</Text>
             </Pressable>
 
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.sm,
@@ -457,23 +457,23 @@ const styles = StyleSheet.create({
   },
   warningCard: {
     alignItems: 'center',
-    backgroundColor: 'rgba(244,67,54,0.1)',
+    backgroundColor: 'rgba(220,38,38,0.06)',
     borderRadius: 16,
     padding: spacing.xl,
     borderWidth: 1,
-    borderColor: 'rgba(244,67,54,0.3)',
+    borderColor: 'rgba(220,38,38,0.30)',
     marginBottom: spacing.lg,
   },
   warningTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#DC2626',
     marginTop: spacing.md,
     marginBottom: spacing.sm,
   },
   warningText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   infoList: {
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
   },
   infoItem: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   stepIndicator: {
     flexDirection: 'row',
@@ -508,21 +508,21 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: colors.hairline,
   },
   stepDotActive: {
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
   },
   stepDotComplete: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0E8C7B',
   },
   stepLine: {
     width: 40,
     height: 2,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: colors.hairline,
   },
   stepLineComplete: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0E8C7B',
   },
   stepCard: {
     alignItems: 'center',
@@ -536,13 +536,13 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginTop: spacing.md,
     marginBottom: spacing.sm,
   },
   stepText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -563,30 +563,30 @@ const styles = StyleSheet.create({
   exportButtonTitle: {
     fontSize: 15,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   exportButtonSubtitle: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   confirmCard: {
-    backgroundColor: 'rgba(244,67,54,0.08)',
+    backgroundColor: 'rgba(220,38,38,0.06)',
     borderRadius: 12,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(244,67,54,0.2)',
+    borderColor: 'rgba(220,38,38,0.22)',
     marginBottom: spacing.md,
   },
   confirmTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#DC2626',
     marginBottom: spacing.sm,
   },
   confirmText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
   confirmList: {
@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
   },
   confirmItem: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   buttonRow: {
     flexDirection: 'row',
@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -613,18 +613,20 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#000',
+    color: colors.textPrimary,
   },
   secondaryButton: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: 12,
     padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
   },
   secondaryButtonText: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textPrimary,
   },
   dangerButton: {
     flex: 1,
@@ -632,37 +634,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: 'rgba(244,67,54,0.2)',
+    backgroundColor: 'rgba(220,38,38,0.10)',
     borderRadius: 12,
     padding: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(220,38,38,0.30)',
   },
   dangerButtonFinal: {
-    backgroundColor: '#F44336',
+    backgroundColor: '#DC2626',
+    borderColor: '#DC2626',
   },
   dangerButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#FFF',
+    color: '#FFFFFF',
   },
   completeCard: {
     alignItems: 'center',
-    backgroundColor: 'rgba(76,175,80,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     borderRadius: 16,
     padding: spacing.xl,
     borderWidth: 1,
-    borderColor: 'rgba(76,175,80,0.3)',
+    borderColor: 'rgba(45,212,191,0.30)',
     marginBottom: spacing.lg,
   },
   completeTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#4CAF50',
+    color: '#0E8C7B',
     marginTop: spacing.md,
     marginBottom: spacing.sm,
   },
   completeText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -683,11 +688,11 @@ const styles = StyleSheet.create({
   certificateTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#00E5FF',
+    color: colors.textPrimary,
   },
   certificateText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     fontFamily: 'monospace',
     lineHeight: 16,
   },
@@ -697,7 +702,7 @@ const styles = StyleSheet.create({
   },
   doneButtonText: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   bottomSpacer: {
     height: spacing.xl * 2,

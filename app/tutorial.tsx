@@ -131,7 +131,7 @@ export default function TutorialScreen() {
         <View style={styles.headerSpacer} />
         <Pressable onPress={handleSkip} style={styles.skipButton}>
           <Text style={styles.skipText}>Skip</Text>
-          <X color="rgba(255,255,255,0.5)" size={16} />
+          <X color={colors.textSecondary} size={16} />
         </Pressable>
       </View>
 
@@ -159,7 +159,7 @@ export default function TutorialScreen() {
         >
           {/* Icon */}
           <View style={styles.iconContainer}>
-            <Icon color="#00E5FF" size={48} />
+            <Icon color={colors.primary} size={48} />
           </View>
 
           {/* Title */}
@@ -183,7 +183,7 @@ export default function TutorialScreen() {
           disabled={isFirstStep}
         >
           <ChevronLeft
-            color={isFirstStep ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.7)'}
+            color={isFirstStep ? colors.textTertiary : colors.textPrimary}
             size={24}
           />
           <Text style={[styles.navText, isFirstStep && styles.navTextDisabled]}>Back</Text>
@@ -193,7 +193,7 @@ export default function TutorialScreen() {
           <Text style={styles.primaryButtonText}>
             {isLastStep ? 'Start Using Orbital' : 'Next'}
           </Text>
-          {!isLastStep && <ChevronRight color="#000" size={20} />}
+          {!isLastStep && <ChevronRight color={colors.textPrimary} size={20} />}
         </Pressable>
       </View>
 
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   },
   skipText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   progressContainer: {
     flexDirection: 'row',
@@ -243,14 +243,14 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: colors.hairline,
   },
   progressDotActive: {
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     width: 24,
   },
   progressDotComplete: {
-    backgroundColor: 'rgba(0,229,255,0.4)',
+    backgroundColor: 'rgba(45,212,191,0.40)',
   },
   contentContainer: {
     flex: 1,
@@ -261,10 +261,10 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     maxWidth: 340,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.xl,
     alignItems: 'center',
   },
@@ -272,9 +272,9 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: 'rgba(0,229,255,0.08)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.2)',
+    borderColor: 'rgba(45,212,191,0.22)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.lg,
@@ -282,26 +282,26 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: spacing.md,
   },
   description: {
     fontSize: 16,
     lineHeight: 24,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: spacing.lg,
   },
   hintContainer: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: 12,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
   },
   hint: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     fontStyle: 'italic',
   },
@@ -324,16 +324,16 @@ const styles = StyleSheet.create({
   },
   navText: {
     fontSize: 16,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   navTextDisabled: {
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textTertiary,
   },
   primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
@@ -341,11 +341,11 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: colors.textPrimary,
   },
   stepCounter: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textTertiary,
     textAlign: 'center',
     paddingBottom: spacing.lg,
   },

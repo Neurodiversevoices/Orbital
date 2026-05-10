@@ -52,7 +52,7 @@ export default function AboutScreen() {
         {/* What Orbital Is */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Target color="#00E5FF" size={20} />
+            <Target color={colors.primary} size={20} />
             <Text style={styles.sectionTitle}>What Orbital Is</Text>
           </View>
           <View style={styles.bulletList}>
@@ -67,7 +67,7 @@ export default function AboutScreen() {
         {/* What Orbital Is NOT */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <AlertTriangle color="#E8A830" size={20} />
+            <AlertTriangle color="#F59E0B" size={20} />
             <Text style={styles.sectionTitle}>What Orbital Is NOT</Text>
           </View>
           <View style={styles.bulletList}>
@@ -82,7 +82,7 @@ export default function AboutScreen() {
         {/* Design Principles */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <CircleDot color="#00E5FF" size={20} />
+            <CircleDot color={colors.primary} size={20} />
             <Text style={styles.sectionTitle}>Design Principles</Text>
           </View>
           <View style={styles.principleGrid}>
@@ -108,7 +108,7 @@ export default function AboutScreen() {
         {/* Institutional Deployment */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Building2 color="#00E5FF" size={20} />
+            <Building2 color={colors.primary} size={20} />
             <Text style={styles.sectionTitle}>Institutional Deployment</Text>
           </View>
           <Text style={styles.sectionText}>
@@ -127,7 +127,7 @@ export default function AboutScreen() {
         {/* Governance */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Scale color="#00E5FF" size={20} />
+            <Scale color={colors.primary} size={20} />
             <Text style={styles.sectionTitle}>Governance Posture</Text>
           </View>
           <View style={styles.governanceGrid}>
@@ -161,7 +161,7 @@ export default function AboutScreen() {
         {/* Target Users */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Users color="#00E5FF" size={20} />
+            <Users color={colors.primary} size={20} />
             <Text style={styles.sectionTitle}>Who Uses Orbital</Text>
           </View>
           <View style={styles.userGrid}>
@@ -186,7 +186,7 @@ export default function AboutScreen() {
 
         {/* Disclaimer */}
         <View style={styles.disclaimerCard}>
-          <ShieldCheck color="rgba(255,255,255,0.4)" size={24} />
+          <ShieldCheck color={colors.textSecondary} size={24} />
           <Text style={styles.disclaimerText}>
             Orbital records self-reported functional capacity. It is not a regulated
             health instrument and does not provide professional evaluation, care recommendations, or
@@ -199,9 +199,9 @@ export default function AboutScreen() {
           <Text style={styles.versionText}>Orbital v1.0.0</Text>
           <Text style={styles.versionSubtext}>Longitudinal Capacity Intelligence</Text>
           <View style={styles.colorDots}>
-            <View style={[styles.dot, { backgroundColor: '#00E5FF' }]} />
-            <View style={[styles.dot, { backgroundColor: '#E8A830' }]} />
-            <View style={[styles.dot, { backgroundColor: '#F44336' }]} />
+            <View style={[styles.dot, { backgroundColor: '#2DD4BF' }]} />
+            <View style={[styles.dot, { backgroundColor: '#F59E0B' }]} />
+            <View style={[styles.dot, { backgroundColor: '#DC2626' }]} />
           </View>
         </View>
 
@@ -265,22 +265,22 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
   },
   logoInner: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.sm,
@@ -297,13 +297,13 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: spacing.sm,
   },
   heroSubtitle: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
   },
@@ -319,11 +319,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   sectionText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textPrimary,
     lineHeight: 20,
     marginBottom: spacing.md,
   },
@@ -339,20 +339,20 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     marginTop: 6,
   },
   bulletDotWarning: {
-    backgroundColor: '#E8A830',
+    backgroundColor: '#F59E0B',
   },
   bulletText: {
     flex: 1,
     fontSize: 14,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     lineHeight: 20,
   },
   bulletTextWarning: {
-    color: 'rgba(232,168,48,0.8)',
+    color: '#B7791F',
   },
   principleGrid: {
     flexDirection: 'row',
@@ -370,12 +370,12 @@ const styles = StyleSheet.create({
   principleTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#00E5FF',
+    color: '#0E8C7B',
     marginBottom: spacing.xs,
   },
   principleDesc: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     lineHeight: 16,
   },
   governanceGrid: {
@@ -394,11 +394,11 @@ const styles = StyleSheet.create({
   governanceTitle: {
     fontSize: 14,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   governanceValue: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     maxWidth: '55%',
     textAlign: 'right',
   },
@@ -415,29 +415,29 @@ const styles = StyleSheet.create({
   userTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
   userDesc: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   disclaimerCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: spacing.md,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: 12,
     padding: spacing.md,
     marginBottom: spacing.xl,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
   },
   disclaimerText: {
     flex: 1,
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   versionSection: {
@@ -448,11 +448,11 @@ const styles = StyleSheet.create({
   versionText: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   versionSubtext: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: spacing.xs,
     marginBottom: spacing.md,
   },

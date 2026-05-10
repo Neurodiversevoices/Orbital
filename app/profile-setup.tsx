@@ -126,7 +126,7 @@ export default function ProfileSetupScreen() {
                 />
               ) : (
                 <View style={styles.previewPlaceholder}>
-                  <User size={40} color="rgba(255,255,255,0.3)" />
+                  <User size={40} color={colors.textTertiary} />
                 </View>
               )}
             </View>
@@ -146,7 +146,7 @@ export default function ProfileSetupScreen() {
               value={displayName}
               onChangeText={setDisplayName}
               placeholder="Enter your name"
-              placeholderTextColor="rgba(255,255,255,0.5)"
+              placeholderTextColor={colors.textTertiary}
               maxLength={30}
               autoCapitalize="words"
               returnKeyType="done"
@@ -175,13 +175,7 @@ export default function ProfileSetupScreen() {
           entering={FadeInDown.delay(400).duration(400)}
           style={styles.actions}
         >
-          <Pressable
-            style={styles.skipButton}
-            onPress={handleSkip}
-            accessibilityRole="button"
-            accessibilityLabel="Skip for now"
-            accessibilityHint="Skips profile setup and continues to the home screen"
-          >
+          <Pressable style={styles.skipButton} onPress={handleSkip}>
             <Text style={styles.skipText}>Skip for now</Text>
           </Pressable>
 
@@ -192,10 +186,6 @@ export default function ProfileSetupScreen() {
             ]}
             onPress={handleContinue}
             disabled={!canContinue || isSubmitting}
-            accessibilityRole="button"
-            accessibilityLabel={isSubmitting ? 'Saving profile' : 'Continue'}
-            accessibilityHint="Saves your display name and avatar, then continues to the home screen"
-            accessibilityState={{ disabled: !canContinue || isSubmitting, busy: isSubmitting }}
           >
             <Text
               style={[
@@ -207,7 +197,7 @@ export default function ProfileSetupScreen() {
             </Text>
             <ArrowRight
               size={20}
-              color={canContinue ? '#000' : 'rgba(255,255,255,0.3)'}
+              color={canContinue ? colors.textPrimary : colors.textTertiary}
             />
           </Pressable>
         </Animated.View>
@@ -244,7 +234,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
@@ -257,7 +247,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     textAlign: 'center',
     maxWidth: 280,
   },
@@ -269,7 +259,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.sm,
@@ -285,7 +275,7 @@ const styles = StyleSheet.create({
     width: 94,
     height: 94,
     borderRadius: 47,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -304,18 +294,18 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.background,
     borderRadius: borderRadius.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     fontSize: 16,
     color: colors.textPrimary,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.hairline,
   },
   inputHint: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     marginTop: spacing.xs,
   },
   pickerSection: {
@@ -328,7 +318,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)',
+    borderTopColor: colors.hairline,
   },
   skipButton: {
     paddingVertical: spacing.sm,
@@ -336,7 +326,7 @@ const styles = StyleSheet.create({
   },
   skipText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   continueButton: {
     flexDirection: 'row',
@@ -348,14 +338,14 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   continueButtonDisabled: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
   },
   continueText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: colors.textPrimary,
   },
   continueTextDisabled: {
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textTertiary,
   },
 });

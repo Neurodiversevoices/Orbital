@@ -127,7 +127,7 @@ function TierCard({
   onSelectMonthly,
   onSelectAnnual,
   disabled,
-  color = '#00E5FF',
+  color = '#0E8C7B',
   requiresText,
 }: TierCardProps) {
   const annualSavings = Math.round(100 - (annualPrice / (monthlyPrice * 12)) * 100);
@@ -140,7 +140,7 @@ function TierCard({
         </View>
       )}
       {isCurrentTier && (
-        <View style={[styles.recommendedBadge, { backgroundColor: '#4CAF50' }]}>
+        <View style={[styles.recommendedBadge, { backgroundColor: '#0E8C7B' }]}>
           <Text style={styles.recommendedBadgeText}>ACTIVE</Text>
         </View>
       )}
@@ -172,10 +172,6 @@ function TierCard({
           style={[styles.tierButton, disabled && styles.tierButtonDisabled]}
           onPress={onSelectAnnual}
           disabled={disabled || isCurrentTier}
-          accessibilityRole="button"
-          accessibilityLabel={isCurrentTier ? `${name} annual, current plan` : `Subscribe to ${name} annual at ${formatPrice(annualPrice, 'year')}`}
-          accessibilityState={{ disabled: disabled || isCurrentTier, selected: isCurrentTier }}
-          accessibilityHint={isCurrentTier ? undefined : 'Begins the annual subscription purchase flow'}
         >
           <Text style={[styles.tierButtonText, disabled && styles.tierButtonTextDisabled]}>
             {isCurrentTier ? 'Current' : `${formatPrice(annualPrice, 'year')}`}
@@ -189,10 +185,6 @@ function TierCard({
           style={[styles.tierButtonSecondary, disabled && styles.tierButtonDisabled]}
           onPress={onSelectMonthly}
           disabled={disabled || isCurrentTier}
-          accessibilityRole="button"
-          accessibilityLabel={`Subscribe to ${name} monthly at ${formatPrice(monthlyPrice, 'month')}`}
-          accessibilityState={{ disabled: disabled || isCurrentTier }}
-          accessibilityHint="Begins the monthly subscription purchase flow"
         >
           <Text style={styles.tierButtonSecondaryText}>
             {formatPrice(monthlyPrice, 'month')}
@@ -221,13 +213,9 @@ function BundleCard({ seats, annualPrice, onSelect, disabled, isOwned }: BundleC
       style={[styles.bundleItem, isOwned && styles.bundleItemOwned]}
       onPress={onSelect}
       disabled={disabled || isOwned}
-      accessibilityRole="button"
-      accessibilityLabel={isOwned ? `${seats}-seat bundle, owned` : `Purchase ${seats}-seat bundle for ${formatPrice(annualPrice)} per year`}
-      accessibilityState={{ disabled: disabled || isOwned, selected: isOwned }}
-      accessibilityHint={isOwned ? undefined : 'Begins the bundle purchase flow'}
     >
       <View style={styles.bundleItemLeft}>
-        <Users size={20} color={isOwned ? '#4CAF50' : '#00E5FF'} />
+        <Users size={20} color={isOwned ? '#0E8C7B' : '#0E8C7B'} />
         <Text style={styles.bundleItemSeats}>{seats} Seats</Text>
       </View>
       <View style={styles.bundleItemRight}>
@@ -309,9 +297,6 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
             style={styles.cciConfirmationRow}
             onPress={() => setPermanentRecordChecked(!permanentRecordChecked)}
             disabled={disabled}
-            accessibilityRole="checkbox"
-            accessibilityLabel={CCI_PERMANENT_RECORD_TEXT}
-            accessibilityState={{ checked: permanentRecordChecked, disabled }}
           >
             <View style={[styles.cciCheckbox, permanentRecordChecked && styles.cciCheckboxChecked]}>
               {permanentRecordChecked && <Text style={styles.cciCheckboxMark}>✓</Text>}
@@ -323,9 +308,6 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
             style={styles.cciConfirmationRow}
             onPress={() => setNotDiagnosisChecked(!notDiagnosisChecked)}
             disabled={disabled}
-            accessibilityRole="checkbox"
-            accessibilityLabel={CCI_NOT_DIAGNOSIS_TEXT}
-            accessibilityState={{ checked: notDiagnosisChecked, disabled }}
           >
             <View style={[styles.cciCheckbox, notDiagnosisChecked && styles.cciCheckboxChecked]}>
               {notDiagnosisChecked && <Text style={styles.cciCheckboxMark}>✓</Text>}
@@ -337,9 +319,6 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
             style={styles.cciConfirmationRow}
             onPress={() => setConfirmationChecked(!confirmationChecked)}
             disabled={disabled}
-            accessibilityRole="checkbox"
-            accessibilityLabel={CCI_CONFIRMATION_TEXT}
-            accessibilityState={{ checked: confirmationChecked, disabled }}
           >
             <View style={[styles.cciCheckbox, confirmationChecked && styles.cciCheckboxChecked]}>
               {confirmationChecked && <Text style={styles.cciCheckboxMark}>✓</Text>}
@@ -353,10 +332,6 @@ function CCICard({ isPro, onPurchase, disabled, hasPurchased }: CCICardProps) {
         style={[styles.cciButton, !canPurchase && styles.cciButtonDisabled]}
         onPress={() => onPurchase(allConfirmed)}
         disabled={!canPurchase}
-        accessibilityRole="button"
-        accessibilityLabel={hasPurchased ? 'CCI issued' : `Issue Individual CCI for ${formatPrice(price)}`}
-        accessibilityState={{ disabled: !canPurchase }}
-        accessibilityHint={hasPurchased ? undefined : 'Begins the CCI issuance purchase flow'}
       >
         <Text style={[styles.cciButtonText, !canPurchase && styles.cciButtonTextDisabled]}>
           {hasPurchased ? 'Issued' : `Issue Individual CCI · ${formatPrice(price)}`}
@@ -483,7 +458,7 @@ export default function UpgradeScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator color="#00E5FF" size="large" />
+          <ActivityIndicator color={colors.primary} size="large" />
           <Text style={styles.loadingText}>Loading...</Text>
         </View>
       </SafeAreaView>
@@ -504,13 +479,7 @@ export default function UpgradeScreen() {
         <View style={styles.headerTitleContainer}>
           <Text style={styles.title}>Plans</Text>
         </View>
-        <Pressable
-          onPress={() => router.back()}
-          style={styles.closeButton}
-          accessibilityRole="button"
-          accessibilityLabel="Close plans"
-          accessibilityHint="Returns to the previous screen"
-        >
+        <Pressable onPress={() => router.back()} style={styles.closeButton}>
           <X color={colors.textPrimary} size={24} />
         </Pressable>
       </View>
@@ -562,10 +531,6 @@ export default function UpgradeScreen() {
                 style={[styles.cciInlineButton, (isPurchasing || hasCCIPurchased) && styles.cciInlineButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CCI_FREE, 'Individual CCI')}
                 disabled={isPurchasing || hasCCIPurchased}
-                accessibilityRole="button"
-                accessibilityLabel={hasCCIPurchased ? 'Individual CCI issued' : `Get Individual CCI for ${formatPrice(CCI_PRICING.ninetyDay)}`}
-                accessibilityState={{ disabled: isPurchasing || hasCCIPurchased }}
-                accessibilityHint={hasCCIPurchased ? undefined : 'Begins the Individual CCI purchase flow'}
               >
                 <Text style={styles.cciInlineButtonText}>
                   {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.ninetyDay)}`}
@@ -597,10 +562,6 @@ export default function UpgradeScreen() {
                 style={[styles.planCardCtaButton, isPro && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.PRO_ANNUAL, 'Pro (Annual)')}
                 disabled={isPurchasing || isPro}
-                accessibilityRole="button"
-                accessibilityLabel={isPro ? 'Pro annual, active' : `Subscribe to Pro annual at ${formatPrice(PRO_PRICING.annual)} per year`}
-                accessibilityState={{ disabled: isPurchasing || isPro, selected: isPro }}
-                accessibilityHint={isPro ? undefined : 'Begins the Pro annual subscription purchase flow'}
               >
                 <Text style={[styles.planCardCtaButtonText, isPro && styles.planCardCtaButtonTextDisabled]}>
                   {isPro ? 'Active' : `${formatPrice(PRO_PRICING.annual)}/yr`}
@@ -611,10 +572,6 @@ export default function UpgradeScreen() {
                 style={[styles.planCardCtaButtonSecondary, isPro && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.PRO_MONTHLY, 'Pro (Monthly)')}
                 disabled={isPurchasing || isPro}
-                accessibilityRole="button"
-                accessibilityLabel={`Subscribe to Pro monthly at ${formatPrice(PRO_PRICING.monthly)} per month`}
-                accessibilityState={{ disabled: isPurchasing || isPro }}
-                accessibilityHint="Begins the Pro monthly subscription purchase flow"
               >
                 <Text style={[styles.planCardCtaButtonSecondaryText, isPro && styles.planCardCtaButtonTextDisabled]}>
                   {formatPrice(PRO_PRICING.monthly)}/mo
@@ -634,10 +591,6 @@ export default function UpgradeScreen() {
                 style={[styles.cciInlineButtonPro, (isPurchasing || hasCCIPurchased || !isPro) && styles.cciInlineButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CCI_PRO, 'Individual CCI')}
                 disabled={isPurchasing || hasCCIPurchased || !isPro}
-                accessibilityRole="button"
-                accessibilityLabel={hasCCIPurchased ? 'Individual CCI issued' : `Get Individual CCI for ${formatPrice(CCI_PRICING.sixtyDay)}, Pro discount`}
-                accessibilityState={{ disabled: isPurchasing || hasCCIPurchased || !isPro }}
-                accessibilityHint={hasCCIPurchased ? undefined : 'Begins the Individual CCI purchase flow at the Pro discount'}
               >
                 <Text style={styles.cciInlineButtonText}>
                   {hasCCIPurchased ? 'Issued' : `Get CCI · ${formatPrice(CCI_PRICING.sixtyDay)}`}
@@ -669,10 +622,6 @@ export default function UpgradeScreen() {
                 style={[styles.planCardCtaButton, { backgroundColor: '#F59E0B' }, hasFamily && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_ANNUAL, 'Family (Annual)')}
                 disabled={isPurchasing || hasFamily}
-                accessibilityRole="button"
-                accessibilityLabel={hasFamily ? 'Family annual, active' : `Subscribe to Family annual at ${formatPrice(FAMILY_PRICING.annual)} per year`}
-                accessibilityState={{ disabled: isPurchasing || hasFamily, selected: hasFamily }}
-                accessibilityHint={hasFamily ? undefined : 'Begins the Family annual subscription purchase flow'}
               >
                 <Text style={[styles.planCardCtaButtonText, hasFamily && styles.planCardCtaButtonTextDisabled]}>
                   {hasFamily ? 'Active' : `${formatPrice(FAMILY_PRICING.annual)}/yr`}
@@ -683,10 +632,6 @@ export default function UpgradeScreen() {
                 style={[styles.planCardCtaButtonSecondary, hasFamily && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_MONTHLY, 'Family (Monthly)')}
                 disabled={isPurchasing || hasFamily}
-                accessibilityRole="button"
-                accessibilityLabel={`Subscribe to Family monthly at ${formatPrice(FAMILY_PRICING.monthly)} per month`}
-                accessibilityState={{ disabled: isPurchasing || hasFamily }}
-                accessibilityHint="Begins the Family monthly subscription purchase flow"
               >
                 <Text style={[styles.planCardCtaButtonSecondaryText, hasFamily && styles.planCardCtaButtonTextDisabled]}>
                   {formatPrice(FAMILY_PRICING.monthly)}/mo
@@ -701,11 +646,11 @@ export default function UpgradeScreen() {
           <View style={[styles.planCard, hasCircle && styles.planCardCurrent]}>
             <View style={styles.planCardHeader}>
               <View>
-                <Text style={[styles.planCardName, { color: '#00E5FF' }]}>Circles</Text>
+                <Text style={[styles.planCardName, { color: '#0E8C7B' }]}>Circles</Text>
                 <Text style={styles.planCardPrice}>{formatPrice(CIRCLE_PRICING.monthly)}/mo · {formatPrice(CIRCLE_PRICING.annual)}/yr</Text>
               </View>
               {hasCircle && (
-                <View style={[styles.currentBadge, { backgroundColor: '#00E5FF' }]}>
+                <View style={[styles.currentBadge, { backgroundColor: '#0E8C7B' }]}>
                   <Text style={[styles.currentBadgeText, { color: '#000' }]}>ACTIVE</Text>
                 </View>
               )}
@@ -716,13 +661,9 @@ export default function UpgradeScreen() {
             {!isPro && <Text style={styles.planCardRequires}>Requires Pro for all members</Text>}
             <View style={styles.planCardButtonRow}>
               <Pressable
-                style={[styles.planCardCtaButton, { backgroundColor: '#00E5FF' }, (hasCircle || !isPro) && styles.planCardCtaButtonDisabled]}
+                style={[styles.planCardCtaButton, { backgroundColor: '#0E8C7B' }, (hasCircle || !isPro) && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CIRCLE_ANNUAL, 'Circle (Annual)')}
                 disabled={isPurchasing || hasCircle || !isPro}
-                accessibilityRole="button"
-                accessibilityLabel={hasCircle ? 'Circle annual, active' : `Subscribe to Circle annual at ${formatPrice(CIRCLE_PRICING.annual)} per year`}
-                accessibilityState={{ disabled: isPurchasing || hasCircle || !isPro, selected: hasCircle }}
-                accessibilityHint={hasCircle ? undefined : 'Begins the Circle annual subscription purchase flow. Requires Pro.'}
               >
                 <Text style={[styles.planCardCtaButtonText, (hasCircle || !isPro) && styles.planCardCtaButtonTextDisabled]}>
                   {hasCircle ? 'Active' : `${formatPrice(CIRCLE_PRICING.annual)}/yr`}
@@ -733,10 +674,6 @@ export default function UpgradeScreen() {
                 style={[styles.planCardCtaButtonSecondary, (hasCircle || !isPro) && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CIRCLE_MONTHLY, 'Circle (Monthly)')}
                 disabled={isPurchasing || hasCircle || !isPro}
-                accessibilityRole="button"
-                accessibilityLabel={`Subscribe to Circle monthly at ${formatPrice(CIRCLE_PRICING.monthly)} per month`}
-                accessibilityState={{ disabled: isPurchasing || hasCircle || !isPro }}
-                accessibilityHint="Begins the Circle monthly subscription purchase flow. Requires Pro."
               >
                 <Text style={[styles.planCardCtaButtonSecondaryText, (hasCircle || !isPro) && styles.planCardCtaButtonTextDisabled]}>
                   {formatPrice(CIRCLE_PRICING.monthly)}/mo
@@ -747,19 +684,15 @@ export default function UpgradeScreen() {
             {/* Circle Aggregate CCI $399 - Always visible in Circles panel */}
             <View style={styles.cciInlineSection}>
               <View style={styles.cciInlineHeader}>
-                <FileText size={16} color="#00E5FF" />
+                <FileText size={16} color={colors.primary} />
                 <Text style={styles.cciInlineTitle}>Circle Aggregate CCI</Text>
-                <Text style={[styles.cciInlinePrice, { color: '#00E5FF' }]}>{formatPrice(CCI_GROUP_PRICING.circleAll)}</Text>
+                <Text style={[styles.cciInlinePrice, { color: '#0E8C7B' }]}>{formatPrice(CCI_GROUP_PRICING.circleAll)}</Text>
               </View>
               <Text style={styles.cciInlineDescription}>One CCI covering all Circle members · No individual attribution</Text>
               <Pressable
                 style={[styles.cciInlineButtonCircle, (isPurchasing || !hasCircle) && styles.cciInlineButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CCI_CIRCLE_ALL, 'Circle Aggregate CCI')}
                 disabled={isPurchasing || !hasCircle}
-                accessibilityRole="button"
-                accessibilityLabel={`Get Circle Aggregate CCI for ${formatPrice(CCI_GROUP_PRICING.circleAll)}`}
-                accessibilityState={{ disabled: isPurchasing || !hasCircle }}
-                accessibilityHint="Begins the Circle aggregate CCI purchase flow. Requires an active Circle subscription."
               >
                 <Text style={styles.cciInlineButtonText}>
                   {`Get Circle CCI · ${formatPrice(CCI_GROUP_PRICING.circleAll)}`}
@@ -774,11 +707,11 @@ export default function UpgradeScreen() {
           <View style={[styles.planCard, bundleSize !== null && styles.planCardCurrent]}>
             <View style={styles.planCardHeader}>
               <View>
-                <Text style={[styles.planCardName, { color: '#9C27B0' }]}>Bundles</Text>
+                <Text style={[styles.planCardName, { color: '#7B1FA2' }]}>Bundles</Text>
                 <Text style={styles.planCardPrice}>From {formatPrice(BUNDLE_PRICING.bundle_10.annual)}/yr</Text>
               </View>
               {bundleSize !== null && (
-                <View style={[styles.currentBadge, { backgroundColor: '#9C27B0' }]}>
+                <View style={[styles.currentBadge, { backgroundColor: '#7B1FA2' }]}>
                   <Text style={styles.currentBadgeText}>{bundleSize} SEATS</Text>
                 </View>
               )}
@@ -791,10 +724,6 @@ export default function UpgradeScreen() {
                 style={[styles.bundleOptionButton, bundleSize === 10 && styles.bundleOptionButtonActive]}
                 onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_10_ANNUAL, '10-Seat Pro Bundle')}
                 disabled={isPurchasing || bundleSize !== null}
-                accessibilityRole="button"
-                accessibilityLabel={`10-seat Pro bundle, ${formatPrice(BUNDLE_PRICING.bundle_10.annual)} annual`}
-                accessibilityState={{ disabled: isPurchasing || bundleSize !== null, selected: bundleSize === 10 }}
-                accessibilityHint="Begins the 10-seat bundle purchase flow"
               >
                 <Text style={[styles.bundleOptionText, bundleSize === 10 && styles.bundleOptionTextActive]}>10 seats</Text>
                 <Text style={[styles.bundleOptionPrice, bundleSize === 10 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_10.annual)}</Text>
@@ -803,10 +732,6 @@ export default function UpgradeScreen() {
                 style={[styles.bundleOptionButton, bundleSize === 15 && styles.bundleOptionButtonActive]}
                 onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_15_ANNUAL, '15-Seat Pro Bundle')}
                 disabled={isPurchasing || bundleSize !== null}
-                accessibilityRole="button"
-                accessibilityLabel={`15-seat Pro bundle, ${formatPrice(BUNDLE_PRICING.bundle_15.annual)} annual`}
-                accessibilityState={{ disabled: isPurchasing || bundleSize !== null, selected: bundleSize === 15 }}
-                accessibilityHint="Begins the 15-seat bundle purchase flow"
               >
                 <Text style={[styles.bundleOptionText, bundleSize === 15 && styles.bundleOptionTextActive]}>15 seats</Text>
                 <Text style={[styles.bundleOptionPrice, bundleSize === 15 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_15.annual)}</Text>
@@ -815,10 +740,6 @@ export default function UpgradeScreen() {
                 style={[styles.bundleOptionButton, bundleSize === 20 && styles.bundleOptionButtonActive]}
                 onPress={() => handlePurchase(PRODUCT_IDS.BUNDLE_20_ANNUAL, '20-Seat Pro Bundle')}
                 disabled={isPurchasing || bundleSize !== null}
-                accessibilityRole="button"
-                accessibilityLabel={`20-seat Pro bundle, ${formatPrice(BUNDLE_PRICING.bundle_20.annual)} annual`}
-                accessibilityState={{ disabled: isPurchasing || bundleSize !== null, selected: bundleSize === 20 }}
-                accessibilityHint="Begins the 20-seat bundle purchase flow"
               >
                 <Text style={[styles.bundleOptionText, bundleSize === 20 && styles.bundleOptionTextActive]}>20 seats</Text>
                 <Text style={[styles.bundleOptionPrice, bundleSize === 20 && styles.bundleOptionTextActive]}>{formatPrice(BUNDLE_PRICING.bundle_20.annual)}</Text>
@@ -830,17 +751,13 @@ export default function UpgradeScreen() {
               <View style={styles.cciInlineHeader}>
                 <FileText size={16} color="#9C27B0" />
                 <Text style={styles.cciInlineTitle}>Bundle Aggregate CCI</Text>
-                <Text style={[styles.cciInlinePrice, { color: '#9C27B0' }]}>{formatPrice(CCI_GROUP_PRICING.bundleAll)}</Text>
+                <Text style={[styles.cciInlinePrice, { color: '#7B1FA2' }]}>{formatPrice(CCI_GROUP_PRICING.bundleAll)}</Text>
               </View>
               <Text style={styles.cciInlineDescription}>One CCI covering all Bundle seats · No individual attribution</Text>
               <Pressable
                 style={[styles.cciInlineButtonBundle, (isPurchasing || bundleSize === null) && styles.cciInlineButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.CCI_BUNDLE_ALL, 'Bundle Aggregate CCI')}
                 disabled={isPurchasing || bundleSize === null}
-                accessibilityRole="button"
-                accessibilityLabel={`Get Bundle Aggregate CCI for ${formatPrice(CCI_GROUP_PRICING.bundleAll)}`}
-                accessibilityState={{ disabled: isPurchasing || bundleSize === null }}
-                accessibilityHint="Begins the Bundle aggregate CCI purchase flow. Requires an active bundle."
               >
                 <Text style={styles.cciInlineButtonText}>
                   {`Get Bundle CCI · ${formatPrice(CCI_GROUP_PRICING.bundleAll)}`}
@@ -886,16 +803,12 @@ export default function UpgradeScreen() {
             onPress={handleRestore}
             disabled={isRestoring}
             style={styles.restoreButton}
-            accessibilityRole="button"
-            accessibilityLabel={isRestoring ? 'Restoring purchases' : 'Restore Purchases'}
-            accessibilityState={{ disabled: isRestoring, busy: isRestoring }}
-            accessibilityHint="Restores previously purchased subscriptions and CCI artifacts"
           >
             {isRestoring ? (
-              <ActivityIndicator color="rgba(255,255,255,0.6)" size="small" />
+              <ActivityIndicator color={colors.textSecondary} size="small" />
             ) : (
               <>
-                <RefreshCw size={14} color="rgba(255,255,255,0.5)" />
+                <RefreshCw size={14} color={colors.textSecondary} />
                 <Text style={styles.restoreButtonText}>Restore Purchases</Text>
               </>
             )}
@@ -919,21 +832,11 @@ export default function UpgradeScreen() {
           </Text>
 
           <View style={styles.footerLinks}>
-            <Pressable
-              onPress={() => Linking.openURL('https://orbitalhealth.app/terms')}
-              accessibilityRole="link"
-              accessibilityLabel="Terms"
-              accessibilityHint="Opens the Terms of Service in your browser"
-            >
+            <Pressable onPress={() => Linking.openURL('https://orbitalhealth.app/terms')}>
               <Text style={styles.footerLink}>Terms</Text>
             </Pressable>
             <Text style={styles.footerDot}>·</Text>
-            <Pressable
-              onPress={() => Linking.openURL('https://orbitalhealth.app/privacy')}
-              accessibilityRole="link"
-              accessibilityLabel="Privacy"
-              accessibilityHint="Opens the Privacy Policy in your browser"
-            >
+            <Pressable onPress={() => Linking.openURL('https://orbitalhealth.app/privacy')}>
               <Text style={styles.footerLink}>Privacy</Text>
             </Pressable>
           </View>
@@ -961,7 +864,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: spacing.md,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     fontSize: 14,
   },
   header: {
@@ -978,14 +881,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   headerTitleContainer: {
     alignItems: 'center',
   },
   headerSubtitle: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginTop: 4,
     maxWidth: 260,
@@ -1002,7 +905,7 @@ const styles = StyleSheet.create({
   plansHeader: {
     fontSize: 20,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     marginBottom: spacing.lg,
     textAlign: 'center',
   },
@@ -1011,14 +914,14 @@ const styles = StyleSheet.create({
   oneTimePurchasesHeader: {
     fontSize: 20,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     marginBottom: spacing.xs,
     marginTop: spacing.xl,
     textAlign: 'center',
   },
   oneTimePurchasesSubheader: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.lg,
   },
@@ -1028,22 +931,22 @@ const styles = StyleSheet.create({
   cciSectionLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     letterSpacing: 1,
     marginBottom: spacing.xs,
   },
   cciSectionPriceHint: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
 
   // Plan Card (equal for all plans)
   planCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
     padding: spacing.lg,
     marginBottom: spacing.md,
   },
@@ -1063,17 +966,17 @@ const styles = StyleSheet.create({
   planCardName: {
     fontSize: 22,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   planCardPrice: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   planCardDescription: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     lineHeight: 20,
     marginBottom: spacing.md,
   },
@@ -1088,7 +991,7 @@ const styles = StyleSheet.create({
   },
   planCardCtaText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textAlign: 'center',
   },
   planCardCtaButton: {
@@ -1101,7 +1004,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
   },
   planCardCtaButtonDisabled: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
   },
   planCardCtaButtonText: {
     fontSize: 15,
@@ -1109,7 +1012,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   planCardCtaButtonTextDisabled: {
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
   planCardButtonRow: {
     flexDirection: 'row',
@@ -1117,22 +1020,22 @@ const styles = StyleSheet.create({
   },
   planCardCtaButtonSecondary: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: colors.backgroundSubtle,
     paddingVertical: spacing.md,
     borderRadius: borderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: colors.cardBorder,
   },
   planCardCtaButtonSecondaryText: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
   },
   savingsBadge: {
     fontSize: 10,
-    color: '#4CAF50',
+    color: '#0E8C7B',
     marginTop: 2,
   },
   currentBadge: {
@@ -1144,7 +1047,7 @@ const styles = StyleSheet.create({
   currentBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#4CAF50',
+    color: '#0E8C7B',
     letterSpacing: 0.5,
   },
 
@@ -1155,38 +1058,38 @@ const styles = StyleSheet.create({
   },
   bundleOptionButton: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.sm,
     alignItems: 'center',
   },
   bundleOptionButtonActive: {
     backgroundColor: 'rgba(156,39,176,0.2)',
-    borderColor: '#9C27B0',
+    borderColor: '#7B1FA2',
   },
   bundleOptionText: {
     fontSize: 13,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
   },
   bundleOptionPrice: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginTop: 2,
   },
   bundleOptionTextActive: {
-    color: '#9C27B0',
+    color: '#7B1FA2',
   },
 
   // Status Card
   statusCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.lg,
   },
@@ -1197,10 +1100,10 @@ const styles = StyleSheet.create({
   },
   statusLabel: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
   },
   statusBadge: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: 4,
@@ -1211,11 +1114,11 @@ const styles = StyleSheet.create({
   statusBadgeText: {
     fontSize: 12,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
   },
   statusHint: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginTop: spacing.xs,
   },
 
@@ -1223,24 +1126,24 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 11,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     letterSpacing: 1,
     marginBottom: spacing.sm,
     marginTop: spacing.md,
   },
   sectionSubtitle: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginBottom: spacing.md,
     marginTop: -4,
   },
 
   // Tier Card
   tierCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
     padding: spacing.lg,
     marginBottom: spacing.md,
   },
@@ -1270,7 +1173,7 @@ const styles = StyleSheet.create({
   },
   tierDescription: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
   requiresText: {
@@ -1287,11 +1190,11 @@ const styles = StyleSheet.create({
   priceAmount: {
     fontSize: 36,
     fontWeight: '300',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
   },
   pricePeriod: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginLeft: 4,
   },
   featuresContainer: {
@@ -1305,7 +1208,7 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
   },
   tierActions: {
     flexDirection: 'row',
@@ -1313,13 +1216,13 @@ const styles = StyleSheet.create({
   },
   tierButton: {
     flex: 1,
-    backgroundColor: '#00E5FF',
+    backgroundColor: '#0E8C7B',
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.md,
     alignItems: 'center',
   },
   tierButtonDisabled: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
   },
   tierButtonText: {
     fontSize: 14,
@@ -1327,60 +1230,60 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   tierButtonTextDisabled: {
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
   tierButtonAnnual: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: colors.backgroundSubtle,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.md,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: colors.cardBorder,
   },
   tierButtonAnnualText: {
     fontSize: 14,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
   },
   savingsText: {
     fontSize: 10,
-    color: '#4CAF50',
+    color: '#0E8C7B',
     marginTop: 2,
   },
   savingsTextPrimary: {
     fontSize: 10,
-    color: '#4CAF50',
+    color: '#0E8C7B',
     marginTop: 2,
   },
   monthlyAvailable: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     fontStyle: 'italic',
     marginBottom: spacing.md,
     marginTop: -4,
   },
   tierButtonSecondary: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: colors.backgroundSubtle,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.md,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: colors.cardBorder,
   },
   tierButtonSecondaryText: {
     fontSize: 13,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
   },
 
   // Family Expansion Pricing
   expansionPricingCard: {
-    backgroundColor: 'rgba(245,158,11,0.05)',
+    backgroundColor: 'rgba(255,152,0,0.05)',
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(245,158,11,0.15)',
+    borderColor: 'rgba(255,152,0,0.15)',
     borderStyle: 'dashed',
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -1394,11 +1297,11 @@ const styles = StyleSheet.create({
   expansionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.85)',
+    color: colors.textPrimary,
   },
   expansionSubtitle: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.md,
   },
   expansionPriceRow: {
@@ -1418,12 +1321,12 @@ const styles = StyleSheet.create({
   },
   expansionPricePeriod: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   expansionPriceOr: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textTertiary,
     fontStyle: 'italic',
   },
   addMemberButton: {
@@ -1450,7 +1353,7 @@ const styles = StyleSheet.create({
   },
   bundleFooter: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.sm,
     marginBottom: spacing.md,
@@ -1460,10 +1363,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
   },
   bundleItemOwned: {
@@ -1478,7 +1381,7 @@ const styles = StyleSheet.create({
   bundleItemSeats: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   bundleItemRight: {
     alignItems: 'flex-end',
@@ -1486,7 +1389,7 @@ const styles = StyleSheet.create({
   bundleItemPrice: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#00E5FF',
+    color: '#0E8C7B',
   },
 
   // CCI Card
@@ -1510,11 +1413,11 @@ const styles = StyleSheet.create({
   cciTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   cciSubtitle: {
     fontSize: 12,
-    color: '#7A9AAA',
+    color: '#1D4ED8',
     marginTop: 2,
   },
   cciPricing: {
@@ -1527,12 +1430,12 @@ const styles = StyleSheet.create({
   },
   cciPriceLabel: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
   },
   cciPriceValue: {
     fontSize: 24,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
   },
   cciProBadge: {
     backgroundColor: 'rgba(255,215,0,0.2)',
@@ -1547,7 +1450,7 @@ const styles = StyleSheet.create({
   },
   cciProHint: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginTop: spacing.xs,
   },
   cciCptNotice: {
@@ -1558,7 +1461,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   cciButton: {
-    backgroundColor: '#7A9AAA',
+    backgroundColor: '#1D4ED8',
     paddingVertical: spacing.md,
     borderRadius: borderRadius.md,
     alignItems: 'center',
@@ -1572,7 +1475,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   cciButtonTextDisabled: {
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
 
   // CCI Confirmation (FIX 5 — Legal Required)
@@ -1582,10 +1485,10 @@ const styles = StyleSheet.create({
   cciConfirmationRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.md,
   },
@@ -1594,7 +1497,7 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderColor: colors.textTertiary,
     backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
@@ -1602,8 +1505,8 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   cciCheckboxChecked: {
-    backgroundColor: '#7A9AAA',
-    borderColor: '#7A9AAA',
+    backgroundColor: '#1D4ED8',
+    borderColor: '#1D4ED8',
   },
   cciCheckboxMark: {
     fontSize: 12,
@@ -1613,12 +1516,12 @@ const styles = StyleSheet.create({
   cciConfirmationText: {
     flex: 1,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   cciConfirmationHint: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textAlign: 'center',
     marginTop: spacing.sm,
     fontStyle: 'italic',
@@ -1628,12 +1531,12 @@ const styles = StyleSheet.create({
   cciModalTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   cciModalBody: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 18,
     marginBottom: spacing.md,
   },
@@ -1643,18 +1546,18 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     paddingTop: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.08)',
+    borderTopColor: colors.hairline,
   },
   cciIssuedLabel: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginTop: spacing.sm,
   },
   cciIssuedValue: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
     fontFamily: 'monospace',
   },
   cciReissuanceNote: {
@@ -1688,7 +1591,7 @@ const styles = StyleSheet.create({
   comingSoonText: {
     fontSize: 9,
     fontWeight: '700',
-    color: '#9C27B0',
+    color: '#7B1FA2',
     letterSpacing: 0.5,
   },
   cciAggregateNotice: {
@@ -1700,7 +1603,7 @@ const styles = StyleSheet.create({
   },
   cciRequiresNote: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     fontStyle: 'italic',
     textAlign: 'center',
     paddingVertical: spacing.md,
@@ -1725,11 +1628,11 @@ const styles = StyleSheet.create({
   sponsorCardTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   sponsorCardDescription: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
 
@@ -1746,7 +1649,7 @@ const styles = StyleSheet.create({
   },
   restoreButtonText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   reviewHint: {
     backgroundColor: 'rgba(0,229,255,0.06)',
@@ -1762,7 +1665,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   stubNotice: {
-    backgroundColor: 'rgba(245,158,11,0.1)',
+    backgroundColor: 'rgba(255,152,0,0.1)',
     borderRadius: borderRadius.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
@@ -1775,7 +1678,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textTertiary,
     textAlign: 'center',
     lineHeight: 14,
     marginBottom: spacing.sm,
@@ -1789,11 +1692,11 @@ const styles = StyleSheet.create({
   },
   footerLink: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
   footerDot: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textTertiary,
   },
 
   // =============================================================================
@@ -1803,7 +1706,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     paddingTop: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.1)',
+    borderTopColor: colors.hairline,
   },
   cciInlineHeader: {
     flexDirection: 'row',
@@ -1814,21 +1717,21 @@ const styles = StyleSheet.create({
   },
   cciInlineDescription: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
   cciInlineTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.85)',
+    color: colors.textPrimary,
   },
   cciInlinePrice: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#7A9AAA',
+    color: '#1D4ED8',
   },
   cciInlineButton: {
-    backgroundColor: '#7A9AAA',
+    backgroundColor: '#1D4ED8',
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,
@@ -1842,7 +1745,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cciInlineButtonDisabled: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
   },
   cciInlineButtonText: {
     fontSize: 13,
@@ -1851,7 +1754,7 @@ const styles = StyleSheet.create({
   },
   cciInlineHint: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginTop: spacing.sm,
     textAlign: 'center',
   },
@@ -1868,14 +1771,14 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   cciInlineButtonCircle: {
-    backgroundColor: '#00E5FF',
+    backgroundColor: '#0E8C7B',
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,
     alignItems: 'center',
   },
   cciInlineButtonBundle: {
-    backgroundColor: '#9C27B0',
+    backgroundColor: '#7B1FA2',
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,

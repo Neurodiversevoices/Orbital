@@ -3,29 +3,38 @@ import { colors } from './colors';
 import { borderRadius } from './spacing';
 
 export const glowStyles = {
-  // Glow shadow for iOS
-  shadowColor: colors.good,
+  // Soft glow for iOS (light theme — subtle teal)
+  shadowColor: colors.primary,
   shadowOffset: { width: 0, height: 0 },
-  shadowOpacity: 0.8,
-  shadowRadius: 20,
+  shadowOpacity: 0.35,
+  shadowRadius: 18,
   // Android elevation
-  elevation: 10,
+  elevation: 6,
 };
 
 export const createGlow = (color: string, intensity: number = 1) => ({
   shadowColor: color,
   shadowOffset: { width: 0, height: 0 },
-  shadowOpacity: 0.8 * intensity,
-  shadowRadius: 20 * intensity,
-  elevation: Math.round(10 * intensity),
+  shadowOpacity: 0.35 * intensity,
+  shadowRadius: 18 * intensity,
+  elevation: Math.round(6 * intensity),
 });
 
+/**
+ * Light-surface "glass" — solid white card with hairline border + soft shadow.
+ * Replaces the legacy translucent dark glass.
+ */
 export const glassStyle = StyleSheet.create({
   container: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.cardBorder,
     borderRadius: borderRadius.lg,
+    shadowColor: colors.cardShadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 2,
   },
 });
 

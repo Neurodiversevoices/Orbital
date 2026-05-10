@@ -8,6 +8,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import type { LucideIcon } from 'lucide-react-native';
+import { colors } from '../theme';
 
 interface EmptyStateProps {
   /** Icon to display */
@@ -41,7 +42,7 @@ export function EmptyState({
     <View style={[styles.container, { paddingVertical: config.padding }]} testID="empty-state" data-testid="empty-state">
       <View style={styles.iconContainer}>
         <Icon
-          color="rgba(255, 255, 255, 0.2)"
+          color={colors.textTertiary}
           size={config.iconSize}
           strokeWidth={1.5}
         />
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255, 255, 255, 0.6)',
+    color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: 8,
   },
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.4)',
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
     maxWidth: 280,
@@ -108,14 +109,14 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: 'rgba(0, 255, 255, 0.1)',
+    backgroundColor: 'rgba(45, 212, 191, 0.10)',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(0, 255, 255, 0.2)',
+    borderColor: 'rgba(45, 212, 191, 0.22)',
   },
   actionHint: {
     fontSize: 13,
-    color: '#00FFFF',
+    color: '#0E8C7B',
     textAlign: 'center',
     fontWeight: '500',
   },

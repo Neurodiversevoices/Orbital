@@ -133,7 +133,7 @@ export default function RedeemScreen() {
               <Text style={styles.activeTier}>{tierLabel}</Text>
               {sponsorExpiration && (
                 <View style={styles.expirationRow}>
-                  <Calendar size={14} color="rgba(255,255,255,0.5)" />
+                  <Calendar size={14} color={colors.textSecondary} />
                   <Text style={styles.expirationText}>
                     Valid until {sponsorExpiration.toLocaleDateString()}
                   </Text>
@@ -177,7 +177,7 @@ export default function RedeemScreen() {
                 {success.tier === 'Pro' ? 'Pro + Insights' : 'Core'} Access Activated
               </Text>
               <View style={styles.expirationRow}>
-                <Calendar size={14} color="rgba(255,255,255,0.5)" />
+                <Calendar size={14} color={colors.textSecondary} />
                 <Text style={styles.expirationText}>
                   Valid until {success.expiresAt.toLocaleDateString()}
                 </Text>
@@ -187,22 +187,22 @@ export default function RedeemScreen() {
             <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.successFeatures}>
               <Text style={styles.successFeaturesTitle}>Your access includes:</Text>
               <View style={styles.featureRow}>
-                <Check size={14} color="#00E5FF" />
+                <Check size={14} color={colors.primary} />
                 <Text style={styles.featureText}>Unlimited capacity signals</Text>
               </View>
               <View style={styles.featureRow}>
-                <Check size={14} color="#00E5FF" />
+                <Check size={14} color={colors.primary} />
                 <Text style={styles.featureText}>
                   {success.tier === 'Pro' ? 'Unlimited' : '90-day'} pattern history
                 </Text>
               </View>
               <View style={styles.featureRow}>
-                <Check size={14} color="#00E5FF" />
+                <Check size={14} color={colors.primary} />
                 <Text style={styles.featureText}>QSB Strategic Brief</Text>
               </View>
               {success.tier === 'Pro' && (
                 <View style={styles.featureRow}>
-                  <Check size={14} color="#00E5FF" />
+                  <Check size={14} color={colors.primary} />
                   <Text style={styles.featureText}>Executive reports</Text>
                 </View>
               )}
@@ -237,7 +237,7 @@ export default function RedeemScreen() {
           {/* Hero */}
           <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.hero}>
             <View style={styles.iconContainer}>
-              <Gift size={32} color="#00E5FF" />
+              <Gift size={32} color={colors.primary} />
             </View>
             <Text style={styles.heroTitle}>Sponsor Code</Text>
             <Text style={styles.heroSubtitle}>
@@ -252,7 +252,7 @@ export default function RedeemScreen() {
               value={code}
               onChangeText={handleCodeChange}
               placeholder="XXXX-XXXX-XXXX-XXXX"
-              placeholderTextColor="rgba(255,255,255,0.5)"
+              placeholderTextColor={colors.textTertiary}
               autoCapitalize="characters"
               autoCorrect={false}
               maxLength={19} // 16 chars + 3 dashes
@@ -271,13 +271,13 @@ export default function RedeemScreen() {
           <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.infoCard}>
             <Text style={styles.infoTitle}>Sponsor Seat Types</Text>
             <View style={styles.infoRow}>
-              <Check size={14} color="#00E5FF" />
+              <Check size={14} color={colors.primary} />
               <Text style={styles.infoText}>
                 <Text style={styles.infoBold}>Core ($200/yr)</Text> - Individual access for one year
               </Text>
             </View>
             <View style={styles.infoRow}>
-              <Check size={14} color="#00E5FF" />
+              <Check size={14} color={colors.primary} />
               <Text style={styles.infoText}>
                 <Text style={styles.infoBold}>Pro + Insights ($349/yr)</Text> - Pro access with full analytics
               </Text>
@@ -292,7 +292,7 @@ export default function RedeemScreen() {
               disabled={isRedeeming || !code.trim() || code.length < 19}
             >
               {isRedeeming ? (
-                <ActivityIndicator color="#000" size="small" />
+                <ActivityIndicator color={colors.textPrimary} size="small" />
               ) : (
                 <Text style={styles.ctaButtonText}>Redeem Sponsor Code</Text>
               )}
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.sm,
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
@@ -378,27 +378,27 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
   heroSubtitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   inputContainer: {
     marginBottom: spacing.lg,
   },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
     fontSize: 18,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     textAlign: 'center',
     letterSpacing: 2,
   },
@@ -411,20 +411,20 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 13,
-    color: '#FF3B30',
+    color: '#DC2626',
   },
   infoCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.xl,
   },
   infoTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
   infoRow: {
@@ -436,30 +436,30 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   infoBold: {
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
   },
   ctaContainer: {
     marginBottom: spacing.lg,
   },
   ctaButton: {
-    backgroundColor: '#00E5FF',
+    backgroundColor: '#0E8C7B',
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
     borderRadius: borderRadius.lg,
     alignItems: 'center',
   },
   ctaButtonDisabled: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
   },
   ctaButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: colors.textPrimary,
   },
   footer: {
     marginTop: 'auto',
@@ -467,23 +467,23 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textAlign: 'center',
     lineHeight: 18,
     marginBottom: spacing.sm,
   },
   footerContact: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
   },
 
   // Success State
   successCard: {
-    backgroundColor: 'rgba(76,175,80,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(76,175,80,0.3)',
+    borderColor: 'rgba(45,212,191,0.30)',
     padding: spacing.xl,
     alignItems: 'center',
     marginBottom: spacing.xl,
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: 'rgba(76,175,80,0.2)',
+    backgroundColor: 'rgba(45,212,191,0.20)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
@@ -500,13 +500,13 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#4CAF50',
+    color: '#0E8C7B',
     marginBottom: spacing.xs,
   },
   successTier: {
     fontSize: 16,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
     marginBottom: spacing.md,
   },
   expirationRow: {
@@ -516,20 +516,20 @@ const styles = StyleSheet.create({
   },
   expirationText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   successFeatures: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.xl,
   },
   successFeaturesTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
   featureRow: {
@@ -540,10 +540,10 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
   },
   doneButton: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
     paddingVertical: spacing.md,
     borderRadius: borderRadius.md,
     alignItems: 'center',
@@ -551,15 +551,15 @@ const styles = StyleSheet.create({
   doneButtonText: {
     fontSize: 16,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
   },
 
   // Active Sponsored State
   activeCard: {
-    backgroundColor: 'rgba(76,175,80,0.08)',
+    backgroundColor: 'rgba(45,212,191,0.08)',
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(76,175,80,0.2)',
+    borderColor: 'rgba(45,212,191,0.22)',
     padding: spacing.xl,
     alignItems: 'center',
     marginBottom: spacing.xl,
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: 'rgba(76,175,80,0.15)',
+    backgroundColor: 'rgba(45,212,191,0.15)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
@@ -576,13 +576,13 @@ const styles = StyleSheet.create({
   activeTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
   activeTier: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#4CAF50',
+    color: '#0E8C7B',
     marginBottom: spacing.md,
   },
 
@@ -590,10 +590,10 @@ const styles = StyleSheet.create({
   devSection: {
     marginTop: spacing.md,
     padding: spacing.md,
-    backgroundColor: 'rgba(245,158,11,0.1)',
+    backgroundColor: 'rgba(245,158,11,0.10)',
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(245,158,11,0.3)',
+    borderColor: 'rgba(245,158,11,0.30)',
   },
   devLabel: {
     fontSize: 11,
@@ -608,7 +608,7 @@ const styles = StyleSheet.create({
   },
   devButton: {
     flex: 1,
-    backgroundColor: 'rgba(245,158,11,0.2)',
+    backgroundColor: 'rgba(245,158,11,0.18)',
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.sm,
     alignItems: 'center',
