@@ -6,7 +6,7 @@
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, StyleSheet, Text, Pressable, ScrollView, Share, Alert, RefreshControl, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Text, Pressable, ScrollView, Share, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { X, Download, Shield, Eye, FileOutput, Share2, UserX, Clock } from 'lucide-react-native';
@@ -14,7 +14,6 @@ import { colors, commonStyles, spacing } from '../theme';
 import { getAuditLog, getRecipients } from '../lib/storage';
 import { AuditEntry, AuditAction, ShareRecipient } from '../types';
 import { useLocale } from '../lib/hooks/useLocale';
-import { EmptyState } from '../components';
 
 const ACTION_ICONS: Record<AuditAction, React.ComponentType<{ color: string; size: number }>> = {
   share_created: Share2,
@@ -25,10 +24,10 @@ const ACTION_ICONS: Record<AuditAction, React.ComponentType<{ color: string; siz
 };
 
 const ACTION_COLORS: Record<AuditAction, string> = {
-  share_created: '#00E5FF',
-  share_expired: '#E8A830',
-  share_revoked: '#F44336',
-  share_accessed: '#4CAF50',
+  share_created: '#0E8C7B',
+  share_expired: '#F59E0B',
+  share_revoked: '#DC2626',
+  share_accessed: '#0E8C7B',
   export_generated: '#9C27B0',
 };
 
@@ -38,7 +37,6 @@ export default function AuditScreen() {
   const [entries, setEntries] = useState<AuditEntry[]>([]);
   const [recipients, setRecipients] = useState<Map<string, ShareRecipient>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -54,17 +52,6 @@ export default function AuditScreen() {
     setRecipients(new Map(recipientList.map(r => [r.id, r])));
     setIsLoading(false);
   };
-
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    const [auditEntries, recipientList] = await Promise.all([
-      getAuditLog(),
-      getRecipients(),
-    ]);
-    setEntries(auditEntries);
-    setRecipients(new Map(recipientList.map(r => [r.id, r])));
-    setIsRefreshing(false);
-  }, []);
 
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -147,12 +134,12 @@ export default function AuditScreen() {
     <SafeAreaView style={commonStyles.screen}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Shield color="#00E5FF" size={24} />
-          <Text style={styles.headerTitle}>Audit Log</Text>
+          <Shield color="#0E8C7B" size={24} />
+          <Text style={styles.headerTitle} maxFontSizeMultiplier={1.5}>Audit Log</Text>
         </View>
         <View style={styles.headerRight}>
           <Pressable onPress={exportAuditLog} style={styles.exportButton}>
-            <Download color="rgba(255,255,255,0.7)" size={20} />
+            <Download color={colors.textSecondary} size={20} />
           </Pressable>
           <Pressable onPress={() => router.back()} style={styles.closeButton}>
             <X color={colors.textPrimary} size={24} />
@@ -161,35 +148,26 @@ export default function AuditScreen() {
       </View>
 
       <View style={styles.infoCard}>
-        <Text style={styles.infoTitle}>Activity Record</Text>
-        <Text style={styles.infoDesc}>
+        <Text style={styles.infoTitle} maxFontSizeMultiplier={1.5}>Activity Record</Text>
+        <Text style={styles.infoDesc} maxFontSizeMultiplier={1.5}>
           Immutable log of all sharing, export, and access events.
           This record supports compliance auditing and institutional review.
         </Text>
       </View>
 
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefresh}
-            tintColor="#00E5FF"
-            colors={['#00E5FF']}
-          />
-        }
-      >
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {isLoading ? (
           <View style={styles.emptyState}>
-            <ActivityIndicator size="small" color="#00E5FF" />
+            <Text style={styles.emptyText} maxFontSizeMultiplier={1.5}>Loading...</Text>
           </View>
         ) : entries.length === 0 ? (
-          <EmptyState
-            icon={Shield}
-            title="No Activity Recorded"
-            description="Share and export actions will appear here once you take them."
-          />
+          <View style={styles.emptyState}>
+            <Shield color={colors.textTertiary} size={48} />
+            <Text style={styles.emptyTitle} maxFontSizeMultiplier={1.5}>No Activity Recorded</Text>
+            <Text style={styles.emptyText} maxFontSizeMultiplier={1.5}>
+              Share and export actions will appear here.
+            </Text>
+          </View>
         ) : (
           entries.map((entry, index) => {
             const Icon = ACTION_ICONS[entry.action];
@@ -201,17 +179,17 @@ export default function AuditScreen() {
                   <Icon color={color} size={18} />
                 </View>
                 <View style={styles.entryContent}>
-                  <Text style={styles.entryAction}>{getActionLabel(entry.action)}</Text>
+                  <Text style={styles.entryAction} maxFontSizeMultiplier={1.5}>{getActionLabel(entry.action)}</Text>
                   {entry.recipientName && (
-                    <Text style={styles.entryRecipient}>{entry.recipientName}</Text>
+                    <Text style={styles.entryRecipient} maxFontSizeMultiplier={1.5}>{entry.recipientName}</Text>
                   )}
                   {entry.details && (
-                    <Text style={styles.entryDetails}>{entry.details}</Text>
+                    <Text style={styles.entryDetails} maxFontSizeMultiplier={1.5}>{entry.details}</Text>
                   )}
-                  <Text style={styles.entryTime}>{formatTimestamp(entry.timestamp)}</Text>
+                  <Text style={styles.entryTime} maxFontSizeMultiplier={1.5}>{formatTimestamp(entry.timestamp)}</Text>
                 </View>
                 <View style={[styles.sequence, { backgroundColor: `${color}20` }]}>
-                  <Text style={[styles.sequenceText, { color }]}>#{entries.length - index}</Text>
+                  <Text style={[styles.sequenceText, { color }]} maxFontSizeMultiplier={1.5}>#{entries.length - index}</Text>
                 </View>
               </View>
             );
@@ -219,7 +197,7 @@ export default function AuditScreen() {
         )}
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
+          <Text style={styles.footerText} maxFontSizeMultiplier={1.5}>
             {entries.length} entries recorded
           </Text>
         </View>
@@ -245,7 +223,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   headerRight: {
     flexDirection: 'row',
@@ -260,22 +238,22 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     marginHorizontal: spacing.md,
-    backgroundColor: 'rgba(0,229,255,0.08)',
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.2)',
+    borderColor: colors.cardBorder,
     marginBottom: spacing.md,
   },
   infoTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#00E5FF',
+    color: '#0E8C7B',
     marginBottom: spacing.xs,
   },
   infoDesc: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   content: {
@@ -290,11 +268,11 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
   },
   emptyText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textAlign: 'center',
   },
   entryRow: {
@@ -321,21 +299,21 @@ const styles = StyleSheet.create({
   entryAction: {
     fontSize: 15,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   entryRecipient: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   entryDetails: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginTop: 2,
   },
   entryTime: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textTertiary,
     marginTop: spacing.xs,
   },
   sequence: {
@@ -354,6 +332,6 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textTertiary,
   },
 });

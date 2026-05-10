@@ -96,7 +96,7 @@ export default function ExportScreen() {
     <SafeAreaView style={commonStyles.screen}>
       <View style={styles.header}>
         <View style={styles.headerSpacer} />
-        <Text style={styles.headerTitle}>{t.export.title}</Text>
+        <Text style={styles.headerTitle} maxFontSizeMultiplier={1.5}>{t.export.title}</Text>
         <Pressable onPress={() => router.back()} style={styles.closeButton}>
           <X color={colors.textPrimary} size={24} />
         </Pressable>
@@ -105,7 +105,7 @@ export default function ExportScreen() {
       <View style={styles.content}>
         {/* Summary Exports */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>SUMMARIES</Text>
+          <Text style={styles.sectionLabel} maxFontSizeMultiplier={1.5}>SUMMARIES</Text>
           <ExportRow
             icon={FileText}
             label={t.export.ninetyDaySummary}
@@ -124,7 +124,7 @@ export default function ExportScreen() {
 
         {/* Full Data Exports */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>FULL DATA</Text>
+          <Text style={styles.sectionLabel} maxFontSizeMultiplier={1.5}>FULL DATA</Text>
           <ExportRow
             icon={FileJson}
             label={t.export.fullJson}
@@ -144,7 +144,7 @@ export default function ExportScreen() {
         {/* Executive Reports - Only shown for enterprise/pilot tiers */}
         {hasExecutiveReports && (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>
+            <Text style={styles.sectionLabel} maxFontSizeMultiplier={1.5}>
               {locale === 'es' ? 'INFORMES EJECUTIVOS' : 'EXECUTIVE REPORTS'}
             </Text>
             <ExportRow
@@ -168,7 +168,7 @@ export default function ExportScreen() {
 
         {/* Disclaimer */}
         <View style={styles.disclaimerContainer}>
-          <Text style={styles.disclaimerText}>{t.export.disclaimer}</Text>
+          <Text style={styles.disclaimerText} maxFontSizeMultiplier={1.5}>{t.export.disclaimer}</Text>
         </View>
       </View>
     </SafeAreaView>
@@ -205,8 +205,8 @@ function ExportRow({
     scale.value = withSpring(1, { damping: 15 });
   };
 
-  const iconColor = enterprise ? '#00E5FF' : 'rgba(255,255,255,0.6)';
-  const borderColor = enterprise ? 'rgba(0,229,255,0.2)' : colors.cardBorder;
+  const iconColor = enterprise ? '#0E8C7B' : colors.textSecondary;
+  const borderColor = enterprise ? 'rgba(45,212,191,0.3)' : colors.cardBorder;
 
   return (
     <AnimatedPressable
@@ -219,10 +219,10 @@ function ExportRow({
         <Icon color={iconColor} size={20} />
       </View>
       <View style={styles.rowContent}>
-        <Text style={styles.rowLabel}>{label}</Text>
-        {sublabel && <Text style={styles.rowSublabel}>{sublabel}</Text>}
+        <Text style={styles.rowLabel} maxFontSizeMultiplier={1.5}>{label}</Text>
+        {sublabel && <Text style={styles.rowSublabel} maxFontSizeMultiplier={1.5}>{sublabel}</Text>}
       </View>
-      <ChevronRight color="rgba(255,255,255,0.2)" size={18} />
+      <ChevronRight color={colors.textTertiary} size={18} />
     </AnimatedPressable>
   );
 }
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.35)',
+    color: colors.textTertiary,
     letterSpacing: 1,
     marginBottom: spacing.sm,
     marginLeft: spacing.xs,
@@ -277,13 +277,13 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
   },
   iconContainerEnterprise: {
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.16)',
   },
   rowContent: {
     flex: 1,
@@ -291,11 +291,11 @@ const styles = StyleSheet.create({
   rowLabel: {
     fontSize: 15,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   rowSublabel: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginTop: 2,
   },
   disclaimerContainer: {
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   },
   disclaimerText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textTertiary,
     textAlign: 'center',
     fontStyle: 'italic',
   },

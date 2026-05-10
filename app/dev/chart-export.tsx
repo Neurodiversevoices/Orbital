@@ -100,41 +100,41 @@ export default function DevChartExportPage() {
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <ArrowLeft size={24} color={colors.textPrimary} />
         </Pressable>
-        <Text style={styles.title}>Chart Export</Text>
+        <Text style={styles.title} maxFontSizeMultiplier={1.5}>Chart Export</Text>
         <View style={styles.badge}>
-          <Text style={styles.badgeText}>DEV</Text>
+          <Text style={styles.badgeText} maxFontSizeMultiplier={1.5}>DEV</Text>
         </View>
       </View>
 
       <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
         {/* Color Reference */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Color Reference</Text>
+          <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>Color Reference</Text>
           <View style={styles.colorRow}>
             <View style={styles.colorChip}>
               <View style={[styles.colorDot, { backgroundColor: CHART_COLORS.resourced }]} />
-              <Text style={styles.colorLabel}>Resourced: {CHART_COLORS.resourced}</Text>
+              <Text style={styles.colorLabel} maxFontSizeMultiplier={1.5}>Resourced: {CHART_COLORS.resourced}</Text>
             </View>
             <View style={styles.colorChip}>
               <View style={[styles.colorDot, { backgroundColor: CHART_COLORS.stretched }]} />
-              <Text style={styles.colorLabel}>Stretched: {CHART_COLORS.stretched}</Text>
+              <Text style={styles.colorLabel} maxFontSizeMultiplier={1.5}>Stretched: {CHART_COLORS.stretched}</Text>
             </View>
             <View style={styles.colorChip}>
               <View style={[styles.colorDot, { backgroundColor: CHART_COLORS.depleted }]} />
-              <Text style={styles.colorLabel}>Depleted: {CHART_COLORS.depleted}</Text>
+              <Text style={styles.colorLabel} maxFontSizeMultiplier={1.5}>Depleted: {CHART_COLORS.depleted}</Text>
             </View>
           </View>
         </View>
 
         {/* Export Mode Toggle */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Export Mode</Text>
+          <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>Export Mode</Text>
           <View style={styles.toggleRow}>
             <Pressable
               style={[styles.toggleButton, exportMode === 'qcr' && styles.toggleButtonActive]}
               onPress={() => setExportMode('qcr')}
             >
-              <Text style={[styles.toggleText, exportMode === 'qcr' && styles.toggleTextActive]}>
+              <Text style={[styles.toggleText, exportMode === 'qcr' && styles.toggleTextActive]} maxFontSizeMultiplier={1.5}>
                 QCR (PDF)
               </Text>
             </Pressable>
@@ -142,7 +142,7 @@ export default function DevChartExportPage() {
               style={[styles.toggleButton, exportMode === 'app' && styles.toggleButtonActive]}
               onPress={() => setExportMode('app')}
             >
-              <Text style={[styles.toggleText, exportMode === 'app' && styles.toggleTextActive]}>
+              <Text style={[styles.toggleText, exportMode === 'app' && styles.toggleTextActive]} maxFontSizeMultiplier={1.5}>
                 App Style
               </Text>
             </Pressable>
@@ -151,7 +151,7 @@ export default function DevChartExportPage() {
 
         {/* Time Range Selector */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Time Range</Text>
+          <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>Time Range</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.rangeRow}>
               {TIME_RANGE_OPTIONS.map((range) => (
@@ -168,6 +168,7 @@ export default function DevChartExportPage() {
                       styles.rangeText,
                       selectedRange === range.value && styles.rangeTextActive,
                     ]}
+                    maxFontSizeMultiplier={1.5}
                   >
                     {range.label}
                   </Text>
@@ -179,7 +180,7 @@ export default function DevChartExportPage() {
 
         {/* Live Preview: App Component */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Live Preview (App Component)</Text>
+          <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>Live Preview (App Component)</Text>
           <View style={styles.previewContainer}>
             <EnergyGraph logs={logs} width={width - spacing.md * 4} timeRange={selectedRange} />
           </View>
@@ -187,7 +188,7 @@ export default function DevChartExportPage() {
 
         {/* Generated SVG Preview */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Generated SVG ({exportMode === 'qcr' ? '400x180' : '380x200'})</Text>
+          <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>Generated SVG ({exportMode === 'qcr' ? '400x180' : '380x200'})</Text>
           <View style={[styles.svgPreview, exportMode === 'app' && styles.svgPreviewDark]}>
             {Platform.OS === 'web' && svgContent ? (
               <div
@@ -195,7 +196,7 @@ export default function DevChartExportPage() {
                 style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
               />
             ) : (
-              <Text style={styles.previewPlaceholder}>
+              <Text style={styles.previewPlaceholder} maxFontSizeMultiplier={1.5}>
                 {isLoading ? 'Loading...' : logs.length === 0 ? 'No data' : 'Web only'}
               </Text>
             )}
@@ -204,7 +205,7 @@ export default function DevChartExportPage() {
 
         {/* Actions */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Export Actions</Text>
+          <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>Export Actions</Text>
           <View style={styles.actionRow}>
             <Pressable style={styles.actionButton} onPress={handleCopy}>
               {copied ? (
@@ -212,22 +213,22 @@ export default function DevChartExportPage() {
               ) : (
                 <Copy size={18} color={colors.textSecondary} />
               )}
-              <Text style={[styles.actionText, copied && { color: CHART_COLORS.resourced }]}>
+              <Text style={[styles.actionText, copied && { color: CHART_COLORS.resourced }]} maxFontSizeMultiplier={1.5}>
                 {copied ? 'Copied!' : 'Copy SVG'}
               </Text>
             </Pressable>
             <Pressable style={styles.actionButton} onPress={handleDownload}>
               <Download size={18} color={colors.textSecondary} />
-              <Text style={styles.actionText}>Download SVG</Text>
+              <Text style={styles.actionText} maxFontSizeMultiplier={1.5}>Download SVG</Text>
             </Pressable>
           </View>
         </View>
 
         {/* SVG Code */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>SVG Code ({svgContent.length} chars)</Text>
+          <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>SVG Code ({svgContent.length} chars)</Text>
           <ScrollView style={styles.codeContainer} horizontal>
-            <Text style={styles.codeText} selectable>
+            <Text style={styles.codeText} selectable maxFontSizeMultiplier={1.5}>
               {svgContent || '// No SVG generated'}
             </Text>
           </ScrollView>
@@ -235,21 +236,21 @@ export default function DevChartExportPage() {
 
         {/* Stats */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Data Stats</Text>
+          <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>Data Stats</Text>
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{logs.length}</Text>
-              <Text style={styles.statLabel}>Total Logs</Text>
+              <Text style={styles.statValue} maxFontSizeMultiplier={1.5}>{logs.length}</Text>
+              <Text style={styles.statLabel} maxFontSizeMultiplier={1.5}>Total Logs</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{selectedDays}</Text>
-              <Text style={styles.statLabel}>Days in Range</Text>
+              <Text style={styles.statValue} maxFontSizeMultiplier={1.5}>{selectedDays}</Text>
+              <Text style={styles.statLabel} maxFontSizeMultiplier={1.5}>Days in Range</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>
+              <Text style={styles.statValue} maxFontSizeMultiplier={1.5}>
                 {logs.filter((l) => l.timestamp >= Date.now() - selectedDays * 86400000).length}
               </Text>
-              <Text style={styles.statLabel}>In Period</Text>
+              <Text style={styles.statLabel} maxFontSizeMultiplier={1.5}>In Period</Text>
             </View>
           </View>
         </View>
@@ -278,7 +279,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   badge: {
-    backgroundColor: 'rgba(255, 0, 0, 0.2)',
+    backgroundColor: 'rgba(220,38,38,0.16)',
     paddingHorizontal: spacing.sm,
     paddingVertical: 4,
     borderRadius: 4,
@@ -286,7 +287,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#FF0000',
+    color: '#DC2626',
     letterSpacing: 1,
   },
   content: {
@@ -347,7 +348,7 @@ const styles = StyleSheet.create({
     borderColor: colors.cardBorder,
   },
   toggleButtonActive: {
-    backgroundColor: 'rgba(0, 229, 255, 0.15)',
+    backgroundColor: 'rgba(45,212,191,0.16)',
     borderColor: CHART_COLORS.resourced,
   },
   toggleText: {
@@ -371,7 +372,7 @@ const styles = StyleSheet.create({
     borderColor: colors.cardBorder,
   },
   rangeButtonActive: {
-    backgroundColor: 'rgba(0, 229, 255, 0.15)',
+    backgroundColor: 'rgba(45,212,191,0.16)',
     borderColor: CHART_COLORS.resourced,
   },
   rangeText: {
@@ -398,11 +399,11 @@ const styles = StyleSheet.create({
     minHeight: 200,
   },
   svgPreviewDark: {
-    backgroundColor: '#0A0B10',
+    backgroundColor: colors.backgroundSubtle,
   },
   previewPlaceholder: {
     fontSize: 14,
-    color: '#999',
+    color: colors.textTertiary,
   },
   actionRow: {
     flexDirection: 'row',
@@ -426,15 +427,17 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   codeContainer: {
-    backgroundColor: '#0D0E12',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: 8,
     padding: spacing.sm,
     maxHeight: 200,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
   },
   codeText: {
     fontSize: 10,
     fontFamily: Platform.OS === 'web' ? 'monospace' : undefined,
-    color: 'rgba(255, 255, 255, 0.6)',
+    color: colors.textSecondary,
   },
   statsRow: {
     flexDirection: 'row',

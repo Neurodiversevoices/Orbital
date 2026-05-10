@@ -15,11 +15,9 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
-  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
 import {
   X,
   Smartphone,
@@ -42,7 +40,6 @@ import {
   DeviceSession,
 } from '../lib/session';
 import { getAuditLog, getActionDescription, SessionAuditEntry } from '../lib/session';
-import { EmptyState } from '../components';
 
 export default function ActiveSessionsScreen() {
   const router = useRouter();
@@ -86,11 +83,6 @@ export default function ActiveSessionsScreen() {
       return;
     }
 
-    // HIG: warn haptic before presenting a destructive confirmation alert.
-    if (Platform.OS === 'ios') {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
-    }
-
     Alert.alert(
       'Remove Session',
       `Remove session from ${session.deviceName}? This will require re-authentication on that device.`,
@@ -114,11 +106,6 @@ export default function ActiveSessionsScreen() {
     if (otherSessions.length === 0) {
       Alert.alert('No Other Sessions', 'There are no other sessions to remove.');
       return;
-    }
-
-    // HIG: warn haptic before presenting a destructive confirmation alert.
-    if (Platform.OS === 'ios') {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
     }
 
     Alert.alert(
@@ -149,7 +136,7 @@ export default function ActiveSessionsScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#00E5FF" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -159,7 +146,7 @@ export default function ActiveSessionsScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerSpacer} />
-        <Text style={styles.title}>Active Sessions</Text>
+        <Text style={styles.title} maxFontSizeMultiplier={1.5}>Active Sessions</Text>
         <Pressable onPress={() => router.back()} style={styles.closeButton}>
           <X color={colors.textPrimary} size={24} />
         </Pressable>
@@ -172,29 +159,29 @@ export default function ActiveSessionsScreen() {
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={handleRefresh}
-            tintColor="#00E5FF"
+            tintColor={colors.primary}
           />
         }
       >
         {/* Current Session */}
         <Animated.View entering={FadeInDown.duration(400)} style={styles.section}>
-          <Text style={styles.sectionLabel}>CURRENT SESSION</Text>
+          <Text style={styles.sectionLabel} maxFontSizeMultiplier={1.5}>CURRENT SESSION</Text>
           {sessions.filter(s => s.id === currentSessionId).map(session => {
             const IconComponent = getPlatformIconComponent(session.platform);
             return (
               <View key={session.id} style={[styles.sessionCard, styles.currentSession]}>
                 <View style={[styles.sessionIcon, styles.currentSessionIcon]}>
-                  <IconComponent size={24} color="#4CAF50" />
+                  <IconComponent size={24} color="#0E8C7B" />
                 </View>
                 <View style={styles.sessionInfo}>
                   <View style={styles.sessionHeader}>
-                    <Text style={styles.sessionName}>{session.deviceName}</Text>
+                    <Text style={styles.sessionName} maxFontSizeMultiplier={1.5}>{session.deviceName}</Text>
                     <View style={styles.currentBadge}>
-                      <CheckCircle size={12} color="#4CAF50" />
-                      <Text style={styles.currentBadgeText}>This Device</Text>
+                      <CheckCircle size={12} color="#0E8C7B" />
+                      <Text style={styles.currentBadgeText} maxFontSizeMultiplier={1.5}>This Device</Text>
                     </View>
                   </View>
-                  <Text style={styles.sessionMeta}>
+                  <Text style={styles.sessionMeta} maxFontSizeMultiplier={1.5}>
                     Active now
                   </Text>
                 </View>
@@ -207,9 +194,9 @@ export default function ActiveSessionsScreen() {
         {sessions.filter(s => s.id !== currentSessionId).length > 0 && (
           <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.section}>
             <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionLabel}>OTHER SESSIONS</Text>
+              <Text style={styles.sectionLabel} maxFontSizeMultiplier={1.5}>OTHER SESSIONS</Text>
               <Pressable onPress={handleClearOthers} style={styles.clearAllButton}>
-                <Text style={styles.clearAllText}>Sign Out All</Text>
+                <Text style={styles.clearAllText} maxFontSizeMultiplier={1.5}>Sign Out All</Text>
               </Pressable>
             </View>
 
@@ -222,13 +209,13 @@ export default function ActiveSessionsScreen() {
                 >
                   <View style={styles.sessionCard}>
                     <View style={styles.sessionIcon}>
-                      <IconComponent size={24} color="rgba(255,255,255,0.6)" />
+                      <IconComponent size={24} color={colors.textSecondary} />
                     </View>
                     <View style={styles.sessionInfo}>
-                      <Text style={styles.sessionName}>{session.deviceName}</Text>
+                      <Text style={styles.sessionName} maxFontSizeMultiplier={1.5}>{session.deviceName}</Text>
                       <View style={styles.sessionMetaRow}>
-                        <Clock size={12} color="rgba(255,255,255,0.4)" />
-                        <Text style={styles.sessionMeta}>
+                        <Clock size={12} color={colors.textTertiary} />
+                        <Text style={styles.sessionMeta} maxFontSizeMultiplier={1.5}>
                           Last active {formatSessionTime(session.lastActiveAt)}
                         </Text>
                       </View>
@@ -237,7 +224,7 @@ export default function ActiveSessionsScreen() {
                       onPress={() => handleRemoveSession(session)}
                       style={styles.removeButton}
                     >
-                      <Trash2 size={18} color="#F44336" />
+                      <Trash2 size={18} color="#DC2626" />
                     </Pressable>
                   </View>
                 </Animated.View>
@@ -248,20 +235,19 @@ export default function ActiveSessionsScreen() {
 
         {/* No Other Sessions */}
         {sessions.filter(s => s.id !== currentSessionId).length === 0 && (
-          <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.emptyStateWrap}>
-            <EmptyState
-              icon={Shield}
-              title="No Other Sessions"
-              description="You're only signed in on this device."
-              size="compact"
-            />
+          <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.emptyState}>
+            <Shield size={32} color={colors.textTertiary} />
+            <Text style={styles.emptyTitle} maxFontSizeMultiplier={1.5}>No Other Sessions</Text>
+            <Text style={styles.emptyText} maxFontSizeMultiplier={1.5}>
+              You're only signed in on this device.
+            </Text>
           </Animated.View>
         )}
 
         {/* Recent Activity */}
         {auditLog.length > 0 && (
           <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.section}>
-            <Text style={styles.sectionLabel}>RECENT ACTIVITY</Text>
+            <Text style={styles.sectionLabel} maxFontSizeMultiplier={1.5}>RECENT ACTIVITY</Text>
             <View style={styles.auditCard}>
               {auditLog.map((entry, index) => (
                 <View
@@ -273,10 +259,10 @@ export default function ActiveSessionsScreen() {
                 >
                   <View style={styles.auditDot} />
                   <View style={styles.auditContent}>
-                    <Text style={styles.auditAction}>
+                    <Text style={styles.auditAction} maxFontSizeMultiplier={1.5}>
                       {getActionDescription(entry.action)}
                     </Text>
-                    <Text style={styles.auditTime}>
+                    <Text style={styles.auditTime} maxFontSizeMultiplier={1.5}>
                       {formatSessionTime(entry.timestamp)} · {entry.deviceName}
                     </Text>
                   </View>
@@ -288,10 +274,10 @@ export default function ActiveSessionsScreen() {
 
         {/* Security Info */}
         <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.infoCard}>
-          <Shield size={20} color="#00E5FF" />
+          <Shield size={20} color="#0E8C7B" />
           <View style={styles.infoContent}>
-            <Text style={styles.infoTitle}>Session Security</Text>
-            <Text style={styles.infoText}>
+            <Text style={styles.infoTitle} maxFontSizeMultiplier={1.5}>Session Security</Text>
+            <Text style={styles.infoText} maxFontSizeMultiplier={1.5}>
               Sessions automatically expire after 15 minutes of inactivity.
               You can manually sign out other devices at any time.
             </Text>
@@ -328,7 +314,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.sm,
@@ -343,7 +329,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.35)',
+    color: colors.textTertiary,
     letterSpacing: 1,
     marginBottom: spacing.sm,
   },
@@ -359,7 +345,7 @@ const styles = StyleSheet.create({
   },
   clearAllText: {
     fontSize: 12,
-    color: '#F44336',
+    color: '#DC2626',
     fontWeight: '500',
   },
   sessionCard: {
@@ -373,20 +359,20 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   currentSession: {
-    borderColor: 'rgba(76,175,80,0.3)',
-    backgroundColor: 'rgba(76,175,80,0.05)',
+    borderColor: 'rgba(45,212,191,0.3)',
+    backgroundColor: 'rgba(45,212,191,0.05)',
   },
   sessionIcon: {
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
   },
   currentSessionIcon: {
-    backgroundColor: 'rgba(76,175,80,0.15)',
+    backgroundColor: 'rgba(45,212,191,0.16)',
   },
   sessionInfo: {
     flex: 1,
@@ -399,13 +385,13 @@ const styles = StyleSheet.create({
   sessionName: {
     fontSize: 16,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   currentBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(76,175,80,0.15)',
+    backgroundColor: 'rgba(45,212,191,0.16)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 4,
@@ -413,7 +399,7 @@ const styles = StyleSheet.create({
   currentBadgeText: {
     fontSize: 10,
     fontWeight: '500',
-    color: '#4CAF50',
+    color: '#0E8C7B',
   },
   sessionMetaRow: {
     flexDirection: 'row',
@@ -423,13 +409,13 @@ const styles = StyleSheet.create({
   },
   sessionMeta: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
   removeButton: {
     width: 40,
     height: 40,
     borderRadius: 10,
-    backgroundColor: 'rgba(244,67,54,0.1)',
+    backgroundColor: 'rgba(220,38,38,0.10)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -437,26 +423,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: spacing.xl,
     paddingHorizontal: spacing.lg,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.lg,
     marginBottom: spacing.xl,
-  },
-  emptyStateWrap: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderRadius: borderRadius.lg,
-    marginBottom: spacing.xl,
-    overflow: 'hidden',
   },
   emptyTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
     marginTop: spacing.md,
     marginBottom: spacing.xs,
   },
   emptyText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textAlign: 'center',
   },
   auditCard: {
@@ -473,13 +453,13 @@ const styles = StyleSheet.create({
   },
   auditRowBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: colors.hairline,
   },
   auditDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     marginTop: 5,
     marginRight: spacing.md,
   },
@@ -489,20 +469,20 @@ const styles = StyleSheet.create({
   auditAction: {
     fontSize: 14,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
     marginBottom: 2,
   },
   auditTime: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
   infoCard: {
     flexDirection: 'row',
     gap: spacing.md,
-    backgroundColor: 'rgba(0,229,255,0.08)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.2)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
   },
   infoContent: {
@@ -511,12 +491,12 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#00E5FF',
+    color: '#0E8C7B',
     marginBottom: spacing.xs,
   },
   infoText: {
     fontSize: 12,
     lineHeight: 18,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
 });

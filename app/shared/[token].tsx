@@ -34,7 +34,7 @@ export default function SharedViewScreen() {
     return (
       <SafeAreaView style={commonStyles.screen}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#00E5FF" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -61,8 +61,8 @@ export default function SharedViewScreen() {
       <SafeAreaView style={commonStyles.screen}>
         <View style={styles.centered}>
           <View style={styles.errorCard}>
-            <Text style={styles.errorTitle}>Access Denied</Text>
-            <Text style={styles.errorMessage}>{message}</Text>
+            <Text style={styles.errorTitle} maxFontSizeMultiplier={1.5}>Access Denied</Text>
+            <Text style={styles.errorMessage} maxFontSizeMultiplier={1.5}>{message}</Text>
           </View>
         </View>
       </SafeAreaView>
@@ -77,11 +77,11 @@ export default function SharedViewScreen() {
       <ReadOnlyBanner message={t.sharing.readOnlyBanner} />
       <View style={styles.content}>
         <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>Shared View Active</Text>
-          <Text style={styles.infoText}>
+          <Text style={styles.infoTitle} maxFontSizeMultiplier={1.5}>Shared View Active</Text>
+          <Text style={styles.infoText} maxFontSizeMultiplier={1.5}>
             You are viewing shared capacity data in read-only mode.
           </Text>
-          <Text style={styles.infoSubtext}>
+          <Text style={styles.infoSubtext} maxFontSizeMultiplier={1.5}>
             This view will expire when the share period ends.
           </Text>
         </View>
@@ -106,19 +106,19 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: spacing.xl,
     borderWidth: 1,
-    borderColor: 'rgba(244,67,54,0.3)',
+    borderColor: 'rgba(220,38,38,0.3)',
     alignItems: 'center',
     maxWidth: 300,
   },
   errorTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#DC2626',
     marginBottom: spacing.sm,
   },
   errorMessage: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   infoCard: {
@@ -126,24 +126,24 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: spacing.xl,
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.2)',
+    borderColor: colors.cardBorder,
     alignItems: 'center',
   },
   infoTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#00E5FF',
+    color: '#0E8C7B',
     marginBottom: spacing.sm,
   },
   infoText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.sm,
   },
   infoSubtext: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textAlign: 'center',
     fontStyle: 'italic',
   },

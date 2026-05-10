@@ -32,11 +32,11 @@ import {
   Link2,
   Package,
 } from 'lucide-react-native';
-import { colors, spacing, borderRadius } from '../theme';
-import { useAccess } from '../lib/access';
-import { CCISummaryChart } from '../components/CCISummaryChart';
-import { BundleCCIPreview } from '../components/BundleCCIPreview';
-import { FABRICATED_HISTORIES, getCapacityState } from '../lib/cci/demoData';
+import { colors, spacing, borderRadius } from '../../theme';
+import { useAccess } from '../../lib/access';
+import { CCISummaryChart } from '../../components/CCISummaryChart';
+import { BundleCCIPreview } from '../../components/BundleCCIPreview';
+import { FABRICATED_HISTORIES, getCapacityState } from '../../lib/cci/demoData';
 
 // =============================================================================
 // TYPES
@@ -98,14 +98,14 @@ export default function BriefingsScreen() {
       {/* FREE USER VIEW Banner */}
       {freeUserViewActive && (
         <View style={styles.freeUserViewBanner}>
-          <Text style={styles.freeUserViewBannerText}>{freeUserViewBanner}</Text>
+          <Text style={styles.freeUserViewBannerText} maxFontSizeMultiplier={1.5}>{freeUserViewBanner}</Text>
         </View>
       )}
 
       {/* Header */}
       <Animated.View entering={FadeIn.duration(400)} style={styles.header}>
-        <Text style={styles.headerTitle}>Briefings</Text>
-        <Text style={styles.headerSubtitle}>
+        <Text style={styles.headerTitle} maxFontSizeMultiplier={1.5}>Briefings</Text>
+        <Text style={styles.headerSubtitle} maxFontSizeMultiplier={1.5}>
           {freeUserViewActive
             ? 'Personal capacity intelligence'
             : 'Capacity intelligence across scopes'}
@@ -124,10 +124,10 @@ export default function BriefingsScreen() {
               onPress={() => setScope(tab.id)}
             >
               <Icon
-                color={isActive ? '#00D7FF' : 'rgba(255,255,255,0.5)'}
+                color={isActive ? '#0E8C7B' : colors.textSecondary}
                 size={18}
               />
-              <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
+              <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]} maxFontSizeMultiplier={1.5}>
                 {tab.label}
               </Text>
             </Pressable>
@@ -160,7 +160,7 @@ function PersonalBrief() {
     <Animated.View entering={FadeInDown.duration(400)}>
       {/* Demo Banner */}
       <View style={styles.demoBanner}>
-        <Text style={styles.demoBannerText}>DEMO / SAMPLE</Text>
+        <Text style={styles.demoBannerText} maxFontSizeMultiplier={1.5}>DEMO / SAMPLE</Text>
       </View>
 
       {/* CCI Card */}
@@ -170,28 +170,28 @@ function PersonalBrief() {
       >
         <View style={styles.cciHeader}>
           <View style={styles.cciIconContainer}>
-            <FileText color="#00D7FF" size={28} />
+            <FileText color="#0E8C7B" size={28} />
           </View>
-          <ChevronRight color="rgba(255,255,255,0.3)" size={24} />
+          <ChevronRight color={colors.textTertiary} size={24} />
         </View>
 
-        <Text style={styles.cciTitle}>Clinical Capacity Instrument</Text>
-        <Text style={styles.cciSubtitle}>CCI-Q4</Text>
+        <Text style={styles.cciTitle} maxFontSizeMultiplier={1.5}>Clinical Capacity Instrument</Text>
+        <Text style={styles.cciSubtitle} maxFontSizeMultiplier={1.5}>CCI-Q4</Text>
 
-        <Text style={styles.cciDescription}>
+        <Text style={styles.cciDescription} maxFontSizeMultiplier={1.5}>
           Your personal capacity signal rendered as a clinical-grade instrument.
           Demo data shown — real issuance reflects your actual capacity patterns.
         </Text>
 
         <View style={styles.cciCta}>
-          <Text style={styles.cciCtaText}>View CCI-Q4</Text>
-          <ChevronRight color="#00D7FF" size={18} />
+          <Text style={styles.cciCtaText} maxFontSizeMultiplier={1.5}>View CCI-Q4</Text>
+          <ChevronRight color="#0E8C7B" size={18} />
         </View>
       </Pressable>
 
       {/* Info Note */}
       <View style={styles.infoNote}>
-        <Text style={styles.infoNoteText}>
+        <Text style={styles.infoNoteText} maxFontSizeMultiplier={1.5}>
           The CCI-Q4 artifact is generated from your capacity signals.
           {'\n'}More signals = more accurate instrument.
         </Text>
@@ -213,30 +213,30 @@ function CirclesCCIBrief() {
     <Animated.View entering={FadeInDown.duration(400)}>
       {/* Demo Banner */}
       <View style={styles.demoBanner}>
-        <Text style={styles.demoBannerText}>DEMO / SAMPLE</Text>
+        <Text style={styles.demoBannerText} maxFontSizeMultiplier={1.5}>DEMO / SAMPLE</Text>
       </View>
 
       {/* Admin Breadcrumb */}
       <View style={styles.breadcrumb}>
-        <LayoutGrid color="rgba(255,255,255,0.5)" size={14} />
-        <Text style={styles.breadcrumbText}>Admin</Text>
-        <Text style={styles.breadcrumbSeparator}>/</Text>
-        <Text style={styles.breadcrumbActive}>Sensory Support Group</Text>
+        <LayoutGrid color={colors.textSecondary} size={14} />
+        <Text style={styles.breadcrumbText} maxFontSizeMultiplier={1.5}>Admin</Text>
+        <Text style={styles.breadcrumbSeparator} maxFontSizeMultiplier={1.5}>/</Text>
+        <Text style={styles.breadcrumbActive} maxFontSizeMultiplier={1.5}>Sensory Support Group</Text>
       </View>
 
       {/* Circle Header */}
       <View style={styles.circleHeader}>
         <View style={styles.circleHeaderLeft}>
-          <Text style={styles.circleTitle}>SENSORY SUPPORT GROUP</Text>
-          <Text style={styles.circleSubtitle}>Circle Coordinator: Emily Zhang</Text>
+          <Text style={styles.circleTitle} maxFontSizeMultiplier={1.5}>SENSORY SUPPORT GROUP</Text>
+          <Text style={styles.circleSubtitle} maxFontSizeMultiplier={1.5}>Circle Coordinator: Emily Zhang</Text>
         </View>
         <View style={styles.circleHeaderRight}>
           <View style={styles.circleMemberBadge}>
-            <Text style={styles.circleMemberBadgeText}>5 / 5 Members</Text>
+            <Text style={styles.circleMemberBadgeText} maxFontSizeMultiplier={1.5}>5 / 5 Members</Text>
           </View>
           <Pressable style={styles.lingsButton} onPress={() => router.push('/cci?type=circle')}>
-            <Link2 color="#00D7FF" size={14} />
-            <Text style={styles.lingsButtonText}>LINGS</Text>
+            <Link2 color="#0E8C7B" size={14} />
+            <Text style={styles.lingsButtonText} maxFontSizeMultiplier={1.5}>LINGS</Text>
           </Pressable>
         </View>
       </View>
@@ -245,13 +245,13 @@ function CirclesCCIBrief() {
       <View style={[styles.cciDescriptionRow, isWideScreen && styles.cciDescriptionRowWide]}>
         {/* Left: CCI Description */}
         <View style={[styles.circleCCICard, isWideScreen && { flex: 1, marginRight: spacing.md }]}>
-          <Text style={styles.circleCCITitle}>CIRCLE CAPACITY INDICATOR (CCI)</Text>
-          <Text style={styles.circleCCIDescription}>
+          <Text style={styles.circleCCITitle} maxFontSizeMultiplier={1.5}>CIRCLE CAPACITY INDICATOR (CCI)</Text>
+          <Text style={styles.circleCCIDescription} maxFontSizeMultiplier={1.5}>
             A non-diagnostic, aggregate snapshot of a group's{' '}
             <Text style={styles.circleCCIHighlight}>functional regulation bandwidth</Text>
             {' '}over time — reflecting how much emotional, cognitive, sensory, and social load the group can tolerate before regulation begins to degrade.
           </Text>
-          <Text style={styles.circleCCINote}>
+          <Text style={styles.circleCCINote} maxFontSizeMultiplier={1.5}>
             This report summarizes patterns, not individuals. Non-diagnostic. No severity scoring
           </Text>
         </View>
@@ -259,11 +259,11 @@ function CirclesCCIBrief() {
         {/* Right: Data Confidence */}
         <View style={[styles.dataConfidenceCard, isWideScreen && { flex: 0.4 }]}>
           <View style={styles.dataConfidenceHeader}>
-            <CheckCircle color="#10B981" size={20} />
-            <Text style={styles.dataConfidenceTitle}>Data Confidence:</Text>
-            <Text style={styles.dataConfidenceValue}>High</Text>
+            <CheckCircle color="#0E8C7B" size={20} />
+            <Text style={styles.dataConfidenceTitle} maxFontSizeMultiplier={1.5}>Data Confidence:</Text>
+            <Text style={styles.dataConfidenceValue} maxFontSizeMultiplier={1.5}>High</Text>
           </View>
-          <Text style={styles.dataConfidenceText}>
+          <Text style={styles.dataConfidenceText} maxFontSizeMultiplier={1.5}>
             Based on consistent participation and stable reporting patterns across members.
           </Text>
         </View>
@@ -272,8 +272,8 @@ function CirclesCCIBrief() {
       {/* Integrated Member Cards - Info + Chart together */}
       <View style={styles.memberCardsSection}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>MEMBER CAPACITY — 90 DAYS</Text>
-          <Text style={styles.sectionSubtitle}>Non-diagnostic. Per-member view.</Text>
+          <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>MEMBER CAPACITY — 90 DAYS</Text>
+          <Text style={styles.sectionSubtitle} maxFontSizeMultiplier={1.5}>Non-diagnostic. Per-member view.</Text>
         </View>
 
         {DEMO_CIRCLE_MEMBERS.map((member) => (
@@ -285,39 +285,39 @@ function CirclesCCIBrief() {
                   <Image source={{ uri: member.avatar }} style={styles.cardAvatar} />
                 ) : (
                   <View style={styles.cardAvatarPlaceholder}>
-                    <Text style={styles.cardAvatarText}>{member.name[0]}</Text>
+                    <Text style={styles.cardAvatarText} maxFontSizeMultiplier={1.5}>{member.name[0]}</Text>
                   </View>
                 )}
                 <View style={styles.memberNameContainer}>
-                  <Text style={styles.cardMemberName}>{member.name}</Text>
-                  <Text style={styles.cardMemberUsername}>{member.username}</Text>
+                  <Text style={styles.cardMemberName} maxFontSizeMultiplier={1.5}>{member.name}</Text>
+                  <Text style={styles.cardMemberUsername} maxFontSizeMultiplier={1.5}>{member.username}</Text>
                 </View>
               </View>
 
               <View style={styles.memberDetails}>
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Status</Text>
+                  <Text style={styles.detailLabel} maxFontSizeMultiplier={1.5}>Status</Text>
                   <View style={[
                     styles.capacityBadge,
                     member.capacityState === 'resourced' && styles.capacityBadgeResourced,
                     member.capacityState === 'stretched' && styles.capacityBadgeStretched,
                     member.capacityState === 'depleted' && styles.capacityBadgeDepleted,
                   ]}>
-                    <Text style={styles.capacityBadgeText}>
+                    <Text style={styles.capacityBadgeText} maxFontSizeMultiplier={1.5}>
                       {member.capacityState.charAt(0).toUpperCase() + member.capacityState.slice(1)}
                     </Text>
                   </View>
                 </View>
 
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Participation</Text>
-                  <Text style={styles.detailValue}>{member.participation}</Text>
+                  <Text style={styles.detailLabel} maxFontSizeMultiplier={1.5}>Participation</Text>
+                  <Text style={styles.detailValue} maxFontSizeMultiplier={1.5}>{member.participation}</Text>
                 </View>
 
                 {member.notes && (
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Notes</Text>
-                    <Text style={styles.detailValue}>{member.notes}</Text>
+                    <Text style={styles.detailLabel} maxFontSizeMultiplier={1.5}>Notes</Text>
+                    <Text style={styles.detailValue} maxFontSizeMultiplier={1.5}>{member.notes}</Text>
                   </View>
                 )}
               </View>
@@ -335,7 +335,7 @@ function CirclesCCIBrief() {
         ))}
 
         {/* Disclaimer */}
-        <Text style={styles.gridDisclaimer}>
+        <Text style={styles.gridDisclaimer} maxFontSizeMultiplier={1.5}>
           Not a diagnostic tool. Not a severity scale.
         </Text>
       </View>
@@ -343,18 +343,18 @@ function CirclesCCIBrief() {
       {/* CTA Section */}
       <View style={styles.ctaSection}>
         <Pressable style={styles.ctaPrimary} onPress={() => router.push('/cci?type=circle')}>
-          <Text style={styles.ctaPrimaryText}>Generate Circle Capacity Summary (CCI)</Text>
-          <Text style={styles.ctaPriceText}>$399</Text>
+          <Text style={styles.ctaPrimaryText} maxFontSizeMultiplier={1.5}>Generate Circle Capacity Summary (CCI)</Text>
+          <Text style={styles.ctaPriceText} maxFontSizeMultiplier={1.5}>$399</Text>
         </Pressable>
         <Pressable style={styles.ctaSecondary} onPress={() => router.push('/cci')}>
-          <Text style={styles.ctaSecondaryText}>Generate Individual Capacity Summaries</Text>
-          <Text style={styles.ctaSecondaryPrice}>$149 each</Text>
+          <Text style={styles.ctaSecondaryText} maxFontSizeMultiplier={1.5}>Generate Individual Capacity Summaries</Text>
+          <Text style={styles.ctaSecondaryPrice} maxFontSizeMultiplier={1.5}>$149 each</Text>
         </Pressable>
       </View>
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Orbital – Assembled in the USA</Text>
+        <Text style={styles.footerText} maxFontSizeMultiplier={1.5}>Orbital – Assembled in the USA</Text>
       </View>
     </Animated.View>
   );
@@ -372,36 +372,36 @@ function BundlesCCIBrief() {
     <Animated.View entering={FadeInDown.duration(400)}>
       {/* Demo Banner */}
       <View style={styles.demoBanner}>
-        <Text style={styles.demoBannerText}>DEMO / SAMPLE</Text>
+        <Text style={styles.demoBannerText} maxFontSizeMultiplier={1.5}>DEMO / SAMPLE</Text>
       </View>
 
       {/* Bundle Header */}
       <View style={styles.bundleHeader}>
         <View style={styles.bundleHeaderLeft}>
-          <Text style={styles.bundleTitle}>BUNDLE CAPACITY</Text>
-          <Text style={styles.bundleSubtitle}>Anonymous seat-level capacity view</Text>
+          <Text style={styles.bundleTitle} maxFontSizeMultiplier={1.5}>BUNDLE CAPACITY</Text>
+          <Text style={styles.bundleSubtitle} maxFontSizeMultiplier={1.5}>Anonymous seat-level capacity view</Text>
         </View>
         <View style={styles.bundleBadge}>
-          <Text style={styles.bundleBadgeText}>{selectedSize} SEATS</Text>
+          <Text style={styles.bundleBadgeText} maxFontSizeMultiplier={1.5}>{selectedSize} SEATS</Text>
         </View>
       </View>
 
       {/* Bundle Description */}
       <View style={styles.bundleCCICard}>
-        <Text style={styles.bundleCCITitle}>BUNDLE CAPACITY INDICATOR (CCI)</Text>
-        <Text style={styles.bundleCCIDescription}>
+        <Text style={styles.bundleCCITitle} maxFontSizeMultiplier={1.5}>BUNDLE CAPACITY INDICATOR (CCI)</Text>
+        <Text style={styles.bundleCCIDescription} maxFontSizeMultiplier={1.5}>
           A non-diagnostic, aggregate snapshot of a bundle's{' '}
           <Text style={styles.bundleCCIHighlight}>functional regulation bandwidth</Text>
           {' '}over time. Individual seats are represented by avatars only — no names or identifying information.
         </Text>
-        <Text style={styles.bundleCCINote}>
+        <Text style={styles.bundleCCINote} maxFontSizeMultiplier={1.5}>
           Privacy first: avatars only, no individual attribution
         </Text>
       </View>
 
       {/* Size Selector */}
       <View style={styles.bundleSizeSelector}>
-        <Text style={styles.bundleSizeSelectorLabel}>Select Bundle Size:</Text>
+        <Text style={styles.bundleSizeSelectorLabel} maxFontSizeMultiplier={1.5}>Select Bundle Size:</Text>
         <View style={styles.bundleSizeButtons}>
           {([10, 15, 20] as const).map((size) => (
             <Pressable
@@ -417,6 +417,7 @@ function BundlesCCIBrief() {
                   styles.bundleSizeButtonText,
                   selectedSize === size && styles.bundleSizeButtonTextActive,
                 ]}
+                maxFontSizeMultiplier={1.5}
               >
                 {size} seats
               </Text>
@@ -431,20 +432,20 @@ function BundlesCCIBrief() {
       {/* CTA Section */}
       <View style={styles.ctaSection}>
         <Pressable style={styles.ctaBundlePrimary} onPress={() => router.push('/upgrade')}>
-          <Text style={styles.ctaBundlePrimaryText}>Purchase Bundle</Text>
-          <Text style={styles.ctaBundlePriceText}>From $2,700/yr</Text>
+          <Text style={styles.ctaBundlePrimaryText} maxFontSizeMultiplier={1.5}>Purchase Bundle</Text>
+          <Text style={styles.ctaBundlePriceText} maxFontSizeMultiplier={1.5}>From $2,700/yr</Text>
         </Pressable>
         <Pressable style={styles.ctaSecondary} onPress={() => {
           router.push(`/cci?type=bundle&seats=${selectedSize}`);
         }}>
-          <Text style={styles.ctaSecondaryText}>Generate Bundle Capacity Summary (CCI)</Text>
-          <Text style={styles.ctaSecondaryPrice}>$999</Text>
+          <Text style={styles.ctaSecondaryText} maxFontSizeMultiplier={1.5}>Generate Bundle Capacity Summary (CCI)</Text>
+          <Text style={styles.ctaSecondaryPrice} maxFontSizeMultiplier={1.5}>$999</Text>
         </Pressable>
       </View>
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Orbital – Assembled in the USA</Text>
+        <Text style={styles.footerText} maxFontSizeMultiplier={1.5}>Orbital – Assembled in the USA</Text>
       </View>
     </Animated.View>
   );
@@ -460,12 +461,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   freeUserViewBanner: {
-    backgroundColor: '#F44336',
+    backgroundColor: '#DC2626',
     paddingVertical: 8,
     alignItems: 'center',
   },
   freeUserViewBannerText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1,
@@ -478,12 +479,12 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: '300',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     letterSpacing: 0.5,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 4,
   },
   tabContainer: {
@@ -501,21 +502,21 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
   },
   tabActive: {
-    backgroundColor: 'rgba(0,215,255,0.1)',
-    borderColor: 'rgba(0,215,255,0.3)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
+    borderColor: 'rgba(45,212,191,0.30)',
   },
   tabLabel: {
     fontSize: 13,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   tabLabelActive: {
-    color: '#00D7FF',
+    color: '#0E8C7B',
   },
   scrollView: {
     flex: 1,
@@ -525,26 +526,28 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl * 2,
   },
   demoBanner: {
-    backgroundColor: '#7A9AAA',
+    backgroundColor: colors.backgroundSubtle,
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: borderRadius.sm,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
     alignItems: 'center',
     marginBottom: spacing.md,
   },
   demoBannerText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#000',
+    color: colors.textSecondary,
     letterSpacing: 1,
   },
 
   // Personal Tab - CCI Card
   cciCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0,215,255,0.2)',
+    borderColor: 'rgba(45,212,191,0.30)',
     padding: spacing.lg,
     marginBottom: spacing.md,
   },
@@ -558,24 +561,24 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 14,
-    backgroundColor: 'rgba(0,215,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   cciTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
   },
   cciSubtitle: {
     fontSize: 13,
-    color: '#00D7FF',
+    color: '#0E8C7B',
     marginTop: 2,
     marginBottom: spacing.sm,
   },
   cciDescription: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 20,
     marginBottom: spacing.md,
   },
@@ -587,16 +590,18 @@ const styles = StyleSheet.create({
   cciCtaText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#00D7FF',
+    color: '#0E8C7B',
   },
   infoNote: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
     padding: spacing.md,
   },
   infoNoteText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 18,
   },
@@ -611,15 +616,15 @@ const styles = StyleSheet.create({
   },
   breadcrumbText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   breadcrumbSeparator: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.3)',
+    color: colors.textTertiary,
   },
   breadcrumbActive: {
     fontSize: 12,
-    color: '#00D7FF',
+    color: '#0E8C7B',
     fontWeight: '500',
   },
 
@@ -640,42 +645,42 @@ const styles = StyleSheet.create({
   circleTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     letterSpacing: 0.5,
   },
   circleSubtitle: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 4,
   },
   circleMemberBadge: {
-    backgroundColor: 'rgba(0,215,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: borderRadius.sm,
     borderWidth: 1,
-    borderColor: 'rgba(0,215,255,0.3)',
+    borderColor: 'rgba(45,212,191,0.30)',
   },
   circleMemberBadgeText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#00D7FF',
+    color: '#0E8C7B',
   },
   lingsButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    backgroundColor: 'rgba(0,215,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: borderRadius.sm,
     borderWidth: 1,
-    borderColor: 'rgba(0,215,255,0.3)',
+    borderColor: 'rgba(45,212,191,0.30)',
   },
   lingsButtonText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#00D7FF',
+    color: '#0E8C7B',
     letterSpacing: 0.5,
   },
 
@@ -703,10 +708,10 @@ const styles = StyleSheet.create({
 
   // Chart Container
   chartContainer: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
     padding: spacing.lg,
     marginBottom: spacing.md,
   },
@@ -719,12 +724,12 @@ const styles = StyleSheet.create({
   chartTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#00D7FF',
+    color: '#0E8C7B',
     letterSpacing: 0.5,
   },
   chartSubtitle: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   // Member Chart Grid (Circles)
   memberChartGrid: {
@@ -736,10 +741,10 @@ const styles = StyleSheet.create({
   },
   memberChartCard: {
     width: '100%',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
   },
   memberChartCardNarrow: {
@@ -748,12 +753,12 @@ const styles = StyleSheet.create({
   memberChartName: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
   gridDisclaimer: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textAlign: 'center',
     marginTop: spacing.md,
     fontStyle: 'italic',
@@ -769,21 +774,21 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 6,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
   },
   timeRangeButtonActive: {
-    backgroundColor: 'rgba(0,215,255,0.15)',
-    borderColor: 'rgba(0,215,255,0.4)',
+    backgroundColor: 'rgba(45,212,191,0.16)',
+    borderColor: 'rgba(45,212,191,0.40)',
   },
   timeRangeButtonText: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   timeRangeButtonTextActive: {
-    color: '#00D7FF',
+    color: '#0E8C7B',
   },
   chartLegend: {
     flexDirection: 'row',
@@ -792,7 +797,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     paddingTop: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.1)',
+    borderTopColor: colors.hairline,
   },
   legendItem: {
     flexDirection: 'row',
@@ -806,7 +811,7 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
   },
   chartPlaceholder: {
     flex: 1,
@@ -834,50 +839,50 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     paddingTop: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.1)',
+    borderTopColor: colors.hairline,
   },
   chartXLabel: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
 
   // Circle CCI Card
   circleCCICard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0,215,255,0.2)',
+    borderColor: 'rgba(45,212,191,0.30)',
     padding: spacing.lg,
     marginBottom: spacing.md,
   },
   circleCCITitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#00D7FF',
+    color: '#0E8C7B',
     letterSpacing: 1,
     marginBottom: spacing.sm,
   },
   circleCCIDescription: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
     lineHeight: 22,
     marginBottom: spacing.sm,
   },
   circleCCIHighlight: {
-    color: '#00D7FF',
+    color: '#0E8C7B',
     fontWeight: '600',
   },
   circleCCINote: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     fontStyle: 'italic',
   },
   dataConfidenceCard: {
-    backgroundColor: 'rgba(16,185,129,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.08)',
     borderRadius: borderRadius.md,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(16,185,129,0.3)',
+    borderColor: 'rgba(45,212,191,0.30)',
   },
   dataConfidenceHeader: {
     flexDirection: 'row',
@@ -888,16 +893,16 @@ const styles = StyleSheet.create({
   dataConfidenceTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
   },
   dataConfidenceValue: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#10B981',
+    color: '#0E8C7B',
   },
   dataConfidenceText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
 
@@ -908,26 +913,26 @@ const styles = StyleSheet.create({
   circleStatusTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     marginBottom: spacing.md,
   },
   tableHeader: {
     flexDirection: 'row',
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
+    borderBottomColor: colors.hairline,
   },
   tableHeaderCell: {
     fontSize: 10,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     letterSpacing: 0.5,
   },
   tableRow: {
     flexDirection: 'row',
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: colors.hairline,
     alignItems: 'center',
   },
   tableCell: {
@@ -937,7 +942,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: 'rgba(0,215,255,0.2)',
+    backgroundColor: 'rgba(45,212,191,0.20)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -946,21 +951,21 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: 'rgba(0,215,255,0.3)',
+    borderColor: 'rgba(45,212,191,0.30)',
   },
   avatarText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#00D7FF',
+    color: '#0E8C7B',
   },
   memberName: {
     fontSize: 13,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   memberUsername: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   capacityBadge: {
     paddingVertical: 4,
@@ -969,24 +974,24 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   capacityBadgeResourced: {
-    backgroundColor: 'rgba(16,185,129,0.2)',
+    backgroundColor: 'rgba(45,212,191,0.16)',
     borderWidth: 1,
-    borderColor: '#10B981',
+    borderColor: '#2DD4BF',
   },
   capacityBadgeStretched: {
-    backgroundColor: 'rgba(232,168,48,0.2)',
+    backgroundColor: 'rgba(245,158,11,0.16)',
     borderWidth: 1,
-    borderColor: '#E8A830',
+    borderColor: '#F59E0B',
   },
   capacityBadgeDepleted: {
-    backgroundColor: 'rgba(244,67,54,0.2)',
+    backgroundColor: 'rgba(220,38,38,0.16)',
     borderWidth: 1,
-    borderColor: '#F44336',
+    borderColor: '#DC2626',
   },
   capacityBadgeText: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   trendText: {
     fontSize: 12,
@@ -994,11 +999,11 @@ const styles = StyleSheet.create({
   },
   participationText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
   },
   notesText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     fontStyle: 'italic',
   },
   paginationHint: {
@@ -1007,20 +1012,22 @@ const styles = StyleSheet.create({
   },
   paginationText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
 
   // Aggregate Section
   aggregateSection: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
     padding: spacing.lg,
     marginBottom: spacing.md,
   },
   aggregateSectionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     marginBottom: spacing.md,
   },
   aggregateBullets: {
@@ -1029,16 +1036,16 @@ const styles = StyleSheet.create({
   },
   aggregateBullet: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
     lineHeight: 20,
   },
   boldText: {
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   aggregateDisclaimer: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     fontStyle: 'italic',
   },
 
@@ -1048,9 +1055,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   ctaPrimary: {
-    backgroundColor: 'rgba(0,215,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     borderWidth: 1,
-    borderColor: 'rgba(0,215,255,0.3)',
+    borderColor: 'rgba(45,212,191,0.30)',
     borderRadius: borderRadius.md,
     padding: spacing.md,
     flexDirection: 'row',
@@ -1060,17 +1067,17 @@ const styles = StyleSheet.create({
   ctaPrimaryText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#00D7FF',
+    color: '#0E8C7B',
   },
   ctaPriceText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#00D7FF',
+    color: '#0E8C7B',
   },
   ctaSecondary: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
     borderRadius: borderRadius.md,
     padding: spacing.md,
     flexDirection: 'row',
@@ -1079,11 +1086,11 @@ const styles = StyleSheet.create({
   },
   ctaSecondaryText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
   },
   ctaSecondaryPrice: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textTertiary,
   },
 
   // Footer
@@ -1093,7 +1100,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.3)',
+    color: colors.textTertiary,
   },
 
   // Integrated Member Cards
@@ -1106,19 +1113,19 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#00D7FF',
+    color: '#0E8C7B',
     letterSpacing: 0.5,
   },
   sectionSubtitle: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   integratedCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.xs,
     marginBottom: 6,
   },
@@ -1134,7 +1141,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     marginRight: spacing.sm,
     borderRightWidth: 1,
-    borderRightColor: 'rgba(255,255,255,0.08)',
+    borderRightColor: colors.hairline,
     paddingRight: spacing.sm,
   },
   memberHeader: {
@@ -1147,20 +1154,20 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: 'rgba(0,215,255,0.3)',
+    borderColor: 'rgba(45,212,191,0.30)',
   },
   cardAvatarPlaceholder: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: 'rgba(0,215,255,0.2)',
+    backgroundColor: 'rgba(45,212,191,0.20)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   cardAvatarText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#00D7FF',
+    color: '#0E8C7B',
   },
   memberNameContainer: {
     marginLeft: spacing.xs,
@@ -1169,11 +1176,11 @@ const styles = StyleSheet.create({
   cardMemberName: {
     fontSize: 13,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
   },
   cardMemberUsername: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   memberDetails: {
     gap: 2,
@@ -1185,12 +1192,12 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     fontWeight: '500',
   },
   detailValue: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
   },
   memberChartSection: {
     minHeight: 60,
@@ -1212,21 +1219,21 @@ const styles = StyleSheet.create({
   bundleTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     letterSpacing: 0.5,
   },
   bundleSubtitle: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 4,
   },
   bundleBadge: {
-    backgroundColor: 'rgba(156,39,176,0.15)',
+    backgroundColor: 'rgba(156,39,176,0.10)',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: borderRadius.sm,
     borderWidth: 1,
-    borderColor: 'rgba(156,39,176,0.3)',
+    borderColor: 'rgba(156,39,176,0.30)',
   },
   bundleBadgeText: {
     fontSize: 12,
@@ -1234,10 +1241,10 @@ const styles = StyleSheet.create({
     color: '#9C27B0',
   },
   bundleCCICard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(156,39,176,0.2)',
+    borderColor: 'rgba(156,39,176,0.30)',
     padding: spacing.lg,
     marginBottom: spacing.md,
   },
@@ -1250,7 +1257,7 @@ const styles = StyleSheet.create({
   },
   bundleCCIDescription: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
     lineHeight: 22,
     marginBottom: spacing.sm,
   },
@@ -1260,7 +1267,7 @@ const styles = StyleSheet.create({
   },
   bundleCCINote: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     fontStyle: 'italic',
   },
   bundleSizeSelector: {
@@ -1269,7 +1276,7 @@ const styles = StyleSheet.create({
   bundleSizeSelectorLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
   bundleSizeButtons: {
@@ -1281,27 +1288,27 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
     alignItems: 'center',
   },
   bundleSizeButtonActive: {
-    backgroundColor: 'rgba(156,39,176,0.15)',
+    backgroundColor: 'rgba(156,39,176,0.10)',
     borderColor: '#9C27B0',
   },
   bundleSizeButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
   },
   bundleSizeButtonTextActive: {
     color: '#9C27B0',
   },
   ctaBundlePrimary: {
-    backgroundColor: 'rgba(156,39,176,0.1)',
+    backgroundColor: 'rgba(156,39,176,0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(156,39,176,0.3)',
+    borderColor: 'rgba(156,39,176,0.30)',
     borderRadius: borderRadius.md,
     padding: spacing.md,
     flexDirection: 'row',

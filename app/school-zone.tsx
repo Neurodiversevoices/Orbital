@@ -172,17 +172,17 @@ export default function SchoolZoneScreen() {
     <SafeAreaView style={commonStyles.screen}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color="rgba(255,255,255,0.8)" />
+          <ArrowLeft size={24} color={colors.textPrimary} />
         </Pressable>
-        <Text style={styles.title}>School Zone</Text>
+        <Text style={styles.title} maxFontSizeMultiplier={1.5}>School Zone</Text>
         <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Privacy Notice */}
         <View style={styles.privacyBanner}>
-          <Shield size={16} color="#00E5FF" />
-          <Text style={styles.privacyText}>
+          <Shield size={16} color="#0E8C7B" />
+          <Text style={styles.privacyText} maxFontSizeMultiplier={1.5}>
             Student privacy first. Educators see aggregate data only. Notes are never shared.
           </Text>
         </View>
@@ -190,15 +190,15 @@ export default function SchoolZoneScreen() {
         {/* No School - Join Form */}
         {!currentSchool && !showJoinForm && (
           <View style={styles.emptyState}>
-            <GraduationCap size={48} color="rgba(255,255,255,0.2)" />
-            <Text style={styles.emptyTitle}>Join a School Zone</Text>
-            <Text style={styles.emptyBody}>
+            <GraduationCap size={48} color={colors.textTertiary} />
+            <Text style={styles.emptyTitle} maxFontSizeMultiplier={1.5}>Join a School Zone</Text>
+            <Text style={styles.emptyBody} maxFontSizeMultiplier={1.5}>
               Connect with your school to track capacity in an educational context. Students log
               their own capacity; educators see only aggregate class data.
             </Text>
             <Pressable style={styles.primaryButton} onPress={() => setShowJoinForm(true)}>
-              <GraduationCap size={18} color="#000" />
-              <Text style={styles.primaryButtonText}>Enter School Code</Text>
+              <GraduationCap size={18} color="#FFFFFF" />
+              <Text style={styles.primaryButtonText} maxFontSizeMultiplier={1.5}>Enter School Code</Text>
             </Pressable>
           </View>
         )}
@@ -206,8 +206,8 @@ export default function SchoolZoneScreen() {
         {/* Join Form */}
         {!currentSchool && showJoinForm && (
           <View style={styles.joinForm}>
-            <Text style={styles.formTitle}>Join a School Zone</Text>
-            <Text style={styles.formDescription}>
+            <Text style={styles.formTitle} maxFontSizeMultiplier={1.5}>Join a School Zone</Text>
+            <Text style={styles.formDescription} maxFontSizeMultiplier={1.5}>
               Enter the school code and select your role.
             </Text>
 
@@ -216,7 +216,7 @@ export default function SchoolZoneScreen() {
               value={schoolCode}
               onChangeText={setSchoolCode}
               placeholder="School Code (e.g., ELM-2024)"
-              placeholderTextColor="rgba(255,255,255,0.5)"
+              placeholderTextColor={colors.textTertiary}
               autoCapitalize="characters"
             />
 
@@ -225,10 +225,10 @@ export default function SchoolZoneScreen() {
               value={schoolName}
               onChangeText={setSchoolName}
               placeholder="School Name (optional)"
-              placeholderTextColor="rgba(255,255,255,0.5)"
+              placeholderTextColor={colors.textTertiary}
             />
 
-            <Text style={styles.roleLabel}>I am a:</Text>
+            <Text style={styles.roleLabel} maxFontSizeMultiplier={1.5}>I am a:</Text>
             <View style={styles.roleOptions}>
               {(['student', 'caregiver', 'educator'] as SchoolRole[]).map((role) => {
                 const Icon = roleIcons[role];
@@ -239,9 +239,10 @@ export default function SchoolZoneScreen() {
                     style={[styles.roleOption, isSelected && styles.roleOptionSelected]}
                     onPress={() => setSelectedRole(role)}
                   >
-                    <Icon size={20} color={isSelected ? '#00E5FF' : 'rgba(255,255,255,0.5)'} />
+                    <Icon size={20} color={isSelected ? '#0E8C7B' : colors.textSecondary} />
                     <Text
                       style={[styles.roleOptionText, isSelected && styles.roleOptionTextSelected]}
+                      maxFontSizeMultiplier={1.5}
                     >
                       {roleLabels[role]}
                     </Text>
@@ -260,14 +261,14 @@ export default function SchoolZoneScreen() {
                   setSelectedRole(null);
                 }}
               >
-                <Text style={styles.secondaryButtonText}>Cancel</Text>
+                <Text style={styles.secondaryButtonText} maxFontSizeMultiplier={1.5}>Cancel</Text>
               </Pressable>
               <Pressable
                 style={[styles.primaryButton, isJoining && styles.buttonDisabled]}
                 onPress={handleJoinSchool}
                 disabled={isJoining}
               >
-                <Text style={styles.primaryButtonText}>
+                <Text style={styles.primaryButtonText} maxFontSizeMultiplier={1.5}>
                   {isJoining ? 'Joining...' : 'Join'}
                 </Text>
               </Pressable>
@@ -281,28 +282,28 @@ export default function SchoolZoneScreen() {
             {/* School Header */}
             <View style={styles.schoolHeader}>
               <View style={styles.schoolInfo}>
-                <Text style={styles.schoolName}>{currentSchool.name}</Text>
-                <Text style={styles.schoolMeta}>
+                <Text style={styles.schoolName} maxFontSizeMultiplier={1.5}>{currentSchool.name}</Text>
+                <Text style={styles.schoolMeta} maxFontSizeMultiplier={1.5}>
                   {roleLabels[settings.role || 'student']} | Code: {currentSchool.schoolCode}
                 </Text>
               </View>
               <Pressable style={styles.leaveButton} onPress={handleLeaveSchool}>
-                <LogOut size={16} color="#F44336" />
-                <Text style={styles.leaveButtonText}>Leave</Text>
+                <LogOut size={16} color="#DC2626" />
+                <Text style={styles.leaveButtonText} maxFontSizeMultiplier={1.5}>Leave</Text>
               </Pressable>
             </View>
 
             {/* Student View */}
             {settings.role === 'student' && (
               <View style={styles.card}>
-                <Text style={styles.cardTitle}>Your Capacity Logging</Text>
-                <Text style={styles.cardBody}>
+                <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>Your Capacity Logging</Text>
+                <Text style={styles.cardBody} maxFontSizeMultiplier={1.5}>
                   Continue logging your capacity on the Home screen. Your individual entries are
                   private - only you can see them. Aggregate class data (without your name or
                   details) may be visible to educators.
                 </Text>
                 <Pressable style={styles.goHomeButton} onPress={() => router.push('/')}>
-                  <Text style={styles.goHomeButtonText}>Go to Home</Text>
+                  <Text style={styles.goHomeButtonText} maxFontSizeMultiplier={1.5}>Go to Home</Text>
                 </Pressable>
               </View>
             )}
@@ -312,76 +313,77 @@ export default function SchoolZoneScreen() {
               <>
                 <View style={styles.card}>
                   <View style={styles.cardTitleRow}>
-                    <FileText size={18} color="#E8A830" />
-                    <Text style={styles.cardTitle}>School Summary Card</Text>
+                    <FileText size={18} color="#F59E0B" />
+                    <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>School Summary Card</Text>
                   </View>
-                  <Text style={styles.cardBody}>
+                  <Text style={styles.cardBody} maxFontSizeMultiplier={1.5}>
                     Generate a summary card to share with school staff. Shows capacity trends and
                     common drivers. Notes are excluded by default.
                   </Text>
                   <Pressable style={styles.generateButton} onPress={handleGenerateSummary}>
-                    <Download size={18} color="#000" />
-                    <Text style={styles.generateButtonText}>Generate Summary Card</Text>
+                    <Download size={18} color="#FFFFFF" />
+                    <Text style={styles.generateButtonText} maxFontSizeMultiplier={1.5}>Generate Summary Card</Text>
                   </Pressable>
                 </View>
 
                 {/* Summary Card Preview */}
                 {summaryCard && (
                   <View style={styles.summaryCard}>
-                    <Text style={styles.summaryTitle}>Capacity Summary Card</Text>
-                    <Text style={styles.summaryPeriod}>
+                    <Text style={styles.summaryTitle} maxFontSizeMultiplier={1.5}>Capacity Summary Card</Text>
+                    <Text style={styles.summaryPeriod} maxFontSizeMultiplier={1.5}>
                       {summaryCard.dateRange.start} to {summaryCard.dateRange.end}
                     </Text>
 
                     <View style={styles.summaryRow}>
-                      <Text style={styles.summaryLabel}>Average Capacity</Text>
-                      <Text style={styles.summaryValue}>{summaryCard.averageCapacity}%</Text>
+                      <Text style={styles.summaryLabel} maxFontSizeMultiplier={1.5}>Average Capacity</Text>
+                      <Text style={styles.summaryValue} maxFontSizeMultiplier={1.5}>{summaryCard.averageCapacity}%</Text>
                     </View>
 
                     <View style={styles.summaryRow}>
-                      <Text style={styles.summaryLabel}>Trend</Text>
+                      <Text style={styles.summaryLabel} maxFontSizeMultiplier={1.5}>Trend</Text>
                       <Text
                         style={[
                           styles.summaryValue,
                           {
                             color:
                               summaryCard.capacityTrend === 'improving'
-                                ? '#00E5FF'
+                                ? '#2DD4BF'
                                 : summaryCard.capacityTrend === 'declining'
-                                ? '#F44336'
-                                : '#E8A830',
+                                ? '#DC2626'
+                                : '#F59E0B',
                           },
                         ]}
+                        maxFontSizeMultiplier={1.5}
                       >
                         {summaryCard.capacityTrend}
                       </Text>
                     </View>
 
                     <View style={styles.summarySection}>
-                      <Text style={styles.summarySectionTitle}>What Helps</Text>
+                      <Text style={styles.summarySectionTitle} maxFontSizeMultiplier={1.5}>What Helps</Text>
                       {summaryCard.environmentFactors.helps.map((factor) => (
                         <View key={factor} style={styles.factorRow}>
-                          <CheckCircle size={14} color="#00E5FF" />
-                          <Text style={styles.factorText}>{factor.replace(/_/g, ' ')}</Text>
+                          <CheckCircle size={14} color="#2DD4BF" />
+                          <Text style={styles.factorText} maxFontSizeMultiplier={1.5}>{factor.replace(/_/g, ' ')}</Text>
                         </View>
                       ))}
                     </View>
 
                     <View style={styles.summarySection}>
-                      <Text style={styles.summarySectionTitle}>What Drains</Text>
+                      <Text style={styles.summarySectionTitle} maxFontSizeMultiplier={1.5}>What Drains</Text>
                       {summaryCard.environmentFactors.drains.map((factor) => (
                         <View key={factor} style={styles.factorRow}>
-                          <XCircle size={14} color="#F44336" />
-                          <Text style={styles.factorText}>{factor.replace(/_/g, ' ')}</Text>
+                          <XCircle size={14} color="#DC2626" />
+                          <Text style={styles.factorText} maxFontSizeMultiplier={1.5}>{factor.replace(/_/g, ' ')}</Text>
                         </View>
                       ))}
                     </View>
 
                     <Pressable style={styles.shareButton} onPress={handleShareSummary}>
-                      <Text style={styles.shareButtonText}>Share Summary Card</Text>
+                      <Text style={styles.shareButtonText} maxFontSizeMultiplier={1.5}>Share Summary Card</Text>
                     </Pressable>
 
-                    <Text style={styles.notesExcluded}>Notes excluded for privacy</Text>
+                    <Text style={styles.notesExcluded} maxFontSizeMultiplier={1.5}>Notes excluded for privacy</Text>
                   </View>
                 )}
               </>
@@ -393,12 +395,12 @@ export default function SchoolZoneScreen() {
                 {/* Privacy Threshold Warning */}
                 {!aggregate.hasEnoughStudents && (
                   <View style={styles.thresholdWarning}>
-                    <AlertCircle size={20} color="#E8A830" />
+                    <AlertCircle size={20} color="#F59E0B" />
                     <View style={styles.thresholdContent}>
-                      <Text style={styles.thresholdTitle}>
+                      <Text style={styles.thresholdTitle} maxFontSizeMultiplier={1.5}>
                         Not enough students to protect privacy
                       </Text>
-                      <Text style={styles.thresholdBody}>
+                      <Text style={styles.thresholdBody} maxFontSizeMultiplier={1.5}>
                         At least 10 students must log signals before aggregate data is displayed.
                         Current: {aggregate.studentCount} students.
                       </Text>
@@ -411,7 +413,7 @@ export default function SchoolZoneScreen() {
                   <>
                     {/* Capacity Distribution */}
                     <View style={styles.card}>
-                      <Text style={styles.cardTitle}>Class Capacity Distribution</Text>
+                      <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>Class Capacity Distribution</Text>
                       <View style={styles.distributionBar}>
                         {aggregate.capacityDistribution.plenty > 0 && (
                           <View
@@ -419,7 +421,7 @@ export default function SchoolZoneScreen() {
                               styles.distributionSegment,
                               {
                                 flex: aggregate.capacityDistribution.plenty,
-                                backgroundColor: '#00E5FF',
+                                backgroundColor: '#2DD4BF',
                                 borderTopLeftRadius: 4,
                                 borderBottomLeftRadius: 4,
                               },
@@ -432,7 +434,7 @@ export default function SchoolZoneScreen() {
                               styles.distributionSegment,
                               {
                                 flex: aggregate.capacityDistribution.elevated,
-                                backgroundColor: '#E8A830',
+                                backgroundColor: '#F59E0B',
                               },
                             ]}
                           />
@@ -443,7 +445,7 @@ export default function SchoolZoneScreen() {
                               styles.distributionSegment,
                               {
                                 flex: aggregate.capacityDistribution.nearLimit,
-                                backgroundColor: '#F44336',
+                                backgroundColor: '#DC2626',
                                 borderTopRightRadius: 4,
                                 borderBottomRightRadius: 4,
                               },
@@ -453,20 +455,20 @@ export default function SchoolZoneScreen() {
                       </View>
                       <View style={styles.distributionLegend}>
                         <View style={styles.legendItem}>
-                          <View style={[styles.legendDot, { backgroundColor: '#00E5FF' }]} />
-                          <Text style={styles.legendText}>
+                          <View style={[styles.legendDot, { backgroundColor: '#2DD4BF' }]} />
+                          <Text style={styles.legendText} maxFontSizeMultiplier={1.5}>
                             Plenty {aggregate.capacityDistribution.plenty}%
                           </Text>
                         </View>
                         <View style={styles.legendItem}>
-                          <View style={[styles.legendDot, { backgroundColor: '#E8A830' }]} />
-                          <Text style={styles.legendText}>
+                          <View style={[styles.legendDot, { backgroundColor: '#F59E0B' }]} />
+                          <Text style={styles.legendText} maxFontSizeMultiplier={1.5}>
                             Elevated {aggregate.capacityDistribution.elevated}%
                           </Text>
                         </View>
                         <View style={styles.legendItem}>
-                          <View style={[styles.legendDot, { backgroundColor: '#F44336' }]} />
-                          <Text style={styles.legendText}>
+                          <View style={[styles.legendDot, { backgroundColor: '#DC2626' }]} />
+                          <Text style={styles.legendText} maxFontSizeMultiplier={1.5}>
                             Near Limit {aggregate.capacityDistribution.nearLimit}%
                           </Text>
                         </View>
@@ -475,15 +477,15 @@ export default function SchoolZoneScreen() {
 
                     {/* Top Drivers */}
                     <View style={styles.card}>
-                      <Text style={styles.cardTitle}>Common Load Drivers</Text>
+                      <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>Common Load Drivers</Text>
                       <View style={styles.driversRow}>
                         {aggregate.topDrivers.map((driver) => {
                           const Icon = categoryIcons[driver.driver];
                           return (
                             <View key={driver.driver} style={styles.driverItem}>
-                              <Icon size={20} color="rgba(255,255,255,0.7)" />
-                              <Text style={styles.driverLabel}>{driver.driver}</Text>
-                              <Text style={styles.driverPercent}>{driver.percentage}%</Text>
+                              <Icon size={20} color={colors.textSecondary} />
+                              <Text style={styles.driverLabel} maxFontSizeMultiplier={1.5}>{driver.driver}</Text>
+                              <Text style={styles.driverPercent} maxFontSizeMultiplier={1.5}>{driver.percentage}%</Text>
                             </View>
                           );
                         })}
@@ -492,7 +494,7 @@ export default function SchoolZoneScreen() {
 
                     {/* Stats Footer */}
                     <View style={styles.statsFooter}>
-                      <Text style={styles.statsText}>
+                      <Text style={styles.statsText} maxFontSizeMultiplier={1.5}>
                         {aggregate.studentCount} students | {aggregate.totalSignals} signals |
                         Confidence: {aggregate.participationConfidence}
                       </Text>
@@ -524,7 +526,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   headerSpacer: {
     width: 40,
@@ -537,7 +539,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: 'rgba(0, 229, 255, 0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     borderRadius: 8,
     padding: spacing.sm,
     marginBottom: spacing.lg,
@@ -545,7 +547,7 @@ const styles = StyleSheet.create({
   privacyText: {
     flex: 1,
     fontSize: 12,
-    color: '#00E5FF',
+    color: '#0E8C7B',
   },
   emptyState: {
     alignItems: 'center',
@@ -554,13 +556,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
   },
   emptyBody: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: spacing.lg,
@@ -570,7 +572,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderRadius: 24,
@@ -578,7 +580,7 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: '#FFFFFF',
   },
   buttonDisabled: {
     opacity: 0.5,
@@ -586,33 +588,35 @@ const styles = StyleSheet.create({
   joinForm: {
     backgroundColor: colors.card,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
     padding: spacing.lg,
   },
   formTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   formDescription: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.lg,
   },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     fontSize: 16,
     marginBottom: spacing.md,
   },
   roleLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
   roleOptions: {
@@ -626,19 +630,19 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    backgroundColor: 'rgba(255,255,255,0.02)',
+    borderColor: colors.cardBorder,
+    backgroundColor: colors.backgroundSubtle,
   },
   roleOptionSelected: {
-    borderColor: '#00E5FF',
-    backgroundColor: 'rgba(0, 229, 255, 0.1)',
+    borderColor: '#0E8C7B',
+    backgroundColor: 'rgba(45,212,191,0.10)',
   },
   roleOptionText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
   },
   roleOptionTextSelected: {
-    color: '#00E5FF',
+    color: '#0E8C7B',
   },
   formButtons: {
     flexDirection: 'row',
@@ -650,12 +654,12 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: colors.cardBorder,
   },
   secondaryButtonText: {
     fontSize: 16,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
   },
   schoolHeader: {
     flexDirection: 'row',
@@ -667,11 +671,11 @@ const styles = StyleSheet.create({
   schoolName: {
     fontSize: 20,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   schoolMeta: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginTop: 2,
   },
   leaveButton: {
@@ -682,7 +686,7 @@ const styles = StyleSheet.create({
   },
   leaveButtonText: {
     fontSize: 14,
-    color: '#F44336',
+    color: '#DC2626',
   },
   card: {
     backgroundColor: colors.card,
@@ -695,7 +699,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: spacing.md,
@@ -708,7 +712,7 @@ const styles = StyleSheet.create({
   },
   cardBody: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 20,
     marginBottom: spacing.md,
   },
@@ -716,44 +720,44 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.md,
     borderRadius: 8,
-    backgroundColor: 'rgba(0, 229, 255, 0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
   },
   goHomeButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#00E5FF',
+    color: '#0E8C7B',
   },
   generateButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: '#E8A830',
+    backgroundColor: '#F59E0B',
     paddingVertical: spacing.md,
     borderRadius: 8,
   },
   generateButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
+    color: '#FFFFFF',
   },
   summaryCard: {
-    backgroundColor: 'rgba(232, 168, 48, 0.1)',
+    backgroundColor: 'rgba(245,158,11,0.08)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(232, 168, 48, 0.3)',
+    borderColor: 'rgba(245,158,11,0.30)',
     padding: spacing.md,
     marginBottom: spacing.md,
   },
   summaryTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#E8A830',
+    color: '#F59E0B',
     marginBottom: 4,
   },
   summaryPeriod: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.md,
   },
   summaryRow: {
@@ -761,16 +765,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: colors.hairline,
   },
   summaryLabel: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
   },
   summaryValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     textTransform: 'capitalize',
   },
   summarySection: {
@@ -779,7 +783,7 @@ const styles = StyleSheet.create({
   summarySectionTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: spacing.sm,
@@ -792,24 +796,24 @@ const styles = StyleSheet.create({
   },
   factorText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
     textTransform: 'capitalize',
   },
   shareButton: {
     alignItems: 'center',
     padding: spacing.md,
     borderRadius: 8,
-    backgroundColor: '#E8A830',
+    backgroundColor: '#F59E0B',
     marginTop: spacing.md,
   },
   shareButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
+    color: '#FFFFFF',
   },
   notesExcluded: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textTertiary,
     textAlign: 'center',
     marginTop: spacing.sm,
     fontStyle: 'italic',
@@ -817,8 +821,10 @@ const styles = StyleSheet.create({
   thresholdWarning: {
     flexDirection: 'row',
     gap: spacing.md,
-    backgroundColor: 'rgba(232, 168, 48, 0.1)',
+    backgroundColor: 'rgba(245,158,11,0.08)',
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(245,158,11,0.30)',
     padding: spacing.md,
     marginBottom: spacing.lg,
   },
@@ -828,12 +834,12 @@ const styles = StyleSheet.create({
   thresholdTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#E8A830',
+    color: '#F59E0B',
     marginBottom: 4,
   },
   thresholdBody: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   distributionBar: {
@@ -841,7 +847,7 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
     marginBottom: spacing.md,
   },
   distributionSegment: {
@@ -863,7 +869,7 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
   },
   driversRow: {
     flexDirection: 'row',
@@ -875,13 +881,13 @@ const styles = StyleSheet.create({
   },
   driverLabel: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     textTransform: 'capitalize',
   },
   driverPercent: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   statsFooter: {
     alignItems: 'center',
@@ -889,7 +895,7 @@ const styles = StyleSheet.create({
   },
   statsText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textTertiary,
   },
   bottomPadding: {
     height: 40,

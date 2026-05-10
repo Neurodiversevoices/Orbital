@@ -136,7 +136,7 @@ export default function ProfileScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerSpacer} />
-        <Text style={styles.title}>Profile</Text>
+        <Text style={styles.title} maxFontSizeMultiplier={1.5}>Profile</Text>
         <Pressable onPress={() => router.back()} style={styles.closeButton}>
           <X color={colors.textPrimary} size={24} />
         </Pressable>
@@ -145,10 +145,10 @@ export default function ProfileScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Privacy Notice */}
         <Animated.View entering={FadeInDown.duration(400)} style={styles.privacyCard}>
-          <Shield size={20} color="#4CAF50" />
+          <Shield size={20} color="#0E8C7B" />
           <View style={styles.privacyContent}>
-            <Text style={styles.privacyTitle}>Private Information</Text>
-            <Text style={styles.privacyText}>
+            <Text style={styles.privacyTitle} maxFontSizeMultiplier={1.5}>Private Information</Text>
+            <Text style={styles.privacyText} maxFontSizeMultiplier={1.5}>
               These optional fields are used only for anonymous aggregate insights.
               They are never shown to other users, Circles, or sponsors.
             </Text>
@@ -158,9 +158,9 @@ export default function ProfileScreen() {
         {/* Year of Birth */}
         <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Calendar size={18} color="rgba(255,255,255,0.6)" />
-            <Text style={styles.sectionTitle}>Year of Birth</Text>
-            <Text style={styles.optionalBadge}>Optional</Text>
+            <Calendar size={18} color={colors.textSecondary} />
+            <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>Year of Birth</Text>
+            <Text style={styles.optionalBadge} maxFontSizeMultiplier={1.5}>Optional</Text>
           </View>
 
           <View style={styles.inputRow}>
@@ -170,13 +170,13 @@ export default function ProfileScreen() {
               onChangeText={handleYearChange}
               onBlur={handleSaveYear}
               placeholder="YYYY"
-              placeholderTextColor="rgba(255,255,255,0.3)"
+              placeholderTextColor={colors.textTertiary}
               keyboardType="number-pad"
               maxLength={4}
             />
             {yearInput.length === 4 && !yearError && (
               <View style={styles.bracketBadge}>
-                <Text style={styles.bracketText}>
+                <Text style={styles.bracketText} maxFontSizeMultiplier={1.5}>
                   {ageBracket ? `${ageBracket} years` : ''}
                 </Text>
               </View>
@@ -185,12 +185,12 @@ export default function ProfileScreen() {
 
           {yearError && (
             <View style={styles.errorRow}>
-              <AlertCircle size={14} color="#FF5252" />
-              <Text style={styles.errorText}>{yearError}</Text>
+              <AlertCircle size={14} color="#DC2626" />
+              <Text style={styles.errorText} maxFontSizeMultiplier={1.5}>{yearError}</Text>
             </View>
           )}
 
-          <Text style={styles.helperText}>
+          <Text style={styles.helperText} maxFontSizeMultiplier={1.5}>
             Used only for anonymous age-range insights. Never shown to others.
           </Text>
         </Animated.View>
@@ -198,9 +198,9 @@ export default function ProfileScreen() {
         {/* Gender */}
         <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.section}>
           <View style={styles.sectionHeader}>
-            <User size={18} color="rgba(255,255,255,0.6)" />
-            <Text style={styles.sectionTitle}>Gender</Text>
-            <Text style={styles.optionalBadge}>Optional</Text>
+            <User size={18} color={colors.textSecondary} />
+            <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>Gender</Text>
+            <Text style={styles.optionalBadge} maxFontSizeMultiplier={1.5}>Optional</Text>
           </View>
 
           <Pressable
@@ -210,12 +210,12 @@ export default function ProfileScreen() {
             <Text style={[
               styles.genderSelectorText,
               !selectedGender && styles.genderSelectorPlaceholder
-            ]}>
+            ]} maxFontSizeMultiplier={1.5}>
               {currentGenderLabel}
             </Text>
             <ChevronDown
               size={18}
-              color="rgba(255,255,255,0.4)"
+              color={colors.textTertiary}
               style={{ transform: [{ rotate: showGenderPicker ? '180deg' : '0deg' }] }}
             />
           </Pressable>
@@ -234,11 +234,11 @@ export default function ProfileScreen() {
                   <Text style={[
                     styles.genderOptionText,
                     selectedGender === option.value && styles.genderOptionTextSelected
-                  ]}>
+                  ]} maxFontSizeMultiplier={1.5}>
                     {option.label}
                   </Text>
                   {selectedGender === option.value && (
-                    <Check size={16} color="#00E5FF" />
+                    <Check size={16} color="#0E8C7B" />
                   )}
                 </Pressable>
               ))}
@@ -253,44 +253,44 @@ export default function ProfileScreen() {
                 onChangeText={setSelfDescribedText}
                 onBlur={handleSaveSelfDescribed}
                 placeholder="How do you describe yourself? (optional)"
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor={colors.textTertiary}
                 maxLength={100}
               />
-              <Text style={styles.selfDescribedNote}>
+              <Text style={styles.selfDescribedNote} maxFontSizeMultiplier={1.5}>
                 This text is stored privately and never displayed or used in analytics.
               </Text>
             </View>
           )}
 
-          <Text style={styles.helperText}>
+          <Text style={styles.helperText} maxFontSizeMultiplier={1.5}>
             Used only for anonymous, thresholded aggregate insights.
           </Text>
         </Animated.View>
 
         {/* Info Card */}
         <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.infoCard}>
-          <Text style={styles.infoTitle}>How this data is used</Text>
+          <Text style={styles.infoTitle} maxFontSizeMultiplier={1.5}>How this data is used</Text>
           <View style={styles.infoItem}>
-            <Check size={14} color="#4CAF50" />
-            <Text style={styles.infoText}>
+            <Check size={14} color="#0E8C7B" />
+            <Text style={styles.infoText} maxFontSizeMultiplier={1.5}>
               Aggregate analytics only (e.g., "25-30 age group: 60% resourced")
             </Text>
           </View>
           <View style={styles.infoItem}>
-            <Check size={14} color="#4CAF50" />
-            <Text style={styles.infoText}>
+            <Check size={14} color="#0E8C7B" />
+            <Text style={styles.infoText} maxFontSizeMultiplier={1.5}>
               Minimum 10 users required to show any demographic breakdown
             </Text>
           </View>
           <View style={styles.infoItem}>
-            <Check size={14} color="#4CAF50" />
-            <Text style={styles.infoText}>
+            <Check size={14} color="#0E8C7B" />
+            <Text style={styles.infoText} maxFontSizeMultiplier={1.5}>
               Included in your personal data export (you own your data)
             </Text>
           </View>
           <View style={styles.infoItem}>
-            <X size={14} color="#FF5252" />
-            <Text style={styles.infoText}>
+            <X size={14} color="#DC2626" />
+            <Text style={styles.infoText} maxFontSizeMultiplier={1.5}>
               Never visible in Circles, sharing, or to other users
             </Text>
           </View>
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   closeButton: {
     padding: spacing.sm,
@@ -333,10 +333,10 @@ const styles = StyleSheet.create({
   privacyCard: {
     flexDirection: 'row',
     gap: spacing.md,
-    backgroundColor: 'rgba(76,175,80,0.08)',
+    backgroundColor: 'rgba(45,212,191,0.08)',
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(76,175,80,0.2)',
+    borderColor: 'rgba(45,212,191,0.3)',
     padding: spacing.md,
     marginBottom: spacing.xl,
   },
@@ -346,13 +346,13 @@ const styles = StyleSheet.create({
   privacyTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#4CAF50',
+    color: '#0E8C7B',
     marginBottom: spacing.xs,
   },
   privacyText: {
     fontSize: 12,
     lineHeight: 18,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   section: {
     marginBottom: spacing.xl,
@@ -366,14 +366,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     flex: 1,
   },
   optionalBadge: {
     fontSize: 10,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.4)',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    color: colors.textTertiary,
+    backgroundColor: colors.backgroundSubtle,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 4,
@@ -388,28 +388,28 @@ const styles = StyleSheet.create({
   yearInput: {
     width: 100,
     height: 48,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
     paddingHorizontal: spacing.md,
     fontSize: 18,
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     textAlign: 'center',
     fontFamily: 'monospace',
   },
   inputError: {
-    borderColor: '#FF5252',
+    borderColor: '#DC2626',
   },
   bracketBadge: {
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.16)',
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.sm,
   },
   bracketText: {
     fontSize: 13,
-    color: '#00E5FF',
+    color: '#0E8C7B',
   },
   errorRow: {
     flexDirection: 'row',
@@ -419,37 +419,37 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    color: '#FF5252',
+    color: '#DC2626',
   },
   helperText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginTop: spacing.sm,
   },
   genderSelector: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
     paddingHorizontal: spacing.md,
     height: 48,
   },
   genderSelectorText: {
     fontSize: 16,
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   genderSelectorPlaceholder: {
-    color: 'rgba(255,255,255,0.3)',
+    color: colors.textTertiary,
   },
   genderOptions: {
     marginTop: spacing.sm,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: colors.cardBorder,
     overflow: 'hidden',
   },
   genderOption: {
@@ -459,49 +459,49 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.03)',
+    borderBottomColor: colors.hairline,
   },
   genderOptionSelected: {
-    backgroundColor: 'rgba(0,229,255,0.08)',
+    backgroundColor: 'rgba(45,212,191,0.08)',
   },
   genderOptionText: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
   },
   genderOptionTextSelected: {
-    color: '#00E5FF',
+    color: '#0E8C7B',
     fontWeight: '500',
   },
   selfDescribedContainer: {
     marginTop: spacing.sm,
   },
   selfDescribedInput: {
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.cardBorder,
     paddingHorizontal: spacing.md,
     height: 48,
     fontSize: 15,
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   selfDescribedNote: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.3)',
+    color: colors.textTertiary,
     marginTop: spacing.xs,
     fontStyle: 'italic',
   },
   infoCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: colors.cardBorder,
     padding: spacing.lg,
   },
   infoTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     marginBottom: spacing.md,
   },
   infoItem: {
@@ -514,6 +514,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 12,
     lineHeight: 18,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
 });
