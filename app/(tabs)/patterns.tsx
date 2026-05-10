@@ -7,6 +7,7 @@ import { PatternCard } from '../../components/patterns/PatternCard';
 import { Skeleton } from '../../components/Skeleton';
 import { SkeletonRow } from '../../components/SkeletonRow';
 import { ParallaxCard } from '../../components/ParallaxCard';
+import { NovaPatternInsight, type NovaPattern } from '../../components/nova/NovaPatternInsight';
 import { getFakeCapacityData, ALL_FAKE_DATA, type RangeKey } from '../../lib/dev/fakeCapacityData';
 
 const RANGES: RangeKey[] = ['14d', '30d', '90d', '1y', 'all'];
@@ -41,6 +42,32 @@ export default function PatternsScreen() {
   // Stats for sub-headline
   const sampleDays = all.length;
   const confidence = Math.min(99, Math.round(50 + (sampleDays / 1825) * 49));
+
+  // Nova insight · derive a pattern + reflective message from the data so she
+  // SHOWS UP on the Patterns tab (not a chatbot — she greets the user's signal).
+  const novaInsight: { pattern: NovaPattern; message: string } | null = useMemo(() => {
+    if (data30d.length < 14 || prevData30d.length < 14) return null;
+    const avg = (rs: typeof data30d) => rs.reduce((a, r) => a + r.score, 0) / rs.length;
+    const cur = avg(data30d);
+    const prev = avg(prevData30d);
+    // Monday vs rest-of-week deficit
+    const mondays = data30d.filter(r => new Date(r.date).getDay() === 1);
+    const others  = data30d.filter(r => new Date(r.date).getDay() !== 1);
+    if (mondays.length >= 3 && others.length >= 3) {
+      const mAvg = avg(mondays); const oAvg = avg(others);
+      if (oAvg - mAvg >= 8) {
+        return { pattern: 'weekday_pattern', message: 'Your Mondays run depleted. Pattern · not coincidence.' };
+      }
+    }
+    // Trending direction
+    if (cur - prev >= 5) {
+      return { pattern: 'trending_up', message: 'Last 30 days are climbing. Whatever you changed · keep it.' };
+    }
+    if (prev - cur >= 5) {
+      return { pattern: 'trending_down', message: 'Capacity is sliding. Worth naming what shifted.' };
+    }
+    return { pattern: 'weekend_recovery', message: 'Weekends are doing real work for you. Protect them.' };
+  }, [data30d, prevData30d]);
 
   if (BASELINE_DAY < 14) {
     return (
@@ -83,6 +110,11 @@ export default function PatternsScreen() {
             </Pressable>
           ))}
         </ScrollView>
+
+        {/* Nova reflects on the user's signal · she shows up, not a chatbot */}
+        {!isLoading && novaInsight && (
+          <NovaPatternInsight pattern={novaInsight.pattern} message={novaInsight.message} />
+        )}
 
         {isLoading ? (
           <>

@@ -7,6 +7,8 @@ import { Settings, Sparkles } from 'lucide-react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Gauge } from '../../components/instrument/Gauge';
 import { TodayTrendSparkline } from '../../components/today/TrendSparkline';
+import { NovaGreeter } from '../../components/nova/NovaGreeter';
+import { NovaCapacityNarrator } from '../../components/nova/NovaCapacityNarrator';
 import { getFakeCapacityData, ALL_FAKE_DATA } from '../../lib/dev/fakeCapacityData';
 import { computeDeltaAndMomentum, getSystemVoice, getDirective } from '../../lib/today/voice';
 import { useAppMode } from '../../lib/hooks/useAppMode';
@@ -159,6 +161,9 @@ export default function HomeScreen() {
         </Animated.View>
 
         <ScrollView style={s.scroll} contentContainerStyle={[s.content, { paddingBottom: insets.bottom + 24 }]} showsVerticalScrollIndicator={false}>
+          {/* Nova-as-presenter · time-aware greeter */}
+          <NovaGreeter userName="Eric" />
+
           {/* Eyebrow + date */}
           <Animated.View entering={FadeIn.delay(60).duration(350)} style={s.dateWrap}>
             <Text style={s.eyebrow}>SYSTEM STATUS</Text>
@@ -169,6 +174,9 @@ export default function HomeScreen() {
           <Animated.View entering={FadeIn.delay(150).duration(400)} style={s.gaugeWrap} testID="focal-section">
             <Gauge score={todayScore} state={capacityState} />
           </Animated.View>
+
+          {/* Nova narrates capacity-state transitions (silent on first mount) */}
+          <NovaCapacityNarrator state={capacityState} />
 
           {/* Delta / momentum row */}
           {hasSufficientData ? (
