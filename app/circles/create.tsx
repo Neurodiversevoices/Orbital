@@ -21,6 +21,7 @@ import {
   Label,
   dangerConfirm,
 } from './_ui';
+import { colors } from '../../theme';
 
 function formatTime(seconds: number): string {
   if (seconds <= 0) return 'Expired';
@@ -37,16 +38,16 @@ function formatTime(seconds: number): string {
 function getStatusColor(status: string): string {
   switch (status) {
     case 'PENDING':
-      return '#19D3FF';
+      return '#0E8C7B';
     case 'LOCKED':
-      return '#E8A830';
+      return '#F59E0B';
     case 'CONFIRMED':
-      return '#4CAF50';
+      return '#0E8C7B';
     case 'EXPIRED':
     case 'REVOKED':
-      return '#F44336';
+      return '#DC2626';
     default:
-      return '#B9C6E4';
+      return colors.textSecondary;
   }
 }
 
@@ -135,10 +136,11 @@ export default function CirclesCreateInvite() {
                   marginBottom: 10,
                 }}
               >
-                <Text style={{ color: '#B9C6E4' }}>Time Remaining:</Text>
+                <Text maxFontSizeMultiplier={1.5} style={{ color: colors.textSecondary }}>Time Remaining:</Text>
                 <Text
+                  maxFontSizeMultiplier={1.5}
                   style={{
-                    color: timeLeft < 300 ? '#F44336' : '#D8E5FF',
+                    color: timeLeft < 300 ? '#DC2626' : colors.textPrimary,
                     fontWeight: '800',
                   }}
                 >
@@ -146,8 +148,9 @@ export default function CirclesCreateInvite() {
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text style={{ color: '#B9C6E4' }}>Status:</Text>
+                <Text maxFontSizeMultiplier={1.5} style={{ color: colors.textSecondary }}>Status:</Text>
                 <Text
+                  maxFontSizeMultiplier={1.5}
                   style={{
                     color: getStatusColor(invite.status),
                     fontWeight: '800',

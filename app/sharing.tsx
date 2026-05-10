@@ -129,8 +129,8 @@ export default function SharingScreen() {
       <View style={styles.header}>
         <View style={styles.headerSpacer} />
         <View>
-          <Text style={styles.headerTitle}>{t.sharing.title}</Text>
-          <Text style={styles.headerSubtitle}>{t.sharing.subtitle}</Text>
+          <Text maxFontSizeMultiplier={1.5} style={styles.headerTitle}>{t.sharing.title}</Text>
+          <Text maxFontSizeMultiplier={1.5} style={styles.headerSubtitle}>{t.sharing.subtitle}</Text>
         </View>
         <Pressable onPress={() => router.back()} style={styles.closeButton}>
           <X color={colors.textPrimary} size={24} />
@@ -144,18 +144,18 @@ export default function SharingScreen() {
             style={styles.addButton}
             onPress={() => setAddStep('name')}
           >
-            <UserPlus size={20} color="#00E5FF" />
-            <Text style={styles.addButtonText}>{t.sharing.addRecipient}</Text>
+            <UserPlus size={20} color="#0E8C7B" />
+            <Text maxFontSizeMultiplier={1.5} style={styles.addButtonText}>{t.sharing.addRecipient}</Text>
           </Pressable>
         )}
 
         {addStep === 'name' && (
           <View style={styles.addFlow}>
-            <Text style={styles.addFlowLabel}>{t.sharing.addRecipient}</Text>
+            <Text maxFontSizeMultiplier={1.5} style={styles.addFlowLabel}>{t.sharing.addRecipient}</Text>
             <TextInput
               style={styles.textInput}
               placeholder="Name"
-              placeholderTextColor="rgba(255,255,255,0.5)"
+              placeholderTextColor={colors.textTertiary}
               value={newName}
               onChangeText={setNewName}
               autoFocus
@@ -171,6 +171,7 @@ export default function SharingScreen() {
                   onPress={() => setNewRole(role)}
                 >
                   <Text
+                    maxFontSizeMultiplier={1.5}
                     style={[
                       styles.roleButtonText,
                       newRole === role && styles.roleButtonTextSelected,
@@ -186,14 +187,14 @@ export default function SharingScreen() {
                 style={styles.cancelButton}
                 onPress={() => setAddStep('closed')}
               >
-                <Text style={styles.cancelButtonText}>{t.sharing.cancel}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.cancelButtonText}>{t.sharing.cancel}</Text>
               </Pressable>
               <Pressable
                 style={[styles.confirmButton, !newName.trim() && styles.confirmButtonDisabled]}
                 onPress={handleAddRecipient}
                 disabled={!newName.trim()}
               >
-                <Text style={styles.confirmButtonText}>{t.sharing.confirm}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.confirmButtonText}>{t.sharing.confirm}</Text>
               </Pressable>
             </View>
           </View>
@@ -201,7 +202,7 @@ export default function SharingScreen() {
 
         {addStep === 'duration' && (
           <View style={styles.addFlow}>
-            <Text style={styles.addFlowLabel}>{t.sharing.durationLabel}</Text>
+            <Text maxFontSizeMultiplier={1.5} style={styles.addFlowLabel}>{t.sharing.durationLabel}</Text>
             <ShareDurationPicker
               selected={shareDuration}
               onSelect={setShareDuration}
@@ -215,13 +216,13 @@ export default function SharingScreen() {
                   setSelectedRecipientId(null);
                 }}
               >
-                <Text style={styles.cancelButtonText}>{t.sharing.cancel}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.cancelButtonText}>{t.sharing.cancel}</Text>
               </Pressable>
               <Pressable
                 style={styles.confirmButton}
                 onPress={handleCreateShare}
               >
-                <Text style={styles.confirmButtonText}>{t.sharing.createShare}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.confirmButtonText}>{t.sharing.createShare}</Text>
               </Pressable>
             </View>
           </View>
@@ -230,9 +231,9 @@ export default function SharingScreen() {
         {/* Recipients List */}
         {addStep === 'closed' && (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t.sharing.recipientsSection}</Text>
+            <Text maxFontSizeMultiplier={1.5} style={styles.sectionLabel}>{t.sharing.recipientsSection}</Text>
             {recipients.length === 0 ? (
-              <Text style={styles.emptyText}>{t.sharing.noRecipients}</Text>
+              <Text maxFontSizeMultiplier={1.5} style={styles.emptyText}>{t.sharing.noRecipients}</Text>
             ) : (
               recipients.map((recipient) => {
                 const hasActiveShare = activeShares.some(
@@ -256,14 +257,14 @@ export default function SharingScreen() {
         {/* Audit Log */}
         {addStep === 'closed' && auditLog.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t.sharing.auditSection}</Text>
+            <Text maxFontSizeMultiplier={1.5} style={styles.sectionLabel}>{t.sharing.auditSection}</Text>
             {auditLog.slice(0, 10).map((entry) => (
               <View key={entry.id} style={styles.auditRow}>
-                <Clock size={14} color="rgba(255,255,255,0.3)" />
-                <Text style={styles.auditText}>
+                <Clock size={14} color={colors.textTertiary} />
+                <Text maxFontSizeMultiplier={1.5} style={styles.auditText}>
                   {getAuditActionText(entry.action, entry.recipientName)}
                 </Text>
-                <Text style={styles.auditDate}>{formatAuditDate(entry.timestamp)}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.auditDate}>{formatAuditDate(entry.timestamp)}</Text>
               </View>
             ))}
           </View>
@@ -295,7 +296,7 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textAlign: 'center',
     marginTop: 2,
   },
@@ -311,17 +312,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     borderRadius: 12,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.3)',
+    borderColor: 'rgba(45,212,191,0.30)',
     marginBottom: spacing.lg,
   },
   addButtonText: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#00E5FF',
+    color: '#0E8C7B',
   },
   addFlow: {
     backgroundColor: colors.card,
@@ -334,17 +335,17 @@ const styles = StyleSheet.create({
   addFlowLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     marginBottom: spacing.md,
   },
   textInput: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: 10,
     padding: spacing.md,
     fontSize: 15,
     color: colors.textPrimary,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.hairline,
     marginBottom: spacing.md,
   },
   roleGrid: {
@@ -357,20 +358,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.hairline,
   },
   roleButtonSelected: {
-    backgroundColor: 'rgba(0,229,255,0.15)',
-    borderColor: '#00E5FF',
+    backgroundColor: 'rgba(45,212,191,0.15)',
+    borderColor: '#2DD4BF',
   },
   roleButtonText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   roleButtonTextSelected: {
-    color: '#00E5FF',
+    color: '#0E8C7B',
     fontWeight: '500',
   },
   addFlowActions: {
@@ -381,18 +382,18 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: spacing.md,
     borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     alignItems: 'center',
   },
   cancelButtonText: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   confirmButton: {
     flex: 1,
     padding: spacing.md,
     borderRadius: 10,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     alignItems: 'center',
   },
   confirmButtonDisabled: {
@@ -401,7 +402,7 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#000',
+    color: '#FFFFFF',
   },
   section: {
     marginBottom: spacing.xl,
@@ -409,14 +410,14 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.35)',
+    color: colors.textTertiary,
     letterSpacing: 1,
     marginBottom: spacing.sm,
     marginLeft: spacing.xs,
   },
   emptyText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     fontStyle: 'italic',
     textAlign: 'center',
     paddingVertical: spacing.lg,
@@ -427,16 +428,16 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: colors.hairline,
   },
   auditText: {
     flex: 1,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
   },
   auditDate: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textTertiary,
   },
   bottomSpacer: {
     height: spacing.xl,

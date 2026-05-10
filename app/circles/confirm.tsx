@@ -26,6 +26,7 @@ import {
   Label,
   dangerConfirm,
 } from './_ui';
+import { colors } from '../../theme';
 
 export default function CirclesConfirm() {
   const router = useRouter();
@@ -118,8 +119,8 @@ export default function CirclesConfirm() {
     return (
       <Screen title="Final Handshake">
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 40 }}>
-          <ActivityIndicator size="large" color="#19D3FF" />
-          <Text style={{ color: '#8899AA', marginTop: 12 }}>Loading...</Text>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text maxFontSizeMultiplier={1.5} style={{ color: colors.textSecondary, marginTop: 12 }}>Loading...</Text>
         </View>
       </Screen>
     );
@@ -144,8 +145,9 @@ export default function CirclesConfirm() {
               <Label>Confirm connection with:</Label>
               <View style={{ marginTop: 10, alignItems: 'center', paddingVertical: 16 }}>
                 <Text
+                  maxFontSizeMultiplier={1.5}
                   style={{
-                    color: '#19D3FF',
+                    color: '#0E8C7B',
                     fontSize: 28,
                     fontWeight: '900',
                   }}

@@ -63,20 +63,20 @@ export default function CircleSettingsScreen() {
           <Pressable onPress={() => router.back()} style={styles.closeButton}>
             <X color={colors.textPrimary} size={24} />
           </Pressable>
-          <Text style={styles.headerTitle}>Circle Membership</Text>
+          <Text maxFontSizeMultiplier={1.5} style={styles.headerTitle}>Circle Membership</Text>
           <View style={styles.headerSpacer} />
         </View>
         <View style={styles.emptyState}>
-          <Users color="rgba(255,255,255,0.3)" size={48} />
-          <Text style={styles.emptyStateText}>No Active Circle</Text>
-          <Text style={styles.emptyStateSubtext}>
+          <Users color={colors.textTertiary} size={48} />
+          <Text maxFontSizeMultiplier={1.5} style={styles.emptyStateText}>No Active Circle</Text>
+          <Text maxFontSizeMultiplier={1.5} style={styles.emptyStateSubtext}>
             Join or create a Circle from the Pricing page
           </Text>
           <Pressable
             style={styles.upgradeButton}
             onPress={() => router.push('/upgrade')}
           >
-            <Text style={styles.upgradeButtonText}>View Plans</Text>
+            <Text maxFontSizeMultiplier={1.5} style={styles.upgradeButtonText}>View Plans</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -89,7 +89,7 @@ export default function CircleSettingsScreen() {
         <Pressable onPress={() => router.back()} style={styles.closeButton}>
           <X color={colors.textPrimary} size={24} />
         </Pressable>
-        <Text style={styles.headerTitle}>Circle Membership</Text>
+        <Text maxFontSizeMultiplier={1.5} style={styles.headerTitle}>Circle Membership</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -99,18 +99,18 @@ export default function CircleSettingsScreen() {
           <View style={styles.circleCard}>
             <View style={styles.circleHeader}>
               <View style={styles.circleIconContainer}>
-                <Users color="#00E5FF" size={24} />
+                <Users color="#0E8C7B" size={24} />
               </View>
               <View style={styles.circleInfo}>
-                <Text style={styles.circleName}>{circleName}</Text>
-                <Text style={styles.circleMeta}>{memberCount} members</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.circleName}>{circleName}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.circleMeta}>{memberCount} members</Text>
               </View>
             </View>
 
             {/* Role Badge */}
             <View style={styles.roleBadge}>
-              <UserCheck color="#10B981" size={14} />
-              <Text style={styles.roleBadgeText}>{circleRole}</Text>
+              <UserCheck color="#0E8C7B" size={14} />
+              <Text maxFontSizeMultiplier={1.5} style={styles.roleBadgeText}>{circleRole}</Text>
             </View>
           </View>
         </Animated.View>
@@ -118,27 +118,27 @@ export default function CircleSettingsScreen() {
         {/* Actions */}
         <Animated.View entering={FadeInDown.delay(100).duration(400)}>
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>ACTIONS</Text>
+            <Text maxFontSizeMultiplier={1.5} style={styles.sectionLabel}>ACTIONS</Text>
 
             {/* View Circle */}
             <Pressable style={styles.actionRow} onPress={handleViewCircle}>
               <View style={styles.actionIconContainer}>
-                <ExternalLink color="#00E5FF" size={18} />
+                <ExternalLink color="#0E8C7B" size={18} />
               </View>
               <View style={styles.actionContent}>
-                <Text style={styles.actionLabel}>View Circle</Text>
-                <Text style={styles.actionSublabel}>Open in Briefings tab</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.actionLabel}>View Circle</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.actionSublabel}>Open in Briefings tab</Text>
               </View>
             </Pressable>
 
             {/* Privacy Info */}
             <Pressable style={styles.actionRow} onPress={() => router.push('/security-controls')}>
               <View style={styles.actionIconContainer}>
-                <Shield color="rgba(255,255,255,0.5)" size={18} />
+                <Shield color={colors.textSecondary} size={18} />
               </View>
               <View style={styles.actionContent}>
-                <Text style={styles.actionLabel}>Privacy & Permissions</Text>
-                <Text style={styles.actionSublabel}>What Circle members can see</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.actionLabel}>Privacy & Permissions</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.actionSublabel}>What Circle members can see</Text>
               </View>
             </Pressable>
           </View>
@@ -147,8 +147,8 @@ export default function CircleSettingsScreen() {
         {/* Info Box */}
         <Animated.View entering={FadeInDown.delay(300).duration(400)}>
           <View style={styles.infoBox}>
-            <Text style={styles.infoTitle}>About Circles</Text>
-            <Text style={styles.infoText}>
+            <Text maxFontSizeMultiplier={1.5} style={styles.infoTitle}>About Circles</Text>
+            <Text maxFontSizeMultiplier={1.5} style={styles.infoText}>
               Circles enable trusted groups to share capacity awareness without exposing
               individual data. Each member controls what they share.
             </Text>
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
+    borderBottomColor: colors.hairline,
   },
   closeButton: {
     padding: spacing.xs,
@@ -197,12 +197,12 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
     marginTop: spacing.md,
   },
   emptyStateSubtext: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginTop: spacing.xs,
     textAlign: 'center',
   },
@@ -210,20 +210,20 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     borderRadius: borderRadius.md,
   },
   upgradeButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
+    color: '#FFFFFF',
   },
   circleCard: {
     backgroundColor: colors.card,
     borderRadius: 12,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.3)',
+    borderColor: colors.cardBorder,
     marginBottom: spacing.lg,
   },
   circleHeader: {
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.12)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -249,14 +249,14 @@ const styles = StyleSheet.create({
   },
   circleMeta: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   roleBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(16,185,129,0.15)',
+    backgroundColor: 'rgba(45,212,191,0.12)',
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 12,
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   roleBadgeText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#10B981',
+    color: '#0E8C7B',
   },
   section: {
     marginBottom: spacing.lg,
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.35)',
+    color: colors.textTertiary,
     letterSpacing: 0.5,
     marginBottom: spacing.sm,
   },
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -303,11 +303,11 @@ const styles = StyleSheet.create({
   actionLabel: {
     fontSize: 15,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   actionSublabel: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginTop: 2,
   },
   dangerRow: {
@@ -317,13 +317,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(244,67,54,0.3)',
+    borderColor: 'rgba(220,38,38,0.3)',
   },
   dangerIconContainer: {
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: 'rgba(244,67,54,0.1)',
+    backgroundColor: 'rgba(220,38,38,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -331,15 +331,15 @@ const styles = StyleSheet.create({
   dangerLabel: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#F44336',
+    color: '#DC2626',
   },
   dangerSublabel: {
     fontSize: 12,
-    color: 'rgba(244,67,54,0.6)',
+    color: 'rgba(220,38,38,0.6)',
     marginTop: 2,
   },
   infoBox: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: 12,
     padding: spacing.md,
     marginTop: spacing.sm,
@@ -347,12 +347,12 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
   infoText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     lineHeight: 20,
   },
 });
