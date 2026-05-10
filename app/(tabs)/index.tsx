@@ -46,6 +46,8 @@ import { useAppMode } from '../../lib/hooks/useAppMode';
 import { useTutorial } from '../../lib/hooks/useTutorial';
 import { useSubscription, shouldBypassSubscription } from '../../lib/subscription';
 import { useGlassStyle } from '../../lib/hooks/useAccessibility';
+import { useOptionalSubBrand } from '../../lib/platform/SubBrandProvider';
+import { recordAuditEvent } from '../../lib/platform/trustCore';
 import { Locale } from '../../locales';
 
 function formatDate(locale: Locale): string {
@@ -81,6 +83,12 @@ export default function HomeScreen() {
   // The signalBar is one of the most prominent glass surfaces on the home tab —
   // demoing the useGlassStyle() pattern here.
   const glassStyle = useGlassStyle();
+  // Sub-brand posture — when auditLogging is on (workspace/enterprise/health/
+  // edu/gov), capacity saves emit an audit event. `useOptionalSubBrand`
+  // returns null if the home tab is somehow rendered above the provider —
+  // we degrade silently rather than crash.
+  const subBrandCtx = useOptionalSubBrand();
+  const posture = subBrandCtx?.posture;
   const bypassesSubscription = shouldBypassSubscription(currentMode);
   const canLogSignal = bypassesSubscription || isPro || !hasHitSignalLimit;
   const [currentState, setCurrentState] = useState<CapacityState | null>(null);
@@ -238,6 +246,17 @@ export default function HomeScreen() {
         const tags = selectedCategory ? [selectedCategory] : [];
         const trimmedNote = note.trim() || undefined;
         await saveEntry(currentState, tags, trimmedNote, trimmedNote);
+        // Posture-driven audit hook. Currently only one representative call
+        // — full coverage (memory edits, permission grants, etc.) is a
+        // followup. Wrapped in try/catch so audit failures never break the
+        // primary save flow.
+        if (posture?.auditLogging) {
+          try {
+            await recordAuditEvent({ action: 'capacity.log', target: 'self' });
+          } catch (err) {
+            if (__DEV__) console.warn('[home] audit failed', err);
+          }
+        }
         // HIG: confirm successful capacity log with a system success haptic (iOS only).
         if (Platform.OS === 'ios') {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
@@ -253,7 +272,7 @@ export default function HomeScreen() {
         setIsSaving(false);
       }
     }
-  }, [currentState, selectedCategory, note, isSaving, saveEntry, canLogSignal]);
+  }, [currentState, selectedCategory, note, isSaving, saveEntry, canLogSignal, posture]);
 
   if (tutorialLoading) {
     return (

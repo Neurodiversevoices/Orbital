@@ -5,6 +5,7 @@ import { Home, BarChart2, FileText } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../../theme';
 import { useAuth } from '../../lib/supabase';
+import { useBrandAccent } from '../../lib/platform/useBrandAccent';
 import { isProfileSetupComplete } from '../profile-setup';
 
 // HIG: light selection haptic on tab change. iOS-only — Android haptic API parity is inconsistent.
@@ -19,6 +20,9 @@ const tabPressListeners = { tabPress: tabPressHaptic };
 export default function TabLayout() {
   const router = useRouter();
   const auth = useAuth();
+  // Active tab indicator follows the selected sub-brand. Falls back to the
+  // canonical Orbital teal when no SubBrandProvider context is available.
+  const brandAccent = useBrandAccent();
   const [checkingSetup, setCheckingSetup] = useState(true);
 
   // Check if B2C user needs profile setup
@@ -55,7 +59,7 @@ export default function TabLayout() {
           paddingBottom: 8,
           paddingTop: 8,
         },
-        tabBarActiveTintColor: colors.accent,
+        tabBarActiveTintColor: brandAccent || colors.accent,
         tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.4)',
         tabBarShowLabel: false,
       }}

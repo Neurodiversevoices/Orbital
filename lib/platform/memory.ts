@@ -16,6 +16,7 @@
 import { useEffect, useState } from 'react';
 
 import type { MemoryRecord, MemoryScope } from './types';
+import { useOptionalSubBrand } from './SubBrandProvider';
 
 // =============================================================================
 // IN-MEMORY STORE (until backend wired)
@@ -65,16 +66,38 @@ let TEMPORARY_CHAT_ENABLED = false;
  *   - subscribe to Supabase realtime updates on the user's memory rows
  *   - filter by tenant when posture.tenancyIsolation is true
  *   - never return ephemeral records older than the current session
+ *
+ * Posture enforcement: when the active sub-brand's posture has
+ * `memoryDefault === 'off'` (the case for ALL 6 brands today), the
+ * `implicit` scope returns an empty list regardless of stored data.
+ * Implicit memory is the inferred-pattern layer — keeping it dark by
+ * default is the conservative privacy stance our regulated tiers expect.
+ * The user can still opt-in per scope via the Memory dashboard.
+ *
+ * Other scopes (ephemeral / workspace / profile) are unchanged here —
+ * they have their own per-scope toggles surfaced in the dashboard.
  */
 export function useMemory(scope: MemoryScope): MemoryRecord[] {
+  const subBrandCtx = useOptionalSubBrand();
+  const memoryDefault = subBrandCtx?.posture.memoryDefault ?? 'off';
+  // When memory is off by posture and the caller is reading the implicit
+  // scope, short-circuit before we ever hit the (eventually Supabase-backed)
+  // store. This is the wire that makes brand selection actually shut down
+  // implicit pattern recall, not just hide the toggle.
+  const isImplicitOff = scope === 'implicit' && memoryDefault === 'off';
+
   const [records, setRecords] = useState<MemoryRecord[]>(() =>
-    MOCK_RECORDS.filter((r) => r.scope === scope),
+    isImplicitOff ? [] : MOCK_RECORDS.filter((r) => r.scope === scope),
   );
 
   useEffect(() => {
     // TODO: wire to Supabase / AsyncStorage. For now, recompute when scope flips.
+    if (isImplicitOff) {
+      setRecords([]);
+      return;
+    }
     setRecords(MOCK_RECORDS.filter((r) => r.scope === scope));
-  }, [scope]);
+  }, [scope, isImplicitOff]);
 
   return records;
 }

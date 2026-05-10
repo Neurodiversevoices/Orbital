@@ -23,6 +23,7 @@ layers ON TOP of the current app.
 | `SubBrandProvider.tsx` | React context + AsyncStorage persistence (`orbital.subBrand`) | DONE |
 | `trustCore.ts` | `useTrustPosture`, `recordAuditEvent`, `requestPermissionGrant`, `revokeGrant` | SKELETON (TODOs) |
 | `memory.ts` | `useMemory`, `editMemory`, `deleteMemory`, `clearScope`, `setTemporaryChat` | SKELETON (TODOs) |
+| `useBrandAccent.ts` | `useBrandAccent()` — returns the active brand's themeAccent (with safe fallback) | DONE |
 
 ## Routes
 
@@ -74,6 +75,67 @@ Memory default is **off** for every tier — opt-in only.
   a no-op).
 - `app/(platform)/audit.tsx` → swap mock data for `audit_events` query.
 - `app/(platform)/permissions.tsx` → swap mock data for grants query.
+
+## Brand selection now affects behavior
+
+Selecting a sub-brand on `/sub-brand` (or programmatically via
+`useSubBrand().setBrand(id)`) is no longer a cosmetic-only choice — it
+now drives runtime behavior across the app:
+
+### 1. Theme accent (`useBrandAccent`)
+
+`lib/platform/useBrandAccent.ts` exposes a single hook that returns the
+current brand's `themeAccent` (capacity-spectrum hex) with a safe fallback
+to `#2DD4BF` whenever the SubBrandProvider is unavailable. Three
+representative surfaces are wired:
+
+| Surface | File | Effect |
+|---|---|---|
+| Active tab indicator | `app/(tabs)/_layout.tsx` | `tabBarActiveTintColor` follows brand |
+| Composer primary button | `components/Composer.tsx` | Default accent (when no `accentColor` prop) follows brand |
+| Settings header chip | `app/settings.tsx` | Logo orb + border tint follows brand (demo mode still wins) |
+
+The capacity spectrum on the orb (`crimson → amber → teal → cyan`) is
+fixed and unchanged — only the *accent* shifts. Primary teal stays teal.
+
+### 2. Audit logging (`posture.auditLogging`)
+
+- `SubBrandProvider.setBrand` now fires
+  `recordAuditEvent({ action: 'subbrand.set', target: brand })` on every
+  brand switch (wrapped in try/catch — audit never blocks the UI).
+- `app/(tabs)/index.tsx` `handleSave` fires
+  `recordAuditEvent({ action: 'capacity.log', target: 'self' })` when
+  `posture.auditLogging === true`. This is one representative call —
+  full coverage (memory edits, permission grants, etc.) is a followup.
+
+`recordAuditEvent` accepts a partial input (`{ action, target }`) and
+auto-fills `id`, `actor`, and `timestamp`. The full `AuditEvent` shape
+is still accepted for callers that already have one.
+
+### 3. Memory default (`posture.memoryDefault`)
+
+`memory.useMemory(scope)` now consults the active posture. When
+`memoryDefault === 'off'` (the case for ALL 6 brands today), the
+`implicit` scope returns `[]` — the inferred-pattern layer stays dark
+without an explicit user opt-in. Other scopes are unchanged.
+
+### 4. Compliance mode chip
+
+`app/(platform)/_layout.tsx` renders the compliance chip whenever
+`posture.complianceMode !== 'none'`. Labels are humanized
+(`SOC 2`, `HIPAA`, `FERPA`, `FedRAMP`) and carry an accessibility label.
+
+### 5. Tenancy isolation note
+
+`app/(platform)/memory.tsx` shows a "Workspace-scoped · Tenant isolated"
+chip above the memory list when `posture.tenancyIsolation === true`.
+Visual reassurance only — the SQL itself is already user-scoped.
+
+### Default behavior preserved
+
+The default brand is `personal`. Its posture is the most permissive
+(no audit, no tenancy, no compliance), so users who never visit the
+sub-brand picker see *zero* behavior change.
 
 ## Constraints honored
 

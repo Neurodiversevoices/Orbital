@@ -20,6 +20,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors, spacing, borderRadius } from '../theme';
 import { useGlassStyle } from '../lib/hooks/useAccessibility';
+import { useBrandAccent } from '../lib/platform/useBrandAccent';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -32,6 +33,12 @@ interface ComposerProps {
   onChangeText: (text: string) => void;
   onSubmit: () => void;
   placeholder?: string;
+  /**
+   * Optional explicit accent override. When omitted, the Composer pulls
+   * the active sub-brand's themeAccent via `useBrandAccent` (with a safe
+   * fallback to the canonical Orbital teal). The capacity-state caller on
+   * the home tab still passes the per-state color, which wins.
+   */
   accentColor?: string;
   canSubmit?: boolean;
   isSubmitting?: boolean;
@@ -43,12 +50,17 @@ export function Composer({
   onChangeText,
   onSubmit,
   placeholder = 'Add details...',
-  accentColor = colors.accent,
+  accentColor,
   canSubmit = false,
   isSubmitting = false,
   keyboardVisible = false,
 }: ComposerProps) {
   const insets = useSafeAreaInsets();
+  // Brand-aware default: when no explicit accent prop is given, tint the
+  // primary submit affordance with the active sub-brand color. Existing
+  // callers that pass `accentColor` are unaffected.
+  const brandAccent = useBrandAccent();
+  const effectiveAccent = accentColor ?? brandAccent ?? colors.accent;
   // Audit Phase 5 followup B4: card surface honors Reduce Transparency.
   const glassStyle = useGlassStyle();
   const inputRef = useRef<TextInput>(null);
@@ -110,8 +122,8 @@ export function Composer({
 
   const buttonStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
-    backgroundColor: canSubmit ? `${accentColor}20` : 'rgba(255,255,255,0.05)',
-    borderColor: canSubmit ? accentColor : 'rgba(255,255,255,0.1)',
+    backgroundColor: canSubmit ? `${effectiveAccent}20` : 'rgba(255,255,255,0.05)',
+    borderColor: canSubmit ? effectiveAccent : 'rgba(255,255,255,0.1)',
     opacity: isSubmitting ? 0.5 : 1,
   }));
 
@@ -144,10 +156,10 @@ export function Composer({
         { paddingBottom: Math.max(insets.bottom, spacing.sm) },
       ]}
     >
-      <View style={[styles.card, glassStyle, { borderColor: `${accentColor}30` }]}>
+      <View style={[styles.card, glassStyle, { borderColor: `${effectiveAccent}30` }]}>
         <TextInput
           ref={inputRef}
-          style={[styles.input, { borderColor: `${accentColor}20` }]}
+          style={[styles.input, { borderColor: `${effectiveAccent}20` }]}
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
@@ -171,7 +183,7 @@ export function Composer({
         >
           <Check
             size={24}
-            color={canSubmit ? accentColor : 'rgba(255,255,255,0.3)'}
+            color={canSubmit ? effectiveAccent : 'rgba(255,255,255,0.3)'}
             strokeWidth={2.5}
           />
         </AnimatedPressable>

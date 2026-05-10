@@ -30,6 +30,7 @@ import {
   setTemporaryChat,
   useMemory,
 } from '../../lib/platform/memory';
+import { useSubBrand } from '../../lib/platform/SubBrandProvider';
 import type { MemoryRecord, MemoryScope } from '../../lib/platform/types';
 
 const BACKGROUND = '#01020A';
@@ -220,6 +221,7 @@ function ScopeSection({ meta }: ScopeSectionProps): React.ReactElement {
 
 export default function MemoryDashboardScreen(): React.ReactElement {
   const [tempChat, setTempChat] = useState<boolean>(false);
+  const { posture } = useSubBrand();
 
   const handleTempChat = useCallback((next: boolean): void => {
     setTempChat(next);
@@ -232,6 +234,20 @@ export default function MemoryDashboardScreen(): React.ReactElement {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
+        {/* TENANT ISOLATION NOTE — visible reassurance for regulated tiers.
+            The query itself is already scoped server-side by user_id; this
+            chip only communicates the posture, it does not change any read. */}
+        {posture.tenancyIsolation ? (
+          <View
+            style={styles.tenancyNote}
+            accessibilityLabel="Workspace-scoped memory · tenant isolated"
+          >
+            <Text style={styles.tenancyNoteText}>
+              Workspace-scoped · Tenant isolated
+            </Text>
+          </View>
+        ) : null}
+
         {/* GLOBAL TEMPORARY CHAT */}
         <View style={styles.heroCard}>
           <View style={{ flex: 1 }}>
@@ -269,6 +285,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingTop: 16,
     paddingBottom: 64,
+  },
+
+  tenancyNote: {
+    backgroundColor: GLASS_BG,
+    borderColor: GLASS_BORDER,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 12,
+    alignItems: 'flex-start',
+  },
+  tenancyNoteText: {
+    fontFamily: 'SpaceMono_400Regular',
+    fontSize: 10,
+    letterSpacing: 1.6,
+    color: TEXT_SECONDARY,
+    textTransform: 'uppercase',
   },
 
   heroCard: {

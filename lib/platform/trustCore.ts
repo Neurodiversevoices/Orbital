@@ -48,16 +48,39 @@ export function useTrustPosture(): TrustPosture {
 const auditQueue: AuditEvent[] = [];
 
 /**
+ * Input shape accepted by `recordAuditEvent`. Callers only need to
+ * provide `action` and `target`; the helper fills in `id`, `actor`,
+ * and `timestamp` defaults so call-sites stay terse.
+ */
+export type AuditEventInput =
+  | AuditEvent
+  | (Pick<AuditEvent, 'action' | 'target'> & Partial<AuditEvent>);
+
+/**
  * Record an audit event. Best-effort — failures are warned, never thrown.
  *
  * Contract:
  *   1. Event is enqueued locally (synchronous, never fails).
  *   2. We attempt to flush to Supabase `audit_events`.
  *   3. On flush failure the event remains in the queue for retry.
+ *
+ * Accepts either a full AuditEvent or a partial `{ action, target }` —
+ * missing id/actor/timestamp are auto-filled. This keeps caller ergonomics
+ * tight (e.g. `recordAuditEvent({ action: 'subbrand.set', target: id })`).
  */
-export async function recordAuditEvent(event: AuditEvent): Promise<void> {
+export async function recordAuditEvent(event: AuditEventInput): Promise<void> {
   try {
-    auditQueue.push(event);
+    const filled: AuditEvent = {
+      id:
+        event.id ??
+        `evt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      actor: event.actor ?? 'self',
+      action: event.action,
+      target: event.target,
+      timestamp: event.timestamp ?? new Date().toISOString(),
+      metadata: event.metadata,
+    };
+    auditQueue.push(filled);
     // TODO: wire to lib/supabase/auditLog.ts → insert into audit_events.
     // TODO: respect TrustPosture.auditLogging — skip flush when false.
     // TODO: drain queue on app foreground + on auth.

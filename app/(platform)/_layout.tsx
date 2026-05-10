@@ -21,9 +21,22 @@ const BACKGROUND = '#01020A';
 // HEADER CHIP — shows current sub-brand + posture badges
 // =============================================================================
 
+/**
+ * Display label for each ComplianceMode. Keeps the chip readable —
+ * "SOC2" → "SOC 2", everything else uppercased as-is.
+ */
+const COMPLIANCE_LABELS: Record<string, string> = {
+  soc2: 'SOC 2',
+  hipaa: 'HIPAA',
+  ferpa: 'FERPA',
+  fedramp: 'FedRAMP',
+};
+
 function SubBrandChip(): React.ReactElement {
   const { config } = useSubBrand();
   const { complianceMode, auditLogging, tenancyIsolation } = config.posture;
+  const complianceLabel =
+    COMPLIANCE_LABELS[complianceMode] ?? complianceMode.toUpperCase();
 
   return (
     <View style={styles.chipRow} accessibilityRole="header">
@@ -38,10 +51,11 @@ function SubBrandChip(): React.ReactElement {
       </View>
 
       {complianceMode !== 'none' ? (
-        <View style={styles.postureBadge}>
-          <Text style={styles.postureText}>
-            {complianceMode.toUpperCase()}
-          </Text>
+        <View
+          style={styles.postureBadge}
+          accessibilityLabel={`Compliance mode: ${complianceLabel}`}
+        >
+          <Text style={styles.postureText}>{complianceLabel}</Text>
         </View>
       ) : null}
 

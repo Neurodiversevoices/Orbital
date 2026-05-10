@@ -52,6 +52,7 @@ import { APP_MODE_CONFIGS } from '../types';
 import { ModeSelector } from '../components';
 import { getUserEntitlements, type UserEntitlements } from '../lib/entitlements';
 import { useGlassStyle } from '../lib/hooks/useAccessibility';
+import { useBrandAccent } from '../lib/platform/useBrandAccent';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -88,6 +89,11 @@ export default function SettingsScreen() {
   const [entitlements, setEntitlements] = useState<UserEntitlements | null>(null);
   // Audit Phase 5 followup B4: about card honors Reduce Transparency.
   const glassStyle = useGlassStyle();
+
+  // Settings header chip color follows the active sub-brand. Demo mode
+  // still wins (amber) — the chip only repaints when not in demo.
+  const brandAccent = useBrandAccent();
+  const headerChipColor = isDemoMode ? '#F59E0B' : (brandAccent || '#00E5FF');
 
   // Load entitlements for Circle membership check
   useEffect(() => {
@@ -221,8 +227,14 @@ export default function SettingsScreen() {
       <View style={styles.header}>
         <View style={styles.headerSpacer} />
         <View style={styles.logoContainer}>
-          <View style={[styles.logoOrb, isDemoMode && styles.logoOrbDemo]}>
-            <View style={[styles.logoInner, { backgroundColor: isDemoMode ? '#F59E0B' : '#00E5FF' }]} />
+          <View
+            style={[
+              styles.logoOrb,
+              isDemoMode && styles.logoOrbDemo,
+              !isDemoMode && { borderColor: `${headerChipColor}55` },
+            ]}
+          >
+            <View style={[styles.logoInner, { backgroundColor: headerChipColor }]} />
           </View>
         </View>
         <Pressable

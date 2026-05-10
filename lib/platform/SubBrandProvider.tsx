@@ -24,6 +24,7 @@ import {
   SUB_BRAND_CONFIGS,
   getSubBrandConfig,
 } from './subBrandConfig';
+import { recordAuditEvent } from './trustCore';
 
 // =============================================================================
 // CONSTANTS
@@ -103,6 +104,15 @@ export function SubBrandProvider({
       await AsyncStorage.setItem(STORAGE_KEY, next);
     } catch (err) {
       console.warn('[SubBrandProvider] persist failed', err);
+    }
+    // Record the brand switch as an audit event. This is safe to call even
+    // while trustCore is stubbed — the queue accepts entries and warns on
+    // failure rather than throwing. Wrapped in try/catch so a misbehaving
+    // audit path can never block a user-facing brand change.
+    try {
+      await recordAuditEvent({ action: 'subbrand.set', target: next });
+    } catch (err) {
+      console.warn('[SubBrandProvider] audit failed', err);
     }
   }, []);
 
