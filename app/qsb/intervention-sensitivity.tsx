@@ -46,9 +46,9 @@ const INTERVENTION_LABELS: Record<InterventionType, string> = {
 };
 
 const CONFIDENCE_COLORS: Record<ConfidenceLevel, string> = {
-  high: '#00D7FF',
-  medium: '#F5B700',
-  low: 'rgba(255,255,255,0.5)',
+  high: '#0E8C7B',
+  medium: '#F59E0B',
+  low: 'rgba(15,22,36,0.38)',
 };
 
 export default function InterventionSensitivityScreen() {
@@ -69,9 +69,9 @@ export default function InterventionSensitivityScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <ChevronLeft color="rgba(255,255,255,0.7)" size={24} />
+          <ChevronLeft color={colors.textSecondary} size={24} />
         </Pressable>
-        <Text style={styles.headerTitle}>Intervention Sensitivity</Text>
+        <Text style={styles.headerTitle} maxFontSizeMultiplier={1.5}>Intervention Sensitivity</Text>
         <View style={styles.headerRight}>
           <ScopeSelectorCompact scope={scope} onScopeChange={setScope} />
         </View>
