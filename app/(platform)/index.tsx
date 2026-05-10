@@ -23,13 +23,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 
 import { useSubBrand } from '../../lib/platform/SubBrandProvider';
+import { colors } from '../../theme/colors';
 
-const BACKGROUND = '#01020A';
-const TEAL = '#2DD4BF';
-const GLASS_BG = 'rgba(255,255,255,0.07)';
-const GLASS_BORDER = 'rgba(255,255,255,0.15)';
-const TEXT_PRIMARY = '#FFFFFF';
-const TEXT_SECONDARY = 'rgba(255,255,255,0.7)';
+const TEAL = colors.primary;
 
 // =============================================================================
 // LAYER CARD
@@ -56,13 +52,20 @@ function LayerCard({
     >
       <View style={styles.cardHeader}>
         <View style={[styles.layerBadge, { borderColor: accent }]}>
-          <Text style={[styles.layerBadgeText, { color: accent }]}>
+          <Text
+            style={[styles.layerBadgeText, { color: accent }]}
+            maxFontSizeMultiplier={1.5}
+          >
             LAYER {index}
           </Text>
         </View>
-        <Text style={styles.cardTitle}>{title}</Text>
+        <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>
+          {title}
+        </Text>
       </View>
-      <Text style={styles.cardBody}>{body}</Text>
+      <Text style={styles.cardBody} maxFontSizeMultiplier={1.5}>
+        {body}
+      </Text>
     </View>
   );
 }
@@ -83,9 +86,13 @@ export default function PlatformLandingScreen(): React.ReactElement {
       >
         {/* HERO */}
         <View style={styles.hero}>
-          <Text style={styles.eyebrow}>HUMAN-CAPACITY INTELLIGENCE</Text>
-          <Text style={styles.heroTitle}>The Orbital Platform</Text>
-          <Text style={styles.heroSubtitle}>
+          <Text style={styles.eyebrow} maxFontSizeMultiplier={1.5}>
+            HUMAN-CAPACITY INTELLIGENCE
+          </Text>
+          <Text style={styles.heroTitle} maxFontSizeMultiplier={1.5}>
+            The Orbital Platform
+          </Text>
+          <Text style={styles.heroSubtitle} maxFontSizeMultiplier={1.5}>
             Three layers. One orb. {config.tagline}
           </Text>
 
@@ -110,7 +117,9 @@ export default function PlatformLandingScreen(): React.ReactElement {
 
         {/* LAYERS */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>ARCHITECTURE</Text>
+          <Text style={styles.sectionLabel} maxFontSizeMultiplier={1.5}>
+            ARCHITECTURE
+          </Text>
           <View style={styles.cardStack}>
             <LayerCard
               index={1}
@@ -135,7 +144,9 @@ export default function PlatformLandingScreen(): React.ReactElement {
 
         {/* CTAs */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>EXPLORE</Text>
+          <Text style={styles.sectionLabel} maxFontSizeMultiplier={1.5}>
+            EXPLORE
+          </Text>
 
           <Pressable
             accessibilityRole="button"
@@ -146,7 +157,9 @@ export default function PlatformLandingScreen(): React.ReactElement {
             ]}
             onPress={() => router.push('/(platform)/sub-brand')}
           >
-            <Text style={styles.primaryButtonText}>Pick your tier</Text>
+            <Text style={styles.primaryButtonText} maxFontSizeMultiplier={1.5}>
+              Pick your tier
+            </Text>
           </Pressable>
 
           <View style={styles.linkRow}>
@@ -159,7 +172,12 @@ export default function PlatformLandingScreen(): React.ReactElement {
               ]}
               onPress={() => router.push('/(platform)/memory')}
             >
-              <Text style={styles.secondaryButtonText}>Memory</Text>
+              <Text
+                style={styles.secondaryButtonText}
+                maxFontSizeMultiplier={1.5}
+              >
+                Memory
+              </Text>
             </Pressable>
 
             <Pressable
@@ -171,7 +189,12 @@ export default function PlatformLandingScreen(): React.ReactElement {
               ]}
               onPress={() => router.push('/(platform)/permissions')}
             >
-              <Text style={styles.secondaryButtonText}>Permissions</Text>
+              <Text
+                style={styles.secondaryButtonText}
+                maxFontSizeMultiplier={1.5}
+              >
+                Permissions
+              </Text>
             </Pressable>
 
             <Pressable
@@ -183,7 +206,12 @@ export default function PlatformLandingScreen(): React.ReactElement {
               ]}
               onPress={() => router.push('/(platform)/audit')}
             >
-              <Text style={styles.secondaryButtonText}>Audit</Text>
+              <Text
+                style={styles.secondaryButtonText}
+                maxFontSizeMultiplier={1.5}
+              >
+                Audit
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -197,7 +225,7 @@ export default function PlatformLandingScreen(): React.ReactElement {
 // =============================================================================
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: BACKGROUND },
+  safe: { flex: 1, backgroundColor: colors.background },
   scroll: {
     paddingHorizontal: 32,
     paddingTop: 16,
@@ -212,7 +240,7 @@ const styles = StyleSheet.create({
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 11,
     letterSpacing: 1.76, // 0.16em on 11px
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     marginBottom: 8,
   },
@@ -220,13 +248,13 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_500Medium',
     fontWeight: '500',
     fontSize: 32,
-    color: TEXT_PRIMARY,
+    color: colors.textPrimary,
     textAlign: 'center',
   },
   heroSubtitle: {
     fontFamily: 'DMSans_400Regular',
     fontSize: 15,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
     textAlign: 'center',
     marginTop: 8,
     paddingHorizontal: 16,
@@ -252,7 +280,7 @@ const styles = StyleSheet.create({
     height: 110,
     borderRadius: 55,
     opacity: 0.85,
-    shadowOpacity: 0.6,
+    shadowOpacity: 0.35,
     shadowRadius: 40,
     shadowOffset: { width: 0, height: 0 },
   },
@@ -264,7 +292,7 @@ const styles = StyleSheet.create({
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 11,
     letterSpacing: 1.76,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     marginBottom: 12,
   },
@@ -272,11 +300,15 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   card: {
-    backgroundColor: GLASS_BG,
-    borderColor: GLASS_BORDER,
+    backgroundColor: colors.card,
+    borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 14,
     padding: 16,
+    shadowColor: colors.cardShadow,
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
   },
   cardHeader: {
     flexDirection: 'row',
@@ -299,14 +331,14 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_500Medium',
     fontWeight: '500',
     fontSize: 18,
-    color: TEXT_PRIMARY,
+    color: colors.textPrimary,
     flexShrink: 1,
   },
   cardBody: {
     fontFamily: 'DMSans_400Regular',
     fontSize: 14,
     lineHeight: 21,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
   },
 
   primaryButton: {
@@ -320,7 +352,7 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_500Medium',
     fontWeight: '500',
     fontSize: 16,
-    color: '#01020A',
+    color: '#0F1624',
   },
 
   linkRow: {
@@ -332,9 +364,9 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 54,
     borderRadius: 14,
-    backgroundColor: GLASS_BG,
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: GLASS_BORDER,
+    borderColor: colors.cardBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -342,6 +374,6 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_500Medium',
     fontWeight: '500',
     fontSize: 14,
-    color: TEXT_PRIMARY,
+    color: colors.textPrimary,
   },
 });

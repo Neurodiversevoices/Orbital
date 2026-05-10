@@ -25,12 +25,7 @@ import {
   SUB_BRAND_ORDER,
 } from '../../lib/platform/subBrandConfig';
 import type { SubBrand, SubBrandConfig } from '../../lib/platform/types';
-
-const BACKGROUND = '#01020A';
-const GLASS_BG = 'rgba(255,255,255,0.07)';
-const GLASS_BORDER = 'rgba(255,255,255,0.15)';
-const TEXT_PRIMARY = '#FFFFFF';
-const TEXT_SECONDARY = 'rgba(255,255,255,0.7)';
+import { colors } from '../../theme/colors';
 
 // =============================================================================
 // POSTURE CHIPS
@@ -74,7 +69,7 @@ function BrandCard({
         styles.card,
         active && {
           borderColor: config.themeAccent,
-          backgroundColor: 'rgba(255,255,255,0.10)',
+          backgroundColor: colors.backgroundSubtle,
         },
         { opacity: pressed ? 0.85 : 1 },
       ]}
@@ -83,20 +78,29 @@ function BrandCard({
         <View
           style={[styles.dot, { backgroundColor: config.themeAccent }]}
         />
-        <Text style={styles.cardTitle}>{config.label}</Text>
+        <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>
+          {config.label}
+        </Text>
         {active ? (
-          <Text style={[styles.activeFlag, { color: config.themeAccent }]}>
+          <Text
+            style={[styles.activeFlag, { color: config.themeAccent }]}
+            maxFontSizeMultiplier={1.5}
+          >
             ACTIVE
           </Text>
         ) : null}
       </View>
 
-      <Text style={styles.cardTagline}>{config.tagline}</Text>
+      <Text style={styles.cardTagline} maxFontSizeMultiplier={1.5}>
+        {config.tagline}
+      </Text>
 
       <View style={styles.chipRow}>
         {chips.map((chip) => (
           <View key={chip} style={styles.chip}>
-            <Text style={styles.chipText}>{chip}</Text>
+            <Text style={styles.chipText} maxFontSizeMultiplier={1.5}>
+              {chip}
+            </Text>
           </View>
         ))}
       </View>
@@ -128,9 +132,13 @@ export default function SubBrandPickerScreen(): React.ReactElement {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.eyebrow}>PICK YOUR TIER</Text>
-        <Text style={styles.title}>Same engine. Six postures.</Text>
-        <Text style={styles.subtitle}>
+        <Text style={styles.eyebrow} maxFontSizeMultiplier={1.5}>
+          PICK YOUR TIER
+        </Text>
+        <Text style={styles.title} maxFontSizeMultiplier={1.5}>
+          Same engine. Six postures.
+        </Text>
+        <Text style={styles.subtitle} maxFontSizeMultiplier={1.5}>
           Choose the trust posture that fits your context. You can change at
           any time.
         </Text>
@@ -155,7 +163,7 @@ export default function SubBrandPickerScreen(): React.ReactElement {
 // =============================================================================
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: BACKGROUND },
+  safe: { flex: 1, backgroundColor: colors.background },
   scroll: {
     paddingHorizontal: 32,
     paddingTop: 16,
@@ -165,7 +173,7 @@ const styles = StyleSheet.create({
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 11,
     letterSpacing: 1.76,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     marginBottom: 8,
   },
@@ -173,24 +181,28 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_500Medium',
     fontWeight: '500',
     fontSize: 26,
-    color: TEXT_PRIMARY,
+    color: colors.textPrimary,
   },
   subtitle: {
     fontFamily: 'DMSans_400Regular',
     fontSize: 14,
     lineHeight: 20,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
     marginTop: 8,
     marginBottom: 24,
   },
 
   list: { gap: 16 },
   card: {
-    backgroundColor: GLASS_BG,
-    borderColor: GLASS_BORDER,
+    backgroundColor: colors.card,
+    borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 14,
     padding: 16,
+    shadowColor: colors.cardShadow,
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
   },
   cardHeader: {
     flexDirection: 'row',
@@ -206,7 +218,7 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_500Medium',
     fontWeight: '500',
     fontSize: 18,
-    color: TEXT_PRIMARY,
+    color: colors.textPrimary,
     flex: 1,
   },
   activeFlag: {
@@ -218,7 +230,7 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_400Regular',
     fontSize: 14,
     lineHeight: 20,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
     marginTop: 6,
     marginBottom: 12,
   },
@@ -231,14 +243,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: colors.backgroundSubtle,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: colors.hairline,
   },
   chipText: {
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 9,
     letterSpacing: 1.44,
-    color: 'rgba(255,255,255,0.85)',
+    color: colors.textSecondary,
   },
 });

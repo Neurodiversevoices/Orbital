@@ -32,13 +32,9 @@ import {
 } from '../../lib/platform/memory';
 import { useOptionalSubBrand } from '../../lib/platform/SubBrandProvider';
 import type { MemoryRecord, MemoryScope } from '../../lib/platform/types';
+import { colors } from '../../theme/colors';
 
-const BACKGROUND = '#01020A';
-const TEAL = '#2DD4BF';
-const GLASS_BG = 'rgba(255,255,255,0.07)';
-const GLASS_BORDER = 'rgba(255,255,255,0.15)';
-const TEXT_PRIMARY = '#FFFFFF';
-const TEXT_SECONDARY = 'rgba(255,255,255,0.7)';
+const TEAL = colors.primary;
 const DANGER = '#DC2626';
 
 // =============================================================================
@@ -91,11 +87,15 @@ function RecordRow({
 }: RecordRowProps): React.ReactElement {
   return (
     <View style={styles.recordRow}>
-      <Text style={styles.recordContent} numberOfLines={3}>
+      <Text
+        style={styles.recordContent}
+        numberOfLines={3}
+        maxFontSizeMultiplier={1.5}
+      >
         {record.content}
       </Text>
       <View style={styles.recordMetaRow}>
-        <Text style={styles.recordMeta}>
+        <Text style={styles.recordMeta} maxFontSizeMultiplier={1.5}>
           {record.source.toUpperCase()} ·{' '}
           {new Date(record.createdAt).toLocaleDateString()}
         </Text>
@@ -110,7 +110,9 @@ function RecordRow({
               { opacity: pressed || !record.userEditable ? 0.5 : 1 },
             ]}
           >
-            <Text style={styles.actionText}>Edit</Text>
+            <Text style={styles.actionText} maxFontSizeMultiplier={1.5}>
+              Edit
+            </Text>
           </Pressable>
           <Pressable
             accessibilityRole="button"
@@ -121,7 +123,12 @@ function RecordRow({
               { opacity: pressed ? 0.5 : 1 },
             ]}
           >
-            <Text style={[styles.actionText, { color: DANGER }]}>Delete</Text>
+            <Text
+              style={[styles.actionText, { color: DANGER }]}
+              maxFontSizeMultiplier={1.5}
+            >
+              Delete
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -173,15 +180,21 @@ function ScopeSection({ meta }: ScopeSectionProps): React.ReactElement {
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
         <View style={{ flexShrink: 1 }}>
-          <Text style={styles.sectionTitle}>{meta.title}</Text>
-          <Text style={styles.sectionDescription}>{meta.description}</Text>
+          <Text style={styles.sectionTitle} maxFontSizeMultiplier={1.5}>
+            {meta.title}
+          </Text>
+          <Text style={styles.sectionDescription} maxFontSizeMultiplier={1.5}>
+            {meta.description}
+          </Text>
         </View>
         <View style={styles.toggleWrap}>
-          <Text style={styles.toggleLabel}>USE PAST CHATS</Text>
+          <Text style={styles.toggleLabel} maxFontSizeMultiplier={1.5}>
+            USE PAST CHATS
+          </Text>
           <Switch
             value={usePastChats}
             onValueChange={setUsePastChats}
-            trackColor={{ false: '#222', true: TEAL }}
+            trackColor={{ false: '#E5E7EB', true: TEAL }}
             thumbColor="#FFFFFF"
             accessibilityLabel={`Toggle 'use past chats' for ${meta.title} scope`}
           />
@@ -190,11 +203,15 @@ function ScopeSection({ meta }: ScopeSectionProps): React.ReactElement {
 
       {loading ? (
         <View style={styles.emptyCard}>
-          <Text style={styles.emptyText}>Loading…</Text>
+          <Text style={styles.emptyText} maxFontSizeMultiplier={1.5}>
+            Loading…
+          </Text>
         </View>
       ) : records.length === 0 ? (
         <View style={styles.emptyCard}>
-          <Text style={styles.emptyText}>No records in this scope.</Text>
+          <Text style={styles.emptyText} maxFontSizeMultiplier={1.5}>
+            No records in this scope.
+          </Text>
         </View>
       ) : (
         <View style={styles.recordList}>
@@ -218,7 +235,9 @@ function ScopeSection({ meta }: ScopeSectionProps): React.ReactElement {
           { opacity: pressed ? 0.6 : 1 },
         ]}
       >
-        <Text style={styles.clearButtonText}>Clear scope</Text>
+        <Text style={styles.clearButtonText} maxFontSizeMultiplier={1.5}>
+          Clear scope
+        </Text>
       </Pressable>
     </View>
   );
@@ -251,7 +270,7 @@ export default function MemoryDashboardScreen(): React.ReactElement {
             accessibilityRole="text"
             accessibilityLabel="Workspace-scoped, tenant isolated"
           >
-            <Text style={styles.tenantNoteText}>
+            <Text style={styles.tenantNoteText} maxFontSizeMultiplier={1.5}>
               Workspace-scoped · Tenant isolated
             </Text>
           </View>
@@ -260,8 +279,10 @@ export default function MemoryDashboardScreen(): React.ReactElement {
         {/* GLOBAL TEMPORARY CHAT */}
         <View style={styles.heroCard}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.heroTitle}>Temporary chat mode</Text>
-            <Text style={styles.heroSubtitle}>
+            <Text style={styles.heroTitle} maxFontSizeMultiplier={1.5}>
+              Temporary chat mode
+            </Text>
+            <Text style={styles.heroSubtitle} maxFontSizeMultiplier={1.5}>
               When on, every conversation is forced into the ephemeral scope.
               Nothing is saved across sessions.
             </Text>
@@ -269,7 +290,7 @@ export default function MemoryDashboardScreen(): React.ReactElement {
           <Switch
             value={tempChat}
             onValueChange={handleTempChat}
-            trackColor={{ false: '#222', true: TEAL }}
+            trackColor={{ false: '#E5E7EB', true: TEAL }}
             thumbColor="#FFFFFF"
             accessibilityLabel="Toggle temporary chat mode"
           />
@@ -289,7 +310,7 @@ export default function MemoryDashboardScreen(): React.ReactElement {
 // =============================================================================
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: BACKGROUND },
+  safe: { flex: 1, backgroundColor: colors.background },
   scroll: {
     paddingHorizontal: 32,
     paddingTop: 16,
@@ -297,16 +318,16 @@ const styles = StyleSheet.create({
   },
 
   tenantNote: {
-    backgroundColor: GLASS_BG,
-    borderColor: GLASS_BORDER,
+    backgroundColor: colors.backgroundSubtle,
+    borderColor: colors.hairline,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 14,
     paddingVertical: 10,
     paddingHorizontal: 14,
     marginBottom: 16,
   },
   tenantNoteText: {
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 11,
     letterSpacing: 1.6,
@@ -318,24 +339,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
-    backgroundColor: GLASS_BG,
-    borderColor: GLASS_BORDER,
+    backgroundColor: colors.card,
+    borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 14,
     padding: 16,
     marginBottom: 24,
+    shadowColor: colors.cardShadow,
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
   },
   heroTitle: {
     fontFamily: 'DMSans_500Medium',
     fontWeight: '500',
     fontSize: 18,
-    color: TEXT_PRIMARY,
+    color: colors.textPrimary,
   },
   heroSubtitle: {
     fontFamily: 'DMSans_400Regular',
     fontSize: 13,
     lineHeight: 19,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
     marginTop: 4,
   },
 
@@ -352,13 +377,13 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_500Medium',
     fontWeight: '500',
     fontSize: 18,
-    color: TEXT_PRIMARY,
+    color: colors.textPrimary,
   },
   sectionDescription: {
     fontFamily: 'DMSans_400Regular',
     fontSize: 13,
     lineHeight: 19,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
     marginTop: 2,
   },
   toggleWrap: {
@@ -369,7 +394,7 @@ const styles = StyleSheet.create({
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 9,
     letterSpacing: 1.44,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
     textTransform: 'uppercase',
   },
 
@@ -377,17 +402,21 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   recordRow: {
-    backgroundColor: GLASS_BG,
-    borderColor: GLASS_BORDER,
+    backgroundColor: colors.card,
+    borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 14,
     padding: 12,
+    shadowColor: colors.cardShadow,
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
   },
   recordContent: {
     fontFamily: 'DMSans_400Regular',
     fontSize: 14,
     lineHeight: 20,
-    color: TEXT_PRIMARY,
+    color: colors.textPrimary,
   },
   recordMetaRow: {
     flexDirection: 'row',
@@ -399,7 +428,7 @@ const styles = StyleSheet.create({
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 9,
     letterSpacing: 1.44,
-    color: TEXT_SECONDARY,
+    color: colors.textTertiary,
   },
   recordActions: {
     flexDirection: 'row',
@@ -413,21 +442,21 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_500Medium',
     fontWeight: '500',
     fontSize: 12,
-    color: TEXT_PRIMARY,
+    color: colors.textPrimary,
   },
 
   emptyCard: {
-    backgroundColor: GLASS_BG,
-    borderColor: GLASS_BORDER,
+    backgroundColor: colors.backgroundSubtle,
+    borderColor: colors.hairline,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 14,
     padding: 16,
     alignItems: 'center',
   },
   emptyText: {
     fontFamily: 'DMSans_400Regular',
     fontSize: 13,
-    color: TEXT_SECONDARY,
+    color: colors.textSecondary,
   },
 
   clearButton: {

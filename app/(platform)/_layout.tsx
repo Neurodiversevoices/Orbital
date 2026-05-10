@@ -14,8 +14,7 @@ import { Stack } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
 
 import { SubBrandProvider, useSubBrand } from '../../lib/platform/SubBrandProvider';
-
-const BACKGROUND = '#01020A';
+import { colors } from '../../theme/colors';
 
 // =============================================================================
 // HEADER CHIP — shows current sub-brand + posture badges
@@ -47,7 +46,12 @@ function SubBrandChip(): React.ReactElement {
         <View
           style={[styles.dot, { backgroundColor: config.themeAccent }]}
         />
-        <Text style={styles.chipLabel}>{config.label.toUpperCase()}</Text>
+        <Text
+          style={styles.chipLabel}
+          maxFontSizeMultiplier={1.5}
+        >
+          {config.label.toUpperCase()}
+        </Text>
       </View>
 
       {complianceMode !== 'none' ? (
@@ -55,19 +59,25 @@ function SubBrandChip(): React.ReactElement {
           style={styles.postureBadge}
           accessibilityLabel={`Compliance mode: ${complianceLabel}`}
         >
-          <Text style={styles.postureText}>{complianceLabel}</Text>
+          <Text style={styles.postureText} maxFontSizeMultiplier={1.5}>
+            {complianceLabel}
+          </Text>
         </View>
       ) : null}
 
       {tenancyIsolation ? (
         <View style={styles.postureBadge}>
-          <Text style={styles.postureText}>TENANT</Text>
+          <Text style={styles.postureText} maxFontSizeMultiplier={1.5}>
+            TENANT
+          </Text>
         </View>
       ) : null}
 
       {auditLogging ? (
         <View style={styles.postureBadge}>
-          <Text style={styles.postureText}>AUDIT</Text>
+          <Text style={styles.postureText} maxFontSizeMultiplier={1.5}>
+            AUDIT
+          </Text>
         </View>
       ) : null}
     </View>
@@ -83,14 +93,14 @@ function PlatformStack(): React.ReactElement {
     <Stack
       screenOptions={{
         headerShown: true,
-        headerStyle: { backgroundColor: BACKGROUND },
-        headerTintColor: '#FFFFFF',
+        headerStyle: { backgroundColor: colors.background },
+        headerTintColor: colors.textPrimary,
         headerTitleStyle: {
           fontFamily: 'DMSans_500Medium',
           fontWeight: '500',
-          color: '#FFFFFF',
+          color: colors.textPrimary,
         },
-        contentStyle: { backgroundColor: BACKGROUND },
+        contentStyle: { backgroundColor: colors.background },
         headerRight: () => <SubBrandChip />,
         animation: 'fade',
       }}
@@ -131,7 +141,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 999,
     borderWidth: 1,
-    backgroundColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: colors.backgroundSubtle,
   },
   dot: {
     width: 8,
@@ -142,20 +152,20 @@ const styles = StyleSheet.create({
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 10,
     letterSpacing: 1.6,
-    color: '#FFFFFF',
+    color: colors.textPrimary,
   },
   postureBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: colors.backgroundSubtle,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: colors.hairline,
   },
   postureText: {
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 9,
     letterSpacing: 1.6,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
   },
 });
