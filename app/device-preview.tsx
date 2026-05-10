@@ -24,7 +24,8 @@ import { View, Text, StyleSheet, Platform, useWindowDimensions } from 'react-nat
 import { useLocalSearchParams } from 'expo-router';
 import { TrendingUp, Minus } from 'lucide-react-native';
 import { IPhoneFrame } from '../components/device';
-import { GlassOrb } from '../components';
+import { AtmosphericReservoirFallback } from '../components';
+import { useSharedValue } from 'react-native-reanimated';
 import { colors, spacing } from '../theme';
 import { useEnergyLogs } from '../lib/hooks/useEnergyLogs';
 import { useLocale } from '../lib/hooks/useLocale';
@@ -40,9 +41,22 @@ function formatDate(locale: Locale): string {
   });
 }
 
+// Static preview seed for the dev device-preview screen — keeps the
+// AtmosphericReservoirFallback rendering deterministically without
+// depending on user signal data.
+const PREVIEW_SEED = {
+  seed: [0.5, 0.5, 0.5, 0.5] as const,
+  hueShift: 0,
+  surfacePattern: 0,
+  pulseSeconds: 6,
+  rotationSpeed: 0.08,
+};
+
 function HomePreview() {
   const { logs } = useEnergyLogs();
   const { t, locale } = useLocale();
+  const reservesShared = useSharedValue(0.7);
+  const demandShared = useSharedValue(0.4);
 
   const signalData = useMemo(() => {
     const now = Date.now();
@@ -136,7 +150,13 @@ function HomePreview() {
 
         {/* Orb */}
         <View style={previewStyles.orbContainer}>
-          <GlassOrb state={null} onStateChange={() => {}} onSave={() => {}} />
+          <AtmosphericReservoirFallback
+            reserves={reservesShared}
+            demand={demandShared}
+            seed={PREVIEW_SEED}
+            width={280}
+            height={280}
+          />
           {/* Capacity Spectrum */}
           <View style={previewStyles.spectrumContainer}>
             <View style={previewStyles.spectrumTrack}>

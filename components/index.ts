@@ -1,4 +1,15 @@
-export { GlassOrb } from './GlassOrb';
+// Atmospheric Reservoir — Phase 9 visual centerpiece (replaces orb/gauge/ribbon)
+export { default as AtmosphericReservoir } from './AtmosphericReservoir';
+export { default as AtmosphericReservoirFallback } from './AtmosphericReservoirFallback';
+// New light-theme cards
+export { default as HealthMetricCard } from './HealthMetricCard';
+export { default as PatternBarsChart } from './PatternBarsChart';
+export { default as DetectedPatternCard } from './DetectedPatternCard';
+// CCI window picker (30/60/90)
+export { default as CCIWindowPicker } from './CCIWindowPicker';
+// Capacity ribbon — legacy fallback for screens still mid-migration
+export { default as CapacityRibbon } from './CapacityRibbon';
+
 export { SavePulse } from './SavePulse';
 export { TagSelector } from './TagSelector';
 export { CategorySelector } from './CategorySelector';
