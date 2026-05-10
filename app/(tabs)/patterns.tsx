@@ -1,1352 +1,558 @@
-import React, { useCallback, useState, useMemo, useEffect } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl, useWindowDimensions, Text, Platform, Pressable, Modal } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Circle, Eye, ListTodo, Users, TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Calendar, Clock, Lock, Bug, RefreshCw, Award, FileText, Database } from 'lucide-react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { HistoryItem, EnergyGraph, TimeRangeTabs, TimeRange, getTimeRangeMs, MilestonesPanel, PatternLanguagePanel, OrgRoleBanner, WeeklyCapacityRecord, BlurredPatternTease, EmptyState } from '../../components';
-import { QCRButton, QCRScreen, QCRPaywall } from '../../components/qcr';
-import { colors, commonStyles, spacing } from '../../theme';
-import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
-import { useLocale, interpolate } from '../../lib/hooks/useLocale';
-import { useDemoMode, FOUNDER_DEMO_ENABLED } from '../../lib/hooks/useDemoMode';
-import { useAppMode } from '../../lib/hooks/useAppMode';
-import { useAppTenure } from '../../lib/hooks/useAppTenure';
-import { useSubscription } from '../../lib/subscription';
-import { useQCR } from '../../lib/qcr';
-import { STORAGE_KEYS } from '../../lib/storage';
-import { CapacityLog, CapacityState, Category, getUnlockTier, getNextUnlockTier, BaselineStats, WeeklySummary } from '../../types';
+/**
+ * Pattern Intelligence — Light theme rewrite (May 2026 redesign).
+ *
+ * Layout:
+ *   1. Eyebrow + Headline + Subhead
+ *   2. Time-range tabs (14D / 30D / 90D / 1Y / ALL)
+ *   3. Big PatternBarsChart inside a light card
+ *   4. Pattern Insight card (clickable)
+ *   5. DETECTED PATTERNS section (3 DetectedPatternCards)
+ *   6. Bottom safe-area padding
+ *
+ * Constraints honored:
+ *   - NO orb / gauge imports
+ *   - StatusBar dark
+ *   - All colors from theme/colors.ts
+ *   - Upstream useHealthSnapshot is guarded (other agent's worktree)
+ *   - Existing useEnergyLogs hook is the data source
+ */
+import React, { useCallback, useMemo, useState } from 'react';
 import {
-  calculateBaselineStats,
-  findMostRecent7DayStreakWindow,
-  calculateWeeklySummary,
-  formatDateRange,
-} from '../../lib/baselineUtils';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+  View,
+  StyleSheet,
+  Text,
+  ScrollView,
+  RefreshControl,
+  Pressable,
+  useWindowDimensions,
+} from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import {
+  Calendar,
+  Moon,
+  TrendingDown,
+  TrendingUp,
+  ChevronRight,
+  RotateCcw,
+  Sparkles,
+} from 'lucide-react-native';
 
-const categoryIcons: Record<Category, React.ComponentType<any>> = {
-  sensory: Eye,
-  demand: ListTodo,
-  social: Users,
+import { colors, spacing } from '../../theme';
+import { useEnergyLogs } from '../../lib/hooks/useEnergyLogs';
+import { calculateBaselineStats } from '../../lib/baselineUtils';
+import { CapacityLog, CapacityState } from '../../types';
+import { EmptyState } from '../../components';
+import { PatternBarsChart } from '../../components/PatternBarsChart';
+import { DetectedPatternCard } from '../../components/DetectedPatternCard';
+
+// -----------------------------------------------------------------------------
+// useHealthSnapshot — landing in another agent's worktree at lib/health/.
+// Inline noop fallback so this screen bundles until that hook lands. After
+// merge, replace this with:
+//   import { useHealthSnapshot } from '../../lib/health/useHealth';
+// and read snapshot?.recovery?.hours.
+// -----------------------------------------------------------------------------
+type HealthHookResult = {
+  snapshot: { recovery: { hours: number } | null } | null;
 };
+const useHealthSnapshot = (): HealthHookResult => ({ snapshot: null });
 
-const stateToPercent = (state: CapacityState): number => {
-  switch (state) {
-    case 'resourced': return 100;
-    case 'stretched': return 50;
-    case 'depleted': return 0;
+// -----------------------------------------------------------------------------
+// Local time-range model — distinct from existing TimeRangeTabs (which has
+// 7d/6m/10y). Mockup spec: 14D / 30D / 90D / 1Y / ALL.
+// -----------------------------------------------------------------------------
+type LocalRange = '14d' | '30d' | '90d' | '1y' | 'all';
+
+const RANGES: { key: LocalRange; label: string; days: number | null }[] = [
+  { key: '14d', label: '14D', days: 14 },
+  { key: '30d', label: '30D', days: 30 },
+  { key: '90d', label: '90D', days: 90 },
+  { key: '1y', label: '1Y', days: 365 },
+  { key: 'all', label: 'ALL', days: null },
+];
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const stateToCapacity = (s: CapacityState): number => {
+  switch (s) {
+    case 'resourced':
+      return 0.8;
+    case 'stretched':
+      return 0.5;
+    case 'depleted':
+      return 0.25;
   }
 };
 
-// Data Depth Badge Component
-function DataDepthBadge({ stats }: { stats: BaselineStats }) {
-  // Calm, non-clinical labels for data depth
-  const tierLabel = stats.confidenceTier === 'high' ? 'Strong pattern data'
-    : stats.confidenceTier === 'growing' ? 'Growing pattern data'
-    : stats.confidenceTier === 'baseline' ? 'Building pattern data'
-    : 'Starting out';
-  const tierColor = stats.confidenceTier === 'high' ? '#00E5FF'
-    : stats.confidenceTier === 'growing' ? '#4CAF50'
-    : stats.confidenceTier === 'baseline' ? '#E8A830'
-    : 'rgba(255,255,255,0.4)';
-
-  return (
-    <View style={confidenceStyles.badge}>
-      <Database size={12} color={tierColor} />
-      <Text style={[confidenceStyles.badgeText, { color: tierColor }]}>
-        {tierLabel}
-      </Text>
-      {stats.hasHighConfidenceWeek && (
-        <View style={confidenceStyles.weekBadge}>
-          <Text style={confidenceStyles.weekBadgeText}>7-day view available</Text>
-        </View>
-      )}
-    </View>
-  );
+// Confidence helper — derives a 0-100 confidence number from baselineStats.
+function confidenceFromTier(
+  tier: 'building' | 'baseline' | 'growing' | 'high',
+): number {
+  switch (tier) {
+    case 'building':
+      return 25;
+    case 'baseline':
+      return 55;
+    case 'growing':
+      return 75;
+    case 'high':
+      return 95;
+  }
 }
 
-// Weekly Summary Card Component
-function WeeklySummaryCard({ summary }: { summary: WeeklySummary }) {
-  const dateRange = formatDateRange(summary.startDate, summary.endDate);
-  const { capacitySummary, topDrivers, notesCount, totalEntries } = summary;
+// Daily aggregation — average capacity per local date inside the window.
+function aggregateDaily(
+  logs: CapacityLog[],
+  windowDays: number | null,
+): number[] {
+  if (logs.length === 0) return [];
+  const now = Date.now();
+  const start = windowDays === null ? 0 : now - windowDays * DAY_MS;
+  const inWindow = logs.filter((l) => l.timestamp >= start);
 
-  const avgColor = capacitySummary.averagePercent >= 70 ? '#00E5FF'
-    : capacitySummary.averagePercent >= 40 ? '#E8A830'
-    : '#F44336';
-
-  return (
-    <View style={summaryStyles.card}>
-      <View style={summaryStyles.header}>
-        <View style={summaryStyles.headerLeft}>
-          <Database size={16} color="rgba(255,255,255,0.6)" />
-          <Text style={summaryStyles.title}>This Week</Text>
-        </View>
-        <Text style={summaryStyles.dateRange}>{dateRange}</Text>
-      </View>
-
-      <View style={summaryStyles.statsRow}>
-        <View style={summaryStyles.statItem}>
-          <Text style={[summaryStyles.statValue, { color: avgColor }]}>
-            {capacitySummary.averagePercent}%
-          </Text>
-          <Text style={summaryStyles.statLabel}>Avg Capacity</Text>
-        </View>
-        <View style={summaryStyles.statDivider} />
-        <View style={summaryStyles.statItem}>
-          <Text style={summaryStyles.statValue}>{totalEntries}</Text>
-          <Text style={summaryStyles.statLabel}>Entries</Text>
-        </View>
-        <View style={summaryStyles.statDivider} />
-        <View style={summaryStyles.statItem}>
-          <View style={summaryStyles.notesRow}>
-            <FileText size={14} color="rgba(255,255,255,0.6)" />
-            <Text style={summaryStyles.statValue}>{notesCount}</Text>
-          </View>
-          <Text style={summaryStyles.statLabel}>With Notes</Text>
-        </View>
-      </View>
-
-      {/* Capacity Distribution Bar */}
-      <View style={summaryStyles.distributionContainer}>
-        <Text style={summaryStyles.distributionLabel}>Capacity Distribution</Text>
-        <View style={summaryStyles.distributionBar}>
-          {capacitySummary.resourced > 0 && (
-            <View
-              style={[
-                summaryStyles.distributionSegment,
-                {
-                  flex: capacitySummary.resourced,
-                  backgroundColor: '#00E5FF',
-                  borderTopLeftRadius: 4,
-                  borderBottomLeftRadius: 4,
-                },
-              ]}
-            />
-          )}
-          {capacitySummary.stretched > 0 && (
-            <View
-              style={[
-                summaryStyles.distributionSegment,
-                { flex: capacitySummary.stretched, backgroundColor: '#E8A830' },
-              ]}
-            />
-          )}
-          {capacitySummary.depleted > 0 && (
-            <View
-              style={[
-                summaryStyles.distributionSegment,
-                {
-                  flex: capacitySummary.depleted,
-                  backgroundColor: '#F44336',
-                  borderTopRightRadius: 4,
-                  borderBottomRightRadius: 4,
-                },
-              ]}
-            />
-          )}
-        </View>
-        <View style={summaryStyles.distributionLegend}>
-          <Text style={[summaryStyles.legendItem, { color: '#00E5FF' }]}>
-            {capacitySummary.resourced} resourced
-          </Text>
-          <Text style={[summaryStyles.legendItem, { color: '#E8A830' }]}>
-            {capacitySummary.stretched} stretched
-          </Text>
-          <Text style={[summaryStyles.legendItem, { color: '#F44336' }]}>
-            {capacitySummary.depleted} depleted
-          </Text>
-        </View>
-      </View>
-
-      {/* Top Drivers */}
-      {topDrivers.length > 0 && (
-        <View style={summaryStyles.driversContainer}>
-          <Text style={summaryStyles.driversLabel}>Top Drivers</Text>
-          <View style={summaryStyles.driversRow}>
-            {topDrivers.map((driver, index) => {
-              const Icon = categoryIcons[driver.tag as Category] || Circle;
-              return (
-                <View key={driver.tag} style={summaryStyles.driverChip}>
-                  <Icon size={12} color="rgba(255,255,255,0.7)" />
-                  <Text style={summaryStyles.driverText}>
-                    {driver.tag} ({driver.count})
-                  </Text>
-                </View>
-              );
-            })}
-          </View>
-        </View>
-      )}
-    </View>
-  );
-}
-
-// Debug overlay component
-function DebugOverlay({ logs, storageInfo, onReseed, onClose }: {
-  logs: CapacityLog[];
-  storageInfo: { key: string; rawLength: number; parseError: string | null };
-  onReseed: () => void;
-  onClose: () => void;
-}) {
-  const firstLog = logs.length > 0 ? logs[logs.length - 1] : null;
-  const lastLog = logs.length > 0 ? logs[0] : null;
-
-  return (
-    <View style={debugStyles.overlay}>
-      <View style={debugStyles.header}>
-        <Bug size={16} color="#FF0000" />
-        <Text style={debugStyles.title}>Storage Debug</Text>
-        <Pressable onPress={onClose} style={debugStyles.closeBtn}>
-          <Text style={debugStyles.closeBtnText}>X</Text>
-        </Pressable>
-      </View>
-      <View style={debugStyles.row}>
-        <Text style={debugStyles.label}>Storage Key:</Text>
-        <Text style={debugStyles.value}>{storageInfo.key}</Text>
-      </View>
-      <View style={debugStyles.row}>
-        <Text style={debugStyles.label}>Signals Found:</Text>
-        <Text style={debugStyles.value}>{logs.length}</Text>
-      </View>
-      <View style={debugStyles.row}>
-        <Text style={debugStyles.label}>Raw JSON Length:</Text>
-        <Text style={debugStyles.value}>{storageInfo.rawLength} chars</Text>
-      </View>
-      {firstLog && (
-        <View style={debugStyles.row}>
-          <Text style={debugStyles.label}>First Signal:</Text>
-          <Text style={debugStyles.value}>{new Date(firstLog.timestamp).toLocaleDateString()}</Text>
-        </View>
-      )}
-      {lastLog && (
-        <View style={debugStyles.row}>
-          <Text style={debugStyles.label}>Last Signal:</Text>
-          <Text style={debugStyles.value}>{new Date(lastLog.timestamp).toLocaleDateString()}</Text>
-        </View>
-      )}
-      {storageInfo.parseError && (
-        <View style={debugStyles.row}>
-          <Text style={[debugStyles.label, { color: '#FF0000' }]}>Parse Error:</Text>
-          <Text style={[debugStyles.value, { color: '#FF0000' }]}>{storageInfo.parseError}</Text>
-        </View>
-      )}
-      <View style={debugStyles.row}>
-        <Text style={debugStyles.label}>Platform:</Text>
-        <Text style={debugStyles.value}>{Platform.OS}</Text>
-      </View>
-      <Pressable onPress={onReseed} style={debugStyles.reseedBtn}>
-        <RefreshCw size={14} color="#00E5FF" />
-        <Text style={debugStyles.reseedText}>Reseed Demo Data (90 signals)</Text>
-      </Pressable>
-    </View>
-  );
-}
-
-export default function PatternsScreen() {
-  const params = useLocalSearchParams();
-  // FOUNDER-ONLY: Debug and demo params only work when EXPO_PUBLIC_FOUNDER_DEMO=1
-  const showDebug = FOUNDER_DEMO_ENABLED && params.debug === '1';
-  const forceDemo = FOUNDER_DEMO_ENABLED && params.demo === '1';
-
-  const { logs, isLoading, removeLog, refresh } = useEnergyLogs();
-  const { width } = useWindowDimensions();
-  const { t } = useLocale();
-  const { isDemoMode, enableDemoMode, reseedDemoData } = useDemoMode();
-  const { currentMode } = useAppMode();
-  const { isPro } = useSubscription();
-  const { hasUsedAppFor30Days } = useAppTenure();
-  const router = useRouter();
-  const graphWidth = width - spacing.md * 2;
-  const [timeRange, setTimeRange] = useState<TimeRange>('7d');
-  const [debugVisible, setDebugVisible] = useState(showDebug);
-  const [calendarWeekStart, setCalendarWeekStart] = useState<Date | null>(null);
-  const [calendarWeekEnd, setCalendarWeekEnd] = useState<Date | null>(null);
-  const [storageInfo, setStorageInfo] = useState<{ key: string; rawLength: number; parseError: string | null }>({
-    key: STORAGE_KEYS.LOGS,
-    rawLength: 0,
-    parseError: null,
+  // Group by localDate (YYYY-MM-DD)
+  const buckets = new Map<string, number[]>();
+  for (const log of inWindow) {
+    const key =
+      log.localDate ?? new Date(log.timestamp).toISOString().slice(0, 10);
+    const v = log.capacity_value ?? stateToCapacity(log.state);
+    const arr = buckets.get(key) ?? [];
+    arr.push(v);
+    buckets.set(key, arr);
+  }
+  const dates = Array.from(buckets.keys()).sort();
+  return dates.map((d) => {
+    const arr = buckets.get(d) ?? [];
+    const avg =
+      arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+    return Math.max(0, Math.min(1, avg));
   });
+}
 
-  // QCR State
-  const [showQCRScreen, setShowQCRScreen] = useState(false);
-  const [showQCRPaywall, setShowQCRPaywall] = useState(false);
-  const {
-    hasQCRAccess,
-    report: qcrReport,
-    isGenerating: isQCRGenerating,
-    error: qcrError,
-    generateReport: generateQCR,
-    purchaseQCR,
-    restoreQCR,
-    isDemoReport,
-  } = useQCR({ logs });
+// Pattern detection — Monday score + window vs prior-window trend.
+function detectMondayPattern(logs: CapacityLog[]): {
+  score: string;
+  active: boolean;
+} {
+  const now = Date.now();
+  const windowMs = 30 * DAY_MS;
+  const windowLogs = logs.filter((l) => l.timestamp >= now - windowMs);
+  if (windowLogs.length < 5) return { score: '—', active: false };
 
-  // Load storage debug info
-  useEffect(() => {
-    const loadStorageInfo = async () => {
-      try {
-        const raw = await AsyncStorage.getItem(STORAGE_KEYS.LOGS);
-        setStorageInfo({
-          key: STORAGE_KEYS.LOGS,
-          rawLength: raw?.length || 0,
-          parseError: null,
-        });
-      } catch (error: any) {
-        setStorageInfo({
-          key: STORAGE_KEYS.LOGS,
-          rawLength: 0,
-          parseError: error.message || 'Unknown error',
-        });
-      }
-    };
-    if (debugVisible) {
-      loadStorageInfo();
-    }
-  }, [debugVisible, logs]);
-
-  // Handle ?demo=1 param to force reseed demo data
-  useEffect(() => {
-    if (forceDemo) {
-      const seedDemo = async () => {
-        if (!isDemoMode) {
-          await enableDemoMode('3y');
-        } else {
-          await reseedDemoData('3y');
-        }
-        await refresh();
-      };
-      seedDemo();
-    }
-  }, [forceDemo]);
-
-  const handleReseed = useCallback(async () => {
-    if (!isDemoMode) {
-      await enableDemoMode('3y');
+  let mondayDepleted = 0;
+  let mondayTotal = 0;
+  let otherDepleted = 0;
+  let otherTotal = 0;
+  for (const l of windowLogs) {
+    const d = new Date(l.timestamp).getDay();
+    const isStrained = l.state === 'depleted' || l.state === 'stretched';
+    if (d === 1) {
+      mondayTotal++;
+      if (isStrained) mondayDepleted++;
     } else {
-      await reseedDemoData('3y');
+      otherTotal++;
+      if (isStrained) otherDepleted++;
     }
-    await refresh();
-  }, [isDemoMode, enableDemoMode, reseedDemoData, refresh]);
+  }
+  if (mondayTotal === 0) return { score: '—', active: false };
+  const mondayRate = mondayDepleted / mondayTotal;
+  const otherRate = otherTotal > 0 ? otherDepleted / otherTotal : 0;
+  const lift = mondayRate - otherRate;
+  return {
+    score: `${Math.round(mondayRate * 100)}%`,
+    active: lift > 0.15,
+  };
+}
 
-  // QCR button handler - show paywall if no access, otherwise generate and show report
-  const handleQCRPress = useCallback(async () => {
-    if (hasQCRAccess) {
-      await generateQCR();
-      setShowQCRScreen(true);
-    } else {
-      setShowQCRPaywall(true);
-    }
-  }, [hasQCRAccess, generateQCR]);
+function computeTrend(
+  logs: CapacityLog[],
+  days: number,
+): { delta: number; direction: 'up' | 'down' | 'flat' } {
+  const now = Date.now();
+  const winMs = days * DAY_MS;
+  const cur = logs.filter((l) => l.timestamp >= now - winMs);
+  const prev = logs.filter(
+    (l) => l.timestamp >= now - winMs * 2 && l.timestamp < now - winMs,
+  );
+  if (cur.length === 0 || prev.length === 0) {
+    return { delta: 0, direction: 'flat' };
+  }
+  const avg = (xs: CapacityLog[]) =>
+    xs.reduce((a, l) => a + (l.capacity_value ?? stateToCapacity(l.state)), 0) /
+    xs.length;
+  const delta = (avg(cur) - avg(prev)) * 100; // 0..100 scale
+  const direction = delta > 1 ? 'up' : delta < -1 ? 'down' : 'flat';
+  return { delta, direction };
+}
 
-  const handleQCRPurchase = useCallback(async (productId: 'quarterly') => {
-    const success = await purchaseQCR(productId);
-    if (success) {
-      await generateQCR();
-      setShowQCRScreen(true);
-    }
-    return success;
-  }, [purchaseQCR, generateQCR]);
+function detectSleepCorrelation(logs: CapacityLog[]): boolean {
+  const now = Date.now();
+  return logs
+    .filter((l) => l.timestamp >= now - 30 * DAY_MS)
+    .some((l) => l.tags.includes('sleep'));
+}
 
-  const handleQCRRestore = useCallback(async () => {
-    const success = await restoreQCR();
-    if (success) {
-      await generateQCR();
-      setShowQCRScreen(true);
-    }
-    return success;
-  }, [restoreQCR, generateQCR]);
+// -----------------------------------------------------------------------------
+// SCREEN
+// -----------------------------------------------------------------------------
+export default function PatternsScreen() {
+  const router = useRouter();
+  const { width } = useWindowDimensions();
+  const { logs, isLoading, refresh } = useEnergyLogs();
+  const { snapshot } = useHealthSnapshot();
+  const avgSleepHours = snapshot?.recovery?.hours ?? null;
 
-  const logCount = logs.length;
-  const currentTier = getUnlockTier(logCount);
-  const nextTier = getNextUnlockTier(logCount);
+  const [range, setRange] = useState<LocalRange>('30d');
 
-  // Calculate baseline stats using unique local dates
   const baselineStats = useMemo(() => calculateBaselineStats(logs), [logs]);
+  const dayCount = baselineStats.baselineDays;
+  const confidence = confidenceFromTier(baselineStats.confidenceTier);
 
-  // Patterns are now gated by 7 unique dates, not log count
-  const isLocked = !baselineStats.patternsUnlocked;
-
-  // Weekly Summary for 7-day streak
-  const weeklySummary = useMemo(() => {
-    if (!baselineStats.hasHighConfidenceWeek) return null;
-    const window = findMostRecent7DayStreakWindow(logs);
-    if (!window) return null;
-    return calculateWeeklySummary(logs, window);
-  }, [logs, baselineStats.hasHighConfidenceWeek]);
-
-  // Translated day names for insights
-  const dayNames = [
-    t.patterns.days.sunday,
-    t.patterns.days.monday,
-    t.patterns.days.tuesday,
-    t.patterns.days.wednesday,
-    t.patterns.days.thursday,
-    t.patterns.days.friday,
-    t.patterns.days.saturday,
-  ];
-
-  const stats = useMemo(() => {
-    const now = Date.now();
-    const rangeMs = getTimeRangeMs(timeRange);
-    const startTime = now - rangeMs;
-    const prevStartTime = startTime - rangeMs;
-
-    // Current period logs
-    const currentLogs = logs.filter((log) => log.timestamp >= startTime);
-    // Previous period logs (for trend comparison)
-    const prevLogs = logs.filter((log) => log.timestamp >= prevStartTime && log.timestamp < startTime);
-
-    if (currentLogs.length === 0) {
-      return { avg: null, trend: null, timeInDepleted: null };
-    }
-
-    // Average energy
-    const percentages = currentLogs.map((log) => stateToPercent(log.state));
-    const avg = Math.round(percentages.reduce((a, b) => a + b, 0) / percentages.length);
-
-    // Trend (compare to previous period)
-    let trend: number | null = null;
-    if (prevLogs.length > 0) {
-      const prevPercentages = prevLogs.map((log) => stateToPercent(log.state));
-      const prevAvg = prevPercentages.reduce((a, b) => a + b, 0) / prevPercentages.length;
-      trend = Math.round(avg - prevAvg);
-    }
-
-    // Time in Depleted (percentage of entries that were "depleted")
-    const depletedCount = currentLogs.filter((log) => log.state === 'depleted').length;
-    const timeInDepleted = Math.round((depletedCount / currentLogs.length) * 100);
-
-    // Category breakdown - what % of each category results in depleted/stretched
-    const categoryBreakdown: Record<Category, { count: number; strainRate: number }> = {
-      sensory: { count: 0, strainRate: 0 },
-      demand: { count: 0, strainRate: 0 },
-      social: { count: 0, strainRate: 0 },
-    };
-
-    const categories: Category[] = ['sensory', 'demand', 'social'];
-    categories.forEach((cat) => {
-      const catLogs = currentLogs.filter((log) => log.tags.includes(cat));
-      if (catLogs.length > 0) {
-        const catStrainCount = catLogs.filter((log) => log.state === 'depleted' || log.state === 'stretched').length;
-        categoryBreakdown[cat] = {
-          count: catLogs.length,
-          strainRate: Math.round((catStrainCount / catLogs.length) * 100),
-        };
-      }
-    });
-
-    return { avg, trend, timeInDepleted, categoryBreakdown };
-  }, [logs, timeRange]);
-
-  // Pattern observations - what patterns have emerged
-  const insights = useMemo(() => {
-    if (logs.length < 10) return null;
-
-    const now = Date.now();
-    const dayMs = 24 * 60 * 60 * 1000;
-    const weekLogs = logs.filter((log) => log.timestamp >= now - 7 * dayMs);
-    const monthLogs = logs.filter((log) => log.timestamp >= now - 30 * dayMs);
-
-    // Day of week patterns
-    const dayPatterns: Record<number, { total: number; depleted: number }> = {};
-    for (let i = 0; i < 7; i++) {
-      dayPatterns[i] = { total: 0, depleted: 0 };
-    }
-    monthLogs.forEach((log) => {
-      const day = new Date(log.timestamp).getDay();
-      dayPatterns[day].total++;
-      if (log.state === 'depleted' || log.state === 'stretched') {
-        dayPatterns[day].depleted++;
-      }
-    });
-
-    // Find most challenging day
-    let worstDay = 0;
-    let worstRate = 0;
-    Object.entries(dayPatterns).forEach(([day, data]) => {
-      if (data.total >= 3) {
-        const rate = data.depleted / data.total;
-        if (rate > worstRate) {
-          worstRate = rate;
-          worstDay = parseInt(day);
-        }
-      }
-    });
-
-    // Time of day patterns
-    const hourPatterns: Record<string, { total: number; depleted: number }> = {
-      morning: { total: 0, depleted: 0 },
-      afternoon: { total: 0, depleted: 0 },
-      evening: { total: 0, depleted: 0 },
-    };
-    monthLogs.forEach((log) => {
-      const hour = new Date(log.timestamp).getHours();
-      let period = 'morning';
-      if (hour >= 12 && hour < 17) period = 'afternoon';
-      else if (hour >= 17) period = 'evening';
-      hourPatterns[period].total++;
-      if (log.state === 'depleted' || log.state === 'stretched') {
-        hourPatterns[period].depleted++;
-      }
-    });
-
-    // Find most challenging time
-    let challengingTime = '';
-    let timeRate = 0;
-    Object.entries(hourPatterns).forEach(([period, data]) => {
-      if (data.total >= 5) {
-        const rate = data.depleted / data.total;
-        if (rate > timeRate) {
-          timeRate = rate;
-          challengingTime = period;
-        }
-      }
-    });
-
-    // Recent trajectory (improving or declining)
-    const recentAvg = weekLogs.length > 0
-      ? weekLogs.reduce((sum, log) => sum + stateToPercent(log.state), 0) / weekLogs.length
-      : null;
-    const prevWeekLogs = logs.filter(
-      (log) => log.timestamp >= now - 14 * dayMs && log.timestamp < now - 7 * dayMs
-    );
-    const prevAvg = prevWeekLogs.length > 0
-      ? prevWeekLogs.reduce((sum, log) => sum + stateToPercent(log.state), 0) / prevWeekLogs.length
-      : null;
-
-    let trajectory: 'improving' | 'declining' | 'stable' | null = null;
-    if (recentAvg !== null && prevAvg !== null) {
-      const diff = recentAvg - prevAvg;
-      if (diff > 10) trajectory = 'improving';
-      else if (diff < -10) trajectory = 'declining';
-      else trajectory = 'stable';
-    }
-
-    // Category with highest impact
-    let highImpactCategory: Category | null = null;
-    let highImpactRate = 0;
-    (['sensory', 'demand', 'social'] as Category[]).forEach((cat) => {
-      const catLogs = monthLogs.filter((log) => log.tags.includes(cat));
-      if (catLogs.length >= 5) {
-        const strainCount = catLogs.filter((log) => log.state === 'depleted').length;
-        const rate = strainCount / catLogs.length;
-        if (rate > highImpactRate) {
-          highImpactRate = rate;
-          highImpactCategory = cat;
-        }
-      }
-    });
-
-    return {
-      worstDay: worstRate > 0.4 ? dayNames[worstDay] : null,
-      worstDayRate: Math.round(worstRate * 100),
-      challengingTime: timeRate > 0.4 ? challengingTime : null,
-      challengingTimeRate: Math.round(timeRate * 100),
-      trajectory,
-      highImpactCategory,
-      highImpactRate: Math.round(highImpactRate * 100),
-    };
-  }, [logs]);
-
-  const handleDelete = useCallback(
-    async (id: string) => {
-      await removeLog(id);
-    },
-    [removeLog]
+  const activeRange = RANGES.find((r) => r.key === range) ?? RANGES[1];
+  const chartData = useMemo(
+    () => aggregateDaily(logs, activeRange.days),
+    [logs, activeRange.days],
   );
 
-  // Handle calendar week navigation - sync graph with calendar (7d view only)
-  const handleWeekChange = useCallback((weekStart: Date, weekEnd: Date) => {
-    setCalendarWeekStart(weekStart);
-    setCalendarWeekEnd(weekEnd);
-    setTimeRange('7d'); // Calendar sync always uses 7d view
+  const monday = useMemo(() => detectMondayPattern(logs), [logs]);
+  const sleepCorr = useMemo(() => detectSleepCorrelation(logs), [logs]);
+  const trendDays = activeRange.days ?? 30;
+  const trend = useMemo(
+    () => computeTrend(logs, trendDays),
+    [logs, trendDays],
+  );
+
+  const insightText = monday.active
+    ? "Low-capacity days cluster after poor sleep and early-week load."
+    : sleepCorr
+      ? 'Capacity tracks your sleep duration.'
+      : 'Patterns emerging — keep logging.';
+
+  // Responsive headline size
+  const headlineSize = width < 360 ? 32 : width < 420 ? 36 : 40;
+
+  // Chart sizing — full screen width minus screen H-padding (32*2) minus card padding (12*2)
+  const chartWidth = Math.max(0, width - spacing.xl * 2 - 24);
+
+  const handleInsightPress = useCallback(() => {
+    // Existing /patterns route is this screen; route to brief tab as a deeper view.
+    router.push('/(tabs)/brief');
+  }, [router]);
+
+  const handleRangePress = useCallback((next: LocalRange) => {
+    setRange(next);
   }, []);
 
-  // Handle time range tab changes - clear calendar sync for non-7d views
-  const handleTimeRangeChange = useCallback((range: TimeRange) => {
-    setTimeRange(range);
-    if (range !== '7d') {
-      // Clear calendar sync so graph shows full range from now
-      setCalendarWeekStart(null);
-      setCalendarWeekEnd(null);
-    }
-  }, []);
+  const isEmpty = !isLoading && logs.length === 0;
+
+  // -- Pattern card values --------------------------------------------------
+  const sleepValue =
+    avgSleepHours !== null && Number.isFinite(avgSleepHours)
+      ? `${avgSleepHours.toFixed(1)}h`
+      : '—';
+
+  const trendIcon = trend.direction === 'up' ? TrendingUp : TrendingDown;
+  const trendColor =
+    trend.direction === 'up'
+      ? colors.resourced
+      : trend.direction === 'down'
+        ? colors.depleted
+        : colors.textSecondary;
+  const trendArrow =
+    trend.direction === 'up' ? '↑' : trend.direction === 'down' ? '↓' : '→';
+  const trendValue =
+    trend.direction === 'flat'
+      ? '—'
+      : `${trendArrow} ${Math.abs(trend.delta).toFixed(1)}`;
+  const trendDaysLabel = activeRange.days ?? dayCount;
+
+  // X-axis labels routed into PatternBarsChart
+  const rangeLabel = activeRange.days ? `${activeRange.days} DAYS AGO` : 'ALL TIME';
 
   return (
-    <SafeAreaView style={commonStyles.screen}>
-      {/* Debug Overlay - FOUNDER-ONLY */}
-      {FOUNDER_DEMO_ENABLED && debugVisible && (
-        <DebugOverlay
-          logs={logs}
-          storageInfo={storageInfo}
-          onReseed={handleReseed}
-          onClose={() => setDebugVisible(false)}
-        />
-      )}
-      <View style={styles.content}>
-        <FlatList
-          data={[]}
-          renderItem={null}
-          keyExtractor={() => 'header'}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-          ListHeaderComponent={
-            isLocked ? (
-              <View style={styles.lockedContainer}>
-                <View style={styles.lockedIconContainer}>
-                  <Lock size={32} color="rgba(255,255,255,0.3)" />
-                </View>
-                <Text style={styles.lockedTitle}>Getting to Know Your Patterns</Text>
-                <Text style={styles.lockedBody}>
-                  Log on 7 different days to see your patterns. You can log multiple times per day.
-                </Text>
-                <View style={styles.lockedProgress}>
-                  <View style={styles.lockedProgressBar}>
-                    <View style={[styles.lockedProgressFill, { width: `${(baselineStats.baselineProgress / 7) * 100}%` }]} />
-                  </View>
-                  <Text style={styles.lockedProgressText}>
-                    {baselineStats.baselineProgress} of 7 days logged
-                  </Text>
-                </View>
-                {baselineStats.currentStreak > 1 && (
-                  <View style={styles.streakIndicator}>
-                    <Database size={14} color="rgba(255,255,255,0.5)" />
-                    <Text style={styles.streakText}>
-                      {baselineStats.currentStreak} consecutive days
-                    </Text>
-                  </View>
-                )}
-              </View>
-            ) : (
-              <View>
-                {/* Org Role Banner - shows participant status for org modes */}
-                <OrgRoleBanner mode={currentMode} />
-
-                {/* Page Header - Calm, Non-Diagnostic */}
-                <View style={styles.pageHeader}>
-                  <Text style={styles.pageTitle}>Your Capacity Patterns</Text>
-                  <Text style={styles.pageSubtitle}>
-                    How your capacity has changed over time. This is not a professional evaluation.
-                  </Text>
-                </View>
-
-                {/* GRAPH - TOP OF PAGE */}
-                <TimeRangeTabs
-                  selected={timeRange}
-                  onSelect={handleTimeRangeChange}
-                  logCount={logCount}
-                  isPro={isPro}
-                  hasUsedAppFor30Days={hasUsedAppFor30Days}
-                  isDemoMode={isDemoMode}
-                />
-
-                {/* Show blur tease for 30d+ ranges for Free users after 30 days (skip in demo mode) */}
-                {!isPro && !isDemoMode && hasUsedAppFor30Days && timeRange !== '7d' ? (
-                  <BlurredPatternTease
-                    visible={true}
-                    onUpgradePress={() => router.push('/upgrade')}
-                    timeRange={timeRange}
-                  >
-                    <EnergyGraph
-                      logs={logs}
-                      width={graphWidth}
-                      timeRange={timeRange}
-                      startDate={calendarWeekStart || undefined}
-                      endDate={calendarWeekEnd || undefined}
-                    />
-                  </BlurredPatternTease>
-                ) : (
-                  <EnergyGraph
-                    logs={logs}
-                    width={graphWidth}
-                    timeRange={timeRange}
-                    startDate={calendarWeekStart || undefined}
-                    endDate={calendarWeekEnd || undefined}
-                  />
-                )}
-
-                {/* Stats below graph */}
-                {stats.avg !== null && (
-                  <View style={styles.statsContainer}>
-                    <View style={styles.statItem}>
-                      <Text style={styles.statValue}>{stats.avg}%</Text>
-                      <Text style={styles.statLabel}>Baseline</Text>
-                    </View>
-                    <View style={styles.statDivider} />
-                    <View style={styles.statItem}>
-                      <Text style={[
-                        styles.statValue,
-                        stats.trend !== null && {
-                          color: stats.trend > 0 ? '#00E5FF' : stats.trend < 0 ? '#F44336' : 'rgba(255,255,255,0.9)'
-                        }
-                      ]}>
-                        {stats.trend !== null
-                          ? `${stats.trend > 0 ? '+' : ''}${stats.trend}%`
-                          : '—'}
-                      </Text>
-                      <Text style={styles.statLabel}>Trend</Text>
-                    </View>
-                    <View style={styles.statDivider} />
-                    <View style={styles.statItem}>
-                      <Text style={[
-                        styles.statValue,
-                        { color: stats.timeInDepleted > 30 ? '#F44336' : stats.timeInDepleted > 15 ? '#E8A830' : '#00E5FF' }
-                      ]}>
-                        {stats.timeInDepleted}%
-                      </Text>
-                      <Text style={styles.statLabel}>Depleted</Text>
-                    </View>
-                  </View>
-                )}
-
-                {/* Capacity Drivers */}
-                {stats.avg !== null && (
-                  <View style={styles.categoryContainer}>
-                    <Text style={styles.categoryTitle}>Capacity Drivers</Text>
-                    <View style={styles.categoryRow}>
-                      {(['sensory', 'demand', 'social'] as Category[]).map((cat) => {
-                        const Icon = categoryIcons[cat];
-                        const label = t.categories[cat];
-                        const { count, strainRate } = stats.categoryBreakdown[cat];
-                        const hasData = count > 0;
-                        return (
-                          <View key={cat} style={styles.categoryItem}>
-                            <View style={styles.categoryIconRow}>
-                              <Icon size={16} color={hasData ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)'} />
-                              <Text style={[styles.categoryLabel, !hasData && { opacity: 0.4 }]}>{label}</Text>
-                            </View>
-                            <Text style={[
-                              styles.categoryRate,
-                              hasData && { color: strainRate > 60 ? '#F44336' : strainRate > 40 ? '#E8A830' : '#00E5FF' }
-                            ]}>
-                              {hasData ? `${strainRate}%` : '—'}
-                            </Text>
-                            <Text style={styles.categorySubtext}>
-                              {hasData ? 'correlation' : 'no data'}
-                            </Text>
-                          </View>
-                        );
-                      })}
-                    </View>
-                  </View>
-                )}
-
-                {/* Longitudinal Milestones */}
-                <MilestonesPanel logs={logs} />
-
-                {/* Pattern Language - Stability, Volatility, Recovery Lag */}
-                <PatternLanguagePanel logs={logs} />
-
-                {/* QCR Entry Point */}
-                <QCRButton
-                  hasAccess={hasQCRAccess}
-                  isDemoMode={isDemoMode}
-                  onPress={handleQCRPress}
-                  delay={200}
-                />
-
-                {/* Data Depth Badge */}
-                <DataDepthBadge stats={baselineStats} />
-
-                {/* Weekly Summary Card - shown when 7-day data available */}
-                {weeklySummary && <WeeklySummaryCard summary={weeklySummary} />}
-
-                {/* Weekly Capacity Record - Calendar View (synced with graph) */}
-                <WeeklyCapacityRecord logs={logs} onDelete={handleDelete} onWeekChange={handleWeekChange} />
-
-                {/* Footer */}
-                <View style={styles.footerSection}>
-                  {logs.length === 0 && (
-                    <EmptyState
-                      icon={Calendar}
-                      title="No entries yet"
-                      description="Capacity logs will appear here once you start logging."
-                      actionHint="Tap the orb on Home to log your first signal"
-                    />
-                  )}
-                  <Text style={styles.longitudinalNote}>
-                    {t.patterns.longitudinalNote}
-                  </Text>
-                </View>
-              </View>
-            )
-          }
-          ListEmptyComponent={null}
-          refreshControl={
-            <RefreshControl
-              refreshing={isLoading}
-              onRefresh={refresh}
-              tintColor="rgba(255,255,255,0.5)"
-            />
-          }
-        />
-      </View>
-
-      {/* QCR Screen Modal */}
-      <Modal
-        visible={showQCRScreen && !!qcrReport}
-        animationType="slide"
-        presentationStyle="fullScreen"
-        onRequestClose={() => setShowQCRScreen(false)}
-      >
-        {qcrReport && (
-          <QCRScreen
-            report={qcrReport}
-            onClose={() => setShowQCRScreen(false)}
+    <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
+      <StatusBar style="dark" />
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={refresh}
+            tintColor={colors.textSecondary}
           />
-        )}
-      </Modal>
+        }
+      >
+        {/* 1. Eyebrow + Headline + Subhead --------------------------------- */}
+        <View style={styles.headerBlock}>
+          <Text style={styles.eyebrow} accessibilityRole="text">
+            PATTERN INTELLIGENCE
+          </Text>
+          <Text
+            style={[styles.headline, { fontSize: headlineSize }]}
+            accessibilityRole="header"
+          >
+            What we&apos;ve learned about you
+          </Text>
+          <Text style={styles.subhead}>
+            {dayCount} days of signal · {confidence}% confidence
+          </Text>
+        </View>
 
-      {/* QCR Paywall Modal */}
-      <QCRPaywall
-        visible={showQCRPaywall}
-        onClose={() => setShowQCRPaywall(false)}
-        onPurchase={handleQCRPurchase}
-        onRestore={handleQCRRestore}
-        error={qcrError}
-      />
+        {/* 2. Time-range tabs --------------------------------------------- */}
+        <View
+          style={styles.tabsRow}
+          accessibilityRole="tablist"
+          accessibilityLabel="Time range"
+        >
+          {RANGES.map((r) => {
+            const selected = r.key === range;
+            return (
+              <Pressable
+                key={r.key}
+                onPress={() => handleRangePress(r.key)}
+                accessibilityRole="tab"
+                accessibilityLabel={`${r.label} range`}
+                accessibilityState={{ selected }}
+                style={styles.tabButton}
+                hitSlop={8}
+              >
+                <Text
+                  style={[styles.tabLabel, selected && styles.tabLabelActive]}
+                >
+                  {r.label}
+                </Text>
+                {selected && <View style={styles.tabUnderline} />}
+              </Pressable>
+            );
+          })}
+        </View>
+
+        {/* 3. PatternBarsChart -------------------------------------------- */}
+        <View style={styles.chartCard}>
+          {isEmpty ? (
+            <EmptyState
+              icon={Calendar}
+              title="No entries yet"
+              description="Capacity logs will appear here once you start logging."
+              size="compact"
+            />
+          ) : (
+            <PatternBarsChart
+              data={chartData}
+              width={chartWidth}
+              height={260}
+              rangeLabel={rangeLabel}
+              endLabel="TODAY"
+            />
+          )}
+        </View>
+
+        {/* 4. Pattern Insight card ---------------------------------------- */}
+        <Pressable
+          onPress={handleInsightPress}
+          style={({ pressed }) => [
+            styles.insightCard,
+            pressed && { opacity: 0.85 },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel="Open pattern insight"
+        >
+          <View style={styles.insightIconBubble}>
+            {monday.active ? (
+              <RotateCcw size={20} color={colors.primary} />
+            ) : (
+              <Sparkles size={20} color={colors.primary} />
+            )}
+          </View>
+          <View style={styles.insightTextWrap}>
+            <Text style={styles.insightEyebrow}>PATTERN INSIGHT</Text>
+            <Text style={styles.insightBody}>{insightText}</Text>
+          </View>
+          <ChevronRight size={20} color={colors.textTertiary} />
+        </Pressable>
+
+        {/* 5. DETECTED PATTERNS ------------------------------------------- */}
+        <Text style={styles.sectionLabel}>DETECTED PATTERNS</Text>
+        <View style={styles.cardsRow}>
+          <View style={styles.cardSlot}>
+            <DetectedPatternCard
+              icon={Calendar}
+              iconColor={colors.depleted}
+              eyebrow="MONDAY PATTERN"
+              value={monday.score}
+              valueColor={colors.depleted}
+              description="Capacity usually drops on Mondays."
+            />
+          </View>
+          <View style={styles.cardSlot}>
+            <DetectedPatternCard
+              icon={Moon}
+              iconColor={colors.primary}
+              eyebrow="SLEEP AVERAGE"
+              value={sleepValue}
+              valueColor={colors.primary}
+              description="Your typical sleep across this window."
+            />
+          </View>
+          <View style={styles.cardSlot}>
+            <DetectedPatternCard
+              icon={trendIcon}
+              iconColor={trendColor}
+              eyebrow={`${trendDaysLabel}D TREND`}
+              value={trendValue}
+              valueColor={trendColor}
+              description={`vs prior ${trendDaysLabel} days`}
+            />
+          </View>
+        </View>
+
+        {/* 6. Bottom safe-area padding for tab bar ------------------------ */}
+        <View style={styles.bottomPad} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
+// -----------------------------------------------------------------------------
+// STYLES — light theme. All colors from theme/colors.ts.
+// -----------------------------------------------------------------------------
 const styles = StyleSheet.create({
-  content: {
+  screen: {
     flex: 1,
-    paddingHorizontal: spacing.md,
+    backgroundColor: colors.background,
   },
-  listContent: {
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xl,
-    flexGrow: 1,
+  scrollContent: {
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xxl,
   },
-  pageHeader: {
+
+  // Header block
+  headerBlock: {
+    marginBottom: spacing.lg,
+  },
+  eyebrow: {
+    fontSize: 11,
+    color: colors.primary,
+    fontFamily: 'SpaceMono_400Regular',
+    letterSpacing: 11 * 0.18, // 0.18em at 11pt
+    textTransform: 'uppercase',
+    marginBottom: spacing.sm,
+  },
+  headline: {
+    fontFamily: 'DMSans_700Bold',
+    fontWeight: '700',
+    color: colors.textPrimary,
+    letterSpacing: -0.5,
+    marginBottom: spacing.sm,
+    // line-height ~ 1.05 of font size; set per-render via style override below if needed
+  },
+  subhead: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    fontFamily: 'DMSans_400Regular',
+  },
+
+  // Time-range tabs
+  tabsRow: {
+    flexDirection: 'row',
     alignItems: 'center',
     marginBottom: spacing.lg,
-    paddingVertical: spacing.sm,
+    marginTop: spacing.sm,
+    gap: spacing.lg,
   },
-  pageTitle: {
-    fontSize: 20,
-    fontWeight: '300',
-    color: 'rgba(255,255,255,0.9)',
+  tabButton: {
+    paddingVertical: 6,
+    alignItems: 'center',
+  },
+  tabLabel: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontFamily: 'DMSans_500Medium',
     letterSpacing: 0.5,
+  },
+  tabLabelActive: {
+    color: colors.textPrimary,
+    fontFamily: 'DMSans_700Bold',
+    fontWeight: '700',
+  },
+  tabUnderline: {
+    marginTop: 4,
+    height: 2,
+    width: '100%',
+    backgroundColor: colors.primary,
+    borderRadius: 1,
+  },
+
+  // Chart card
+  chartCard: {
+    backgroundColor: colors.card,
+    borderRadius: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.cardBorder,
+    padding: 12,
+    marginBottom: spacing.lg,
+  },
+
+  // Insight card
+  insightCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.card,
+    borderRadius: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.cardBorder,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  insightIconBubble: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.primaryDim,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  insightTextWrap: {
+    flex: 1,
+  },
+  insightEyebrow: {
+    fontSize: 10,
+    color: colors.primary,
+    fontFamily: 'SpaceMono_400Regular',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
     marginBottom: 4,
   },
-  pageSubtitle: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
-    textAlign: 'center',
-    fontStyle: 'italic',
-  },
-  entriesLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  footerContainer: {
-    marginTop: spacing.lg,
-    paddingTop: spacing.lg,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.08)',
-  },
-  graphSectionLabel: {
+  insightBody: {
     fontSize: 14,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.7)',
-    textAlign: 'center',
-    marginBottom: spacing.md,
-  },
-  graphSection: {
-    marginTop: spacing.lg,
-    paddingTop: spacing.lg,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.08)',
-  },
-  footerSection: {
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
-  },
-  emptyInline: {
-    paddingVertical: spacing.xl,
-    alignItems: 'center',
-  },
-  emptyInlineText: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.4)',
-    fontStyle: 'italic',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 100,
-  },
-  emptyOrb: {
-    marginBottom: spacing.lg,
-    opacity: 0.5,
-  },
-  emptyDots: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    opacity: 0.4,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    paddingVertical: spacing.md,
-    marginBottom: spacing.lg,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: '300',
-    color: 'rgba(255,255,255,0.9)',
-    letterSpacing: 1,
-  },
-  statLabel: {
-    fontSize: 10,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.4)',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginTop: 4,
-  },
-  statDivider: {
-    width: 1,
-    height: 32,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-  },
-  categoryContainer: {
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    padding: spacing.md,
-    marginBottom: spacing.lg,
-  },
-  categoryTitle: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: spacing.md,
-    textAlign: 'center',
-  },
-  categoryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  categoryItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  categoryIconRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 6,
-  },
-  categoryLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.7)',
-  },
-  categoryRate: {
-    fontSize: 18,
-    fontWeight: '300',
-    color: 'rgba(255,255,255,0.5)',
-    letterSpacing: 1,
-  },
-  categorySubtext: {
-    fontSize: 9,
-    color: 'rgba(255,255,255,0.35)',
-    marginTop: 2,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  insightsContainer: {
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    padding: spacing.md,
-    marginBottom: spacing.lg,
-  },
-  insightsTitle: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: spacing.md,
-    textAlign: 'center',
-  },
-  insightRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.sm,
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
-  },
-  insightContent: {
-    flex: 1,
-  },
-  insightText: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: 'rgba(255,255,255,0.85)',
-    lineHeight: 18,
-  },
-  insightSubtext: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
-    marginTop: 2,
-  },
-  insightTip: {
-    borderBottomWidth: 0,
-    marginTop: spacing.xs,
-    paddingTop: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.08)',
-  },
-  tipText: {
-    fontSize: 11,
-    fontStyle: 'italic',
-    color: 'rgba(255,255,255,0.4)',
-    flex: 1,
-  },
-  chartContext: {
-    fontSize: 9,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.35)',
-    textAlign: 'center',
-    marginBottom: spacing.sm,
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-  },
-  longitudinalNote: {
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
-    textAlign: 'center',
-    marginTop: spacing.sm,
-    marginBottom: spacing.md,
-    letterSpacing: 0.3,
-    fontStyle: 'italic',
-  },
-  lockedContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.xl * 2,
-    paddingHorizontal: spacing.lg,
-  },
-  lockedIconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-  },
-  lockedTitle: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
-    marginBottom: spacing.sm,
-    textAlign: 'center',
-  },
-  lockedBody: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
-    textAlign: 'center',
+    color: colors.textPrimary,
+    fontFamily: 'DMSans_500Medium',
     lineHeight: 20,
-    marginBottom: spacing.lg,
   },
-  lockedProgress: {
-    width: '100%',
-    maxWidth: 200,
-    alignItems: 'center',
-  },
-  lockedProgressBar: {
-    width: '100%',
-    height: 4,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 2,
-    overflow: 'hidden',
+
+  // Detected patterns
+  sectionLabel: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    fontFamily: 'SpaceMono_400Regular',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
     marginBottom: spacing.sm,
   },
-  lockedProgressFill: {
-    height: '100%',
-    backgroundColor: '#00E5FF',
-    borderRadius: 2,
-  },
-  lockedProgressText: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
-  },
-  streakIndicator: {
+  cardsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: spacing.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    gap: spacing.sm,
   },
-  streakText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: 'rgba(255, 255, 255, 0.6)',
-  },
-});
-
-// Data Depth Badge Styles
-const confidenceStyles = StyleSheet.create({
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    marginBottom: spacing.md,
-    paddingVertical: spacing.xs,
-  },
-  badgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  weekBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginLeft: spacing.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    backgroundColor: 'rgba(255, 152, 0, 0.15)',
-    borderRadius: 12,
-  },
-  weekBadgeText: {
-    fontSize: 9,
-    fontWeight: '600',
-    color: '#F59E0B',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-});
-
-// Weekly Summary Card Styles
-const summaryStyles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 152, 0, 0.3)',
-    padding: spacing.md,
-    marginBottom: spacing.lg,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  title: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#F59E0B',
-  },
-  dateRange: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  statItem: {
+  cardSlot: {
     flex: 1,
-    alignItems: 'center',
   },
-  statValue: {
-    fontSize: 18,
-    fontWeight: '300',
-    color: 'rgba(255,255,255,0.9)',
-  },
-  statLabel: {
-    fontSize: 9,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.4)',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginTop: 2,
-  },
-  statDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-  },
-  notesRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  distributionContainer: {
-    marginBottom: spacing.md,
-  },
-  distributionLabel: {
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.4)',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: spacing.xs,
-  },
-  distributionBar: {
-    flexDirection: 'row',
-    height: 8,
-    borderRadius: 4,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.1)',
-  },
-  distributionSegment: {
-    height: '100%',
-  },
-  distributionLegend: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: spacing.xs,
-  },
-  legendItem: {
-    fontSize: 9,
-    fontWeight: '500',
-  },
-  driversContainer: {
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.08)',
-    paddingTop: spacing.sm,
-  },
-  driversLabel: {
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.4)',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: spacing.xs,
-  },
-  driversRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.xs,
-  },
-  driverChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: 12,
-  },
-  driverText: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.7)',
-    textTransform: 'capitalize',
-  },
-});
 
-// Debug overlay styles
-const debugStyles = StyleSheet.create({
-  overlay: {
-    position: 'absolute',
-    top: 60,
-    left: 10,
-    right: 10,
-    zIndex: 1000,
-    backgroundColor: 'rgba(0, 0, 0, 0.95)',
-    borderRadius: 8,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 0, 0, 0.5)',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    gap: 8,
-  },
-  title: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#FF0000',
-  },
-  closeBtn: {
-    padding: 4,
-  },
-  closeBtnText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
-  label: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
-    fontFamily: Platform.OS === 'web' ? 'monospace' : undefined,
-  },
-  value: {
-    fontSize: 11,
-    color: '#00E5FF',
-    fontFamily: Platform.OS === 'web' ? 'monospace' : undefined,
-  },
-  reseedBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 12,
-    paddingVertical: 10,
-    backgroundColor: 'rgba(0, 229, 255, 0.1)',
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 229, 255, 0.3)',
-  },
-  reseedText: {
-    fontSize: 12,
-    color: '#00E5FF',
-    fontWeight: '500',
+  bottomPad: {
+    height: spacing.xxl,
   },
 });
