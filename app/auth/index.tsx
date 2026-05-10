@@ -68,7 +68,14 @@ async function migrateLocalLogs(): Promise<void> {
 // CONSTANTS
 // =============================================================================
 
-const BG = '#01020A';
+// Light surface — May 2026 redesign
+const BG = '#FFFFFF';
+const TEXT_PRIMARY = '#0F1624';
+const TEXT_SECONDARY = 'rgba(15, 22, 36, 0.62)';
+const TEXT_TERTIARY = 'rgba(15, 22, 36, 0.38)';
+const HAIRLINE = 'rgba(15, 22, 36, 0.10)';
+const TEAL = '#2DD4BF';
+const CRIMSON = '#DC2626';
 
 // =============================================================================
 // SCREEN
@@ -281,12 +288,12 @@ export default function AuthScreen() {
               {Platform.OS === 'ios' ? (
                 isSubmitting ? (
                   <View style={[styles.btn, styles.appleBtn]}>
-                    <ActivityIndicator color="#000" size="small" />
+                    <ActivityIndicator color="#FFFFFF" size="small" />
                   </View>
                 ) : (
                   <AppleAuthentication.AppleAuthenticationButton
                     buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-                    buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.WHITE}
+                    buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
                     cornerRadius={12}
                     style={styles.appleNativeBtn}
                     onPress={handleApple}
@@ -311,7 +318,7 @@ export default function AuthScreen() {
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
-                    <ActivityIndicator color="rgba(255,255,255,0.85)" size="small" />
+                    <ActivityIndicator color={TEXT_PRIMARY} size="small" />
                   ) : (
                     <Text style={styles.glassBtnText}>Sign in with Google</Text>
                   )}
@@ -356,7 +363,7 @@ export default function AuthScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Email"
-                placeholderTextColor="rgba(255,255,255,0.35)"
+                placeholderTextColor={TEXT_TERTIARY}
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
@@ -375,7 +382,7 @@ export default function AuthScreen() {
                   ref={passwordInputRef}
                   style={[styles.input, styles.passwordInput]}
                   placeholder="Password"
-                  placeholderTextColor="rgba(255,255,255,0.35)"
+                  placeholderTextColor={TEXT_TERTIARY}
                   value={password}
                   onChangeText={setPassword}
                   {...{ [_HIDDEN]: !showPassword }}
@@ -393,8 +400,8 @@ export default function AuthScreen() {
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
                   {showPassword
-                    ? <EyeOff size={18} color="rgba(255,255,255,0.45)" />
-                    : <Eye size={18} color="rgba(255,255,255,0.45)" />
+                    ? <EyeOff size={18} color={TEXT_SECONDARY} />
+                    : <Eye size={18} color={TEXT_SECONDARY} />
                   }
                 </Pressable>
               </View>
@@ -420,14 +427,14 @@ export default function AuthScreen() {
               ) : null}
 
               <Pressable
-                style={[styles.btn, styles.appleBtn, isSubmitting && styles.btnDisabled]}
+                style={[styles.btn, styles.continueBtn, isSubmitting && styles.btnDisabled]}
                 onPress={handleEmailAuth}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
-                  <ActivityIndicator color="#000" size="small" />
+                  <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
-                  <Text style={styles.appleBtnText}>
+                  <Text style={styles.continueBtnText}>
                     {authMode === 'signup' ? 'Create account' : 'Sign in'}
                   </Text>
                 )}
@@ -484,7 +491,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   configErrorText: {
-    color: 'rgba(255,255,255,0.5)',
+    color: TEXT_SECONDARY,
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 22,
@@ -513,17 +520,17 @@ const styles = StyleSheet.create({
   glowOuter: {
     width: 500,
     height: 500,
-    backgroundColor: 'rgba(45,212,191,0.03)',
+    backgroundColor: 'rgba(45,212,191,0.04)',
   },
   glowMid: {
     width: 400,
     height: 400,
-    backgroundColor: 'rgba(45,212,191,0.06)',
+    backgroundColor: 'rgba(45,212,191,0.07)',
   },
   glowInner: {
     width: 300,
     height: 300,
-    backgroundColor: 'rgba(45,212,191,0.10)',
+    backgroundColor: 'rgba(45,212,191,0.12)',
   },
 
   // ── Title ───────────────────────────────────────────────────────────────
@@ -531,7 +538,7 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_700Bold',
     fontSize: 34,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: TEXT_PRIMARY,
     textAlign: 'center',
     marginTop: 28,
   },
@@ -540,7 +547,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 11,
-    color: 'rgba(255,255,255,0.35)',
+    color: TEXT_TERTIARY,
     letterSpacing: 3,
     textAlign: 'center',
     marginTop: 8,
@@ -557,8 +564,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   errorBanner: {
-    backgroundColor: 'rgba(255,82,82,0.10)',
-    borderColor: 'rgba(255,82,82,0.30)',
+    backgroundColor: 'rgba(220,38,38,0.08)',
+    borderColor: 'rgba(220,38,38,0.28)',
   },
   successBanner: {
     backgroundColor: 'rgba(45,212,191,0.08)',
@@ -566,14 +573,14 @@ const styles = StyleSheet.create({
   },
   bannerErrorText: {
     fontFamily: 'DMSans_400Regular',
-    color: '#FF5252',
+    color: CRIMSON,
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 20,
   },
   bannerSuccessText: {
     fontFamily: 'DMSans_400Regular',
-    color: '#2DD4BF',
+    color: TEAL,
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 20,
@@ -591,8 +598,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Apple Sign In stays solid black per HIG (do not repaint)
   appleBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#000000',
   },
   appleNativeBtn: {
     width: '100%',
@@ -600,18 +608,29 @@ const styles = StyleSheet.create({
   },
   appleBtnText: {
     fontFamily: 'DMSans_600SemiBold',
-    color: '#000000',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
+  // Email "Continue" / Sign in / Create account button — primary teal action
+  continueBtn: {
+    backgroundColor: TEAL,
+  },
+  continueBtnText: {
+    fontFamily: 'DMSans_600SemiBold',
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  // Secondary glass button — white with hairline border
   glassBtn: {
-    backgroundColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: HAIRLINE,
   },
   glassBtnText: {
     fontFamily: 'DMSans_500Medium',
-    color: 'rgba(255,255,255,0.85)',
+    color: TEXT_PRIMARY,
     fontSize: 16,
     fontWeight: '500',
   },
@@ -627,7 +646,7 @@ const styles = StyleSheet.create({
   createAccountText: {
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 13,
-    color: '#2DD4BF',
+    color: TEAL,
   },
   forgotLinkHome: {
     alignItems: 'center',
@@ -636,7 +655,7 @@ const styles = StyleSheet.create({
   forgotLinkHomeText: {
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: TEXT_SECONDARY,
   },
 
   // ── Email form ──────────────────────────────────────────────────────────
@@ -647,17 +666,17 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_600SemiBold',
     fontSize: 22,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: TEXT_PRIMARY,
     textAlign: 'center',
     marginBottom: 24,
   },
   input: {
     width: '100%',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: '#F4F5F7',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.11)',
-    borderRadius: 14,
-    color: '#FFFFFF',
+    borderColor: HAIRLINE,
+    borderRadius: 12,
+    color: TEXT_PRIMARY,
     fontFamily: 'DMSans_400Regular',
     fontSize: 16,
     paddingHorizontal: 16,
@@ -685,11 +704,11 @@ const styles = StyleSheet.create({
   strengthText: {
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: TEXT_SECONDARY,
     marginBottom: 16,
   },
   strengthValue: {
-    color: 'rgba(255,255,255,0.65)',
+    color: TEXT_PRIMARY,
     textTransform: 'capitalize',
   },
   forgotLink: {
@@ -699,7 +718,7 @@ const styles = StyleSheet.create({
   },
   forgotLinkText: {
     fontFamily: 'SpaceMono_400Regular',
-    color: 'rgba(255,255,255,0.35)',
+    color: TEXT_SECONDARY,
     fontSize: 12,
   },
   backLink: {
@@ -709,19 +728,19 @@ const styles = StyleSheet.create({
   },
   backLinkText: {
     fontFamily: 'SpaceMono_400Regular',
-    color: 'rgba(255,255,255,0.4)',
+    color: TEXT_SECONDARY,
     fontSize: 14,
   },
   legalText: {
     fontFamily: 'SpaceMono_400Regular',
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: TEXT_SECONDARY,
     textAlign: 'center',
     marginTop: 20,
     lineHeight: 18,
   },
   legalLink: {
-    color: '#2DD4BF',
+    color: TEAL,
     textDecorationLine: 'underline',
   },
 });

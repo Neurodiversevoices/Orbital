@@ -122,8 +122,8 @@ export function Composer({
 
   const buttonStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
-    backgroundColor: canSubmit ? `${effectiveAccent}20` : 'rgba(255,255,255,0.05)',
-    borderColor: canSubmit ? effectiveAccent : 'rgba(255,255,255,0.1)',
+    backgroundColor: canSubmit ? effectiveAccent : colors.backgroundSubtle,
+    borderColor: canSubmit ? effectiveAccent : colors.hairline,
     opacity: isSubmitting ? 0.5 : 1,
   }));
 
@@ -156,14 +156,14 @@ export function Composer({
         { paddingBottom: Math.max(insets.bottom, spacing.sm) },
       ]}
     >
-      <View style={[styles.card, glassStyle, { borderColor: `${effectiveAccent}30` }]}>
+      <View style={[styles.card, glassStyle, { borderColor: colors.hairline }]}>
         <TextInput
           ref={inputRef}
-          style={[styles.input, { borderColor: `${effectiveAccent}20` }]}
+          style={[styles.input, { borderColor: `${effectiveAccent}33` }]}
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="rgba(255,255,255,0.5)"
+          placeholderTextColor={colors.textTertiary}
           multiline
           maxLength={500}
           textAlignVertical="top"
@@ -183,7 +183,7 @@ export function Composer({
         >
           <Check
             size={24}
-            color={canSubmit ? effectiveAccent : 'rgba(255,255,255,0.3)'}
+            color={canSubmit ? '#FFFFFF' : colors.textTertiary}
             strokeWidth={2.5}
           />
         </AnimatedPressable>
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: colors.background,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.08)',
+    borderTopColor: colors.hairline,
     paddingTop: spacing.sm,
     paddingHorizontal: spacing.md,
   },
@@ -211,20 +211,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: spacing.sm,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
     padding: spacing.sm,
   },
   input: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: '#FFFFFF',
     borderRadius: borderRadius.md,
     borderWidth: 1,
     paddingHorizontal: spacing.md,
     paddingTop: spacing.sm,
     paddingBottom: spacing.sm,
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     fontSize: 15,
     minHeight: 44,
     maxHeight: 100,

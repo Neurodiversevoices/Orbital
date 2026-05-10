@@ -93,7 +93,7 @@ export default function SettingsScreen() {
   // Settings header chip color follows the active sub-brand. Demo mode
   // still wins (amber) — the chip only repaints when not in demo.
   const brandAccent = useBrandAccent();
-  const headerChipColor = isDemoMode ? '#F59E0B' : (brandAccent || '#00E5FF');
+  const headerChipColor = isDemoMode ? '#F59E0B' : (brandAccent || colors.primary);
 
   // Load entitlements for Circle membership check
   useEffect(() => {
@@ -664,7 +664,7 @@ export default function SettingsScreen() {
                     {localeNames[localeKey]}
                   </Text>
                   {localeKey === locale && (
-                    <Check color="#00E5FF" size={18} />
+                    <Check color={colors.primary} size={18} />
                   )}
                 </Pressable>
               ))}
@@ -716,7 +716,7 @@ export default function SettingsScreen() {
                     </Text>
                     <Text style={styles.demoOptionSublabel}>Use real data</Text>
                   </View>
-                  {!isDemoMode && <Check color="#00E5FF" size={18} />}
+                  {!isDemoMode && <Check color={colors.primary} size={18} />}
                 </Pressable>
                 <Pressable
                   style={[styles.languageOption, isDemoMode && styles.demoOptionSelected]}
@@ -851,8 +851,8 @@ function SettingsRow({
     scale.value = withSpring(1, { damping: 15 });
   };
 
-  const iconColor = danger ? '#F44336' : highlight ? '#F59E0B' : 'rgba(255,255,255,0.6)';
-  const textColor = danger ? '#F44336' : highlight ? '#F59E0B' : 'rgba(255,255,255,0.9)';
+  const iconColor = danger ? '#DC2626' : highlight ? '#F59E0B' : colors.textSecondary;
+  const textColor = danger ? '#DC2626' : highlight ? '#0F1624' : colors.textPrimary;
 
   const a11yLabel = sublabel ? `${label}. ${sublabel}` : label;
 
@@ -873,7 +873,7 @@ function SettingsRow({
         <Text style={[styles.rowLabel, { color: textColor }]}>{label}</Text>
         {sublabel && <Text style={[styles.rowSublabel, highlight && styles.rowSublabelHighlight]}>{sublabel}</Text>}
       </View>
-      <ChevronRight color={highlight ? '#F59E0B' : 'rgba(255,255,255,0.2)'} size={18} />
+      <ChevronRight color={highlight ? '#F59E0B' : colors.textTertiary} size={18} />
     </AnimatedPressable>
   );
 }
@@ -897,11 +897,11 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.hairline,
   },
   logoInner: {
     width: 12,
@@ -922,18 +922,24 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.35)',
+    color: colors.textSecondary,
+    fontFamily: 'SpaceMono_400Regular',
+    letterSpacing: 1.6,
+    textTransform: 'uppercase',
+    marginBottom: spacing.sm,
   },
   demoNotice: {
-    backgroundColor: 'rgba(122,154,170,0.15)',
+    backgroundColor: 'rgba(245,158,11,0.08)',
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: 8,
     marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(245,158,11,0.20)',
   },
   demoNoticeText: {
     fontSize: 11,
-    color: '#7A9AAA',
+    color: colors.textPrimary,
     textAlign: 'center',
     letterSpacing: 1,
     marginBottom: spacing.sm,
@@ -953,13 +959,13 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
   },
   iconContainerDanger: {
-    backgroundColor: 'rgba(244,67,54,0.1)',
+    backgroundColor: 'rgba(220,38,38,0.10)',
   },
   rowContent: {
     flex: 1,
@@ -970,12 +976,12 @@ const styles = StyleSheet.create({
   },
   rowSublabel: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   aboutCard: {
     backgroundColor: colors.card,
-    borderRadius: 12,
+    borderRadius: 14,
     padding: spacing.lg,
     borderWidth: 1,
     borderColor: colors.cardBorder,
@@ -989,15 +995,15 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 20,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   version: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
   tagline: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: spacing.xs,
     marginBottom: spacing.md,
   },
@@ -1012,7 +1018,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(15,22,36,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.lg,
@@ -1032,12 +1038,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
+    borderBottomColor: colors.hairline,
   },
   languagePickerTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   languageList: {
     padding: spacing.sm,
@@ -1049,16 +1055,18 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderRadius: 10,
     marginBottom: spacing.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.hairline,
   },
   languageOptionSelected: {
-    backgroundColor: 'rgba(0,229,255,0.1)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
   },
   languageOptionText: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   languageOptionTextSelected: {
-    color: '#00E5FF',
+    color: colors.primary,
     fontWeight: '500',
   },
   // Demo Mode Styles
@@ -1068,7 +1076,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   demoBannerText: {
-    color: '#000',
+    color: '#0F1624',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 2,
@@ -1085,10 +1093,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(245,158,11,0.15)',
   },
   rowSublabelHighlight: {
-    color: 'rgba(245,158,11,0.7)',
+    color: '#F59E0B',
   },
   demoOptionSelected: {
-    backgroundColor: 'rgba(245,158,11,0.1)',
+    backgroundColor: 'rgba(245,158,11,0.10)',
   },
   demoOptionTextSelected: {
     color: '#F59E0B',
@@ -1096,7 +1104,7 @@ const styles = StyleSheet.create({
   },
   demoOptionSublabel: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.35)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   // Mode Card Styles
@@ -1128,12 +1136,12 @@ const styles = StyleSheet.create({
   },
   modeCardDescription: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
   orgNameText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginBottom: spacing.sm,
   },
   modeCardActions: {
@@ -1145,14 +1153,14 @@ const styles = StyleSheet.create({
   leaveOrgButton: {
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
-    backgroundColor: 'rgba(244,67,54,0.1)',
+    backgroundColor: 'rgba(220,38,38,0.10)',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(244,67,54,0.3)',
+    borderColor: 'rgba(220,38,38,0.30)',
   },
   leaveOrgText: {
     fontSize: 12,
-    color: '#F44336',
+    color: '#DC2626',
     fontWeight: '500',
   },
   // Subscription Card Styles
@@ -1170,7 +1178,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   starterBadge: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 4,
@@ -1178,16 +1186,16 @@ const styles = StyleSheet.create({
   starterBadgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     letterSpacing: 0.5,
   },
   signalCount: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   subscriptionDescription: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.md,
   },
   upgradeButton: {
@@ -1195,7 +1203,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.xs,
-    backgroundColor: '#00E5FF',
+    backgroundColor: colors.primary,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,
@@ -1203,7 +1211,7 @@ const styles = StyleSheet.create({
   upgradeButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
+    color: '#FFFFFF',
   },
   redeemButton: {
     flexDirection: 'row',
@@ -1215,13 +1223,13 @@ const styles = StyleSheet.create({
   },
   redeemButtonText: {
     fontSize: 13,
-    color: '#00E5FF',
+    color: colors.primary,
   },
   // QA Free Mode Styles
   qaFreeModeActiveBanner: {
-    backgroundColor: 'rgba(156,39,176,0.15)',
+    backgroundColor: 'rgba(156,39,176,0.10)',
     borderWidth: 1,
-    borderColor: 'rgba(156,39,176,0.4)',
+    borderColor: 'rgba(156,39,176,0.30)',
     borderRadius: 8,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
@@ -1236,42 +1244,46 @@ const styles = StyleSheet.create({
   },
   qaFreeModeActiveSubtext: {
     fontSize: 11,
-    color: 'rgba(156,39,176,0.8)',
+    color: 'rgba(156,39,176,0.85)',
     marginTop: 2,
   },
   qaFreeModeInfo: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: 8,
     padding: spacing.md,
     marginTop: spacing.xs,
+    borderWidth: 1,
+    borderColor: colors.hairline,
   },
   qaFreeModeInfoTitle: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
   qaFreeModeInfoText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
-  // FREE USER VIEW Styles
+  // FREE USER VIEW Styles — amber-tinted free-tier banner per spec
   freeUserViewBanner: {
-    backgroundColor: '#F44336',
+    backgroundColor: 'rgba(245,158,11,0.08)',
     paddingVertical: 8,
     alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(245,158,11,0.30)',
   },
   freeUserViewBannerText: {
-    color: '#fff',
+    color: '#0F1624',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1,
   },
   freeUserViewActiveBanner: {
-    backgroundColor: 'rgba(244,67,54,0.15)',
+    backgroundColor: 'rgba(220,38,38,0.10)',
     borderWidth: 2,
-    borderColor: 'rgba(244,67,54,0.6)',
+    borderColor: 'rgba(220,38,38,0.50)',
     borderRadius: 8,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
@@ -1281,37 +1293,37 @@ const styles = StyleSheet.create({
   freeUserViewActiveBannerText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#F44336',
+    color: '#DC2626',
     letterSpacing: 1,
   },
   freeUserViewActiveSubtext: {
     fontSize: 12,
-    color: 'rgba(244,67,54,0.8)',
+    color: 'rgba(220,38,38,0.85)',
     marginTop: 4,
   },
   freeUserViewInfo: {
-    backgroundColor: 'rgba(244,67,54,0.08)',
+    backgroundColor: 'rgba(220,38,38,0.06)',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(244,67,54,0.2)',
+    borderColor: 'rgba(220,38,38,0.20)',
     padding: spacing.md,
     marginTop: spacing.xs,
   },
   freeUserViewInfoTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#DC2626',
     marginBottom: spacing.sm,
   },
   freeUserViewInfoText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   freeUserViewInfoNote: {
     fontSize: 10,
     fontWeight: '600',
-    color: 'rgba(244,67,54,0.8)',
+    color: 'rgba(220,38,38,0.85)',
     marginTop: spacing.sm,
     textAlign: 'center',
   },

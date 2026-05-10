@@ -275,12 +275,12 @@ SceneSample mapScene(float3 p, float t) {
 half3 spectrum(float t, float hueShift) {
     float u = fract(t + hueShift / 6.2831);
     if (u < 0.3333) {
-        return mix(CRIMSON, AMBER, u / 0.3333);
+        return mix(CRIMSON, AMBER, half(u / 0.3333));
     }
     if (u < 0.6666) {
-        return mix(AMBER, TEAL, (u - 0.3333) / 0.3333);
+        return mix(AMBER, TEAL, half((u - 0.3333) / 0.3333));
     }
-    return mix(TEAL, CYAN, (u - 0.6666) / 0.3334);
+    return mix(TEAL, CYAN, half((u - 0.6666) / 0.3334));
 }
 
 //
