@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   headerSpacer: {
     width: 40,
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: 'rgba(0, 229, 255, 0.1)',
+    backgroundColor: 'rgba(45, 212, 191, 0.10)',
     borderRadius: 8,
     padding: spacing.sm,
     marginBottom: spacing.lg,
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
   privacyText: {
     flex: 1,
     fontSize: 12,
-    color: '#00E5FF',
+    color: '#0E8C7B',
   },
   emptyState: {
     alignItems: 'center',
@@ -437,13 +437,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
   },
   emptyBody: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: spacing.lg,
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: '#00E5FF',
+    backgroundColor: '#2DD4BF',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderRadius: 24,
@@ -470,25 +470,27 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: 12,
     padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
   },
   formTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   formDescription: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.lg,
   },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.hairline,
     padding: spacing.md,
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     fontSize: 16,
     marginBottom: spacing.md,
   },
@@ -503,12 +505,12 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: colors.cardBorder,
   },
   secondaryButtonText: {
     fontSize: 16,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   teamHeader: {
     flexDirection: 'row',
@@ -520,11 +522,11 @@ const styles = StyleSheet.create({
   teamName: {
     fontSize: 20,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   teamCode: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginTop: 2,
   },
   leaveButton: {
@@ -535,15 +537,17 @@ const styles = StyleSheet.create({
   },
   leaveButtonText: {
     fontSize: 14,
-    color: '#F44336',
+    color: '#DC2626',
   },
   thresholdWarning: {
     flexDirection: 'row',
     gap: spacing.md,
-    backgroundColor: 'rgba(232, 168, 48, 0.1)',
+    backgroundColor: 'rgba(245, 158, 11, 0.10)',
     borderRadius: 12,
     padding: spacing.md,
     marginBottom: spacing.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.25)',
   },
   thresholdContent: {
     flex: 1,
@@ -551,12 +555,12 @@ const styles = StyleSheet.create({
   thresholdTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#E8A830',
+    color: '#9A6A0A',
     marginBottom: 4,
   },
   thresholdBody: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   card: {
@@ -570,7 +574,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: spacing.md,
@@ -586,7 +590,7 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
     marginBottom: spacing.md,
   },
   distributionSegment: {
@@ -608,7 +612,7 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
   },
   driversRow: {
     flexDirection: 'row',
@@ -620,17 +624,17 @@ const styles = StyleSheet.create({
   },
   driverLabel: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     textTransform: 'capitalize',
   },
   driverPercent: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   noDataText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     fontStyle: 'italic',
   },
   trendRow: {
@@ -645,23 +649,23 @@ const styles = StyleSheet.create({
   },
   confidenceLabel: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     textTransform: 'capitalize',
   },
   suggestionItem: {
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: colors.hairline,
     paddingVertical: spacing.sm,
   },
   suggestionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.85)',
+    color: colors.textPrimary,
     marginBottom: 4,
   },
   suggestionDescription: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   statsFooter: {
@@ -670,7 +674,7 @@ const styles = StyleSheet.create({
   },
   statsText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   bottomPadding: {
     height: 40,

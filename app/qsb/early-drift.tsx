@@ -45,9 +45,9 @@ const SIGNAL_ICONS: Record<DriftSignalType, React.ComponentType<{ color: string;
 };
 
 const CONFIDENCE_COLORS: Record<ConfidenceLevel, string> = {
-  high: '#00D7FF',
-  medium: '#F5B700',
-  low: 'rgba(255,255,255,0.5)',
+  high: '#0E8C7B',
+  medium: '#F59E0B',
+  low: 'rgba(15,22,36,0.38)',
 };
 
 export default function EarlyDriftScreen() {
@@ -60,9 +60,9 @@ export default function EarlyDriftScreen() {
 
   const getRiskColor = (risk: 'low' | 'moderate' | 'elevated') => {
     switch (risk) {
-      case 'low': return '#00D7FF';
-      case 'moderate': return '#F5B700';
-      case 'elevated': return '#FF3B30';
+      case 'low': return '#0E8C7B';
+      case 'moderate': return '#F59E0B';
+      case 'elevated': return '#DC2626';
     }
   };
 
@@ -75,16 +75,16 @@ export default function EarlyDriftScreen() {
   };
 
   const TrendIcon = data?.trendDirection === 'improving' ? TrendingUp : data?.trendDirection === 'declining' ? TrendingDown : Minus;
-  const trendColor = data?.trendDirection === 'improving' ? '#00D7FF' : data?.trendDirection === 'declining' ? '#FF3B30' : 'rgba(255,255,255,0.5)';
+  const trendColor = data?.trendDirection === 'improving' ? '#0E8C7B' : data?.trendDirection === 'declining' ? '#DC2626' : colors.textTertiary;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <ChevronLeft color="rgba(255,255,255,0.7)" size={24} />
+          <ChevronLeft color={colors.textSecondary} size={24} />
         </Pressable>
-        <Text style={styles.headerTitle}>Early Drift Detector</Text>
+        <Text style={styles.headerTitle} maxFontSizeMultiplier={1.5}>Early Drift Detector</Text>
         <View style={styles.headerRight}>
           <ScopeSelectorCompact scope={scope} onScopeChange={setScope} />
         </View>
@@ -117,19 +117,19 @@ export default function EarlyDriftScreen() {
               entering={FadeInDown.delay(100).duration(400)}
               style={[
                 styles.riskCard,
-                { borderColor: `${getRiskColor(data.overallRisk)}40` },
+                { borderColor: `${getRiskColor(data.overallRisk)}55` },
               ]}
             >
               <View style={[styles.riskIndicator, { backgroundColor: getRiskColor(data.overallRisk) }]} />
               <View style={styles.riskContent}>
-                <Text style={styles.riskLabel}>Overall Status</Text>
-                <Text style={[styles.riskValue, { color: getRiskColor(data.overallRisk) }]}>
+                <Text style={styles.riskLabel} maxFontSizeMultiplier={1.5}>Overall Status</Text>
+                <Text style={[styles.riskValue, { color: getRiskColor(data.overallRisk) }]} maxFontSizeMultiplier={1.5}>
                   {getRiskLabel(data.overallRisk)}
                 </Text>
               </View>
               <View style={styles.trendContainer}>
                 <TrendIcon color={trendColor} size={18} />
-                <Text style={[styles.trendLabel, { color: trendColor }]}>
+                <Text style={[styles.trendLabel, { color: trendColor }]} maxFontSizeMultiplier={1.5}>
                   {data.trendDirection === 'improving' ? 'Improving' : data.trendDirection === 'declining' ? 'Declining' : 'Stable'}
                 </Text>
               </View>
@@ -138,10 +138,10 @@ export default function EarlyDriftScreen() {
             {/* Predictive Warning */}
             {data.daysUntilPotentialIssue && (
               <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.warningCard}>
-                <AlertTriangle color="#F5B700" size={20} />
+                <AlertTriangle color="#F59E0B" size={20} />
                 <View style={styles.warningContent}>
-                  <Text style={styles.warningTitle}>Predictive Alert</Text>
-                  <Text style={styles.warningText}>
+                  <Text style={styles.warningTitle} maxFontSizeMultiplier={1.5}>Predictive Alert</Text>
+                  <Text style={styles.warningText} maxFontSizeMultiplier={1.5}>
                     Based on current trends, potential capacity issues in ~{data.daysUntilPotentialIssue} days
                   </Text>
                 </View>
@@ -150,18 +150,18 @@ export default function EarlyDriftScreen() {
 
             {/* Detected Signals */}
             <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.card}>
-              <Text style={styles.cardTitle}>Detected Signals</Text>
+              <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>Detected Signals</Text>
               {data.signals.length === 0 ? (
                 <View style={styles.noSignals}>
-                  <CheckCircle color="#00D7FF" size={24} />
-                  <Text style={styles.noSignalsText}>No warning signals detected</Text>
-                  <Text style={styles.noSignalsSubtext}>Your capacity patterns look healthy</Text>
+                  <CheckCircle color="#0E8C7B" size={24} />
+                  <Text style={styles.noSignalsText} maxFontSizeMultiplier={1.5}>No warning signals detected</Text>
+                  <Text style={styles.noSignalsSubtext} maxFontSizeMultiplier={1.5}>Your capacity patterns look healthy</Text>
                 </View>
               ) : (
                 <View style={styles.signalsList}>
                   {data.signals.map((signal, index) => {
                     const SignalIcon = SIGNAL_ICONS[signal.type];
-                    const severityColor = signal.severity > 60 ? '#FF3B30' : signal.severity > 30 ? '#F5B700' : '#00D7FF';
+                    const severityColor = signal.severity > 60 ? '#DC2626' : signal.severity > 30 ? '#F59E0B' : '#0E8C7B';
 
                     return (
                       <View key={index} style={styles.signalItem}>
@@ -170,23 +170,23 @@ export default function EarlyDriftScreen() {
                             <SignalIcon color={severityColor} size={18} />
                           </View>
                           <View style={styles.signalInfo}>
-                            <Text style={styles.signalLabel}>{signal.label}</Text>
+                            <Text style={styles.signalLabel} maxFontSizeMultiplier={1.5}>{signal.label}</Text>
                             <View style={styles.signalMeta}>
                               <View style={[styles.confidenceBadge, { borderColor: CONFIDENCE_COLORS[signal.confidence] }]}>
-                                <Text style={[styles.confidenceText, { color: CONFIDENCE_COLORS[signal.confidence] }]}>
+                                <Text style={[styles.confidenceText, { color: CONFIDENCE_COLORS[signal.confidence] }]} maxFontSizeMultiplier={1.5}>
                                   {signal.confidence} confidence
                                 </Text>
                               </View>
-                              <Text style={styles.dataPoints}>{signal.dataPoints} data points</Text>
+                              <Text style={styles.dataPoints} maxFontSizeMultiplier={1.5}>{signal.dataPoints} data points</Text>
                             </View>
                           </View>
                           <View style={styles.severityBadge}>
-                            <Text style={[styles.severityText, { color: severityColor }]}>
+                            <Text style={[styles.severityText, { color: severityColor }]} maxFontSizeMultiplier={1.5}>
                               {signal.severity}
                             </Text>
                           </View>
                         </View>
-                        <Text style={styles.signalDescription}>{signal.description}</Text>
+                        <Text style={styles.signalDescription} maxFontSizeMultiplier={1.5}>{signal.description}</Text>
                       </View>
                     );
                   })}
@@ -196,12 +196,12 @@ export default function EarlyDriftScreen() {
 
             {/* Recommendations */}
             <Animated.View entering={FadeInDown.delay(400).duration(400)} style={styles.card}>
-              <Text style={styles.cardTitle}>Recommendations</Text>
+              <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>Recommendations</Text>
               <View style={styles.recommendationsList}>
                 {data.recommendations.map((rec, index) => (
                   <View key={index} style={styles.recommendationItem}>
                     <View style={styles.recommendationDot} />
-                    <Text style={styles.recommendationText}>{rec}</Text>
+                    <Text style={styles.recommendationText} maxFontSizeMultiplier={1.5}>{rec}</Text>
                   </View>
                 ))}
               </View>
@@ -209,8 +209,8 @@ export default function EarlyDriftScreen() {
 
             {/* How It Works */}
             <Animated.View entering={FadeInDown.delay(500).duration(400)} style={styles.infoCard}>
-              <Text style={styles.infoTitle}>How Early Detection Works</Text>
-              <Text style={styles.infoText}>
+              <Text style={styles.infoTitle} maxFontSizeMultiplier={1.5}>How Early Detection Works</Text>
+              <Text style={styles.infoText} maxFontSizeMultiplier={1.5}>
                 The drift detector analyzes multiple signals to identify potential
                 issues before they become problems:{'\n\n'}
                 <Text style={{ fontWeight: '600' }}>• Recovery Lag:</Text> Increasing time to bounce back{'\n'}
@@ -224,7 +224,7 @@ export default function EarlyDriftScreen() {
             {/* Cohort Info */}
             {data.cohortSize && (
               <Animated.View entering={FadeInDown.delay(600).duration(400)} style={styles.cohortInfo}>
-                <Text style={styles.cohortText}>
+                <Text style={styles.cohortText} maxFontSizeMultiplier={1.5}>
                   Based on {data.cohortSize.toLocaleString()} participants
                 </Text>
               </Animated.View>
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: colors.hairline,
   },
   backButton: {
     padding: spacing.sm,
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 17,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     marginLeft: spacing.sm,
   },
   headerRight: {
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
   riskCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
     padding: spacing.md,
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   },
   riskLabel: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: 2,
   },
   riskValue: {
@@ -310,10 +310,10 @@ const styles = StyleSheet.create({
   warningCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: 'rgba(245,183,0,0.08)',
+    backgroundColor: 'rgba(245,158,11,0.10)',
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(245,183,0,0.2)',
+    borderColor: 'rgba(245,158,11,0.30)',
     padding: spacing.md,
     marginBottom: spacing.md,
     gap: spacing.sm,
@@ -324,26 +324,26 @@ const styles = StyleSheet.create({
   warningTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#F5B700',
+    color: '#9A6B0E',
     marginBottom: 2,
   },
   warningText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     lineHeight: 18,
   },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.md,
   },
   cardTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
     marginBottom: spacing.md,
   },
   noSignals: {
@@ -353,19 +353,19 @@ const styles = StyleSheet.create({
   noSignalsText: {
     fontSize: 14,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
     marginTop: spacing.sm,
   },
   noSignalsSubtext: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 2,
   },
   signalsList: {
     gap: spacing.md,
   },
   signalItem: {
-    backgroundColor: 'rgba(255,255,255,0.02)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     padding: spacing.sm,
   },
@@ -378,7 +378,9 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: colors.backgroundSubtle,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.sm,
@@ -389,7 +391,7 @@ const styles = StyleSheet.create({
   signalLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   signalMeta: {
     flexDirection: 'row',
@@ -410,7 +412,7 @@ const styles = StyleSheet.create({
   },
   dataPoints: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
   severityBadge: {
     width: 36,
@@ -423,7 +425,7 @@ const styles = StyleSheet.create({
   },
   signalDescription: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 18,
     marginTop: spacing.xs,
   },
@@ -439,17 +441,17 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#00D7FF',
+    backgroundColor: colors.primary,
     marginTop: 6,
   },
   recommendationText: {
     flex: 1,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     lineHeight: 20,
   },
   infoCard: {
-    backgroundColor: 'rgba(255,255,255,0.02)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -457,12 +459,12 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 13,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   infoText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   cohortInfo: {
@@ -471,6 +473,6 @@ const styles = StyleSheet.create({
   },
   cohortText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
 });

@@ -64,7 +64,7 @@ const BRIEFINGS: BriefingDefinition[] = [
   {
     id: 'alignment-brief',
     icon: Users,
-    color: '#00E5FF',
+    color: '#0E8C7B',
     title: 'Executive Alignment Brief',
     timing: 'Pre-Pilot',
     purpose: [
@@ -99,7 +99,7 @@ const BRIEFINGS: BriefingDefinition[] = [
   {
     id: 'executive-advisory',
     icon: Phone,
-    color: '#FFD700',
+    color: '#F59E0B',
     title: 'Executive Advisory',
     timing: 'Ongoing',
     purpose: [
@@ -132,7 +132,7 @@ export default function ExecutiveEngagementScreen() {
           <ArrowLeft size={24} color={colors.textPrimary} />
         </Pressable>
         <View style={styles.headerCenter}>
-          <Sparkles size={18} color="#FFD700" />
+          <Sparkles size={18} color="#F59E0B" />
           <Text style={styles.headerTitle}>Executive Engagement</Text>
         </View>
         <View style={styles.headerSpacer} />
@@ -236,7 +236,7 @@ function BriefingCard({ briefing }: { briefing: BriefingDefinition }) {
 
       {/* Founder-Led Badge */}
       <View style={styles.founderBadge}>
-        <Sparkles size={12} color="#FFD700" />
+        <Sparkles size={12} color="#F59E0B" />
         <Text style={styles.founderBadgeText}>Founder-Led \u00B7 Available by Request</Text>
       </View>
 
@@ -258,7 +258,7 @@ function BriefingCard({ briefing }: { briefing: BriefingDefinition }) {
 
 const styles = StyleSheet.create({
   demoBanner: {
-    backgroundColor: '#FFD700',
+    backgroundColor: '#F59E0B',
     paddingVertical: 8,
     paddingHorizontal: 16,
     alignItems: 'center',
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.06)',
+    borderBottomColor: colors.hairline,
   },
   headerBack: {
     padding: spacing.sm,
@@ -289,30 +289,30 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   headerSpacer: {
     width: 40,
   },
   contextCard: {
-    backgroundColor: 'rgba(255,215,0,0.08)',
+    backgroundColor: 'rgba(245,158,11,0.08)',
     margin: spacing.md,
     padding: spacing.md,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,215,0,0.2)',
+    borderColor: 'rgba(245,158,11,0.20)',
   },
   contextTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#FFD700',
+    color: '#9A6A0A',
     marginBottom: spacing.sm,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   contextText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
   contextList: {
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
   },
   contextItem: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     paddingLeft: spacing.sm,
   },
   content: {
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
     padding: spacing.lg,
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
   timingBadge: {
@@ -378,24 +378,24 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 10,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textSecondary,
     letterSpacing: 0.5,
     marginBottom: spacing.xs,
   },
   purposeItem: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   descriptionContainer: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.sm,
     padding: spacing.md,
     marginBottom: spacing.md,
   },
   descriptionText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     fontStyle: 'italic',
     lineHeight: 18,
     textAlign: 'center',
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
   },
   deliverableItem: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   founderBadge: {
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
   },
   founderBadgeText: {
     fontSize: 11,
-    color: '#FFD700',
+    color: '#9A6A0A',
     fontWeight: '500',
   },
   ctaButton: {
@@ -434,24 +434,24 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   governanceNotice: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.hairline,
   },
   governanceTitle: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: spacing.xs,
   },
   governanceText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   footer: {
@@ -461,12 +461,12 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   footerTextEmphasis: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     textAlign: 'center',
     fontStyle: 'italic',
   },
