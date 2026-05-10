@@ -42,7 +42,7 @@ export default function RecoveryElasticityScreen() {
   const error = result && !result.success ? result.error : null;
 
   const TrendIcon = data?.trend === 'improving' ? TrendingUp : data?.trend === 'declining' ? TrendingDown : Minus;
-  const trendColor = data?.trend === 'improving' ? '#00D7FF' : data?.trend === 'declining' ? '#FF3B30' : 'rgba(255,255,255,0.5)';
+  const trendColor = data?.trend === 'improving' ? '#0E8C7B' : data?.trend === 'declining' ? '#DC2626' : colors.textTertiary;
   const trendText = data?.trend === 'improving' ? 'Improving' : data?.trend === 'declining' ? 'Declining' : 'Stable';
 
   return (
@@ -50,9 +50,9 @@ export default function RecoveryElasticityScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <ChevronLeft color="rgba(255,255,255,0.7)" size={24} />
+          <ChevronLeft color={colors.textSecondary} size={24} />
         </Pressable>
-        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>Recovery Elasticity</Text>
+        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit maxFontSizeMultiplier={1.5}>Recovery Elasticity</Text>
         <View style={styles.headerRight}>
           <ScopeSelectorCompact scope={scope} onScopeChange={setScope} />
         </View>
@@ -83,14 +83,14 @@ export default function RecoveryElasticityScreen() {
             {/* Main Score */}
             <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.mainScoreCard}>
               <View style={styles.mainScoreHeader}>
-                <Text style={styles.mainScoreLabel}>Elasticity Score</Text>
+                <Text style={styles.mainScoreLabel} maxFontSizeMultiplier={1.5}>Elasticity Score</Text>
                 <View style={styles.trendBadge}>
                   <TrendIcon color={trendColor} size={14} />
-                  <Text style={[styles.trendText, { color: trendColor }]}>{trendText}</Text>
+                  <Text style={[styles.trendText, { color: trendColor }]} maxFontSizeMultiplier={1.5}>{trendText}</Text>
                 </View>
               </View>
-              <Text style={styles.mainScoreValue}>{data.score}</Text>
-              <Text style={styles.mainScoreSubtext}>
+              <Text style={styles.mainScoreValue} maxFontSizeMultiplier={1.5}>{data.score}</Text>
+              <Text style={styles.mainScoreSubtext} maxFontSizeMultiplier={1.5}>
                 Higher = faster, more complete recovery
               </Text>
             </Animated.View>
@@ -98,47 +98,47 @@ export default function RecoveryElasticityScreen() {
             {/* Key Metrics */}
             <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.metricsRow}>
               <View style={styles.metricCard}>
-                <Clock color="rgba(255,255,255,0.5)" size={18} />
-                <Text style={styles.metricValue}>{data.avgRecoveryHours}h</Text>
-                <Text style={styles.metricLabel}>Avg Recovery Time</Text>
+                <Clock color={colors.textSecondary} size={18} />
+                <Text style={styles.metricValue} maxFontSizeMultiplier={1.5}>{data.avgRecoveryHours}h</Text>
+                <Text style={styles.metricLabel} maxFontSizeMultiplier={1.5}>Avg Recovery Time</Text>
               </View>
               <View style={styles.metricCard}>
-                <Target color="rgba(255,255,255,0.5)" size={18} />
-                <Text style={styles.metricValue}>{data.avgRecoveryCompleteness}%</Text>
-                <Text style={styles.metricLabel}>Avg Completeness</Text>
+                <Target color={colors.textSecondary} size={18} />
+                <Text style={styles.metricValue} maxFontSizeMultiplier={1.5}>{data.avgRecoveryCompleteness}%</Text>
+                <Text style={styles.metricLabel} maxFontSizeMultiplier={1.5}>Avg Completeness</Text>
               </View>
             </Animated.View>
 
             {/* Historical Comparison */}
             <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.card}>
               <View style={styles.cardHeader}>
-                <History color="rgba(255,255,255,0.5)" size={18} />
-                <Text style={styles.cardTitle}>30-Day Comparison</Text>
+                <History color={colors.textSecondary} size={18} />
+                <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>30-Day Comparison</Text>
               </View>
               <View style={styles.comparisonContainer}>
                 <View style={styles.comparisonItem}>
-                  <Text style={styles.comparisonLabel}>Last 30 Days</Text>
-                  <Text style={styles.comparisonValue}>{data.historicalComparison.last30Days}</Text>
+                  <Text style={styles.comparisonLabel} maxFontSizeMultiplier={1.5}>Last 30 Days</Text>
+                  <Text style={styles.comparisonValue} maxFontSizeMultiplier={1.5}>{data.historicalComparison.last30Days}</Text>
                 </View>
                 <View style={styles.comparisonArrow}>
                   <Text style={[
                     styles.changeText,
-                    { color: data.historicalComparison.changePercent > 0 ? '#00D7FF' : data.historicalComparison.changePercent < 0 ? '#FF3B30' : 'rgba(255,255,255,0.5)' }
-                  ]}>
+                    { color: data.historicalComparison.changePercent > 0 ? '#0E8C7B' : data.historicalComparison.changePercent < 0 ? '#DC2626' : colors.textTertiary }
+                  ]} maxFontSizeMultiplier={1.5}>
                     {data.historicalComparison.changePercent > 0 ? '+' : ''}{data.historicalComparison.changePercent.toFixed(1)}%
                   </Text>
                 </View>
                 <View style={styles.comparisonItem}>
-                  <Text style={styles.comparisonLabel}>Previous 30 Days</Text>
-                  <Text style={styles.comparisonValue}>{data.historicalComparison.previous30Days}</Text>
+                  <Text style={styles.comparisonLabel} maxFontSizeMultiplier={1.5}>Previous 30 Days</Text>
+                  <Text style={styles.comparisonValue} maxFontSizeMultiplier={1.5}>{data.historicalComparison.previous30Days}</Text>
                 </View>
               </View>
             </Animated.View>
 
             {/* Recent Recovery Events */}
             <Animated.View entering={FadeInDown.delay(400).duration(400)} style={styles.card}>
-              <Text style={styles.cardTitle}>Recent Recovery Events</Text>
-              <Text style={styles.cardSubtitle}>
+              <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>Recent Recovery Events</Text>
+              <Text style={styles.cardSubtitle} maxFontSizeMultiplier={1.5}>
                 How you bounced back from recent capacity dips
               </Text>
               <View style={styles.eventsList}>
@@ -149,24 +149,24 @@ export default function RecoveryElasticityScreen() {
                   return (
                     <View key={index} style={styles.eventItem}>
                       <View style={styles.eventHeader}>
-                        <Text style={styles.eventDate}>
+                        <Text style={styles.eventDate} maxFontSizeMultiplier={1.5}>
                           {daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`}
                         </Text>
                         <Text style={[
                           styles.eventCompleteness,
-                          { color: event.recoveryCompleteness >= 85 ? '#00D7FF' : event.recoveryCompleteness >= 70 ? '#F5B700' : '#FF3B30' }
-                        ]}>
+                          { color: event.recoveryCompleteness >= 85 ? '#0E8C7B' : event.recoveryCompleteness >= 70 ? '#F59E0B' : '#DC2626' }
+                        ]} maxFontSizeMultiplier={1.5}>
                           {event.recoveryCompleteness}% recovered
                         </Text>
                       </View>
                       <View style={styles.eventDetails}>
                         <View style={styles.eventDetail}>
-                          <Text style={styles.eventDetailLabel}>Dip Depth</Text>
-                          <Text style={styles.eventDetailValue}>{event.dipDepth}</Text>
+                          <Text style={styles.eventDetailLabel} maxFontSizeMultiplier={1.5}>Dip Depth</Text>
+                          <Text style={styles.eventDetailValue} maxFontSizeMultiplier={1.5}>{event.dipDepth}</Text>
                         </View>
                         <View style={styles.eventDetail}>
-                          <Text style={styles.eventDetailLabel}>Recovery Time</Text>
-                          <Text style={styles.eventDetailValue}>{event.recoveryTime}h</Text>
+                          <Text style={styles.eventDetailLabel} maxFontSizeMultiplier={1.5}>Recovery Time</Text>
+                          <Text style={styles.eventDetailValue} maxFontSizeMultiplier={1.5}>{event.recoveryTime}h</Text>
                         </View>
                       </View>
                       {/* Visual recovery bar */}
@@ -188,8 +188,8 @@ export default function RecoveryElasticityScreen() {
 
             {/* Explanation */}
             <Animated.View entering={FadeInDown.delay(500).duration(400)} style={styles.infoCard}>
-              <Text style={styles.infoTitle}>What is Recovery Elasticity?</Text>
-              <Text style={styles.infoText}>
+              <Text style={styles.infoTitle} maxFontSizeMultiplier={1.5}>What is Recovery Elasticity?</Text>
+              <Text style={styles.infoText} maxFontSizeMultiplier={1.5}>
                 Recovery Elasticity measures how quickly and completely you bounce back
                 after periods of low capacity. A high score means you recover faster and
                 return closer to your baseline capacity.{'\n\n'}
@@ -204,7 +204,7 @@ export default function RecoveryElasticityScreen() {
             {/* Cohort Info */}
             {data.cohortSize && (
               <Animated.View entering={FadeInDown.delay(600).duration(400)} style={styles.cohortInfo}>
-                <Text style={styles.cohortText}>
+                <Text style={styles.cohortText} maxFontSizeMultiplier={1.5}>
                   Based on {data.cohortSize.toLocaleString()} participants
                 </Text>
               </Animated.View>
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: colors.hairline,
   },
   backButton: {
     padding: spacing.sm,
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 17,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     marginLeft: spacing.sm,
   },
   headerRight: {
@@ -252,10 +252,10 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl * 2,
   },
   mainScoreCard: {
-    backgroundColor: 'rgba(0,215,255,0.08)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0,215,255,0.2)',
+    borderColor: 'rgba(45,212,191,0.30)',
     padding: spacing.lg,
     alignItems: 'center',
     marginBottom: spacing.md,
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   mainScoreLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
@@ -276,10 +276,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.backgroundSubtle,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
   },
   trendText: {
     fontSize: 11,
@@ -288,13 +290,13 @@ const styles = StyleSheet.create({
   mainScoreValue: {
     fontSize: 72,
     fontWeight: '200',
-    color: '#00D7FF',
+    color: '#0E8C7B',
     fontVariant: ['tabular-nums'],
     marginVertical: spacing.sm,
   },
   mainScoreSubtext: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   metricsRow: {
     flexDirection: 'row',
@@ -303,10 +305,10 @@ const styles = StyleSheet.create({
   },
   metricCard: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     alignItems: 'center',
     gap: 4,
@@ -314,19 +316,19 @@ const styles = StyleSheet.create({
   metricValue: {
     fontSize: 24,
     fontWeight: '300',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   metricLabel: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.md,
   },
@@ -339,11 +341,11 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
   },
   cardSubtitle: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 2,
     marginBottom: spacing.md,
   },
@@ -358,12 +360,12 @@ const styles = StyleSheet.create({
   },
   comparisonLabel: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   comparisonValue: {
     fontSize: 28,
     fontWeight: '300',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   comparisonArrow: {
@@ -378,7 +380,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   eventItem: {
-    backgroundColor: 'rgba(255,255,255,0.02)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     padding: spacing.sm,
   },
@@ -391,7 +393,7 @@ const styles = StyleSheet.create({
   eventDate: {
     fontSize: 12,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   eventCompleteness: {
     fontSize: 12,
@@ -409,11 +411,11 @@ const styles = StyleSheet.create({
   },
   eventDetailLabel: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
   eventDetailValue: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   recoveryBar: {
@@ -421,17 +423,17 @@ const styles = StyleSheet.create({
   },
   recoveryBarBg: {
     height: '100%',
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.hairline,
     borderRadius: 2,
     overflow: 'hidden',
   },
   recoveryBarFill: {
     height: '100%',
-    backgroundColor: '#00D7FF',
+    backgroundColor: colors.primary,
     borderRadius: 2,
   },
   infoCard: {
-    backgroundColor: 'rgba(255,255,255,0.02)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -439,12 +441,12 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 13,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   infoText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   cohortInfo: {
@@ -453,6 +455,6 @@ const styles = StyleSheet.create({
   },
   cohortText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
 });

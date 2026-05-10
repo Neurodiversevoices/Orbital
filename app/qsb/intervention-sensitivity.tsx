@@ -102,17 +102,17 @@ export default function InterventionSensitivityScreen() {
             {/* Active Interventions */}
             <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.card}>
               <View style={styles.cardHeader}>
-                <Play color="#00D7FF" size={18} />
-                <Text style={styles.cardTitle}>Active Interventions</Text>
+                <Play color={colors.primary} size={18} />
+                <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>Active Interventions</Text>
                 <View style={styles.countBadge}>
-                  <Text style={styles.countText}>{data.activeInterventions.length}</Text>
+                  <Text style={styles.countText} maxFontSizeMultiplier={1.5}>{data.activeInterventions.length}</Text>
                 </View>
               </View>
 
               {data.activeInterventions.length === 0 ? (
                 <View style={styles.emptyState}>
-                  <Text style={styles.emptyText}>No active interventions being tracked</Text>
-                  <Text style={styles.emptySubtext}>
+                  <Text style={styles.emptyText} maxFontSizeMultiplier={1.5}>No active interventions being tracked</Text>
+                  <Text style={styles.emptySubtext} maxFontSizeMultiplier={1.5}>
                     Add interventions to see how they affect your capacity
                   </Text>
                 </View>
@@ -122,8 +122,8 @@ export default function InterventionSensitivityScreen() {
                     <View key={intervention.id} style={styles.activeItem}>
                       <View style={styles.activeIndicator} />
                       <View style={styles.activeContent}>
-                        <Text style={styles.activeName}>{intervention.label}</Text>
-                        <Text style={styles.activeDate}>
+                        <Text style={styles.activeName} maxFontSizeMultiplier={1.5}>{intervention.label}</Text>
+                        <Text style={styles.activeDate} maxFontSizeMultiplier={1.5}>
                           Started {formatDate(intervention.startDate)}
                           {intervention.isOngoing && ' • Ongoing'}
                         </Text>
@@ -138,32 +138,32 @@ export default function InterventionSensitivityScreen() {
             {data.mostEffective && (
               <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.highlightCard}>
                 <View style={styles.highlightHeader}>
-                  <TrendingUp color="#00D7FF" size={20} />
-                  <Text style={styles.highlightTitle}>Most Effective</Text>
+                  <TrendingUp color="#0E8C7B" size={20} />
+                  <Text style={styles.highlightTitle} maxFontSizeMultiplier={1.5}>Most Effective</Text>
                 </View>
-                <Text style={styles.highlightName}>{data.mostEffective.intervention.label}</Text>
+                <Text style={styles.highlightName} maxFontSizeMultiplier={1.5}>{data.mostEffective.intervention.label}</Text>
                 <View style={styles.effectRow}>
                   <View style={styles.effectItem}>
-                    <Text style={styles.effectLabel}>Before</Text>
-                    <Text style={styles.effectValue}>{data.mostEffective.preCapacityAvg}</Text>
+                    <Text style={styles.effectLabel} maxFontSizeMultiplier={1.5}>Before</Text>
+                    <Text style={styles.effectValue} maxFontSizeMultiplier={1.5}>{data.mostEffective.preCapacityAvg}</Text>
                   </View>
                   <View style={styles.effectArrow}>
-                    <TrendingUp color="#00D7FF" size={16} />
+                    <TrendingUp color="#0E8C7B" size={16} />
                   </View>
                   <View style={styles.effectItem}>
-                    <Text style={styles.effectLabel}>After</Text>
-                    <Text style={[styles.effectValue, { color: '#00D7FF' }]}>
+                    <Text style={styles.effectLabel} maxFontSizeMultiplier={1.5}>After</Text>
+                    <Text style={[styles.effectValue, { color: '#0E8C7B' }]} maxFontSizeMultiplier={1.5}>
                       {data.mostEffective.postCapacityAvg}
                     </Text>
                   </View>
                   <View style={styles.changeContainer}>
-                    <Text style={styles.changeValue}>+{data.mostEffective.changePercent.toFixed(1)}%</Text>
+                    <Text style={styles.changeValue} maxFontSizeMultiplier={1.5}>+{data.mostEffective.changePercent.toFixed(1)}%</Text>
                   </View>
                 </View>
                 {data.mostEffective.isStatisticallySignificant && (
                   <View style={styles.significanceBadge}>
-                    <CheckCircle2 color="#00D7FF" size={12} />
-                    <Text style={styles.significanceText}>Statistically significant</Text>
+                    <CheckCircle2 color="#0E8C7B" size={12} />
+                    <Text style={styles.significanceText} maxFontSizeMultiplier={1.5}>Statistically significant</Text>
                   </View>
                 )}
               </Animated.View>
@@ -172,32 +172,32 @@ export default function InterventionSensitivityScreen() {
             {/* Historical Effects */}
             <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.card}>
               <View style={styles.cardHeader}>
-                <BarChart3 color="rgba(255,255,255,0.5)" size={18} />
-                <Text style={styles.cardTitle}>Historical Effects</Text>
+                <BarChart3 color={colors.textSecondary} size={18} />
+                <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>Historical Effects</Text>
               </View>
 
               <View style={styles.effectsList}>
                 {data.historicalEffects.map((effect, index) => {
                   const isPositive = effect.changePercent > 0;
-                  const changeColor = isPositive ? '#00D7FF' : effect.changePercent < 0 ? '#FF3B30' : 'rgba(255,255,255,0.5)';
+                  const changeColor = isPositive ? '#0E8C7B' : effect.changePercent < 0 ? '#DC2626' : colors.textTertiary;
 
                   return (
                     <View key={effect.intervention.id} style={styles.historyItem}>
                       <View style={styles.historyHeader}>
-                        <Text style={styles.historyName}>{effect.intervention.label}</Text>
-                        <View style={[styles.changeBadge, { backgroundColor: `${changeColor}20` }]}>
-                          <Text style={[styles.changeBadgeText, { color: changeColor }]}>
+                        <Text style={styles.historyName} maxFontSizeMultiplier={1.5}>{effect.intervention.label}</Text>
+                        <View style={[styles.changeBadge, { backgroundColor: `${changeColor}22` }]}>
+                          <Text style={[styles.changeBadgeText, { color: changeColor }]} maxFontSizeMultiplier={1.5}>
                             {isPositive ? '+' : ''}{effect.changePercent.toFixed(1)}%
                           </Text>
                         </View>
                       </View>
                       <View style={styles.historyMeta}>
-                        <Text style={styles.historyDates}>
+                        <Text style={styles.historyDates} maxFontSizeMultiplier={1.5}>
                           {formatDate(effect.intervention.startDate)}
                           {effect.intervention.endDate && ` – ${formatDate(effect.intervention.endDate)}`}
                         </Text>
                         <View style={[styles.confidenceBadge, { borderColor: CONFIDENCE_COLORS[effect.confidence] }]}>
-                          <Text style={[styles.confidenceText, { color: CONFIDENCE_COLORS[effect.confidence] }]}>
+                          <Text style={[styles.confidenceText, { color: CONFIDENCE_COLORS[effect.confidence] }]} maxFontSizeMultiplier={1.5}>
                             {effect.confidence}
                           </Text>
                         </View>
@@ -216,8 +216,8 @@ export default function InterventionSensitivityScreen() {
                         </View>
                       </View>
                       <View style={styles.historyLabels}>
-                        <Text style={styles.historyLabelText}>Before: {effect.preCapacityAvg}</Text>
-                        <Text style={styles.historyLabelText}>After: {effect.postCapacityAvg}</Text>
+                        <Text style={styles.historyLabelText} maxFontSizeMultiplier={1.5}>Before: {effect.preCapacityAvg}</Text>
+                        <Text style={styles.historyLabelText} maxFontSizeMultiplier={1.5}>After: {effect.postCapacityAvg}</Text>
                       </View>
                     </View>
                   );
@@ -228,10 +228,10 @@ export default function InterventionSensitivityScreen() {
             {/* Suggested Interventions */}
             <Animated.View entering={FadeInDown.delay(400).duration(400)} style={styles.card}>
               <View style={styles.cardHeader}>
-                <Lightbulb color="#F5B700" size={18} />
-                <Text style={styles.cardTitle}>Suggested Interventions</Text>
+                <Lightbulb color="#F59E0B" size={18} />
+                <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>Suggested Interventions</Text>
               </View>
-              <Text style={styles.cardSubtitle}>
+              <Text style={styles.cardSubtitle} maxFontSizeMultiplier={1.5}>
                 Based on patterns from similar profiles
               </Text>
 
@@ -239,18 +239,18 @@ export default function InterventionSensitivityScreen() {
                 {data.suggestedInterventions.map((suggestion, index) => (
                   <View key={index} style={styles.suggestionItem}>
                     <View style={styles.suggestionContent}>
-                      <Text style={styles.suggestionName}>{suggestion.label}</Text>
+                      <Text style={styles.suggestionName} maxFontSizeMultiplier={1.5}>{suggestion.label}</Text>
                       <View style={styles.suggestionMeta}>
                         <View style={[styles.confidenceBadge, { borderColor: CONFIDENCE_COLORS[suggestion.confidence] }]}>
-                          <Text style={[styles.confidenceText, { color: CONFIDENCE_COLORS[suggestion.confidence] }]}>
+                          <Text style={[styles.confidenceText, { color: CONFIDENCE_COLORS[suggestion.confidence] }]} maxFontSizeMultiplier={1.5}>
                             {suggestion.confidence} confidence
                           </Text>
                         </View>
                       </View>
                     </View>
                     <View style={styles.impactBadge}>
-                      <Sparkles color="#00D7FF" size={12} />
-                      <Text style={styles.impactText}>+{suggestion.expectedImpact}%</Text>
+                      <Sparkles color="#0E8C7B" size={12} />
+                      <Text style={styles.impactText} maxFontSizeMultiplier={1.5}>+{suggestion.expectedImpact}%</Text>
                     </View>
                   </View>
                 ))}
@@ -259,8 +259,8 @@ export default function InterventionSensitivityScreen() {
 
             {/* How It Works */}
             <Animated.View entering={FadeInDown.delay(500).duration(400)} style={styles.infoCard}>
-              <Text style={styles.infoTitle}>How Intervention Tracking Works</Text>
-              <Text style={styles.infoText}>
+              <Text style={styles.infoTitle} maxFontSizeMultiplier={1.5}>How Intervention Tracking Works</Text>
+              <Text style={styles.infoText} maxFontSizeMultiplier={1.5}>
                 This layer helps you understand which changes actually improve your capacity:{'\n\n'}
                 1. Log an intervention when you make a change{'\n'}
                 2. Continue logging capacity signals as usual{'\n'}
@@ -274,7 +274,7 @@ export default function InterventionSensitivityScreen() {
             {/* Cohort Info */}
             {data.cohortSize && (
               <Animated.View entering={FadeInDown.delay(600).duration(400)} style={styles.cohortInfo}>
-                <Text style={styles.cohortText}>
+                <Text style={styles.cohortText} maxFontSizeMultiplier={1.5}>
                   Based on {data.cohortSize.toLocaleString()} participants
                 </Text>
               </Animated.View>
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: colors.hairline,
   },
   backButton: {
     padding: spacing.sm,
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 17,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     marginLeft: spacing.sm,
   },
   headerRight: {
@@ -321,10 +321,10 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl * 2,
   },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.md,
   },
@@ -338,15 +338,15 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
   },
   cardSubtitle: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: spacing.md,
   },
   countBadge: {
-    backgroundColor: 'rgba(0,215,255,0.2)',
+    backgroundColor: 'rgba(45,212,191,0.18)',
     borderRadius: 10,
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
   countText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#00D7FF',
+    color: '#0E8C7B',
   },
   emptyState: {
     alignItems: 'center',
@@ -362,11 +362,11 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
   },
   emptySubtext: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     marginTop: 2,
   },
   interventionsList: {
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#00D7FF',
+    backgroundColor: colors.primary,
   },
   activeContent: {
     flex: 1,
@@ -389,17 +389,17 @@ const styles = StyleSheet.create({
   activeName: {
     fontSize: 13,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   activeDate: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   highlightCard: {
-    backgroundColor: 'rgba(0,215,255,0.08)',
+    backgroundColor: 'rgba(45,212,191,0.10)',
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0,215,255,0.2)',
+    borderColor: 'rgba(45,212,191,0.30)',
     padding: spacing.md,
     marginBottom: spacing.md,
   },
@@ -412,14 +412,14 @@ const styles = StyleSheet.create({
   highlightTitle: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#00D7FF',
+    color: '#0E8C7B',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   highlightName: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     marginBottom: spacing.md,
   },
   effectRow: {
@@ -432,20 +432,20 @@ const styles = StyleSheet.create({
   },
   effectLabel: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginBottom: 2,
   },
   effectValue: {
     fontSize: 24,
     fontWeight: '300',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   effectArrow: {
     paddingHorizontal: spacing.md,
   },
   changeContainer: {
-    backgroundColor: 'rgba(0,215,255,0.2)',
+    backgroundColor: 'rgba(45,212,191,0.18)',
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
   changeValue: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#00D7FF',
+    color: '#0E8C7B',
   },
   significanceBadge: {
     flexDirection: 'row',
@@ -464,13 +464,13 @@ const styles = StyleSheet.create({
   },
   significanceText: {
     fontSize: 11,
-    color: '#00D7FF',
+    color: '#0E8C7B',
   },
   effectsList: {
     gap: spacing.md,
   },
   historyItem: {
-    backgroundColor: 'rgba(255,255,255,0.02)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     padding: spacing.sm,
   },
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
   historyName: {
     fontSize: 13,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   changeBadge: {
     borderRadius: 6,
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
   },
   historyDates: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   confidenceBadge: {
     borderWidth: 1,
@@ -521,19 +521,19 @@ const styles = StyleSheet.create({
   },
   historyBarBefore: {
     height: 4,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.hairline,
     borderRadius: 2,
     overflow: 'hidden',
   },
   historyBarAfter: {
     height: 4,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.hairline,
     borderRadius: 2,
     overflow: 'hidden',
   },
   historyBarFill: {
     height: '100%',
-    backgroundColor: 'rgba(255,255,255,0.4)',
+    backgroundColor: colors.textTertiary,
     borderRadius: 2,
   },
   historyLabels: {
@@ -543,7 +543,7 @@ const styles = StyleSheet.create({
   },
   historyLabelText: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
     fontVariant: ['tabular-nums'],
   },
   suggestionsList: {
@@ -552,7 +552,7 @@ const styles = StyleSheet.create({
   suggestionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.02)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     padding: spacing.sm,
   },
@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
   suggestionName: {
     fontSize: 13,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.9)',
+    color: colors.textPrimary,
   },
   suggestionMeta: {
     flexDirection: 'row',
@@ -572,7 +572,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(0,215,255,0.15)',
+    backgroundColor: 'rgba(45,212,191,0.15)',
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -580,10 +580,10 @@ const styles = StyleSheet.create({
   impactText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#00D7FF',
+    color: '#0E8C7B',
   },
   infoCard: {
-    backgroundColor: 'rgba(255,255,255,0.02)',
+    backgroundColor: colors.backgroundSubtle,
     borderRadius: borderRadius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -591,12 +591,12 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 13,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   infoText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     lineHeight: 18,
   },
   cohortInfo: {
@@ -605,6 +605,6 @@ const styles = StyleSheet.create({
   },
   cohortText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
 });

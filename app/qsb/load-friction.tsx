@@ -27,20 +27,20 @@ const DAYS: DayOfWeek[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const TIMES: TimeBlock[] = ['Morning', 'Midday', 'Afternoon', 'Evening', 'Night'];
 const TIME_LABELS = ['6-10', '10-14', '14-18', '18-22', '22-6'];
 
-// Color interpolation for heatmap
+// Color interpolation for heatmap (capacity spectrum on light surface)
 function getHeatmapColor(value: number): string {
-  // 0-40: Red (low capacity/high friction)
-  // 40-60: Amber (moderate)
-  // 60-100: Cyan/Green (high capacity/low friction)
+  // 0-40: Crimson #DC2626 (low capacity / high friction)
+  // 40-60: Amber #F59E0B (moderate)
+  // 60-100: Teal #2DD4BF (high capacity / low friction)
   if (value < 40) {
     const intensity = value / 40;
-    return `rgba(255, 59, 48, ${0.3 + (1 - intensity) * 0.4})`;
+    return `rgba(220, 38, 38, ${0.25 + (1 - intensity) * 0.45})`;
   } else if (value < 60) {
     const intensity = (value - 40) / 20;
-    return `rgba(245, 183, 0, ${0.3 + (1 - intensity) * 0.3})`;
+    return `rgba(245, 158, 11, ${0.25 + (1 - intensity) * 0.35})`;
   } else {
     const intensity = (value - 60) / 40;
-    return `rgba(0, 215, 255, ${0.2 + intensity * 0.3})`;
+    return `rgba(45, 212, 191, ${0.20 + intensity * 0.45})`;
   }
 }
 
@@ -63,9 +63,9 @@ export default function LoadFrictionScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <ChevronLeft color="rgba(255,255,255,0.7)" size={24} />
+          <ChevronLeft color={colors.textSecondary} size={24} />
         </Pressable>
-        <Text style={styles.headerTitle}>Load Friction Map</Text>
+        <Text style={styles.headerTitle} maxFontSizeMultiplier={1.5}>Load Friction Map</Text>
         <View style={styles.headerRight}>
           <ScopeSelectorCompact scope={scope} onScopeChange={setScope} />
         </View>
@@ -96,19 +96,19 @@ export default function LoadFrictionScreen() {
             {/* Summary Stats */}
             <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.summaryRow}>
               <View style={styles.summaryCard}>
-                <Text style={styles.summaryValue}>{data.weekdayAvg}</Text>
-                <Text style={styles.summaryLabel}>Weekday Avg</Text>
+                <Text style={styles.summaryValue} maxFontSizeMultiplier={1.5}>{data.weekdayAvg}</Text>
+                <Text style={styles.summaryLabel} maxFontSizeMultiplier={1.5}>Weekday Avg</Text>
               </View>
               <View style={styles.summaryCard}>
-                <Text style={styles.summaryValue}>{data.weekendAvg}</Text>
-                <Text style={styles.summaryLabel}>Weekend Avg</Text>
+                <Text style={styles.summaryValue} maxFontSizeMultiplier={1.5}>{data.weekendAvg}</Text>
+                <Text style={styles.summaryLabel} maxFontSizeMultiplier={1.5}>Weekend Avg</Text>
               </View>
             </Animated.View>
 
             {/* Heatmap */}
             <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.heatmapCard}>
-              <Text style={styles.cardTitle}>Capacity by Day & Time</Text>
-              <Text style={styles.cardSubtitle}>
+              <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>Capacity by Day & Time</Text>
+              <Text style={styles.cardSubtitle} maxFontSizeMultiplier={1.5}>
                 Darker = lower capacity (more friction)
               </Text>
 
@@ -117,7 +117,7 @@ export default function LoadFrictionScreen() {
                 <View style={styles.dayLabelSpacer} />
                 {TIME_LABELS.map((label, i) => (
                   <View key={i} style={styles.timeLabel}>
-                    <Text style={styles.timeLabelText}>{label}</Text>
+                    <Text style={styles.timeLabelText} maxFontSizeMultiplier={1.5}>{label}</Text>
                   </View>
                 ))}
               </View>
@@ -126,7 +126,7 @@ export default function LoadFrictionScreen() {
               <View style={styles.heatmapGrid}>
                 {DAYS.map((day, dayIndex) => (
                   <View key={day} style={styles.heatmapRow}>
-                    <Text style={styles.dayLabel}>{day}</Text>
+                    <Text style={styles.dayLabel} maxFontSizeMultiplier={1.5}>{day}</Text>
                     {TIMES.map((time, timeIndex) => {
                       const value = getCellValue(day, time);
                       return (
@@ -137,7 +137,7 @@ export default function LoadFrictionScreen() {
                             { backgroundColor: getHeatmapColor(value) },
                           ]}
                         >
-                          <Text style={styles.cellValue}>{value}</Text>
+                          <Text style={styles.cellValue} maxFontSizeMultiplier={1.5}>{value}</Text>
                         </View>
                       );
                     })}
@@ -148,16 +148,16 @@ export default function LoadFrictionScreen() {
               {/* Legend */}
               <View style={styles.legend}>
                 <View style={styles.legendItem}>
-                  <View style={[styles.legendColor, { backgroundColor: 'rgba(255,59,48,0.6)' }]} />
-                  <Text style={styles.legendText}>Low capacity</Text>
+                  <View style={[styles.legendColor, { backgroundColor: 'rgba(220,38,38,0.6)' }]} />
+                  <Text style={styles.legendText} maxFontSizeMultiplier={1.5}>Low capacity</Text>
                 </View>
                 <View style={styles.legendItem}>
-                  <View style={[styles.legendColor, { backgroundColor: 'rgba(245,183,0,0.5)' }]} />
-                  <Text style={styles.legendText}>Moderate</Text>
+                  <View style={[styles.legendColor, { backgroundColor: 'rgba(245,158,11,0.55)' }]} />
+                  <Text style={styles.legendText} maxFontSizeMultiplier={1.5}>Moderate</Text>
                 </View>
                 <View style={styles.legendItem}>
-                  <View style={[styles.legendColor, { backgroundColor: 'rgba(0,215,255,0.4)' }]} />
-                  <Text style={styles.legendText}>High capacity</Text>
+                  <View style={[styles.legendColor, { backgroundColor: 'rgba(45,212,191,0.55)' }]} />
+                  <Text style={styles.legendText} maxFontSizeMultiplier={1.5}>High capacity</Text>
                 </View>
               </View>
             </Animated.View>
@@ -165,20 +165,20 @@ export default function LoadFrictionScreen() {
             {/* Peak Friction Times */}
             <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.card}>
               <View style={styles.cardHeader}>
-                <AlertTriangle color="#FF3B30" size={18} />
-                <Text style={styles.cardTitle}>Peak Friction Times</Text>
+                <AlertTriangle color="#DC2626" size={18} />
+                <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>Peak Friction Times</Text>
               </View>
-              <Text style={styles.cardDescription}>
+              <Text style={styles.cardDescription} maxFontSizeMultiplier={1.5}>
                 When capacity tends to dip the most
               </Text>
               <View style={styles.timesList}>
                 {data.peakFrictionTimes.map((item, index) => (
                   <View key={index} style={styles.timeItem}>
-                    <View style={[styles.timeDot, { backgroundColor: '#FF3B30' }]} />
-                    <Text style={styles.timeItemText}>
+                    <View style={[styles.timeDot, { backgroundColor: '#DC2626' }]} />
+                    <Text style={styles.timeItemText} maxFontSizeMultiplier={1.5}>
                       {item.day} {item.time}
                     </Text>
-                    <Text style={styles.timeItemSeverity}>
+                    <Text style={styles.timeItemSeverity} maxFontSizeMultiplier={1.5}>
                       {item.severity}% friction
                     </Text>
                   </View>
@@ -189,20 +189,20 @@ export default function LoadFrictionScreen() {
             {/* Low Friction Times */}
             <Animated.View entering={FadeInDown.delay(400).duration(400)} style={styles.card}>
               <View style={styles.cardHeader}>
-                <Zap color="#00D7FF" size={18} />
-                <Text style={styles.cardTitle}>Best Performance Windows</Text>
+                <Zap color={colors.primary} size={18} />
+                <Text style={styles.cardTitle} maxFontSizeMultiplier={1.5}>Best Performance Windows</Text>
               </View>
-              <Text style={styles.cardDescription}>
+              <Text style={styles.cardDescription} maxFontSizeMultiplier={1.5}>
                 When capacity tends to be highest
               </Text>
               <View style={styles.timesList}>
                 {data.lowFrictionTimes.map((item, index) => (
                   <View key={index} style={styles.timeItem}>
-                    <View style={[styles.timeDot, { backgroundColor: '#00D7FF' }]} />
-                    <Text style={styles.timeItemText}>
+                    <View style={[styles.timeDot, { backgroundColor: colors.primary }]} />
+                    <Text style={styles.timeItemText} maxFontSizeMultiplier={1.5}>
                       {item.day} {item.time}
                     </Text>
-                    <Text style={[styles.timeItemSeverity, { color: '#00D7FF' }]}>
+                    <Text style={[styles.timeItemSeverity, { color: '#0E8C7B' }]} maxFontSizeMultiplier={1.5}>
                       {item.score} capacity
                     </Text>
                   </View>
@@ -213,7 +213,7 @@ export default function LoadFrictionScreen() {
             {/* Cohort Info */}
             {data.cohortSize && (
               <Animated.View entering={FadeInDown.delay(500).duration(400)} style={styles.cohortInfo}>
-                <Text style={styles.cohortText}>
+                <Text style={styles.cohortText} maxFontSizeMultiplier={1.5}>
                   Based on {data.cohortSize.toLocaleString()} participants
                 </Text>
               </Animated.View>
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: colors.hairline,
   },
   backButton: {
     padding: spacing.sm,
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 17,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.95)',
+    color: colors.textPrimary,
     marginLeft: spacing.sm,
   },
   headerRight: {
@@ -266,40 +266,40 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     alignItems: 'center',
   },
   summaryValue: {
     fontSize: 32,
     fontWeight: '300',
-    color: '#00D7FF',
+    color: '#0E8C7B',
     fontVariant: ['tabular-nums'],
   },
   summaryLabel: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 4,
   },
   heatmapCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.md,
   },
   cardTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
   },
   cardSubtitle: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 2,
     marginBottom: spacing.md,
   },
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
   },
   timeLabelText: {
     fontSize: 9,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
   heatmapGrid: {
     gap: 3,
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
   dayLabel: {
     width: 33,
     fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   heatmapCell: {
     flex: 1,
@@ -340,8 +340,8 @@ const styles = StyleSheet.create({
   },
   cellValue: {
     fontSize: 10,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.8)',
+    fontWeight: '600',
+    color: colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   legend: {
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     paddingTop: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)',
+    borderTopColor: colors.hairline,
   },
   legendItem: {
     flexDirection: 'row',
@@ -365,13 +365,13 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
   },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.md,
   },
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
   },
   cardDescription: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     marginTop: 2,
     marginBottom: spacing.md,
   },
@@ -402,11 +402,11 @@ const styles = StyleSheet.create({
   timeItemText: {
     flex: 1,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.8)',
+    color: colors.textPrimary,
   },
   timeItemSeverity: {
     fontSize: 12,
-    color: '#FF3B30',
+    color: '#DC2626',
     fontVariant: ['tabular-nums'],
   },
   cohortInfo: {
@@ -415,6 +415,6 @@ const styles = StyleSheet.create({
   },
   cohortText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.4)',
+    color: colors.textTertiary,
   },
 });
