@@ -65,6 +65,8 @@ import { useTutorial } from '../../lib/hooks/useTutorial';
 import { useSubscription, shouldBypassSubscription } from '../../lib/subscription';
 import { useOptionalSubBrand } from '../../lib/platform/SubBrandProvider';
 import { recordAuditEvent } from '../../lib/platform/trustCore';
+import { useSignalSeed } from '../../lib/health/useSignalSeed';
+import { getFieldStatus } from '../../lib/copy/clinical';
 import { Locale } from '../../locales';
 
 // ---------------------------------------------------------------------------
@@ -95,7 +97,40 @@ try {
   CapacityRibbon = require('../../components/CapacityRibbon').CapacityRibbon
     || require('../../components/CapacityRibbon').default;
 } catch {
-  // TODO(parallel-agent): components/CapacityRibbon.tsx not yet landed.
+  // CapacityRibbon legacy fallback — superseded by AtmosphericReservoir below.
+}
+
+// AtmosphericReservoir — Phase 9 visual centerpiece. Volumetric two-body
+// shader replacing the orb/gauge/ribbon. Falls back to AtmosphericReservoirFallback
+// (pure SVG) if Skia GPU is unavailable.
+type AtmosphericReservoirProps = {
+  reserves: import('react-native-reanimated').SharedValue<number>;
+  demand: import('react-native-reanimated').SharedValue<number>;
+  seed: {
+    seed: readonly [number, number, number, number];
+    hueShift: number;
+    surfacePattern: number;
+    pulseSeconds: number;
+    rotationSpeed: number;
+  };
+  width: number;
+  height: number;
+  onCapacityAdjust?: (delta: number) => void;
+};
+let AtmosphericReservoir: React.ComponentType<AtmosphericReservoirProps> | null = null;
+try {
+  AtmosphericReservoir = require('../../components/AtmosphericReservoir').AtmosphericReservoir
+    || require('../../components/AtmosphericReservoir').default;
+} catch {
+  // No Skia GPU runtime — fall back to SVG fallback below.
+}
+let AtmosphericReservoirFallback: React.ComponentType<AtmosphericReservoirProps> | null = null;
+try {
+  AtmosphericReservoirFallback =
+    require('../../components/AtmosphericReservoirFallback').AtmosphericReservoirFallback
+    || require('../../components/AtmosphericReservoirFallback').default;
+} catch {
+  // Both Skia + SVG missing — keep CapacityRibbon legacy fallback active.
 }
 
 let HealthMetricCard: React.ComponentType<HealthMetricCardProps> | null = null;
@@ -195,6 +230,16 @@ export default function HomeScreen() {
   const headerScale = useSharedValue(1);
   const headerOpacity = useSharedValue(1);
 
+  // Atmospheric Reservoir uniforms — driven by reserves (capacity baseline)
+  // and demand (today's load). Both are SharedValues so the shader updates
+  // without React re-renders. Initial value 0.7 matches prior gauge default.
+  const reservesShared = useSharedValue(0.7);
+  const demandShared = useSharedValue(0.4);
+
+  // Per-user signal seed — shapes the reservoir surface uniquely per user.
+  // Falls back to STARTER_SEED when HealthKit data is unavailable.
+  const { seed: signalSeed } = useSignalSeed();
+
   // Health snapshot — guarded behind hook availability.
   const health: HealthSnapshot = useHealthSnapshot
     ? useHealthSnapshot()
@@ -246,15 +291,54 @@ export default function HomeScreen() {
 
   // ----- Derived data ------------------------------------------------------
 
-  // Map current capacity state → 0..1 used by the ribbon. Mirrors the prior
-  // gauge default (0.82 ≈ resourced) so the dot lives in a sensible spot
-  // before the user taps anything today.
+  // Map current capacity state → 0..1 used by the visual.
   const capacityNumber = useMemo(() => {
     if (currentState === 'depleted') return 0.18;
     if (currentState === 'stretched') return 0.5;
     if (currentState === 'resourced') return 0.82;
     return 0.7;
   }, [currentState]);
+
+  // Reserves (capacity baseline): blend recent log mean with today's selection.
+  // Demand (today's load): blend HealthKit RHR/HRV deficits with logged demand events.
+  // These feed the AtmosphericReservoir uniforms.
+  const reservesNumber = useMemo(() => {
+    if (microBars && microBars.length > 0) {
+      const recentAvg = microBars.reduce((a, d) => a + d.value, 0) / microBars.length;
+      // 70% recent baseline, 30% today's pick — keeps the visual stable across
+      // taps but responds to a dramatic change.
+      return Math.max(0, Math.min(1, recentAvg * 0.7 + capacityNumber * 0.3));
+    }
+    return capacityNumber;
+  }, [microBars, capacityNumber]);
+
+  const demandNumber = useMemo(() => {
+    // Heuristic: today's logged demand events (from category=demand) +
+    // HealthKit deficits when available. Falls back to inverse of capacity.
+    const todayStart = new Date().setHours(0, 0, 0, 0);
+    const demandLogs = logs.filter(
+      (l) => l.timestamp >= todayStart && (l.tags?.includes('demand') || l.category === 'demand'),
+    );
+    const loggedDemand = Math.min(1, demandLogs.length * 0.15);
+    const cardiacDriftFactor =
+      health.status === 'authorized' && health.cardiacDrift?.trend === 'up' ? 0.15 : 0;
+    const recoveryFactor =
+      health.status === 'authorized' && health.recovery && health.recovery.hours < 6 ? 0.2 : 0;
+    const inverseCapacity = 1 - capacityNumber;
+    return Math.max(
+      0,
+      Math.min(1, inverseCapacity * 0.5 + loggedDemand + cardiacDriftFactor + recoveryFactor),
+    );
+  }, [logs, health, capacityNumber]);
+
+  // Push reservoir uniforms into Reanimated SharedValues so the shader updates
+  // without re-rendering React.
+  useEffect(() => {
+    reservesShared.value = reservesNumber;
+  }, [reservesNumber, reservesShared]);
+  useEffect(() => {
+    demandShared.value = demandNumber;
+  }, [demandNumber, demandShared]);
 
   // 7-day micro-bars: aggregate one bar per local-day for the last 7 days.
   const microBars = useMemo(() => {
@@ -357,6 +441,16 @@ export default function HomeScreen() {
 
   const stateMsg = currentState ? stateMessages[currentState] : stateMessages.resourced;
 
+  // Clinical copy: derive eyebrow + headline + subline from reservoir/demand.
+  // Replaces ad-hoc state messages (kept above as fallback if reservoir is null).
+  const fieldStatus = useMemo(
+    () => getFieldStatus(reservesNumber, demandNumber, { now: new Date() }),
+    [reservesNumber, demandNumber],
+  );
+
+  // Render budget for the reservoir — keeps the canvas in a fixed aspect ratio.
+  const reservoirSize = 320;
+
   return (
     <SafeAreaView style={[commonStyles.screen, styles.screen]} edges={['top', 'left', 'right']}>
       <StatusBar style="dark" />
@@ -411,33 +505,45 @@ export default function HomeScreen() {
           {currentMode !== 'personal' && <ModeInsightsPanel logs={logs} />}
 
           {/* --------------------------------------------------------- */}
-          {/* Today's Capacity card                                     */}
+          {/* Field Status — Atmospheric Reservoir centerpiece          */}
           {/* --------------------------------------------------------- */}
-          <View style={styles.card} accessible accessibilityLabel="Today's capacity">
+          <View style={styles.card} accessible accessibilityLabel="Atmospheric reservoir, field status">
             <View style={styles.cardHeaderRow}>
-              <Text style={styles.cardHeadline}>Today's Capacity</Text>
+              <Text style={styles.fieldEyebrow} maxFontSizeMultiplier={1.5}>{fieldStatus.eyebrow}</Text>
               <View style={styles.livePill}>
                 <View style={styles.liveDot} />
-                <Text style={styles.livePillText}>LIVE</Text>
+                <Text style={styles.livePillText} maxFontSizeMultiplier={1.5}>LIVE</Text>
               </View>
             </View>
 
-            <View style={styles.ribbonContainer}>
-              {CapacityRibbon ? (
+            <View style={styles.reservoirContainer}>
+              {AtmosphericReservoir ? (
+                <AtmosphericReservoir
+                  reserves={reservesShared}
+                  demand={demandShared}
+                  seed={signalSeed}
+                  width={reservoirSize}
+                  height={reservoirSize}
+                />
+              ) : AtmosphericReservoirFallback ? (
+                <AtmosphericReservoirFallback
+                  reserves={reservesShared}
+                  demand={demandShared}
+                  seed={signalSeed}
+                  width={reservoirSize}
+                  height={reservoirSize}
+                />
+              ) : CapacityRibbon ? (
                 <CapacityRibbon capacity={capacityNumber} state={currentState} />
               ) : (
-                // TODO(parallel-agent): replace with <CapacityRibbon /> once landed.
                 <View style={styles.ribbonPlaceholder} />
               )}
             </View>
 
             <View style={styles.stateMessageRow}>
-              <View style={[styles.arrowChip, { borderColor: stateMsg.color }]}>
-                <stateMsg.Arrow color={stateMsg.color} size={16} />
-              </View>
               <View style={styles.stateMessageText}>
-                <Text style={styles.stateHeadline}>{stateMsg.headline}</Text>
-                <Text style={styles.stateTip}>{stateMsg.tip}</Text>
+                <Text style={styles.stateHeadline} maxFontSizeMultiplier={1.5}>{fieldStatus.headline}</Text>
+                <Text style={styles.stateTip} maxFontSizeMultiplier={1.5}>{fieldStatus.subline}</Text>
               </View>
             </View>
           </View>
@@ -748,7 +854,7 @@ const styles = StyleSheet.create({
     fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }),
   },
 
-  // Capacity ribbon -----------------------------------------------------
+  // Capacity ribbon (legacy fallback) ------------------------------------
   ribbonContainer: {
     height: 120,
     justifyContent: 'center',
@@ -760,6 +866,22 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     borderWidth: 1,
     borderColor: colors.hairline,
+  },
+
+  // Atmospheric Reservoir centerpiece -----------------------------------
+  reservoirContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.md,
+  },
+
+  // Clinical copy: FIELD STATUS · BAND · HH:MM eyebrow
+  fieldEyebrow: {
+    fontFamily: 'SpaceMono_400Regular',
+    fontSize: 11,
+    letterSpacing: 1.6,
+    textTransform: 'uppercase',
+    color: colors.textSecondary,
   },
 
   // State message under ribbon -----------------------------------------
