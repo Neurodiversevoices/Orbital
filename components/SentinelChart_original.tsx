@@ -59,13 +59,13 @@ const DEFAULT_HEIGHT = 200;
 // Colors matching reference design
 const COLORS = {
   line: '#00E5FF',
-  lineAbove: '#FF9800',
+  lineAbove: '#F59E0B',
   baseline: 'rgba(255,255,255,0.3)',
-  upperBand: 'rgba(255,152,0,0.15)',
+  upperBand: 'rgba(245,158,11,0.15)',
   grid: 'rgba(255,255,255,0.08)',
   text: 'rgba(255,255,255,0.6)',
   textMuted: 'rgba(255,255,255,0.4)',
-  trigger: '#FF9800',
+  trigger: '#F59E0B',
   critical: '#F44336',
 };
 
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,152,0,0.1)',
+    backgroundColor: 'rgba(245,158,11,0.1)',
     borderWidth: 1,
     borderRadius: borderRadius.sm,
     paddingVertical: 4,

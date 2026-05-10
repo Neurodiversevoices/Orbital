@@ -1152,7 +1152,7 @@ const confidenceStyles = StyleSheet.create({
   weekBadgeText: {
     fontSize: 9,
     fontWeight: '600',
-    color: '#FF9800',
+    color: '#F59E0B',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
@@ -1182,7 +1182,7 @@ const summaryStyles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FF9800',
+    color: '#F59E0B',
   },
   dateRange: {
     fontSize: 11,

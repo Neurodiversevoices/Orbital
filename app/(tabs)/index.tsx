@@ -420,10 +420,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(255,152,0,0.1)',
+    backgroundColor: 'rgba(245,158,11,0.1)',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,152,0,0.3)',
+    borderColor: 'rgba(245,158,11,0.3)',
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.md,
     marginBottom: spacing.md,
@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
   },
   limitBannerText: {
     fontSize: 12,
-    color: '#FF9800',
+    color: '#F59E0B',
   },
   limitBannerTextBlocked: {
     fontSize: 12,
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
   limitBannerLink: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#FF9800',
+    color: '#F59E0B',
   },
   limitBannerLinkBlocked: {
     fontSize: 12,

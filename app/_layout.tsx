@@ -12,6 +12,7 @@ import Constants from 'expo-constants';
 import { colors, spacing, borderRadius } from '../theme';
 import { LocaleProvider } from '../lib/hooks/useLocale';
 import { AccessibilityProvider } from '../lib/hooks/useAccessibility';
+import { SubBrandProvider } from '../lib/platform/SubBrandProvider';
 import { DemoModeProvider } from '../lib/hooks/useDemoMode';
 import { AppModeProvider } from '../lib/hooks/useAppMode';
 import { SubscriptionProvider } from '../lib/subscription';
@@ -447,6 +448,7 @@ function RootLayout() {
         <StartupPhase phase="deferred_begin" />
         <LocaleProvider>
           <AccessibilityProvider>
+            <SubBrandProvider>
             <DemoModeProvider>
             <AppModeProvider>
             <SubscriptionProvider>
@@ -621,6 +623,7 @@ function RootLayout() {
             </SubscriptionProvider>
             </AppModeProvider>
             </DemoModeProvider>
+            </SubBrandProvider>
           </AccessibilityProvider>
         </LocaleProvider>
       </GestureHandlerRootView>

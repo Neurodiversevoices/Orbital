@@ -42,7 +42,7 @@ interface DataPointProps {
 function DataPoint({ icon: Icon, title, description, type, delay = 0 }: DataPointProps) {
   const typeConfig = {
     kept: { color: '#00E5FF', badge: 'Kept', icon: CheckCircle },
-    deidentified: { color: '#FF9800', badge: 'De-identified', icon: Eye },
+    deidentified: { color: '#F59E0B', badge: 'De-identified', icon: Eye },
     never: { color: '#4CAF50', badge: 'Never stored', icon: EyeOff },
     protected: { color: '#9C27B0', badge: 'Protected', icon: Lock },
   };

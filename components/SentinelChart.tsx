@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,152,0,0.1)',
+    backgroundColor: 'rgba(245,158,11,0.1)',
     borderWidth: 1,
     borderRadius: borderRadius.sm,
     paddingVertical: 4,

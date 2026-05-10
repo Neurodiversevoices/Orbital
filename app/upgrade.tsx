@@ -652,11 +652,11 @@ export default function UpgradeScreen() {
           <View style={[styles.planCard, hasFamily && styles.planCardCurrent]}>
             <View style={styles.planCardHeader}>
               <View>
-                <Text style={[styles.planCardName, { color: '#FF9800' }]}>Family</Text>
+                <Text style={[styles.planCardName, { color: '#F59E0B' }]}>Family</Text>
                 <Text style={styles.planCardPrice}>{formatPrice(FAMILY_PRICING.monthly)}/mo · {formatPrice(FAMILY_PRICING.annual)}/yr</Text>
               </View>
               {hasFamily && (
-                <View style={[styles.currentBadge, { backgroundColor: '#FF9800' }]}>
+                <View style={[styles.currentBadge, { backgroundColor: '#F59E0B' }]}>
                   <Text style={[styles.currentBadgeText, { color: '#000' }]}>ACTIVE</Text>
                 </View>
               )}
@@ -666,7 +666,7 @@ export default function UpgradeScreen() {
             </Text>
             <View style={styles.planCardButtonRow}>
               <Pressable
-                style={[styles.planCardCtaButton, { backgroundColor: '#FF9800' }, hasFamily && styles.planCardCtaButtonDisabled]}
+                style={[styles.planCardCtaButton, { backgroundColor: '#F59E0B' }, hasFamily && styles.planCardCtaButtonDisabled]}
                 onPress={() => handlePurchase(PRODUCT_IDS.FAMILY_ANNUAL, 'Family (Annual)')}
                 disabled={isPurchasing || hasFamily}
                 accessibilityRole="button"
@@ -1079,7 +1079,7 @@ const styles = StyleSheet.create({
   },
   planCardRequires: {
     fontSize: 12,
-    color: '#FF9800',
+    color: '#F59E0B',
     fontStyle: 'italic',
     marginBottom: spacing.sm,
   },
@@ -1275,7 +1275,7 @@ const styles = StyleSheet.create({
   },
   requiresText: {
     fontSize: 11,
-    color: '#FF9800',
+    color: '#F59E0B',
     fontStyle: 'italic',
     marginBottom: spacing.sm,
   },
@@ -1377,10 +1377,10 @@ const styles = StyleSheet.create({
 
   // Family Expansion Pricing
   expansionPricingCard: {
-    backgroundColor: 'rgba(255,152,0,0.05)',
+    backgroundColor: 'rgba(245,158,11,0.05)',
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,152,0,0.15)',
+    borderColor: 'rgba(245,158,11,0.15)',
     borderStyle: 'dashed',
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -1414,7 +1414,7 @@ const styles = StyleSheet.create({
   expansionPriceAmount: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#FF9800',
+    color: '#F59E0B',
   },
   expansionPricePeriod: {
     fontSize: 11,
@@ -1431,7 +1431,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: '#FF9800',
+    backgroundColor: '#F59E0B',
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
     borderRadius: borderRadius.md,
@@ -1762,7 +1762,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   stubNotice: {
-    backgroundColor: 'rgba(255,152,0,0.1)',
+    backgroundColor: 'rgba(245,158,11,0.1)',
     borderRadius: borderRadius.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
@@ -1770,7 +1770,7 @@ const styles = StyleSheet.create({
   },
   stubNoticeText: {
     fontSize: 11,
-    color: '#FF9800',
+    color: '#F59E0B',
     textAlign: 'center',
   },
   footerText: {

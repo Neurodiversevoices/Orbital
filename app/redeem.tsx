@@ -590,15 +590,15 @@ const styles = StyleSheet.create({
   devSection: {
     marginTop: spacing.md,
     padding: spacing.md,
-    backgroundColor: 'rgba(255,152,0,0.1)',
+    backgroundColor: 'rgba(245,158,11,0.1)',
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,152,0,0.3)',
+    borderColor: 'rgba(245,158,11,0.3)',
   },
   devLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#FF9800',
+    color: '#F59E0B',
     marginBottom: spacing.sm,
     textAlign: 'center',
   },
@@ -608,7 +608,7 @@ const styles = StyleSheet.create({
   },
   devButton: {
     flex: 1,
-    backgroundColor: 'rgba(255,152,0,0.2)',
+    backgroundColor: 'rgba(245,158,11,0.2)',
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.sm,
     alignItems: 'center',
@@ -616,6 +616,6 @@ const styles = StyleSheet.create({
   devButtonText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#FF9800',
+    color: '#F59E0B',
   },
 });

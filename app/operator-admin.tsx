@@ -82,7 +82,7 @@ const AGE_COHORTS = [
 
 const SYSTEM_STATE_CONFIG: Record<SystemState, { label: string; color: string; bgColor: string }> = {
   baseline: { label: 'Baseline', color: '#4CAF50', bgColor: 'rgba(76,175,80,0.15)' },
-  elevated: { label: 'Elevated', color: '#FF9800', bgColor: 'rgba(255,152,0,0.15)' },
+  elevated: { label: 'Elevated', color: '#F59E0B', bgColor: 'rgba(245,158,11,0.15)' },
   sustained_volatility: { label: 'Sustained Volatility', color: '#F44336', bgColor: 'rgba(244,67,54,0.15)' },
 };
 

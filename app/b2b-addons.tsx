@@ -93,7 +93,7 @@ const ADD_ONS: AddOnDefinition[] = [
   {
     id: 'frms-safety',
     icon: Plane,
-    color: '#FF9800',
+    color: '#F59E0B',
     title: 'FRMS Safety-Critical Layer',
     subtitle: 'Aviation, transport, utilities, industrial safety',
     demoLabel: 'FRMS Overlay \u2014 DEMO',

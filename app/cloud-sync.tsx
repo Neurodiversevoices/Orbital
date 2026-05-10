@@ -283,8 +283,8 @@ export default function CloudSyncScreen() {
               </View>
               {cloudSync.status.pendingCount > 0 && (
                 <View style={styles.syncStatusRow}>
-                  <RefreshCw size={14} color="#FF9800" />
-                  <Text style={[styles.syncStatusText, { color: '#FF9800' }]}>
+                  <RefreshCw size={14} color="#F59E0B" />
+                  <Text style={[styles.syncStatusText, { color: '#F59E0B' }]}>
                     {cloudSync.status.pendingCount} pending
                   </Text>
                 </View>
@@ -400,7 +400,7 @@ export default function CloudSyncScreen() {
                                    passwordValidation.strength === 'fair' ? '50%' :
                                    passwordValidation.strength === 'strong' ? '75%' : '100%',
                             backgroundColor: passwordValidation.strength === 'weak' ? '#F44336' :
-                                             passwordValidation.strength === 'fair' ? '#FF9800' :
+                                             passwordValidation.strength === 'fair' ? '#F59E0B' :
                                              passwordValidation.strength === 'strong' ? '#4CAF50' : '#00E5FF',
                           },
                         ]}
@@ -410,7 +410,7 @@ export default function CloudSyncScreen() {
                       styles.strengthText,
                       {
                         color: passwordValidation.strength === 'weak' ? '#F44336' :
-                               passwordValidation.strength === 'fair' ? '#FF9800' :
+                               passwordValidation.strength === 'fair' ? '#F59E0B' :
                                passwordValidation.strength === 'strong' ? '#4CAF50' : '#00E5FF',
                       }
                     ]}>

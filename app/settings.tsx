@@ -34,6 +34,7 @@ import {
   Phone,
   Activity,
   CreditCard,
+  Layers,
 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, commonStyles, spacing, borderRadius } from '../theme';
@@ -221,7 +222,7 @@ export default function SettingsScreen() {
         <View style={styles.headerSpacer} />
         <View style={styles.logoContainer}>
           <View style={[styles.logoOrb, isDemoMode && styles.logoOrbDemo]}>
-            <View style={[styles.logoInner, { backgroundColor: isDemoMode ? '#FF9800' : '#00E5FF' }]} />
+            <View style={[styles.logoInner, { backgroundColor: isDemoMode ? '#F59E0B' : '#00E5FF' }]} />
           </View>
         </View>
         <Pressable
@@ -389,6 +390,39 @@ export default function SettingsScreen() {
               highlight={isDemoMode}
             />
           )}
+        </View>
+
+        {/* Platform · Beta Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>PLATFORM · BETA</Text>
+          <SettingsRow
+            icon={Layers}
+            label="Sub-brand"
+            sublabel="Personal · Workspace · Enterprise · Health · Edu · Gov"
+            onPress={() => router.push('/(platform)/sub-brand' as never)}
+            disabled={isProcessing}
+          />
+          <SettingsRow
+            icon={Database}
+            label="Memory Dashboard"
+            sublabel="What Orbital remembers (preview)"
+            onPress={() => router.push('/(platform)/memory' as never)}
+            disabled={isProcessing}
+          />
+          <SettingsRow
+            icon={ShieldCheck}
+            label="Permission Ledger"
+            sublabel="Active tool grants (preview)"
+            onPress={() => router.push('/(platform)/permissions' as never)}
+            disabled={isProcessing}
+          />
+          <SettingsRow
+            icon={Activity}
+            label="Audit Log"
+            sublabel="Trust core events (preview)"
+            onPress={() => router.push('/(platform)/audit' as never)}
+            disabled={isProcessing}
+          />
         </View>
 
         {/* Security & Privacy Section */}
@@ -805,8 +839,8 @@ function SettingsRow({
     scale.value = withSpring(1, { damping: 15 });
   };
 
-  const iconColor = danger ? '#F44336' : highlight ? '#FF9800' : 'rgba(255,255,255,0.6)';
-  const textColor = danger ? '#F44336' : highlight ? '#FF9800' : 'rgba(255,255,255,0.9)';
+  const iconColor = danger ? '#F44336' : highlight ? '#F59E0B' : 'rgba(255,255,255,0.6)';
+  const textColor = danger ? '#F44336' : highlight ? '#F59E0B' : 'rgba(255,255,255,0.9)';
 
   const a11yLabel = sublabel ? `${label}. ${sublabel}` : label;
 
@@ -827,7 +861,7 @@ function SettingsRow({
         <Text style={[styles.rowLabel, { color: textColor }]}>{label}</Text>
         {sublabel && <Text style={[styles.rowSublabel, highlight && styles.rowSublabelHighlight]}>{sublabel}</Text>}
       </View>
-      <ChevronRight color={highlight ? '#FF9800' : 'rgba(255,255,255,0.2)'} size={18} />
+      <ChevronRight color={highlight ? '#F59E0B' : 'rgba(255,255,255,0.2)'} size={18} />
     </AnimatedPressable>
   );
 }
@@ -1017,7 +1051,7 @@ const styles = StyleSheet.create({
   },
   // Demo Mode Styles
   demoBanner: {
-    backgroundColor: '#FF9800',
+    backgroundColor: '#F59E0B',
     paddingVertical: 4,
     alignItems: 'center',
   },
@@ -1028,24 +1062,24 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   logoOrbDemo: {
-    borderColor: '#FF9800',
+    borderColor: '#F59E0B',
     borderWidth: 2,
   },
   rowHighlight: {
-    borderColor: 'rgba(255,152,0,0.4)',
-    backgroundColor: 'rgba(255,152,0,0.08)',
+    borderColor: 'rgba(245,158,11,0.4)',
+    backgroundColor: 'rgba(245,158,11,0.08)',
   },
   iconContainerHighlight: {
-    backgroundColor: 'rgba(255,152,0,0.15)',
+    backgroundColor: 'rgba(245,158,11,0.15)',
   },
   rowSublabelHighlight: {
-    color: 'rgba(255,152,0,0.7)',
+    color: 'rgba(245,158,11,0.7)',
   },
   demoOptionSelected: {
-    backgroundColor: 'rgba(255,152,0,0.1)',
+    backgroundColor: 'rgba(245,158,11,0.1)',
   },
   demoOptionTextSelected: {
-    color: '#FF9800',
+    color: '#F59E0B',
     fontWeight: '500',
   },
   demoOptionSublabel: {
