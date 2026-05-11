@@ -1,0 +1,8 @@
+# Tell Vercel not to build the dev branch.
+# vercel.json git.deploymentEnabled is the authoritative gate; this is a
+# belt-and-suspenders backstop so even a misconfigured Vercel project
+# can't pull files for a build on this branch.
+*
+
+# Allow only the master deploy path.
+!master
