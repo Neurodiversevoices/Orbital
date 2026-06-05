@@ -13,9 +13,10 @@
  * 4. If authorized, queries are run via service_role (bypasses RLS)
  *
  * Query params:
- *   ?view=summary     → summary stats only
+ *   ?view=summary     → summary stats only (includes marketing + traffic source)
  *   ?view=roster      → user roster with optional filters
  *   ?view=cohorts     → age cohort breakdown
+ *   ?view=marketing   → landing views, waitlist emails, traffic by source
  *   ?view=all         → everything (default)
  *   &plan=pro         → filter roster by plan status
  *   &search=email     → search roster by email
@@ -125,6 +126,29 @@ export default async function handler(
       }
 
       result.summary = data?.[0] || null;
+    }
+
+    // =========================================================================
+    // Marketing stats (landing views + waitlist emails + traffic by source)
+    // =========================================================================
+    if (view === 'summary' || view === 'marketing' || view === 'all') {
+      const { data: marketing, error: marketingErr } = await supabase.rpc(
+        'admin_get_marketing_stats'
+      );
+      if (marketingErr) {
+        res.status(500).json({ error: `Marketing stats failed: ${marketingErr.message}` });
+        return;
+      }
+      result.marketing = marketing?.[0] || null;
+
+      const { data: traffic, error: trafficErr } = await supabase.rpc(
+        'admin_get_traffic_by_source'
+      );
+      if (trafficErr) {
+        res.status(500).json({ error: `Traffic by source failed: ${trafficErr.message}` });
+        return;
+      }
+      result.traffic_by_source = traffic || [];
     }
 
     // =========================================================================
