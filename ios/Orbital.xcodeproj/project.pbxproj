@@ -8,10 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		15D4514430F48B562FA5423A /* libPods-Orbital.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3641CDD2C07F75EA42C99128 /* libPods-Orbital.a */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		552FFD0719525F72D89BBF21 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 9B16B4C1EA30BB5588DA795F /* PrivacyInfo.xcprivacy */; };
-		6C16A50F60B13D5EEA54AD2B /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0AED993527D452BC982FAE0 /* ExpoModulesProvider.swift */; };
+		64DF37728F722742EFE612D8 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C8CD3B91632BC21A39D67C6D /* PrivacyInfo.xcprivacy */; };
+		8A494CBC9CB72987185CFAD0 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172E03386C447A3D834B11AD /* ExpoModulesProvider.swift */; };
+		B6B379A11F5CA11220E9F813 /* libPods-Orbital.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AF434183E59824AB4D29B1E3 /* libPods-Orbital.a */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
@@ -20,16 +20,16 @@
 		13B07F961A680F5B00A75B9A /* Orbital.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Orbital.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Orbital/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Orbital/Info.plist; sourceTree = "<group>"; };
-		2EC8D30CE5EF3D9AED5C8CB7 /* Pods-Orbital.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Orbital.release.xcconfig"; path = "Target Support Files/Pods-Orbital/Pods-Orbital.release.xcconfig"; sourceTree = "<group>"; };
-		3641CDD2C07F75EA42C99128 /* libPods-Orbital.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Orbital.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		96F1C83D31482EC7F51129A6 /* Pods-Orbital.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Orbital.debug.xcconfig"; path = "Target Support Files/Pods-Orbital/Pods-Orbital.debug.xcconfig"; sourceTree = "<group>"; };
-		9B16B4C1EA30BB5588DA795F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Orbital/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		172E03386C447A3D834B11AD /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Orbital/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		45DF8637A779C506D7A5658F /* Pods-Orbital.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Orbital.debug.xcconfig"; path = "Target Support Files/Pods-Orbital/Pods-Orbital.debug.xcconfig"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = Orbital/SplashScreen.storyboard; sourceTree = "<group>"; };
+		AF434183E59824AB4D29B1E3 /* libPods-Orbital.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Orbital.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		D0AED993527D452BC982FAE0 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Orbital/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		C8CD3B91632BC21A39D67C6D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Orbital/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Orbital/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* Orbital-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Orbital-Bridging-Header.h"; path = "Orbital/Orbital-Bridging-Header.h"; sourceTree = "<group>"; };
+		FFC983D9F9CE60FE6FF71CD8 /* Pods-Orbital.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Orbital.release.xcconfig"; path = "Target Support Files/Pods-Orbital/Pods-Orbital.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,13 +37,21 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				15D4514430F48B562FA5423A /* libPods-Orbital.a in Frameworks */,
+				B6B379A11F5CA11220E9F813 /* libPods-Orbital.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		039DC48B9A1A578577E4E44B /* Orbital */ = {
+			isa = PBXGroup;
+			children = (
+				172E03386C447A3D834B11AD /* ExpoModulesProvider.swift */,
+			);
+			name = Orbital;
+			sourceTree = "<group>";
+		};
 		13B07FAE1A68108700A75B9A /* Orbital */ = {
 			isa = PBXGroup;
 			children = (
@@ -53,7 +61,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				9B16B4C1EA30BB5588DA795F /* PrivacyInfo.xcprivacy */,
+				C8CD3B91632BC21A39D67C6D /* PrivacyInfo.xcprivacy */,
 			);
 			name = Orbital;
 			sourceTree = "<group>";
@@ -62,17 +70,27 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				3641CDD2C07F75EA42C99128 /* libPods-Orbital.a */,
+				AF434183E59824AB4D29B1E3 /* libPods-Orbital.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		6E00DCDF3A3845EDF95E5C58 /* ExpoModulesProviders */ = {
+		555F305EE8CBA9B80B9CD422 /* ExpoModulesProviders */ = {
 			isa = PBXGroup;
 			children = (
-				AEDE586F821C9EF0EFD0D9E9 /* Orbital */,
+				039DC48B9A1A578577E4E44B /* Orbital */,
 			);
 			name = ExpoModulesProviders;
+			sourceTree = "<group>";
+		};
+		67342F3DF0E386A3E5F080A8 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				45DF8637A779C506D7A5658F /* Pods-Orbital.debug.xcconfig */,
+				FFC983D9F9CE60FE6FF71CD8 /* Pods-Orbital.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -89,8 +107,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				C718EC4A555EE6394DB8EC76 /* Pods */,
-				6E00DCDF3A3845EDF95E5C58 /* ExpoModulesProviders */,
+				67342F3DF0E386A3E5F080A8 /* Pods */,
+				555F305EE8CBA9B80B9CD422 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -105,14 +123,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		AEDE586F821C9EF0EFD0D9E9 /* Orbital */ = {
-			isa = PBXGroup;
-			children = (
-				D0AED993527D452BC982FAE0 /* ExpoModulesProvider.swift */,
-			);
-			name = Orbital;
-			sourceTree = "<group>";
-		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
 			isa = PBXGroup;
 			children = (
@@ -120,16 +130,6 @@
 			);
 			name = Supporting;
 			path = Orbital/Supporting;
-			sourceTree = "<group>";
-		};
-		C718EC4A555EE6394DB8EC76 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				96F1C83D31482EC7F51129A6 /* Pods-Orbital.debug.xcconfig */,
-				2EC8D30CE5EF3D9AED5C8CB7 /* Pods-Orbital.release.xcconfig */,
-			);
-			name = Pods;
-			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -140,14 +140,14 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Orbital" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				84F698469ADBD67DB668BBE9 /* [Expo] Configure project */,
+				2A2B48608CF6A338C931EDF8 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				6B052EE3B06C47AD8FCFA8F7 /* Upload Debug Symbols to Sentry */,
-				81A2A2E5A83F21B20E2C0D6B /* [CP] Embed Pods Frameworks */,
+				B1018DAABFD6413AA6850362 /* Upload Debug Symbols to Sentry */,
+				BBCD09B4FCBE8599AC854A2A /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -197,7 +197,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				552FFD0719525F72D89BBF21 /* PrivacyInfo.xcprivacy in Resources */,
+				64DF37728F722742EFE612D8 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -243,19 +243,29 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		6B052EE3B06C47AD8FCFA8F7 /* Upload Debug Symbols to Sentry */ = {
+		2A2B48608CF6A338C931EDF8 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputPaths = (
+			inputFileListPaths = (
 			);
-			name = "Upload Debug Symbols to Sentry";
+			inputPaths = (
+				"$(SRCROOT)/.xcode.env",
+				"$(SRCROOT)/.xcode.env.local",
+				"$(SRCROOT)/Orbital/Orbital.entitlements",
+				"$(SRCROOT)/Pods/Target Support Files/Pods-Orbital/expo-configure-project.sh",
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
 			outputPaths = (
+				"$(SRCROOT)/Pods/Target Support Files/Pods-Orbital/ExpoModulesProvider.swift",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/sh `${NODE_BINARY:-node} --print \"require('path').dirname(require.resolve('@sentry/react-native/package.json')) + '/scripts/sentry-xcode-debug-files.sh'\"`";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-Orbital/expo-configure-project.sh\"\n";
 		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -301,7 +311,21 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Orbital/Pods-Orbital-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		81A2A2E5A83F21B20E2C0D6B /* [CP] Embed Pods Frameworks */ = {
+		B1018DAABFD6413AA6850362 /* Upload Debug Symbols to Sentry */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Upload Debug Symbols to Sentry";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh `${NODE_BINARY:-node} --print \"require('path').dirname(require.resolve('@sentry/react-native/package.json')) + '/scripts/sentry-xcode-debug-files.sh'\"`";
+		};
+		BBCD09B4FCBE8599AC854A2A /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -323,30 +347,6 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Orbital/Pods-Orbital-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		84F698469ADBD67DB668BBE9 /* [Expo] Configure project */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/.xcode.env",
-				"$(SRCROOT)/.xcode.env.local",
-				"$(SRCROOT)/Orbital/Orbital.entitlements",
-				"$(SRCROOT)/Pods/Target Support Files/Pods-Orbital/expo-configure-project.sh",
-			);
-			name = "[Expo] Configure project";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(SRCROOT)/Pods/Target Support Files/Pods-Orbital/ExpoModulesProvider.swift",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-Orbital/expo-configure-project.sh\"\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -355,7 +355,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				6C16A50F60B13D5EEA54AD2B /* ExpoModulesProvider.swift in Sources */,
+				8A494CBC9CB72987185CFAD0 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -364,12 +364,12 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 96F1C83D31482EC7F51129A6 /* Pods-Orbital.debug.xcconfig */;
+			baseConfigurationReference = 45DF8637A779C506D7A5658F /* Pods-Orbital.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Orbital/Orbital.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 131;
 				DEVELOPMENT_TEAM = 2KM3QL4UMV;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -382,7 +382,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -401,12 +401,12 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2EC8D30CE5EF3D9AED5C8CB7 /* Pods-Orbital.release.xcconfig */;
+			baseConfigurationReference = FFC983D9F9CE60FE6FF71CD8 /* Pods-Orbital.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Orbital/Orbital.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 131;
 				DEVELOPMENT_TEAM = 2KM3QL4UMV;
 				INFOPLIST_FILE = Orbital/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -414,7 +414,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -487,7 +487,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
 				USE_HERMES = true;
@@ -543,7 +542,6 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
 				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;
