@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Orbital — capacity, and nothing else</title>
+<meta name="description" content="Capacity is the self-reported availability of personal resources. Orbital records it. It does not interpret, advise, or diagnose.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────────────────────────────────
+   THE PAGE IS THE REFUSAL.
+
+   Every competitor in this category is a wellness app: soft gradients, sage
+   green, rounded blobs, streaks and badges. Orbital's entire differentiator is
+   what it will not become -- CAPACITY_DOCTRINE.ts is nine consecutive
+   negations, and ORBITAL_CANON.md §5.1 is six more. That is not fine print to
+   bury under a hero promise; it IS the product, and no competitor can copy it
+   without giving up their feature list.
+
+   So the negation wall is the hero. One affirmative line defines capacity, and
+   then fifteen refusals in the product's own words. The reader learns what this
+   is by reading what it is not, which is exactly how the doctrine defines it.
+
+   COLOUR CARRIES ONE MEANING. --signal marks capacity itself and nothing else
+   on the page. Every negation is set in the muted ink, so the eye finds the one
+   thing Orbital measures without reading a word. Deliberately not the wellness
+   palette this category defaults to, and deliberately not the cream-and-serif
+   or black-and-acid-green that generic pages reach for: the ground is a cold
+   near-white, the rules are hairlines, and the only warmth is the signal.
+   ───────────────────────────────────────────────────────────────────────── */
+:root{
+  --paper:#fbfbfa; --paper-2:#f1f2f0; --ink:#111315; --ink-2:#55595c; --ink-3:#8b9094;
+  --rule:#dcdedb; --rule-hard:#b9bcb8;
+  --signal:#1d4ed8;                       /* capacity, and nothing else */
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --serif:'Instrument Serif',Georgia,serif;
+  --col:min(1080px,100% - 44px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);
+  line-height:1.55;-webkit-font-smoothing:antialiased;padding-bottom:90px}
+.wrap{width:var(--col);margin-inline:auto}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+a{color:var(--signal);text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:2px}
+
+header{padding:30px 0 0}
+.brand{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-3)}
+
+/* ── the one affirmative ────────────────────────────────────────────────── */
+.def{padding:52px 0 46px;border-bottom:1px solid var(--rule-hard)}
+.def__k{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3)}
+.def__line{font-family:var(--serif);font-size:clamp(31px,5.6vw,62px);line-height:1.06;
+  letter-spacing:-.015em;margin-top:14px;max-width:20ch}
+.def__line em{font-style:italic;color:var(--signal)}
+.def__sub{margin-top:20px;font-size:15.5px;color:var(--ink-2);max-width:56ch}
+
+/* ── THE NEGATION WALL — the signature element ─────────────────────────── */
+.wall{padding:44px 0 10px}
+.wall__k{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3)}
+.wall__h{font-family:var(--serif);font-size:clamp(23px,3.4vw,34px);letter-spacing:-.01em;margin:9px 0 5px}
+.wall__sub{font-size:14.5px;color:var(--ink-2);max-width:62ch}
+.nots{margin-top:26px;border-top:1px solid var(--rule)}
+.not{display:grid;grid-template-columns:190px 1fr;gap:24px;padding:13px 0;
+  border-bottom:1px solid var(--rule);align-items:baseline}
+.not__t{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--ink)}
+.not__t::before{content:"not ";color:var(--ink-3)}
+.not__w{font-size:13.5px;color:var(--ink-2)}
+.not__w b{color:var(--ink);font-weight:500}
+
+/* ── what it does instead ──────────────────────────────────────────────── */
+.does{margin-top:46px;padding:32px 0;border-top:2px solid var(--ink);border-bottom:1px solid var(--rule)}
+.does__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);margin-top:20px}
+.cell{background:var(--paper);padding:19px 20px}
+.cell__k{font-family:var(--mono);font-size:10px;letter-spacing:.17em;text-transform:uppercase;color:var(--signal)}
+.cell__h{font-size:16.5px;font-weight:600;margin:7px 0 6px;letter-spacing:-.01em}
+.cell p{font-size:13.5px;color:var(--ink-2)}
+
+/* ── the line, stated once ─────────────────────────────────────────────── */
+.line{margin-top:40px;padding:26px 28px;background:var(--paper-2);border-left:2px solid var(--signal)}
+.line__k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+.line p{margin-top:8px;font-size:14.5px;color:var(--ink);max-width:76ch}
+.line p + p{margin-top:9px;color:var(--ink-2)}
+
+footer{margin-top:38px;padding-top:16px;border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:11px;color:var(--ink-3);
+  display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+
+@media (max-width:720px){ .not{grid-template-columns:1fr;gap:3px} }
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="wrap"><div class="brand">Orbital</div></header>
+
+<div class="wrap">
+
+  <section class="def">
+    <div class="def__k">Definition · canonical</div>
+    <h1 class="def__line">Capacity is the self-reported availability of <em>personal resources</em>.</h1>
+    <p class="def__sub">Orbital records it. It does not interpret it, explain it, score it, or tell
+      you what to do about it. That restraint is the product, and the rest of this page is the
+      list of things it therefore is not.</p>
+  </section>
+
+  <!-- ── THE NEGATION WALL ─────────────────────────────────────────────── -->
+  <section class="wall">
+    <div class="wall__k">What capacity is not</div>
+    <h2 class="wall__h">Nine refusals, in the doctrine's own words</h2>
+    <p class="wall__sub">Carried verbatim from <span class="mono">CAPACITY_DOCTRINE.ts</span>.
+      Each one closes a door a competitor walked through.</p>
+
+    <div class="nots">
+      <div class="not"><div class="not__t">a mood</div><div class="not__w">Moods are emotional experiences. <b>Capacity is resource availability.</b></div></div>
+      <div class="not"><div class="not__t">an emotion</div><div class="not__w">Emotions are affective responses. <b>Capacity is a functional signal.</b></div></div>
+      <div class="not"><div class="not__t">a symptom</div><div class="not__w">Symptoms suggest underlying conditions. <b>Capacity suggests nothing.</b></div></div>
+      <div class="not"><div class="not__t">diagnostic</div><div class="not__w">It does not indicate, suggest, or screen for <b>any condition</b>.</div></div>
+      <div class="not"><div class="not__t">energy</div><div class="not__w">Not "energy" in the colloquial wellness sense. <b>Not vitality or enthusiasm.</b></div></div>
+      <div class="not"><div class="not__t">productivity</div><div class="not__w">It does not measure <b>output, performance, or achievement</b>.</div></div>
+      <div class="not"><div class="not__t">wellbeing</div><div class="not__w">It makes <b>no claim</b> about quality of life or flourishing.</div></div>
+      <div class="not"><div class="not__t">stress</div><div class="not__w">Stress is a response to demands. <b>Capacity is resource availability.</b></div></div>
+      <div class="not"><div class="not__t">fatigue</div><div class="not__w">Fatigue is a sensation. <b>Capacity is a self-assessment.</b></div></div>
+    </div>
+
+    <div class="nots" style="margin-top:34px">
+      <div class="not"><div class="not__t">a wellness app</div><div class="not__w">No lifestyle recommendations, habit coaching, or self-improvement features.</div></div>
+      <div class="not"><div class="not__t">a productivity tool</div><div class="not__w">No task management, time tracking, or efficiency optimization.</div></div>
+      <div class="not"><div class="not__t">a mental health platform</div><div class="not__w">No therapy, counseling, crisis intervention, or clinical workflows.</div></div>
+      <div class="not"><div class="not__t">a symptom tracker</div><div class="not__w">No medical symptom logging, medication reminders, or health monitoring.</div></div>
+      <div class="not"><div class="not__t">a social network</div><div class="not__w">No feeds, likes, shares, comparisons, or community features.</div></div>
+      <div class="not"><div class="not__t">a gamified experience</div><div class="not__w">No points, badges, leaderboards, or achievement systems.</div></div>
+    </div>
+  </section>
+
+  <!-- ── WHAT IT DOES ──────────────────────────────────────────────────── -->
+  <section class="does">
+    <div class="wall__k">What it does instead</div>
+    <h2 class="wall__h">Three things, all descriptive</h2>
+    <p class="wall__sub">Neither advises, recommends, interprets, or prompts. That is the line, and
+      staying on the descriptive side of it is a market position rather than a limitation.</p>
+
+    <div class="does__grid">
+      <div class="cell">
+        <div class="cell__k">Capacity</div>
+        <div class="cell__h">You say where you are</div>
+        <p>A self-report, recorded and kept. Non-causal by design: it does not explain why capacity
+          is at a given level, because explaining would be interpreting.</p>
+      </div>
+      <div class="cell">
+        <div class="cell__k">Schedule</div>
+        <div class="cell__h">Appointments, held plainly</div>
+        <p>A calendar is not a clinical workflow. Orbital holds what is scheduled and shows it
+          against what you recorded. It draws no conclusion from the pair.</p>
+      </div>
+      <div class="cell">
+        <div class="cell__k">Absence</div>
+        <div class="cell__h">A gap is also a signal</div>
+        <p>Days you did not record are shown as days you did not record — never inferred, never
+          filled in, never counted against you.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="line">
+    <div class="line__k">Why the list above is permanent</div>
+    <p>The prohibitions are held in a file marked <span class="mono">Status: FROZEN ·
+      Effective: Permanent · Classification: Infrastructure Law</span>. They are not a roadmap
+      of things not built yet. They are things that will not be built.</p>
+    <p>A personal-assistant surface — medication tracking and life coaching — was proposed for
+      Orbital on 2026-09-12 and <b>withdrawn</b> rather than shipped against this law. The law was
+      not amended, narrowed, or unfrozen to make room for it.</p>
+  </div>
+
+  <footer>
+    <span>Orbital · capacity, and nothing else</span>
+    <span>Every line on this page is quoted from CAPACITY_DOCTRINE.ts or ORBITAL_CANON.md §5.1.</span>
+  </footer>
+</div>
+</body>
+</html>
