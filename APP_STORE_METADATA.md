@@ -9,7 +9,7 @@
 ### App Review notes (paste in App Store Connect)
 
 ```
-Sign in with Apple has been fixed. The OIDC issuer mismatch between appleid.apple.com and account.apple.com has been resolved. Please test with review@orbital.health / Review2026!
+Sign in with Apple has been fixed. The OIDC issuer mismatch between appleid.apple.com and account.apple.com has been resolved. Please test with provided in App Store Connect review notes
 ```
 
 ## How to Test the App
@@ -17,7 +17,7 @@ Sign in with Apple has been fixed. The OIDC issuer mismatch between appleid.appl
 1. Launch the app
 2. Tap "Sign in with Apple"
 3. Complete Apple authentication with:
-   review@orbital.health / Review2026!
+   provided in App Store Connect review notes
 4. Grant notification permissions if prompted
 5. On the home screen, tap the orb to log
    your current capacity state

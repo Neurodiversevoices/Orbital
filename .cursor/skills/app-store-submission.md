@@ -50,7 +50,7 @@ Read this file before any submission task.
 eas build --platform ios --profile production
 Download IPA → upload via Transporter
 Paste review notes from APP_STORE_METADATA.md
-Include: review@orbital.health / Review2026!
+Include: provided in App Store Connect review notes
 
 ## Post-Submit
 - Screenshot rejection notice immediately

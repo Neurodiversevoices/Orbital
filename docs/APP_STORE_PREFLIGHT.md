@@ -215,7 +215,7 @@ If `Contents.json` is missing or uses legacy multi-size entries, run `npx expo p
 
 **1) Simulator / device reachable (smoke):**
 ```bash
-REVIEW_EMAIL='review@orbital.health' REVIEW_PASSWORD='Review2026!' \
+REVIEW_EMAIL='<from ASC review notes>' REVIEW_PASSWORD='<from ASC review notes>' \
   ~/.maestro/bin/maestro test maestro/tests/smoke_test.yaml
 ```
 

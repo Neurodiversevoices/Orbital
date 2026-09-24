@@ -1,8 +1,8 @@
 # Orbital — App Store Connect Review Notes (Build 111)
 
 ## Demo account
-- Email: review@orbital.health
-- Password: Review2026!
+- Email: provided in App Store Connect review notes
+- Password: provided in App Store Connect review notes
 
 ## Sign in
 1. Tap "Sign in with email" or "Sign in with Apple" on the welcome screen.

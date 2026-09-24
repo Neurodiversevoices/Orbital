@@ -16,7 +16,7 @@
   - orbital_individual_annual, orbital_individual_monthly
   - orbital_pro_annual, orbital_pro_monthly
 - Description scrub: auto-replace "clinical-grade" → "pattern-based", "diagnose" → "identify patterns", "treatment" → "support"
-- Review notes: contact eric@orbitalhealth.app, demo review@orbital.health / Review2026!
+- Review notes: contact eric@orbitalhealth.app, demo provided in App Store Connect review notes
 - Support email: eric@orbitalhealth.app (never Zoho)
 - Terms URL: https://orbitalhealth.app/terms (verify 200)
 - Privacy URL: https://orbitalhealth.app/privacy (verify 200)

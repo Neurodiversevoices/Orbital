@@ -10,7 +10,7 @@
 #   maestro test scripts/maestro/screenshot-flow.yaml \
 #     --udid "$(xcrun simctl list devices booted | grep 'iPhone 16)' | grep -v 16e | head -1 | grep -o '[A-F0-9-]\{36\}')" \
 #     --test-output-dir "$SCREENSHOT_DIR" \
-#     -e REVIEW_EMAIL='review@orbital.health' \
+#     -e REVIEW_EMAIL='<from ASC review notes>' \
 #     -e REVIEW_PASSWORD='YourPassword'
 #
 # Screenshots: orbital_01_home.png, orbital_02_paywall.png, orbital_03_cci.png in --test-output-dir

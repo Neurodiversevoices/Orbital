@@ -1,6 +1,6 @@
 # Orbital smoke test
 # Login (when logged out): pass credentials, e.g.
-#   maestro test maestro/tests/smoke_test.yaml -e REVIEW_EMAIL=review@orbital.health -e REVIEW_PASSWORD='***'
+#   maestro test maestro/tests/smoke_test.yaml -e REVIEW_EMAIL='<from ASC review notes>' -e REVIEW_PASSWORD='***'
 appId: com.erparris.orbital
 ---
 - launchApp:
