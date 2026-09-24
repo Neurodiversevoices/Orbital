@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { Tabs, useRouter } from 'expo-router';
-import { Activity, TrendingUp } from 'lucide-react-native';
+import { Activity, MessageCircle, TrendingUp } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../theme';
 import { useAuth } from '../../lib/supabase';
@@ -78,6 +78,13 @@ export default function TabLayout() {
         options={{
           tabBarIcon: ({ color }) => <TrendingUp color={color} size={26} />,
           tabBarAccessibilityLabel: 'Patterns',
+        }}
+      />
+      <Tabs.Screen
+        name="assistant"
+        options={{
+          tabBarIcon: ({ color }) => <MessageCircle color={color} size={26} />,
+          tabBarAccessibilityLabel: 'Assistant',
         }}
       />
       {/* Nova tab removed from Orbital app */}
