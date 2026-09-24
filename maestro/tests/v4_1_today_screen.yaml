@@ -5,8 +5,8 @@
 # Run from repo root:
 #   export PATH="$HOME/.maestro/bin:$PATH"
 #   maestro test maestro/tests/v4_1_today_screen.yaml \
-#     -e REVIEW_EMAIL='review@orbital.health' \
-#     -e REVIEW_PASSWORD='Review2026!'
+#     -e REVIEW_EMAIL='<from ASC review notes>' \
+#     -e REVIEW_PASSWORD='<from ASC review notes>'
 #
 appId: com.erparris.orbital
 ---

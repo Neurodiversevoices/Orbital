@@ -10,13 +10,17 @@
  *   source .env.local  # or: node --env-file=.env.local scripts/upsert-review-account.js
  *   node scripts/upsert-review-account.js
  *
- * Required env: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, EXPO_PUBLIC_SUPABASE_ANON_KEY
+ * Required env: REVIEW_EMAIL, REVIEW_PASSWORD, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, EXPO_PUBLIC_SUPABASE_ANON_KEY
  */
 
-const REVIEW_EMAIL = 'review@orbital.health';
-const REVIEW_PASSWORD = 'Review2026!';
+const REVIEW_EMAIL = process.env.REVIEW_EMAIL;
+const REVIEW_PASSWORD = process.env.REVIEW_PASSWORD;
 
 async function main() {
+  if (!REVIEW_EMAIL || !REVIEW_PASSWORD) {
+    console.error('Set REVIEW_EMAIL and REVIEW_PASSWORD (see App Store Connect review notes).');
+    process.exit(1);
+  }
   let url = process.env.SUPABASE_URL || process.env.EXPO_PUBLIC_SUPABASE_URL;
   if (url && !url.startsWith('http')) {
     url = url.startsWith('://') ? `https${url}` : `https://${url}`;
@@ -43,7 +47,7 @@ async function main() {
     'Content-Type': 'application/json',
   };
 
-  // 1. Check auth.users for review@orbital.health
+  // 1. Check auth.users for the review account
   console.log('1. Checking auth.users for', REVIEW_EMAIL, '...');
   let listRes = await fetch(
     `${url}/auth/v1/admin/users?page=1&per_page=1000`,

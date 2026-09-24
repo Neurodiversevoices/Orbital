@@ -11,8 +11,8 @@ mkdir -p "$OUT"
 find "$OUT" -maxdepth 1 -name '*.png' -delete 2>/dev/null || true
 rm -rf "$OUT/screenshots" "$OUT"/20* 2>/dev/null || true
 
-: "${REVIEW_EMAIL:=review@orbital.health}"
-: "${REVIEW_PASSWORD:=Review2026!}"
+: "${REVIEW_EMAIL:?set REVIEW_EMAIL (see App Store Connect review notes)}"
+: "${REVIEW_PASSWORD:?set REVIEW_PASSWORD (see App Store Connect review notes)}"
 
 export REVIEW_EMAIL REVIEW_PASSWORD
 

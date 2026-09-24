@@ -24,7 +24,7 @@ git push origin dev && eas build --platform ios --profile production --auto-subm
 6. Build: eas build --platform ios --profile production --auto-submit
 7. If auto-submit fails: curl -L -o ~/Desktop/orbital.ipa "<artifact URL>" then use Transporter
 8. App Store Connect → Distribution → Submit for Review
-9. Demo credentials: review@orbital.health / Review2026!
+9. Demo credentials: provided in App Store Connect review notes
 
 ## Edge Functions
 

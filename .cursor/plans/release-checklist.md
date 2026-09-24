@@ -5,4 +5,4 @@
 4. Verify Apple auth in Supabase Dashboard
 5. Run /submit skill
 6. After build lands in TestFlight, go to App Store Connect → Distribution → Submit for Review
-7. Demo credentials: review@orbital.health / Review2026!
+7. Demo credentials: provided in App Store Connect review notes

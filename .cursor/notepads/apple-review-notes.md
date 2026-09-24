@@ -1,5 +1,5 @@
 # Apple Review
-- Demo: review@orbital.health / Review2026!
+- Demo: provided in App Store Connect review notes
 - Swipe orb left/right to change capacity state (cyan/amber/crimson)
 - Tap context tags to add drivers
 - Settings → Account → Delete Account

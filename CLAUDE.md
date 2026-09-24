@@ -43,7 +43,7 @@ proof_events, capacity_baselines
 - PrivacyInfo.xcprivacy must always exist
 - buildNumber must increment on every submission
 - Current bundle ID: com.erparris.orbital
-- Review credentials: review@orbital.health / Review2026!
+- Review credentials: provided in App Store Connect review notes
 - Supabase project: tenfwzjccqfecctxdbpi
 - Last rejection: Guideline 2.1(a) Sign in with Apple
   Root cause: OIDC issuer mismatch — FIXED in build 73
