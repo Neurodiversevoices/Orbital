@@ -13,6 +13,7 @@
     "preflight": "node scripts/preflight.js",
     "test": "npx playwright test",
     "test:headed": "npx playwright test --headed",
+    "test:assistant": "tsx --test tests/unit/assistant.test.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx --max-warnings 100",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
