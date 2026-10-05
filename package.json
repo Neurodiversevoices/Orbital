@@ -55,7 +55,8 @@
     "n8n:verify": "node scripts/n8n/verify.mjs",
     "marketing": "node scripts/marketing-agent.js",
     "creative": "node scripts/marketing-agent.js campaign",
-    "presenter:check": "tsx scripts/presenter-script-check.ts"
+    "presenter:check": "tsx scripts/presenter-script-check.ts",
+    "presenter:attach": "tsx scripts/presenter-attach-clips.ts"
   },
   "dependencies": {
     "@dicebear/collection": "^9.4.2",

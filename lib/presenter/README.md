@@ -21,3 +21,13 @@ reminder, gamification and absence phrases, fixed spoken text, declared caption 
 
 Clips: `clip` is `null` until a line is rendered and passes the lipsync gate (Nova's
 `creator.json standards.lipsync_gate`); it then holds the bundled clip path and its sha256.
+
+- **Render** (Nova, on the Mac, $0, one line at a time):
+  `python3 scripts/nova_build/creator/presenter_lines.py --script <this repo>/lib/presenter/script.en.json --char orbital-presenter`
+  writes `manifest.json` + `clips/<id>.mp4` for the lines that pass the gate (disclosure label + mark applied).
+- **Attach**: `npm run presenter:attach -- <manifest.json>` copies a clip to `assets/presenter/en/<id>.mp4` only if it
+  passed, was rendered from the line's current text, and its sha256 matches; a line whose text changed goes back to `null`.
+- **Check**: `npm run presenter:check` also fails if an attached clip is missing or its bytes differ from the gated clip.
+
+The presenter is the fictional character `orbital-presenter`, **fully clothed in every output**; her swimsuit turntable
+is a private body-fitting input in Nova and is never shipped or published.

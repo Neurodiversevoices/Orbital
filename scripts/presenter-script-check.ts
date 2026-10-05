@@ -7,6 +7,7 @@
  * refuses to report a pass (a checker that finds nothing proves nothing). Then the real script.
  * Exit 0 = control caught everything AND the script has zero violations.
  */
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
@@ -48,6 +49,15 @@ async function main(): Promise<number> {
 
   const script = JSON.parse(readFileSync(join(ROOT, 'lib/presenter/script.en.json'), 'utf8'));
   const v: { id: string; rule: string; detail: string }[] = R.checkScript(script, terms, (p: string) => existsSync(join(ROOT, p)));
+  // An attached clip must be the file it names: present, and the sha256 recorded when it passed the lipsync gate.
+  for (const l of script.lines as { id: string; clip: { path: string; sha256: string } | null }[]) {
+    if (!l.clip) continue;
+    const f = join(ROOT, l.clip.path);
+    if (!existsSync(f)) v.push({ id: l.id, rule: 'clip', detail: `${l.clip.path} does not exist` });
+    else if (createHash('sha256').update(readFileSync(f)).digest('hex') !== l.clip.sha256) {
+      v.push({ id: l.id, rule: 'clip', detail: `${l.clip.path} sha256 differs from the gated clip` });
+    }
+  }
   const sections: Record<string, number> = {};
   for (const l of script.lines) sections[l.section] = (sections[l.section] ?? 0) + 1;
   const clips = script.lines.filter((l: { clip: unknown }) => l.clip).length;
